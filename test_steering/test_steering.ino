@@ -68,7 +68,6 @@ struct PwmInput {
   
   
   void trace() {
-    Serial.print("PWM pin ");
     Serial.print(pin);
     Serial.print(" ");
     Serial.print(pulse_width_us);
@@ -82,8 +81,8 @@ struct PwmInput {
 
 struct TriangleWave {
   int period_ms = 10000;
-  int max_value = 1000;
-  int min_value = 2000;
+  int min_value = 1450;
+  int max_value = 1550;
   int origin_ms;
   
   void init() {
@@ -96,7 +95,7 @@ struct TriangleWave {
 
     double cycle_portion = (( now_ms - origin_ms ) % period_ms) / (double) period_ms;
     if(cycle_portion > 0.5)
-        cycle_portion = 1-cycle_portion;
+        cycle_portion = 1.0-cycle_portion;
     return (2 * cycle_portion * range + min_value);
     
   }
@@ -177,7 +176,8 @@ Servo speed;
 PwmInput rx_str;
 PwmInput rx_spd;
 RxEvents rx_events;
-TriangleWave triangle_wave;
+TriangleWave steering_wave;
+TriangleWave speed_wave;
 
 volatile unsigned int rx_str_trig = 0;
 volatile unsigned int rx_str_width = 0;
@@ -188,6 +188,11 @@ int increment = 1;
 int last_steering_update_millis = 0;
 int steering_update_rate_millis = 20;
 int steer = leftmost;
+enum {
+  mode_starting,
+  mode_connected,
+  mode_running
+} mode;
 
 
 ///////////////////////////////////////////////
@@ -202,8 +207,6 @@ void rx_spd_handler() {
 }
 
 
-
-
 void setup() {
   steering.attach(U_STR);
   speed.attach(U_SPD);
@@ -214,36 +217,62 @@ void setup() {
   attachInterrupt(0, rx_str_handler, CHANGE);
   attachInterrupt(1, rx_spd_handler, CHANGE);
   
-  triangle_wave.min_value = 1200;
-  triangle_wave.max_value = 1800;
-  triangle_wave.init();
+  speed_wave.min_value = 1400;
+  speed_wave.max_value = 1650;
+  speed_wave.period_ms = 30000;
+  speed_wave.init();
+  steering_wave.min_value = 1200;
+  steering_wave.max_value = 1800;
+  steering_wave.init();
+  
+  mode = mode_starting;
   
   tone(PIN_SPEAKER, 440, 200);
 
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("hello, steering!");
 }
 
+
 void loop() {
-  /*
-  rx_str.trace();
-  Serial.print("    ");
-  rx_spd.trace();
-  Serial.println();
-  */
- 
-  int loop_time_millis = millis();
   
+  int loop_time_millis = millis();
   rx_events.process_pulses(rx_str.pulse_us(), rx_spd.pulse_us());
+
   if(rx_events.get_event()) {
     rx_events.trace();
     Serial.println();
   }
+  
+  switch (mode) {
+    case mode_starting:
+      steering.writeMicroseconds(1500);
+      speed.writeMicroseconds(1500);
+      if (rx_events.rx_steer == 'L' && rx_events.rx_speed == 'N') {
+        mode = mode_running;
+      }
+      break;
+      
+    case mode_running:
+      steering.writeMicroseconds(steering_wave.value());
+      speed.writeMicroseconds(speed_wave.value());
+      if (rx_events.rx_steer == 'R' && rx_events.rx_speed == 'N') {
+        mode = mode_starting;
+      }      
+      break;
 
-/*
-  Serial.print("Triangle: ");
-  Serial.println(triangle_wave.value());
-*/  
-  speed.writeMicroseconds(1500);
-  steering.writeMicroseconds(triangle_wave.value());
+  }
+
+  if (0) {
+    rx_str.trace();
+    Serial.print("    ");
+    rx_spd.trace();
+   }
+  
+ 
+
+  if (1) {
+    Serial.print("Speed: ");
+    Serial.println(speed_wave.value());
+  }
 }
