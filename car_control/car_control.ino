@@ -7,25 +7,28 @@
 // on the micro, interrupts must go on pins 2 and 3
 // interrupt 0 = pin 2
 // interrupt 1 = pin 3
-#define RX_STR 2
-#define RX_SPD 3
+#define PIN_RX_STEER 2
+#define PIN_RX_SPEED 3
 
 #define PIN_PING_TRIG 7
 #define PIN_PING_ECHO 6
 #define PIN_SPEAKER   10
 
 // computer steering and speed
-#define U_STR 8
-#define U_SPD 9
+#define PIN_U_STEER 8
+#define PIN_U_SPEED 9
 
 
 struct PwmInput {
   unsigned long last_trigger_us = 0;
   unsigned long pulse_width_us = 0;
   
+  // since we are dealing with standard RC, 
+  // anthing out of of the below ranges should not occur and is ignored
   unsigned long max_pulse_us = 3000;
   unsigned long min_pulse_us = 500;
-  unsigned long last_pulse_ms = 0;
+  
+  unsigned long last_pulse_ms = 0;  // time when last pulse occurred
 
   
   // milliseconds without a pulse to consider a timeout
@@ -58,7 +61,7 @@ struct PwmInput {
     return millis() - last_pulse_ms < timeout_ms;
   }
   
-  // safe method to return us
+  // safe method to return pulse width in microseconds
   // returns 0 if invalid
   int pulse_us() {
     if(is_valid())
@@ -119,7 +122,6 @@ enum rx_event {
 */
 
 
-// todo: merge timout funcionality here?
 struct RxEvents {
   char rx_speed = '0';
   char rx_steer = '0';
@@ -136,7 +138,7 @@ struct RxEvents {
   }
   
  
-  char steer_code(int steer_us) {
+   char steer_code(int steer_us) {
     if (steer_us == 0)
       return '?';
     if (steer_us < 1300)
@@ -175,21 +177,12 @@ struct RxEvents {
 Servo steering;
 Servo speed;
 
-PwmInput rx_str;
-PwmInput rx_spd;
+PwmInput rx_steer;
+PwmInput rx_speed;
 RxEvents rx_events;
 TriangleWave steering_wave;
 TriangleWave speed_wave;
 
-volatile unsigned int rx_str_trig = 0;
-volatile unsigned int rx_str_width = 0;
-
-const int leftmost = 1000;
-const int rightmost = 2000;
-int increment = 1;
-int last_steering_update_millis = 0;
-int steering_update_rate_millis = 20;
-int steer = leftmost;
 enum {
   mode_starting,
   mode_connected,
@@ -201,11 +194,11 @@ enum {
 // Interrupt handlers
 
 void rx_str_handler() {
-  rx_str.handle_change();
+  rx_steer.handle_change();
 }
 
 void rx_spd_handler() {
-  rx_spd.handle_change();
+  rx_speed.handle_change();
 }
 
 
@@ -227,11 +220,11 @@ double ping_inches() {
 
 
 void setup() {
-  steering.attach(U_STR);
-  speed.attach(U_SPD);
+  steering.attach(PIN_U_STEER);
+  speed.attach(PIN_U_SPEED);
   
-  rx_str.attach(RX_STR);
-  rx_spd.attach(RX_SPD);
+  rx_steer.attach(PIN_RX_STEER);
+  rx_speed.attach(PIN_RX_SPEED);
   
   attachInterrupt(0, rx_str_handler, CHANGE);
   attachInterrupt(1, rx_spd_handler, CHANGE);
@@ -264,10 +257,10 @@ double speed_for_ping_inches(double inches) {
   
   // get closer if far
   if (inches > 20.) 
-    return 1405;
+    return 1390;
   // back up if too close
   if (inches < 10.)
-    return 1600;
+    return 1620;
     
   return 1500;
 
@@ -277,12 +270,8 @@ double speed_for_ping_inches(double inches) {
 void loop() {
   
   int loop_time_millis = millis();
-  rx_events.process_pulses(rx_str.pulse_us(), rx_spd.pulse_us());
+  rx_events.process_pulses(rx_steer.pulse_us(), rx_speed.pulse_us());
   double inches = ping_inches();
-  if (0) {
-    Serial.print("ping: ");
-    Serial.print(inches);
-  }
 
   if(rx_events.get_event()) {
     rx_events.trace();
@@ -293,8 +282,9 @@ void loop() {
     case mode_starting:
       steering.writeMicroseconds(1500);
       speed.writeMicroseconds(1500);
-      if (rx_events.rx_steer == 'L' && rx_events.rx_speed == 'N') {
+      if (rx_events.rx_steer == 'R' && rx_events.rx_speed == 'N') {
         mode = mode_running;
+        Serial.print("switched to running");
       }
       break;
       
@@ -302,22 +292,25 @@ void loop() {
 //      steering.writeMicroseconds(steering_wave.value());
       steering.writeMicroseconds(1500);
       speed.writeMicroseconds(speed_for_ping_inches(inches));
-      if (rx_events.rx_steer == 'R' && rx_events.rx_speed == 'N') {
+      if (rx_events.rx_steer == 'L' && rx_events.rx_speed == 'N') {
         mode = mode_starting;
-      }      
+        Serial.print("switched to starting - user initiated");
+      }
+      if (rx_events.rx_steer == '?' || rx_events.rx_speed == '?') {
+        mode = mode_starting;
+        Serial.print("switched to starting - no coms");
+      }
       break;
 
   }
 
-  if (0) {
-    rx_str.trace();
-    Serial.print("    ");
-    rx_spd.trace();
-   }
-  
- 
 
-  if (1) {
+  // state tracing
+  if (0) {
+    rx_steer.trace();
+    Serial.print(",");
+    rx_speed.trace();
+    Serial.print(",");
     Serial.print("Speed: ");
     Serial.println(speed_wave.value());
   }
