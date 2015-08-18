@@ -9,6 +9,7 @@
 // interrupt 1 = pin 3
 #define PIN_RX_STEER 2
 #define PIN_RX_SPEED 3
+#define PIN_SRC_SELECT 4
 
 #define PIN_PING_TRIG 7
 #define PIN_PING_ECHO 6
@@ -226,6 +227,9 @@ void setup() {
   rx_steer.attach(PIN_RX_STEER);
   rx_speed.attach(PIN_RX_SPEED);
   
+  pinMode(PIN_SRC_SELECT, OUTPUT);
+  digitalWrite(PIN_SRC_SELECT, LOW);
+  
   attachInterrupt(0, rx_str_handler, CHANGE);
   attachInterrupt(1, rx_spd_handler, CHANGE);
 
@@ -282,6 +286,7 @@ void loop() {
     case mode_starting:
       steering.writeMicroseconds(1500);
       speed.writeMicroseconds(1500);
+      digitalWrite(PIN_SRC_SELECT, LOW);
       if (rx_events.rx_steer == 'R' && rx_events.rx_speed == 'N') {
         mode = mode_running;
         Serial.print("switched to running");
@@ -290,6 +295,7 @@ void loop() {
       
     case mode_running:
 //      steering.writeMicroseconds(steering_wave.value());
+      digitalWrite(PIN_SRC_SELECT, HIGH);
       steering.writeMicroseconds(1500);
       speed.writeMicroseconds(speed_for_ping_inches(inches));
       if (rx_events.rx_steer == 'L' && rx_events.rx_speed == 'N') {
