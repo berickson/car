@@ -11,8 +11,9 @@
 #define PIN_RX_SPEED 3
 #define PIN_SRC_SELECT 4
 
-#define PIN_PING_TRIG 7
-#define PIN_PING_ECHO 6
+#define PIN_PING_TRIG 6
+#define PIN_PING_ECHO 7
+
 #define PIN_SPEAKER   10
 
 // computer steering and speed
@@ -172,6 +173,108 @@ struct RxEvents {
   }
 };
 
+
+struct Ping {
+  int ping_pin, echo_pin;
+  int ping_start_ms = 0;
+  int ping_start_us = 0;
+  int reply_start_us = 0;
+  bool _new_data_ready = false;
+  
+  double last_ping_distance_inches = 0.;
+  
+  const int ping_rate_ms = 100;
+  const int ping_timeout_us = 20000; // 20000 microseconds should be about 10 feet
+  
+  enum {
+    no_ping_pending,
+    waiting_for_reply_start,
+    waiting_for_reply_end
+  } state;
+  
+  
+  
+  void init(int _ping_pin, int _echo_pin){
+    ping_pin = _ping_pin;
+    echo_pin = _echo_pin;
+    digitalWrite(ping_pin, LOW);
+    state = no_ping_pending;
+  }
+  
+  bool new_data_ready() {
+    bool rv = _new_data_ready;
+    _new_data_ready = false;
+    return rv;
+  }
+  
+  void set_distance_from_us(int us) {
+      double ping_distance_inches = (double) us / 148.; // 148 microseconds for ping round trip per inch
+      if(last_ping_distance_inches != ping_distance_inches) {
+         last_ping_distance_inches = ping_distance_inches;
+         _new_data_ready = true;
+      }
+  }
+  
+  void scan(){
+    int ms = millis();
+    int us = micros();
+    
+    switch(state) {
+      case no_ping_pending:
+        if( ms - ping_start_ms >= ping_rate_ms) {
+          ping_start_ms = ms;
+          ping_start_us = us;
+          // The sensor is triggered by a HIGH pulse of 10 or more microseconds.
+          digitalWrite(ping_pin, HIGH);
+          delayMicroseconds(10);  // todo: can we get rid of this delay or maybe it's ok?
+          digitalWrite(ping_pin, LOW);
+          state = waiting_for_reply_start;
+        }
+        break;
+        
+      case waiting_for_reply_start:
+        if(digitalRead(echo_pin) == HIGH) {
+          reply_start_us = us;
+          state = waiting_for_reply_end;
+        }  else if (us - ping_start_us >  ping_timeout_us) {
+          set_distance_from_us(0); // zero on timeout
+          state = no_ping_pending;
+        }
+        break;
+
+      case waiting_for_reply_end:
+        if(digitalRead(echo_pin) == LOW) {
+          set_distance_from_us(us - reply_start_us);
+          state = no_ping_pending;
+        } else if (us - reply_start_us > ping_timeout_us) {
+          set_distance_from_us(0); // zero on timeout
+          state = no_ping_pending;
+        }
+        
+        break;
+    }
+  }
+  
+  double inches() {
+    return last_ping_distance_inches;
+  }
+};
+
+/*
+double ping_inches() {
+  const int timeout_us = 10000;
+  // Read the signal from the sensor: a HIGH pulse whose
+  // duration is the time (in rmicroseconds) from the sending
+  // of the ping to the reception of its echo off of an object.
+  int microseconds = pulseIn(PIN_PING_ECHO, HIGH, timeout_us);
+
+  // convert the time into a distance
+  double inches = (double) microseconds / 148.;
+  return inches;
+}
+*/
+
+
 //////////////////////////
 // Globals
 
@@ -181,8 +284,17 @@ Servo speed;
 PwmInput rx_steer;
 PwmInput rx_speed;
 RxEvents rx_events;
+Ping ping;
+
+
 TriangleWave steering_wave;
 TriangleWave speed_wave;
+
+// diagnostics for reporting loop speeds
+long loop_count = 0;
+long last_report_millis = 0;
+long last_report_loop_count = 0;
+
 
 enum {
   mode_starting,
@@ -203,23 +315,6 @@ void rx_spd_handler() {
 }
 
 
-double ping_inches() {
-  // The sensor is triggered by a HIGH pulse of 10 or more microseconds.
-  digitalWrite(PIN_PING_TRIG, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(PIN_PING_TRIG, LOW);
-  const int timeout_us = 10000;
-  // Read the signal from the sensor: a HIGH pulse whose
-  // duration is the time (in microseconds) from the sending
-  // of the ping to the reception of its echo off of an object.
-  int microseconds = pulseIn(PIN_PING_ECHO, HIGH, timeout_us);
-
-  // convert the time into a distance
-  double inches = (double) microseconds / 148.;
-  return inches;
-}
-
-
 void setup() {
   steering.attach(PIN_U_STEER);
   speed.attach(PIN_U_SPEED);
@@ -230,8 +325,11 @@ void setup() {
   pinMode(PIN_SRC_SELECT, OUTPUT);
   digitalWrite(PIN_SRC_SELECT, LOW);
   
+  ping.init(PIN_PING_TRIG, PIN_PING_ECHO);
+  
   attachInterrupt(0, rx_str_handler, CHANGE);
   attachInterrupt(1, rx_spd_handler, CHANGE);
+  
 
   pinMode(PIN_PING_TRIG, OUTPUT);
   pinMode(PIN_PING_ECHO, INPUT);
@@ -251,6 +349,8 @@ void setup() {
   mode = mode_starting;
   
   tone(PIN_SPEAKER, 440, 200);
+  
+  last_report_millis = millis();
 
   Serial.begin(9600);
   Serial.println("hello, steering!");
@@ -274,8 +374,16 @@ double speed_for_ping_inches(double inches) {
 void loop() {
   
   int loop_time_millis = millis();
+  loop_count++;
+  
   rx_events.process_pulses(rx_steer.pulse_us(), rx_speed.pulse_us());
-  double inches = ping_inches();
+  ping.scan();
+  
+  double inches = ping.inches();//ping_inches();
+  if(ping.new_data_ready()) {
+    Serial.print("ping inches:");
+    Serial.println(inches);
+  }
 
   if(rx_events.get_event()) {
     rx_events.trace();
@@ -320,5 +428,15 @@ void loop() {
     Serial.print("Speed: ");
     Serial.println(speed_wave.value());
   }
+  
+  // loop speed reporting
+  // 12,300 loops per second as of 8/18 9:30
+  if(loop_time_millis - last_report_millis >= 1000) {
+    Serial.print("loops per second: ");
+    Serial.println( (double) (loop_count - last_report_loop_count) / (loop_time_millis  - last_report_millis) * 1000.);
+    last_report_millis = loop_time_millis;
+    last_report_loop_count = loop_count;
+  }
+  
 }
 
