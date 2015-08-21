@@ -21,29 +21,31 @@
 #define PIN_U_SPEED 9
 
 
+
 struct PwmInput {
   unsigned long last_trigger_us = 0;
   unsigned long pulse_width_us = 0;
-  
-  // since we are dealing with standard RC, 
-  // anthing out of of the below ranges should not occur and is ignored
+
+  // since we are dealing with standard RC,
+  // anything out of of the below ranges should not occur and is ignored
   unsigned long max_pulse_us = 3000;
   unsigned long min_pulse_us = 500;
-  
+
   unsigned long last_pulse_ms = 0;  // time when last pulse occurred
 
-  
+
   // milliseconds without a pulse to consider a timeout
   int timeout_ms = 500;
   int pin;
-  
+
   void attach(int pin) {
     this->pin = pin;
     last_trigger_us = 0;
     pulse_width_us = 0;
     pinMode(pin, INPUT);
   }
-  
+
+  // interrupt handler
   void handle_change() {
     unsigned long us = micros();
     if(digitalRead(pin)) {
@@ -58,11 +60,11 @@ struct PwmInput {
       }
     }
   }
-  
+
   bool is_valid() {
     return millis() - last_pulse_ms < timeout_ms;
   }
-  
+
   // safe method to return pulse width in microseconds
   // returns 0 if invalid
   int pulse_us() {
@@ -71,9 +73,9 @@ struct PwmInput {
     else
       return 0;
   }
-  
-  
-  
+
+
+
   void trace() {
     Serial.print(pin);
     Serial.print(" ");
@@ -86,25 +88,62 @@ struct PwmInput {
 };
 
 
-struct TriangleWave {
-  int period_ms = 10000;
-  int min_value = 1450;
-  int max_value = 1550;
-  int origin_ms;
-  
-  void init() {
-    origin_ms = millis();
-  }
-  
-  int value() {
-    unsigned long now_ms = millis();
-    int range = max_value - min_value;
+struct Beeper {
+  int pin;
 
-    double cycle_portion = (( now_ms - origin_ms ) % period_ms) / (double) period_ms;
-    if(cycle_portion > 0.5)
-        cycle_portion = 1.0-cycle_portion;
-    return (2 * cycle_portion * range + min_value);
-    
+  // hz of notes
+  const int note_c5 = 523;
+  const int note_d5 = 587;
+  const int note_e5 = 659;
+  const int note_f5 = 698;
+  const int note_g5 = 784;
+  const int note_a5 = 880;
+  const int note_b5 = 988;
+
+  // duration of notes
+  const int note_ms = 80;
+  const int gap_ms = 10;
+
+  void attach(int pin) {
+    this->pin = pin;
+  }
+
+  void beep() {
+    tone(pin, note_c5, note_ms);
+  }
+
+  void beep_ascending() {
+    tone(pin, note_c5, note_ms);
+    delay(gap_ms);
+    tone(pin, note_e5, note_ms);
+    delay(gap_ms);
+    tone(pin, note_g5, note_ms);
+  }
+
+  void beep_descending() {
+    tone(pin, note_g5, note_ms);
+    delay(gap_ms);
+    tone(pin, note_e5, note_ms);
+    delay(gap_ms);
+    tone(pin, note_c5, note_ms);
+  }
+
+  void beep_nabisco() {
+    tone(pin, note_c5, note_ms);
+    delay(gap_ms);
+    tone(pin, note_a5, note_ms);
+    delay(gap_ms);
+    tone(pin, note_f5, note_ms);
+  }
+
+  void beep_warble() {
+    tone(pin, note_a5, note_ms);
+    delay(gap_ms);
+    tone(pin, note_f5, note_ms);
+    delay(gap_ms);
+    tone(pin, note_a5, note_ms);
+    delay(gap_ms);
+    tone(pin, note_f5, note_ms);
   }
 };
 
@@ -119,7 +158,7 @@ enum rx_event {
   power_reverse = 32;
   power_neutral = 64;
   power_forward = 128;
-  
+
 }
 */
 
@@ -128,18 +167,26 @@ struct RxEvents {
   char rx_speed = '0';
   char rx_steer = '0';
   bool new_event = false;
-  
+
+  // number of different readings before a new event is triggered
+  // this is used to de-bounce the system
+  const int change_count_threshold = 5;
+  int change_count = 0;
+
   void process_pulses(int steer_us, int speed_us) {
     char new_rx_steer = steer_code(steer_us);
     char new_rx_speed = speed_code(speed_us);
     if (new_rx_steer != rx_steer || new_rx_speed != rx_speed) {
-      rx_speed = new_rx_speed;
-      rx_steer = new_rx_steer;
-      new_event = true;
+      if(change_count++ >= change_count_threshold) {
+        rx_speed = new_rx_speed;
+        rx_steer = new_rx_steer;
+        change_count = 0;
+        new_event = true;
+      }
     }
   }
-  
- 
+
+
    char steer_code(int steer_us) {
     if (steer_us == 0)
       return '?';
@@ -149,7 +196,7 @@ struct RxEvents {
       return 'L';
     return 'C';
   }
-  
+
   char speed_code(int speed_us) {
     if (speed_us == 0)
       return '?';
@@ -159,14 +206,14 @@ struct RxEvents {
       return 'V';
     return 'N';
   }
-  
+
   // returns true if new event received since last call
   bool get_event() {
     bool rv = new_event;
     new_event = false;
     return rv;
   }
-  
+
   void trace() {
     Serial.write(rx_steer);
     Serial.write(rx_speed);
@@ -176,37 +223,37 @@ struct RxEvents {
 
 struct Ping {
   int ping_pin, echo_pin;
-  int ping_start_ms = 0;
-  int ping_start_us = 0;
-  int reply_start_us = 0;
+  unsigned long ping_start_ms = 0;
+  unsigned long ping_start_us = 0;
+  unsigned long reply_start_us = 0;
   bool _new_data_ready = false;
-  
+
   double last_ping_distance_inches = 0.;
-  
+
   const int ping_rate_ms = 100;
   const int ping_timeout_us = 20000; // 20000 microseconds should be about 10 feet
-  
+
   enum {
     no_ping_pending,
     waiting_for_reply_start,
     waiting_for_reply_end
   } state;
-  
-  
-  
+
+
+
   void init(int _ping_pin, int _echo_pin){
     ping_pin = _ping_pin;
     echo_pin = _echo_pin;
     digitalWrite(ping_pin, LOW);
     state = no_ping_pending;
   }
-  
+
   bool new_data_ready() {
     bool rv = _new_data_ready;
     _new_data_ready = false;
     return rv;
   }
-  
+
   void set_distance_from_us(int us) {
       double ping_distance_inches = (double) us / 148.; // 148 microseconds for ping round trip per inch
       if(last_ping_distance_inches != ping_distance_inches) {
@@ -214,11 +261,11 @@ struct Ping {
          _new_data_ready = true;
       }
   }
-  
+
   void scan(){
-    int ms = millis();
-    int us = micros();
-    
+    unsigned long ms = millis();
+    unsigned long  us = micros();
+
     switch(state) {
       case no_ping_pending:
         if( ms - ping_start_ms >= ping_rate_ms) {
@@ -231,7 +278,7 @@ struct Ping {
           state = waiting_for_reply_start;
         }
         break;
-        
+
       case waiting_for_reply_start:
         if(digitalRead(echo_pin) == HIGH) {
           reply_start_us = us;
@@ -250,29 +297,15 @@ struct Ping {
           set_distance_from_us(0); // zero on timeout
           state = no_ping_pending;
         }
-        
+
         break;
     }
   }
-  
+
   double inches() {
     return last_ping_distance_inches;
   }
 };
-
-/*
-double ping_inches() {
-  const int timeout_us = 10000;
-  // Read the signal from the sensor: a HIGH pulse whose
-  // duration is the time (in rmicroseconds) from the sending
-  // of the ping to the reception of its echo off of an object.
-  int microseconds = pulseIn(PIN_PING_ECHO, HIGH, timeout_us);
-
-  // convert the time into a distance
-  double inches = (double) microseconds / 148.;
-  return inches;
-}
-*/
 
 
 //////////////////////////
@@ -285,15 +318,13 @@ PwmInput rx_steer;
 PwmInput rx_speed;
 RxEvents rx_events;
 Ping ping;
+Beeper beeper;
 
-
-TriangleWave steering_wave;
-TriangleWave speed_wave;
 
 // diagnostics for reporting loop speeds
-long loop_count = 0;
-long last_report_millis = 0;
-long last_report_loop_count = 0;
+unsigned long loop_count = 0;
+unsigned long last_report_ms = 0;
+unsigned long last_report_loop_count = 0;
 
 
 enum {
@@ -318,39 +349,30 @@ void rx_spd_handler() {
 void setup() {
   steering.attach(PIN_U_STEER);
   speed.attach(PIN_U_SPEED);
-  
+
   rx_steer.attach(PIN_RX_STEER);
   rx_speed.attach(PIN_RX_SPEED);
-  
+
   pinMode(PIN_SRC_SELECT, OUTPUT);
   digitalWrite(PIN_SRC_SELECT, LOW);
-  
+
   ping.init(PIN_PING_TRIG, PIN_PING_ECHO);
-  
+
   attachInterrupt(0, rx_str_handler, CHANGE);
   attachInterrupt(1, rx_spd_handler, CHANGE);
-  
+
 
   pinMode(PIN_PING_TRIG, OUTPUT);
   pinMode(PIN_PING_ECHO, INPUT);
 
   digitalWrite(PIN_PING_TRIG, LOW);
-  
-  
-  
-  speed_wave.min_value = 1400;
-  speed_wave.max_value = 1650;
-  speed_wave.period_ms = 30000;
-  speed_wave.init();
-  steering_wave.min_value = 1200;
-  steering_wave.max_value = 1800;
-  steering_wave.init();
-  
+
   mode = mode_starting;
-  
-  tone(PIN_SPEAKER, 440, 200);
-  
-  last_report_millis = millis();
+
+  beeper.attach(PIN_SPEAKER);
+  beeper.beep_nabisco();
+
+  last_report_ms = millis();
 
   Serial.begin(9600);
   Serial.println("hello, steering!");
@@ -358,27 +380,24 @@ void setup() {
 
 
 double speed_for_ping_inches(double inches) {
-  
   // get closer if far
-  if (inches > 20.) 
+  if (inches > 20.)
     return 1390;
   // back up if too close
   if (inches < 10.)
     return 1620;
-    
-  return 1500;
 
-  
+  return 1500;
 }
 
 void loop() {
-  
-  int loop_time_millis = millis();
+
+  unsigned long loop_time_ms = millis();
   loop_count++;
-  
+
   rx_events.process_pulses(rx_steer.pulse_us(), rx_speed.pulse_us());
   ping.scan();
-  
+
   double inches = ping.inches();//ping_inches();
   if(ping.new_data_ready()) {
     Serial.print("ping inches:");
@@ -389,7 +408,7 @@ void loop() {
     rx_events.trace();
     Serial.println();
   }
-  
+
   switch (mode) {
     case mode_starting:
       steering.writeMicroseconds(1500);
@@ -397,25 +416,26 @@ void loop() {
       digitalWrite(PIN_SRC_SELECT, LOW);
       if (rx_events.rx_steer == 'R' && rx_events.rx_speed == 'N') {
         mode = mode_running;
-        Serial.print("switched to running");
+        beeper.beep_ascending();
+        Serial.print("switched to automatic");
       }
       break;
-      
+
     case mode_running:
-//      steering.writeMicroseconds(steering_wave.value());
       digitalWrite(PIN_SRC_SELECT, HIGH);
       steering.writeMicroseconds(1500);
       speed.writeMicroseconds(speed_for_ping_inches(inches));
       if (rx_events.rx_steer == 'L' && rx_events.rx_speed == 'N') {
         mode = mode_starting;
+        beeper.beep_descending();
         Serial.print("switched to starting - user initiated");
       }
       if (rx_events.rx_steer == '?' || rx_events.rx_speed == '?') {
         mode = mode_starting;
+        beeper.beep_warble();
         Serial.print("switched to starting - no coms");
       }
       break;
-
   }
 
 
@@ -424,19 +444,24 @@ void loop() {
     rx_steer.trace();
     Serial.print(",");
     rx_speed.trace();
-    Serial.print(",");
-    Serial.print("Speed: ");
-    Serial.println(speed_wave.value());
+    Serial.println();
   }
-  
+
   // loop speed reporting
   // 12,300 loops per second as of 8/18 9:30
-  if(loop_time_millis - last_report_millis >= 1000) {
+  unsigned long ms_since_report = loop_time_ms - last_report_ms;
+  if( ms_since_report >= 1000) {
+    unsigned long loops_since_report = loop_count - last_report_loop_count;
+    double seconds_since_report =  (loop_time_ms  - last_report_ms) / 1000.;
     Serial.print("loops per second: ");
-    Serial.println( (double) (loop_count - last_report_loop_count) / (loop_time_millis  - last_report_millis) * 1000.);
-    last_report_millis = loop_time_millis;
+    Serial.print( loops_since_report / seconds_since_report );
+    Serial.print(" microseconds per loop");
+    Serial.print( 1E6 * seconds_since_report / loops_since_report );
+    Serial.println();
+
+    // remember stats for next report
+    last_report_ms = loop_time_ms;
     last_report_loop_count = loop_count;
   }
-  
-}
 
+}
