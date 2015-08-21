@@ -101,7 +101,7 @@ struct Beeper {
   const int note_b5 = 988;
 
   // duration of notes
-  const int note_ms = 80;
+  const int note_ms = 500;
   const int gap_ms = 10;
 
   void attach(int pin) {
@@ -114,35 +114,35 @@ struct Beeper {
 
   void beep_ascending() {
     tone(pin, note_c5, note_ms);
-    delay(gap_ms);
+    delay(note_ms);
     tone(pin, note_e5, note_ms);
-    delay(gap_ms);
+    delay(note_ms);
     tone(pin, note_g5, note_ms);
   }
 
   void beep_descending() {
     tone(pin, note_g5, note_ms);
-    delay(gap_ms);
+    delay(note_ms);
     tone(pin, note_e5, note_ms);
-    delay(gap_ms);
+    delay(note_ms);
     tone(pin, note_c5, note_ms);
   }
 
   void beep_nabisco() {
     tone(pin, note_c5, note_ms);
-    delay(gap_ms);
+    delay(note_ms);
     tone(pin, note_a5, note_ms);
-    delay(gap_ms);
+    delay(note_ms);
     tone(pin, note_f5, note_ms);
   }
 
   void beep_warble() {
     tone(pin, note_a5, note_ms);
-    delay(gap_ms);
+    delay(note_ms);
     tone(pin, note_f5, note_ms);
-    delay(gap_ms);
+    delay(note_ms);
     tone(pin, note_a5, note_ms);
-    delay(gap_ms);
+    delay(note_ms);
     tone(pin, note_f5, note_ms);
   }
 };
