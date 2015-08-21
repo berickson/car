@@ -1,5 +1,6 @@
 #include <Servo.h>
 
+#define count_of(a) (sizeof(a)/sizeof(a[0]))
 
 /////////////////////////////////////////////////////
 // PIN / Wiring
@@ -108,42 +109,38 @@ struct Beeper {
     this->pin = pin;
   }
 
-  void beep() {
-    tone(pin, note_c5, note_ms);
+  void beep(int note) {
+    tone(pin, note, note_ms);
+    delay(note_ms + gap_ms);
   }
 
   void beep_ascending() {
-    tone(pin, note_c5, note_ms);
-    delay(note_ms);
-    tone(pin, note_e5, note_ms);
-    delay(note_ms);
-    tone(pin, note_g5, note_ms);
+    beep(note_c5);
+    beep(note_e5);
+    beep(note_g5);
   }
 
   void beep_descending() {
-    tone(pin, note_g5, note_ms);
-    delay(note_ms);
-    tone(pin, note_e5, note_ms);
-    delay(note_ms);
-    tone(pin, note_c5, note_ms);
+    beep(note_g5);
+    beep(note_e5);
+    beep(note_c5);
   }
 
   void beep_nabisco() {
-    tone(pin, note_c5, note_ms);
-    delay(note_ms);
-    tone(pin, note_a5, note_ms);
-    delay(note_ms);
-    tone(pin, note_f5, note_ms);
+    beep(note_c5);
+    beep(note_a5);
+    beep(note_f5);
   }
 
   void beep_warble() {
-    tone(pin, note_a5, note_ms);
-    delay(note_ms);
-    tone(pin, note_f5, note_ms);
-    delay(note_ms);
-    tone(pin, note_a5, note_ms);
-    delay(note_ms);
-    tone(pin, note_f5, note_ms);
+    beep(note_a5);
+    beep(note_f5);
+    beep(note_a5);
+    beep(note_f5);
+    beep(note_a5);
+    beep(note_f5);
+    beep(note_a5);
+    beep(note_f5);
   }
 };
 
@@ -162,11 +159,64 @@ enum rx_event {
 }
 */
 
+struct RxEvent {
+  char speed;
+  char steer;
+
+  RxEvent():RxEvent('0','0'){
+  }
+
+  RxEvent(char steer, char speed) {
+    this->steer = steer;
+    this->speed = speed;
+  }
+
+  bool equals(RxEvent other) {
+    return speed == other.speed && steer == other.steer;
+  }
+
+  bool is_bad(){
+    return speed == '?' || steer == '?';
+  }
+};
+
+
+struct EventQueue {
+  static const int size = 5;
+
+  RxEvent events[size];
+
+  void add(RxEvent new_event) {
+    for(int i = size-1; i > 0; --i) {
+      events[i]=events[i-1];
+    }
+    events[0] = new_event;
+
+    if(0) {
+      for(int i = 0; i < size; i++) {
+        Serial.print(events[i].steer);
+        Serial.print(events[i].speed);
+        Serial.print(",");
+      }
+      Serial.println();
+    }
+  }
+
+  bool matches(const RxEvent * pattern, int count) {
+    for(int i = 0; i < count; ++i) {
+      if(!events[i].equals(pattern[count-1 - i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+};
+
 
 struct RxEvents {
-  char rx_speed = '0';
-  char rx_steer = '0';
+  RxEvent current, pending;
   bool new_event = false;
+  EventQueue recent;
 
   // number of different readings before a new event is triggered
   // this is used to de-bounce the system
@@ -174,13 +224,13 @@ struct RxEvents {
   int change_count = 0;
 
   void process_pulses(int steer_us, int speed_us) {
-    char new_rx_steer = steer_code(steer_us);
-    char new_rx_speed = speed_code(speed_us);
-    if (new_rx_steer != rx_steer || new_rx_speed != rx_speed) {
-      if(change_count++ >= change_count_threshold) {
-        rx_speed = new_rx_speed;
-        rx_steer = new_rx_steer;
+    pending.steer = steer_code(steer_us);
+    pending.speed = speed_code(speed_us);
+    if (! pending.equals(current)) {
+      if(++change_count >= change_count_threshold) {
+        current = pending;
         change_count = 0;
+        recent.add(current);
         new_event = true;
       }
     }
@@ -215,8 +265,8 @@ struct RxEvents {
   }
 
   void trace() {
-    Serial.write(rx_steer);
-    Serial.write(rx_speed);
+    Serial.write(current.steer);
+    Serial.write(current.speed);
   }
 };
 
@@ -375,20 +425,23 @@ void setup() {
   last_report_ms = millis();
 
   Serial.begin(9600);
-  Serial.println("hello, steering!");
+  Serial.println("car_control begun");
 }
-
 
 double speed_for_ping_inches(double inches) {
   // get closer if far
   if (inches > 20.)
-    return 1390;
+    return 1300;
   // back up if too close
   if (inches < 10.)
-    return 1620;
+    return 1660;
 
   return 1500;
 }
+
+
+const RxEvent auto_pattern [] =
+  {{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'}};
 
 void loop() {
 
@@ -399,22 +452,19 @@ void loop() {
   ping.scan();
 
   double inches = ping.inches();//ping_inches();
-  if(ping.new_data_ready()) {
+  if(0 && ping.new_data_ready()) {
     Serial.print("ping inches:");
     Serial.println(inches);
   }
 
-  if(rx_events.get_event()) {
-    rx_events.trace();
-    Serial.println();
-  }
+  bool new_rx_event = rx_events.get_event();
 
   switch (mode) {
     case mode_starting:
       steering.writeMicroseconds(1500);
       speed.writeMicroseconds(1500);
       digitalWrite(PIN_SRC_SELECT, LOW);
-      if (rx_events.rx_steer == 'R' && rx_events.rx_speed == 'N') {
+      if (new_rx_event && rx_events.recent.matches(auto_pattern, count_of(auto_pattern))) {
         mode = mode_running;
         beeper.beep_ascending();
         Serial.print("switched to automatic");
@@ -425,15 +475,21 @@ void loop() {
       digitalWrite(PIN_SRC_SELECT, HIGH);
       steering.writeMicroseconds(1500);
       speed.writeMicroseconds(speed_for_ping_inches(inches));
-      if (rx_events.rx_steer == 'L' && rx_events.rx_speed == 'N') {
+      if (new_rx_event && rx_events.current.equals(RxEvent('L','N'))) {
         mode = mode_starting;
+        steering.writeMicroseconds(1500);
+        speed.writeMicroseconds(1500);
+        digitalWrite(PIN_SRC_SELECT, LOW);
         beeper.beep_descending();
-        Serial.print("switched to starting - user initiated");
+        Serial.println("switched to starting - user initiated");
       }
-      if (rx_events.rx_steer == '?' || rx_events.rx_speed == '?') {
+      if (new_rx_event && rx_events.current.is_bad()) {
         mode = mode_starting;
+        steering.writeMicroseconds(1500);
+        speed.writeMicroseconds(1500);
+        digitalWrite(PIN_SRC_SELECT, LOW);
         beeper.beep_warble();
-        Serial.print("switched to starting - no coms");
+        Serial.println("switched to starting - no coms");
       }
       break;
   }
@@ -449,19 +505,21 @@ void loop() {
 
   // loop speed reporting
   // 12,300 loops per second as of 8/18 9:30
-  unsigned long ms_since_report = loop_time_ms - last_report_ms;
-  if( ms_since_report >= 1000) {
-    unsigned long loops_since_report = loop_count - last_report_loop_count;
-    double seconds_since_report =  (loop_time_ms  - last_report_ms) / 1000.;
-    Serial.print("loops per second: ");
-    Serial.print( loops_since_report / seconds_since_report );
-    Serial.print(" microseconds per loop");
-    Serial.print( 1E6 * seconds_since_report / loops_since_report );
-    Serial.println();
+  if(1) {
+    unsigned long ms_since_report = loop_time_ms - last_report_ms;
+    if( ms_since_report >= 10000) {
+      unsigned long loops_since_report = loop_count - last_report_loop_count;
+      double seconds_since_report =  (loop_time_ms  - last_report_ms) / 1000.;
+      Serial.print("loops per second: ");
+      Serial.print( loops_since_report / seconds_since_report );
+      Serial.print(" microseconds per loop");
+      Serial.print( 1E6 * seconds_since_report / loops_since_report );
+      Serial.println();
 
-    // remember stats for next report
-    last_report_ms = loop_time_ms;
-    last_report_loop_count = loop_count;
+      // remember stats for next report
+      last_report_ms = loop_time_ms;
+      last_report_loop_count = loop_count;
+    }
   }
 
 }
