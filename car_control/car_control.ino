@@ -280,7 +280,7 @@ struct Ping {
 
   double last_ping_distance_inches = 0.;
 
-  const int ping_rate_ms = 100;
+  const int ping_rate_ms = 50;
   const int ping_timeout_us = 20000; // 20000 microseconds should be about 10 feet
 
   enum {
@@ -358,11 +358,121 @@ struct Ping {
 };
 
 
+struct SpeedControl {
+
+  Servo * speed;
+
+  const unsigned long brake_ms = 500;
+  const unsigned long pause_ms = 200;
+  unsigned long brake_start_ms = 0;
+  unsigned long pause_start_ms = 0;
+
+  const int forward_us =  1300;
+  const int reverse_us =  1600;
+  const int neutral_us = 1500;
+
+  char command = 'N';
+
+  enum {
+    stopped,
+    forward_braking,
+    reverse_braking,
+    forward,
+    reverse,
+    pausing
+  } state;
+
+  void init(Servo * speed) {
+    this->speed = speed;
+    state = stopped;
+    set_pwm_us(neutral_us);
+  }
+
+  void set_pwm_us(int microseconds) {
+    Serial.println(microseconds);
+    speed->writeMicroseconds(microseconds);
+  }
+
+  void set_command(char speed_code) {
+    Serial.println(speed_code);
+    if(speed_code == 'F') {
+      if(state == stopped || state == forward_braking) {
+        state = forward;
+        set_pwm_us(forward_us);
+      }
+      if(state == reverse) {
+        set_pwm_us(forward_us);
+        state = reverse_braking;
+        brake_start_ms = millis();
+      }
+    }
+    if(speed_code == 'R') {
+      if(state == stopped || state == reverse_braking) {
+        state = reverse;
+        set_pwm_us(reverse_us);
+      }
+      if(state == forward) {
+        state = forward_braking;
+        set_pwm_us(reverse_us);
+        brake_start_ms = millis();
+      }
+    }
+    if(speed_code == 'N'){
+      if(state == forward){
+        state = forward_braking;
+        set_pwm_us(reverse_us);
+        brake_start_ms = millis();
+      }
+      if(state == reverse){
+        state = reverse_braking;
+        set_pwm_us(forward_us);
+        brake_start_ms = millis();
+      }
+    }
+
+    command = speed_code;
+  }
+
+  void execute() {
+    if(state == forward_braking || state == reverse_braking) {
+      unsigned long ms = millis();
+      if(ms - brake_start_ms >= brake_ms) {
+        Serial.println("Braking complete");
+        state = pausing;
+        pause_start_ms = ms;
+        set_pwm_us(neutral_us);
+      }
+    }
+
+    if(state == pausing) {
+      unsigned long ms = millis();
+      if(ms - pause_start_ms >= pause_ms) {
+        Serial.println("Pausing complete");
+        if(command == 'F') {
+          set_pwm_us(forward_us);
+          state = forward;
+        }
+        if(command == 'R') {
+          set_pwm_us(reverse_us);
+          state = reverse;
+        }
+        if(command == 'N') {
+          set_pwm_us(neutral_us);
+          state = stopped;
+        }
+      }
+    }
+  }
+};
+
+
+
 //////////////////////////
 // Globals
 
 Servo steering;
 Servo speed;
+SpeedControl speed_control;
 
 PwmInput rx_steer;
 PwmInput rx_speed;
@@ -378,9 +488,9 @@ unsigned long last_report_loop_count = 0;
 
 
 enum {
-  mode_starting,
+  mode_manual,
   mode_connected,
-  mode_running
+  mode_automatic
 } mode;
 
 
@@ -395,13 +505,31 @@ void rx_spd_handler() {
   rx_speed.handle_change();
 }
 
+char speed_for_ping_inches(double inches) {
+  // get closer if far
+  if (inches > 30.)
+    return 'F';
+  // back up if too close
+  if (inches < 20.)
+    return 'R';
+
+  return 'N';
+}
+
+
+const RxEvent auto_pattern [] =
+  {{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'}};
+
+
 
 void setup() {
   steering.attach(PIN_U_STEER);
   speed.attach(PIN_U_SPEED);
 
+
   rx_steer.attach(PIN_RX_STEER);
   rx_speed.attach(PIN_RX_SPEED);
+  speed_control.init(&speed);
 
   pinMode(PIN_SRC_SELECT, OUTPUT);
   digitalWrite(PIN_SRC_SELECT, LOW);
@@ -417,7 +545,7 @@ void setup() {
 
   digitalWrite(PIN_PING_TRIG, LOW);
 
-  mode = mode_starting;
+  mode = mode_manual;
 
   beeper.attach(PIN_SPEAKER);
   beeper.beep_nabisco();
@@ -428,20 +556,6 @@ void setup() {
   Serial.println("car_control begun");
 }
 
-double speed_for_ping_inches(double inches) {
-  // get closer if far
-  if (inches > 20.)
-    return 1300;
-  // back up if too close
-  if (inches < 10.)
-    return 1660;
-
-  return 1500;
-}
-
-
-const RxEvent auto_pattern [] =
-  {{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'}};
 
 void loop() {
 
@@ -449,6 +563,7 @@ void loop() {
   loop_count++;
 
   rx_events.process_pulses(rx_steer.pulse_us(), rx_speed.pulse_us());
+  bool new_rx_event = rx_events.get_event();
   ping.scan();
 
   double inches = ping.inches();//ping_inches();
@@ -457,26 +572,27 @@ void loop() {
     Serial.println(inches);
   }
 
-  bool new_rx_event = rx_events.get_event();
+
 
   switch (mode) {
-    case mode_starting:
+    case mode_manual:
       steering.writeMicroseconds(1500);
       speed.writeMicroseconds(1500);
       digitalWrite(PIN_SRC_SELECT, LOW);
       if (new_rx_event && rx_events.recent.matches(auto_pattern, count_of(auto_pattern))) {
-        mode = mode_running;
+        mode = mode_automatic;
         beeper.beep_ascending();
         Serial.print("switched to automatic");
       }
       break;
 
-    case mode_running:
+    case mode_automatic:
       digitalWrite(PIN_SRC_SELECT, HIGH);
       steering.writeMicroseconds(1500);
-      speed.writeMicroseconds(speed_for_ping_inches(inches));
+      speed_control.set_command(speed_for_ping_inches(inches));
+      speed_control.execute();
       if (new_rx_event && rx_events.current.equals(RxEvent('L','N'))) {
-        mode = mode_starting;
+        mode = mode_manual;
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
         digitalWrite(PIN_SRC_SELECT, LOW);
@@ -484,7 +600,7 @@ void loop() {
         Serial.println("switched to starting - user initiated");
       }
       if (new_rx_event && rx_events.current.is_bad()) {
-        mode = mode_starting;
+        mode = mode_manual;
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
         digitalWrite(PIN_SRC_SELECT, LOW);
@@ -505,7 +621,7 @@ void loop() {
 
   // loop speed reporting
   // 12,300 loops per second as of 8/18 9:30
-  if(1) {
+  if(0) {
     unsigned long ms_since_report = loop_time_ms - last_report_ms;
     if( ms_since_report >= 10000) {
       unsigned long loops_since_report = loop_count - last_report_loop_count;
