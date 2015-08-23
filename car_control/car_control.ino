@@ -36,7 +36,7 @@ struct PwmInput {
 
 
   // milliseconds without a pulse to consider a timeout
-  int timeout_ms = 500;
+  unsigned long timeout_ms = 500;
   int pin;
 
   void attach(int pin) {
@@ -102,8 +102,8 @@ struct Beeper {
   const int note_b5 = 988;
 
   // duration of notes
-  const int note_ms = 500;
-  const int gap_ms = 10;
+  const unsigned long note_ms = 500;
+  const unsigned long gap_ms = 10;
 
   void attach(int pin) {
     this->pin = pin;
@@ -280,8 +280,8 @@ struct Ping {
 
   double last_ping_distance_inches = 0.;
 
-  const int ping_rate_ms = 50;
-  const int ping_timeout_us = 20000; // 20000 microseconds should be about 10 feet
+  unsigned long ping_rate_ms = 50;
+  const unsigned long ping_timeout_us = 20000; // 20000 microseconds should be about 10 feet
 
   enum {
     no_ping_pending,
@@ -489,7 +489,6 @@ unsigned long last_report_loop_count = 0;
 
 enum {
   mode_manual,
-  mode_connected,
   mode_automatic
 } mode;
 
@@ -621,11 +620,11 @@ void loop() {
 
   // loop speed reporting
   // 12,300 loops per second as of 8/18 9:30
-  if(0) {
+  if(1) {
     unsigned long ms_since_report = loop_time_ms - last_report_ms;
     if( ms_since_report >= 10000) {
       unsigned long loops_since_report = loop_count - last_report_loop_count;
-      double seconds_since_report =  (loop_time_ms  - last_report_ms) / 1000.;
+      double seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
       Serial.print("loops per second: ");
       Serial.print( loops_since_report / seconds_since_report );
       Serial.print(" microseconds per loop");
