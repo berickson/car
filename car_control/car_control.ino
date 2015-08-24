@@ -367,9 +367,10 @@ struct SpeedControl {
   unsigned long brake_start_ms = 0;
   unsigned long pause_start_ms = 0;
 
-  const int forward_us =  1300;
-  const int reverse_us =  1600;
+  const int forward_us =  1350;
+  const int reverse_us =  1650;
   const int neutral_us = 1500;
+  int calibration_us = 0;
 
   char command = 'N';
 
@@ -382,15 +383,24 @@ struct SpeedControl {
     pausing
   } state;
 
+  // used to match the control stick settings.
+  // Will use setting as the new pulse width for
+  // neutral
+  void set_neutral_pwm_us(unsigned long us) {
+    calibration_us = us - neutral_us;
+  }
+
   void init(Servo * speed) {
     this->speed = speed;
     state = stopped;
     set_pwm_us(neutral_us);
   }
 
-  void set_pwm_us(int microseconds) {
-    Serial.println(microseconds);
-    speed->writeMicroseconds(microseconds);
+  // sets pulse width, adjusted by calibration if any
+  void set_pwm_us(int us) {
+    unsigned long c_us = us + calibration_us;
+    Serial.println(c_us);
+    speed->writeMicroseconds(c_us);
   }
 
   void set_command(char speed_code) {
@@ -552,7 +562,7 @@ void setup() {
   last_report_ms = millis();
 
   Serial.begin(9600);
-  Serial.println("car_control begun");
+  Serial.println("car_control begun x");
 }
 
 
