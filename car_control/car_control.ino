@@ -516,10 +516,10 @@ void rx_spd_handler() {
 
 char speed_for_ping_inches(double inches) {
   // get closer if far
-  if (inches > 30.)
+  if (inches > 20.)
     return 'F';
   // back up if too close
-  if (inches < 20.)
+  if (inches < 12.)
     return 'R';
 
   return 'N';
@@ -590,6 +590,7 @@ void loop() {
       digitalWrite(PIN_SRC_SELECT, LOW);
       if (new_rx_event && rx_events.recent.matches(auto_pattern, count_of(auto_pattern))) {
         mode = mode_automatic;
+        speed_control.set_neutral_pwm_us(rx_speed.pulse_us());
         beeper.beep_ascending();
         Serial.print("switched to automatic");
       }
