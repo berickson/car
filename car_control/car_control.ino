@@ -126,7 +126,7 @@ struct Beeper {
     beep(note_c5);
   }
 
-  void beep_nabisco() {
+  void beep_nbc() {
     beep(note_c5);
     beep(note_a5);
     beep(note_f5);
@@ -399,7 +399,6 @@ struct SpeedControl {
   // sets pulse width, adjusted by calibration if any
   void set_pwm_us(int us) {
     unsigned long c_us = us + calibration_us;
-    Serial.println(c_us);
     speed->writeMicroseconds(c_us);
   }
 
@@ -516,7 +515,7 @@ void rx_spd_handler() {
 
 char speed_for_ping_inches(double inches) {
   // get closer if far
-  if (inches > 20.)
+  if (inches > 25.)
     return 'F';
   // back up if too close
   if (inches < 12.)
@@ -557,12 +556,12 @@ void setup() {
   mode = mode_manual;
 
   beeper.attach(PIN_SPEAKER);
-  beeper.beep_nabisco();
+  beeper.beep_nbc();
 
   last_report_ms = millis();
 
   Serial.begin(9600);
-  Serial.println("car_control begun x");
+  Serial.println("car_control begun");
 }
 
 
@@ -607,7 +606,7 @@ void loop() {
         speed.writeMicroseconds(1500);
         digitalWrite(PIN_SRC_SELECT, LOW);
         beeper.beep_descending();
-        Serial.println("switched to starting - user initiated");
+        Serial.println("switched to manual - user initiated");
       }
       if (new_rx_event && rx_events.current.is_bad()) {
         mode = mode_manual;
@@ -615,7 +614,7 @@ void loop() {
         speed.writeMicroseconds(1500);
         digitalWrite(PIN_SRC_SELECT, LOW);
         beeper.beep_warble();
-        Serial.println("switched to starting - no coms");
+        Serial.println("switched to manual - no coms");
       }
       break;
   }
