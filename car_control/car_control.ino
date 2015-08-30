@@ -1,4 +1,7 @@
+#include <Wire.h>
+
 #include <Servo.h>
+#include "mpu9150.h"
 
 #define count_of(a) (sizeof(a)/sizeof(a[0]))
 
@@ -529,6 +532,7 @@ const RxEvent auto_pattern [] =
   {{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'}};
 
 
+Mpu9150 mpu9150;
 
 void setup() {
   steering.attach(PIN_U_STEER);
@@ -562,10 +566,12 @@ void setup() {
 
   Serial.begin(9600);
   Serial.println("car_control begun");
+  mpu9150.setup();
 }
 
 
 void loop() {
+  mpu9150.loop();
 
   unsigned long loop_time_ms = millis();
   loop_count++;
@@ -629,7 +635,9 @@ void loop() {
   }
 
   // loop speed reporting
-  // 12,300 loops per second as of 8/18 9:30
+  //  12,300 loops per second as of 8/18 9:30
+  // 153,400 loops per second on Teensy 3.1 @ 96MHz 8/29
+  //  60,900 loops per second on Teensy 3.1 @ 24MHz 8/29
   if(1) {
     unsigned long ms_since_report = loop_time_ms - last_report_ms;
     if( ms_since_report >= 10000) {
