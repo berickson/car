@@ -1,4 +1,11 @@
+#include <MPU6050_9Axis_MotionApps41.h>
+//#include <MPU6050_6Axis_MotionApps20.h>
+#include <MPU6050.h>
+#include <helper_3dmath.h>
+
 #include <Wire.h>
+
+#include <I2Cdev.h>
 
 #include <Servo.h>
 #include "mpu9150.h"
@@ -645,9 +652,10 @@ void loop() {
       double seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
       Serial.print("loops per second: ");
       Serial.print( loops_since_report / seconds_since_report );
-      Serial.print(" microseconds per loop");
+      Serial.print(" microseconds per loop ");
       Serial.print( 1E6 * seconds_since_report / loops_since_report );
       Serial.println();
+      mpu9150.trace_status();
 
       // remember stats for next report
       last_report_ms = loop_time_ms;
