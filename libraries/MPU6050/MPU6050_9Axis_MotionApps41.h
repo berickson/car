@@ -307,6 +307,7 @@ uint8_t MPU6050::dmpInitialize() {
     DEBUG_PRINT(productID);
 
     // get MPU hardware revision
+    /*
     DEBUG_PRINTLN(F("Selecting user bank 16..."));
     setMemoryBank(0x10, true, true);
     DEBUG_PRINTLN(F("Selecting memory byte 6..."));
@@ -315,14 +316,17 @@ uint8_t MPU6050::dmpInitialize() {
     uint8_t hwRevision = readMemoryByte();
     DEBUG_PRINT(F("Revision @ user[16][6] = "));
     DEBUG_PRINTLNF(hwRevision, HEX);
+    */
     DEBUG_PRINTLN(F("Resetting memory bank selection to 0..."));
     setMemoryBank(0, false, false);
 
     // check OTP bank valid
+    /*
     DEBUG_PRINTLN(F("Reading OTP bank valid flag..."));
     uint8_t otpValid = getOTPBankValid();
     DEBUG_PRINT(F("OTP bank is "));
     DEBUG_PRINTLN(otpValid ? F("valid!") : F("invalid!"));
+    */
 
     // get X/Y/Z gyro offsets
     DEBUG_PRINTLN(F("Reading gyro offset values..."));
@@ -353,6 +357,7 @@ uint8_t MPU6050::dmpInitialize() {
     //mag -> setMode(0x0F);
     I2Cdev::writeByte(0x0E, 0x0A, 0x0F);
 
+     /*
     DEBUG_PRINTLN(F("Reading mag magnetometer factory calibration..."));
     int8_t asax, asay, asaz;
     //mag -> getAdjustment(&asax, &asay, &asaz);
@@ -366,6 +371,7 @@ uint8_t MPU6050::dmpInitialize() {
     DEBUG_PRINT(asay);
     DEBUG_PRINT(F(" / "));
     DEBUG_PRINTLN(asaz);
+    */
 
     DEBUG_PRINTLN(F("Setting magnetometer mode to power-down..."));
     //mag -> setMode(0);
@@ -803,7 +809,7 @@ uint8_t MPU6050::dmpReadAndProcessFIFOPacket(uint8_t numPackets, uint8_t *proces
         if ((status = dmpProcessFIFOPacket(buf)) > 0) return status;
 
         // increment external process count variable, if supplied
-        if (processed != 0) *processed++;
+        //if (processed != 0) *processed++;
     }
     return 0;
 }
@@ -822,4 +828,3 @@ uint16_t MPU6050::dmpGetFIFOPacketSize() {
 }
 
 #endif /* _MPU6050_9AXIS_MOTIONAPPS41_H_ */
-
