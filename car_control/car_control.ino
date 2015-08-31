@@ -18,6 +18,24 @@
 // on the micro, interrupts must go on pins 2 and 3
 // interrupt 0 = pin 2
 // interrupt 1 = pin 3
+
+#ifdef TEENSYDUINO
+
+#define PIN_RX_STEER 2
+#define PIN_RX_SPEED 1
+//#define PIN_SRC_SELECT 4
+
+#define PIN_PING_TRIG 6
+#define PIN_PING_ECHO 23
+
+#define PIN_SPEAKER   10
+
+// computer steering and speed
+#define PIN_U_STEER 4
+#define PIN_U_SPEED 3
+
+#else
+
 #define PIN_RX_STEER 2
 #define PIN_RX_SPEED 3
 #define PIN_SRC_SELECT 4
@@ -30,6 +48,8 @@
 // computer steering and speed
 #define PIN_U_STEER 8
 #define PIN_U_SPEED 9
+#endif
+
 
 
 
@@ -362,7 +382,7 @@ struct Ping {
     }
   }
 
-  double inches() {
+  inline double inches() {
     return last_ping_distance_inches;
   }
 };
@@ -550,13 +570,23 @@ void setup() {
   rx_speed.attach(PIN_RX_SPEED);
   speed_control.init(&speed);
 
+#ifndef TEENSYDUINO
   pinMode(PIN_SRC_SELECT, OUTPUT);
   digitalWrite(PIN_SRC_SELECT, LOW);
+#endif
 
   ping.init(PIN_PING_TRIG, PIN_PING_ECHO);
 
-  attachInterrupt(0, rx_str_handler, CHANGE);
-  attachInterrupt(1, rx_spd_handler, CHANGE);
+#ifdef TEENSYDUINO
+  int int_str = PIN_RX_STEER;
+  int int_esc = PIN_RX_SPEED;
+#else
+  int int_str = 0;
+  int int_esc = 1;
+#endif
+
+  attachInterrupt(int_str, rx_str_handler, CHANGE);
+  attachInterrupt(int_esc, rx_spd_handler, CHANGE);
 
 
   pinMode(PIN_PING_TRIG, OUTPUT);
@@ -573,6 +603,9 @@ void setup() {
 
   Serial.begin(9600);
   Serial.println("car_control begun");
+#ifdef TEENSYDUINO
+  Serial.println("teensy detected");
+#endif
   mpu9150.setup();
 }
 
@@ -597,9 +630,17 @@ void loop() {
 
   switch (mode) {
     case mode_manual:
+#ifdef TEENSYDUINO
+      steering.writeMicroseconds(rx_steer.pulse_us());
+      speed.writeMicroseconds(rx_speed.pulse_us());
+
+#else
+      digitalWrite(PIN_SRC_SELECT, LOW);
       steering.writeMicroseconds(1500);
       speed.writeMicroseconds(1500);
-      digitalWrite(PIN_SRC_SELECT, LOW);
+#endif
+
+
       if (new_rx_event && rx_events.recent.matches(auto_pattern, count_of(auto_pattern))) {
         mode = mode_automatic;
         speed_control.set_neutral_pwm_us(rx_speed.pulse_us());
@@ -609,7 +650,9 @@ void loop() {
       break;
 
     case mode_automatic:
+#ifndef TEENSYDUINO
       digitalWrite(PIN_SRC_SELECT, HIGH);
+#endif
       steering.writeMicroseconds(1500);
       speed_control.set_command(speed_for_ping_inches(inches));
       speed_control.execute();
@@ -617,7 +660,9 @@ void loop() {
         mode = mode_manual;
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
+ #ifndef TEENSYDUINO
         digitalWrite(PIN_SRC_SELECT, LOW);
+ #endif
         beeper.beep_descending();
         Serial.println("switched to manual - user initiated");
       }
@@ -625,7 +670,9 @@ void loop() {
         mode = mode_manual;
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
+#ifndef TEENSYDUINO
         digitalWrite(PIN_SRC_SELECT, LOW);
+#endif
         beeper.beep_warble();
         Serial.println("switched to manual - no coms");
       }

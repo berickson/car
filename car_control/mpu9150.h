@@ -218,7 +218,7 @@ void trace_mpu() {
 }
 
 
-void process_mpu(){
+inline void process_mpu(){
   // wait for MPU interrupt or extra packet(s) available
   if (!mpuInterrupt && fifoCount < packetSize)
     return;
@@ -258,7 +258,7 @@ public:
   void setup(){
     setup_mpu();
   }
-  void loop(){
+  inline void loop(){
     process_mpu();
   }
   void trace_status() {
