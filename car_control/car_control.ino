@@ -1,5 +1,4 @@
-#include <MPU6050_9Axis_MotionApps41.h>
-//#include <MPU6050_6Axis_MotionApps20.h>
+#include "MPU6050_9Axis_MotionApps41.h"
 #include <MPU6050.h>
 #include <helper_3dmath.h>
 
@@ -19,48 +18,58 @@
 // interrupt 0 = pin 2
 // interrupt 1 = pin 3
 
-#ifdef TEENSYDUINO
-
-#define PIN_RX_STEER 2
 #define PIN_RX_SPEED 1
+#define PIN_RX_STEER 2
+
+#define PIN_U_SPEED 3
+#define PIN_U_STEER 4
 //#define PIN_SRC_SELECT 4
 
 #define PIN_PING_TRIG 6
 #define PIN_PING_ECHO 23
 
 #define PIN_SPEAKER   10
+#define PIN_LED 13
+
+
+struct Blinker {
+  int period_ms = 1000;
+  int on_ms = 1;
+  int pin = PIN_LED;
+  unsigned long wait_ms = 0;
+  unsigned long last_change_ms = 0;
+  bool is_on = false;
+
+  void init(int _pin = PIN_LED) {
+    pin = _pin;
+    pinMode(pin, OUTPUT);
+  }
+
+  void execute() {
+    unsigned long ms = millis();
+    if(ms - last_change_ms <= wait_ms)
+      return;
+    is_on = !is_on;
+    last_change_ms = ms;
+    digitalWrite(pin, is_on);
+    if(is_on) {
+      wait_ms =on_ms;
+    }
+    else {
+      wait_ms = period_ms - on_ms;
+    }
+  }
+};
 
 // computer steering and speed
-#define PIN_U_STEER 4
-#define PIN_U_SPEED 3
-
-#else
-
-#define PIN_RX_STEER 2
-#define PIN_RX_SPEED 3
-#define PIN_SRC_SELECT 4
-
-#define PIN_PING_TRIG 6
-#define PIN_PING_ECHO 7
-
-#define PIN_SPEAKER   10
-
-// computer steering and speed
-#define PIN_U_STEER 8
-#define PIN_U_SPEED 9
-#endif
-
-
-
-
 struct PwmInput {
   unsigned long last_trigger_us = 0;
   unsigned long pulse_width_us = 0;
 
   // since we are dealing with standard RC,
   // anything out of of the below ranges should not occur and is ignored
-  unsigned long max_pulse_us = 3000;
-  unsigned long min_pulse_us = 500;
+  unsigned long max_pulse_us = 1700;
+  unsigned long min_pulse_us = 1300;
 
   unsigned long last_pulse_ms = 0;  // time when last pulse occurred
 
@@ -270,9 +279,9 @@ struct RxEvents {
    char steer_code(int steer_us) {
     if (steer_us == 0)
       return '?';
-    if (steer_us < 1300)
+    if (steer_us < 1400)
       return 'R';
-    if (steer_us > 1700)
+    if (steer_us > 1600)
       return 'L';
     return 'C';
   }
@@ -397,7 +406,7 @@ struct SpeedControl {
   unsigned long brake_start_ms = 0;
   unsigned long pause_start_ms = 0;
 
-  const int forward_us =  1350;
+  const int forward_us =  1300;
   const int reverse_us =  1650;
   const int neutral_us = 1500;
   int calibration_us = 0;
@@ -518,6 +527,7 @@ PwmInput rx_speed;
 RxEvents rx_events;
 Ping ping;
 Beeper beeper;
+Blinker blinker;
 
 
 // diagnostics for reporting loop speeds
@@ -569,6 +579,7 @@ void setup() {
   rx_steer.attach(PIN_RX_STEER);
   rx_speed.attach(PIN_RX_SPEED);
   speed_control.init(&speed);
+  blinker.init();
 
 #ifndef TEENSYDUINO
   pinMode(PIN_SRC_SELECT, OUTPUT);
@@ -602,16 +613,14 @@ void setup() {
   last_report_ms = millis();
 
   Serial.begin(9600);
-  Serial.println("car_control begun");
-#ifdef TEENSYDUINO
-  Serial.println("teensy detected");
-#endif
+  Serial.println("car_control begun Nicole");
   mpu9150.setup();
 }
 
 
 void loop() {
   mpu9150.loop();
+  blinker.execute();
 
   unsigned long loop_time_ms = millis();
   loop_count++;
@@ -626,20 +635,22 @@ void loop() {
     Serial.println(inches);
   }
 
-
-
+  if(0) {
+    Serial.print("Speed: ");
+    Serial.print(rx_speed.pulse_us());
+    Serial.print("Steer: ");
+    Serial.print(rx_steer.pulse_us());
+    Serial.println();
+  }
   switch (mode) {
     case mode_manual:
-#ifdef TEENSYDUINO
-      steering.writeMicroseconds(rx_steer.pulse_us());
-      speed.writeMicroseconds(rx_speed.pulse_us());
-
-#else
-      digitalWrite(PIN_SRC_SELECT, LOW);
-      steering.writeMicroseconds(1500);
-      speed.writeMicroseconds(1500);
-#endif
-
+      if(rx_steer.pulse_us() > 0 && rx_speed.pulse_us() > 0) {
+        steering.writeMicroseconds(rx_steer.pulse_us());
+        speed.writeMicroseconds(rx_speed.pulse_us());
+      } else {
+        steering.writeMicroseconds(1500);
+        speed.writeMicroseconds(1500);
+      }
 
       if (new_rx_event && rx_events.recent.matches(auto_pattern, count_of(auto_pattern))) {
         mode = mode_automatic;
@@ -650,9 +661,7 @@ void loop() {
       break;
 
     case mode_automatic:
-#ifndef TEENSYDUINO
-      digitalWrite(PIN_SRC_SELECT, HIGH);
-#endif
+
       steering.writeMicroseconds(1500);
       speed_control.set_command(speed_for_ping_inches(inches));
       speed_control.execute();
@@ -660,9 +669,6 @@ void loop() {
         mode = mode_manual;
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
- #ifndef TEENSYDUINO
-        digitalWrite(PIN_SRC_SELECT, LOW);
- #endif
         beeper.beep_descending();
         Serial.println("switched to manual - user initiated");
       }
@@ -670,9 +676,6 @@ void loop() {
         mode = mode_manual;
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
-#ifndef TEENSYDUINO
-        digitalWrite(PIN_SRC_SELECT, LOW);
-#endif
         beeper.beep_warble();
         Serial.println("switched to manual - no coms");
       }
@@ -694,7 +697,7 @@ void loop() {
   //  60,900 loops per second on Teensy 3.1 @ 24MHz 8/29
   if(1) {
     unsigned long ms_since_report = loop_time_ms - last_report_ms;
-    if( ms_since_report >= 10000) {
+    if( ms_since_report >= 1000) {
       unsigned long loops_since_report = loop_count - last_report_loop_count;
       double seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
       Serial.print("loops per second: ");

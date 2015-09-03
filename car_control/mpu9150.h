@@ -18,14 +18,14 @@ MPU6050 mpu;
 // (in degrees) calculated from the quaternions coming from the FIFO.
 // Note that Euler angles suffer from gimbal lock (for more info, see
 // http://en.wikipedia.org/wiki/Gimbal_lock)
-//#define OUTPUT_READABLE_EULER
+#define OUTPUT_READABLE_EULER
 
 // uncomment "OUTPUT_READABLE_YAWPITCHROLL" if you want to see the yaw/
 // pitch/roll angles (in degrees) calculated from the quaternions coming
 // from the FIFO. Note this also requires gravity vector calculations.
 // Also note that yaw/pitch/roll angles suffer from gimbal lock (for
 // more info, see: http://en.wikipedia.org/wiki/Gimbal_lock)
-//#define OUTPUT_READABLE_YAWPITCHROLL
+#define OUTPUT_READABLE_YAWPITCHROLL
 
 // uncomment "OUTPUT_READABLE_REALACCEL" if you want to see acceleration
 // components with gravity removed. This acceleration reference frame is
@@ -43,6 +43,9 @@ MPU6050 mpu;
 // uncomment "OUTPUT_TEAPOT" if you want output that matches the
 // format used for the InvenSense teapot demo
 //#define OUTPUT_TEAPOT
+
+// uncomment OUTPUT_GRAVITY if you want to display the gravity vector
+#define OUTPUT_GRAVITY
 
 
 
@@ -177,6 +180,13 @@ void trace_mpu() {
       // display real acceleration, adjusted to remove gravity
       mpu.dmpGetQuaternion(&q, fifoBuffer);
       mpu.dmpGetAccel(&aa, fifoBuffer);
+      Serial.print("aa\t");
+      Serial.print(aa.x);
+      Serial.print("\t");
+      Serial.print(aa.y);
+      Serial.print("\t");
+      Serial.println(aa.z);
+
       mpu.dmpGetGravity(&gravity, &q);
       mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
       Serial.print("areal\t");
@@ -200,6 +210,17 @@ void trace_mpu() {
       Serial.print(aaWorld.y);
       Serial.print("\t");
       Serial.println(aaWorld.z);
+  #endif
+
+  #ifdef OUTPUT_GRAVITY
+    mpu.dmpGetQuaternion(&q, fifoBuffer);
+    mpu.dmpGetGravity(&gravity, &q);
+    Serial.print("gravity\t");
+    Serial.print(gravity.x);
+    Serial.print("\t");
+    Serial.print(gravity.y);
+    Serial.print("\t");
+    Serial.println(gravity.z);
   #endif
 
   #ifdef OUTPUT_TEAPOT
