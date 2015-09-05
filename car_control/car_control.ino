@@ -700,11 +700,13 @@ void loop() {
     if( ms_since_report >= 1000) {
       unsigned long loops_since_report = loop_count - last_report_loop_count;
       double seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
+      /*
       Serial.print("loops per second: ");
       Serial.print( loops_since_report / seconds_since_report );
       Serial.print(" microseconds per loop ");
       Serial.print( 1E6 * seconds_since_report / loops_since_report );
       Serial.println();
+      */
       mpu9150.trace_status();
 
       // remember stats for next report

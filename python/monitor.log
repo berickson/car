@@ -9345,3 +9345,1027 @@ aa	7677	-172	-458
 areal	30	0	-9
 aworld	6	3	30
 gravity	1.00	-0.02	-0.06
+loops per second: 91545.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.66	70.14	-99.96
+ypr	-100.66	86.40	-1.28
+aa	7680	-178	-456
+areal	33	-6	-5
+aworld	4	-3	33
+gravity	1.00	-0.02	-0.06
+loops per second: 91561.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.71	70.13	-100.01
+ypr	-100.71	86.38	-1.28
+aa	7686	-178	-459
+areal	39	-6	-6
+aworld	5	-3	39
+gravity	1.00	-0.02	-0.06
+loops per second: 91081.59 microseconds per loop 10.98
+quat	0.67	0.12	-0.72	0.12
+euler	-100.68	70.14	-99.98
+ypr	-100.68	86.39	-1.27
+aa	7695	-174	-442
+areal	48	-3	9
+aworld	-10	-5	47
+gravity	1.00	-0.02	-0.06
+loops per second: 91520.00 microseconds per loop 10.93
+quat	0.67	0.12	-0.72	0.12
+euler	-100.65	70.14	-99.96
+ypr	-100.65	86.40	-1.27
+aa	7681	-164	-454
+areal	34	6	-3
+aworld	-1	6	33
+gravity	1.00	-0.02	-0.06
+loops per second: 91608.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.66	70.13	-99.96
+ypr	-100.66	86.40	-1.28
+aa	7677	-165	-433
+areal	30	5	16
+aworld	-18	0	28
+gravity	1.00	-0.02	-0.06
+loops per second: 91556.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.64	70.14	-99.93
+ypr	-100.64	86.41	-1.28
+aa	7684	-169	-447
+areal	37	2	1
+aworld	-3	1	36
+gravity	1.00	-0.02	-0.06
+loops per second: 91548.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.66	70.14	-99.96
+ypr	-100.66	86.40	-1.28
+aa	7679	-175	-446
+areal	32	-3	4
+aworld	-4	-4	31
+gravity	1.00	-0.02	-0.06
+loops per second: 91542.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.61	70.16	-99.91
+ypr	-100.61	86.41	-1.27
+aa	7685	-175	-448
+areal	37	-4	0
+aworld	0	-3	37
+gravity	1.00	-0.02	-0.06
+loops per second: 91536.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.67	70.15	-99.97
+ypr	-100.67	86.40	-1.28
+aa	7679	-170	-465
+areal	32	0	-14
+aworld	11	4	32
+gravity	1.00	-0.02	-0.06
+loops per second: 91532.00 microseconds per loop 10.93
+quat	0.67	0.12	-0.72	0.12
+euler	-100.67	70.15	-99.97
+ypr	-100.67	86.40	-1.28
+aa	7688	-176	-454
+areal	41	-5	-3
+aworld	1	-3	41
+gravity	1.00	-0.02	-0.06
+loops per second: 91535.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.63	70.14	-99.93
+ypr	-100.63	86.41	-1.28
+aa	7690	-171	-444
+areal	43	0	4
+aworld	-6	-1	42
+gravity	1.00	-0.02	-0.06
+loops per second: 91528.00 microseconds per loop 10.93
+quat	0.67	0.12	-0.72	0.12
+euler	-100.59	70.14	-99.89
+ypr	-100.59	86.42	-1.27
+aa	7686	-169	-446
+areal	38	1	1
+aworld	-3	0	37
+gravity	1.00	-0.02	-0.06
+loops per second: 91533.00 microseconds per loop 10.93
+quat	0.67	0.12	-0.72	0.12
+euler	-100.65	70.12	-99.95
+ypr	-100.65	86.40	-1.28
+aa	7686	-173	-449
+areal	39	-2	0
+aworld	-1	-1	38
+gravity	1.00	-0.02	-0.06
+loops per second: 91576.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.61	70.12	-99.91
+ypr	-100.61	86.41	-1.28
+aa	7678	-166	-445
+areal	31	4	3
+aworld	-6	2	30
+gravity	1.00	-0.02	-0.06
+loops per second: 91538.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.58	70.13	-99.88
+ypr	-100.58	86.42	-1.27
+aa	7683	-173	-452
+areal	35	-2	-4
+aworld	2	0	35
+gravity	1.00	-0.02	-0.06
+loops per second: 91537.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.59	70.12	-99.90
+ypr	-100.59	86.42	-1.27
+aa	7683	-169	-442
+areal	36	1	4
+aworld	-6	0	35
+gravity	1.00	-0.02	-0.06
+loops per second: 91083.67 microseconds per loop 10.98
+quat	0.67	0.12	-0.72	0.12
+euler	-100.56	70.14	-99.86
+ypr	-100.56	86.43	-1.28
+aa	7685	-175	-441
+areal	37	-4	5
+aworld	-5	-5	36
+gravity	1.00	-0.02	-0.06
+loops per second: 91410.00 microseconds per loop 10.94
+quat	0.67	0.12	-0.72	0.12
+euler	-100.60	70.13	-99.90
+ypr	-100.60	86.42	-1.27
+aa	7685	-171	-451
+areal	38	-1	-3
+aworld	0	0	38
+gravity	1.00	-0.02	-0.06
+loops per second: 91542.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.59	70.14	-99.90
+ypr	-100.59	86.42	-1.26
+aa	7690	-163	-437
+areal	42	6	10
+aworld	-14	2	41
+gravity	1.00	-0.02	-0.06
+loops per second: 91562.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.59	70.12	-99.89
+ypr	-100.59	86.42	-1.28
+aa	7678	-176	-455
+areal	31	-5	-8
+aworld	7	-1	31
+gravity	1.00	-0.02	-0.06
+loops per second: 91569.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.61	70.13	-99.92
+ypr	-100.61	86.41	-1.27
+aa	7686	-175	-456
+areal	38	-5	-7
+aworld	5	-2	38
+gravity	1.00	-0.02	-0.06
+loops per second: 91575.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.62	70.12	-99.93
+ypr	-100.62	86.41	-1.27
+aa	7682	-173	-448
+areal	35	-3	0
+aworld	-1	-2	34
+gravity	1.00	-0.02	-0.06
+loops per second: 91586.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.61	70.14	-99.93
+ypr	-100.61	86.41	-1.27
+aa	7680	-172	-450
+areal	32	-2	0
+aworld	-1	-1	31
+gravity	1.00	-0.02	-0.06
+loops per second: 91545.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.61	70.12	-99.93
+ypr	-100.61	86.41	-1.26
+aa	7691	-173	-450
+areal	44	-4	-1
+aworld	0	-3	44
+gravity	1.00	-0.02	-0.06
+loops per second: 91541.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.58	70.12	-99.88
+ypr	-100.58	86.42	-1.27
+aa	7680	-174	-453
+areal	33	-4	-6
+aworld	4	-1	33
+gravity	1.00	-0.02	-0.06
+loops per second: 91535.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.52	70.11	-99.81
+ypr	-100.52	86.44	-1.28
+aa	7687	-171	-448
+areal	39	0	-3
+aworld	0	1	39
+gravity	1.00	-0.02	-0.06
+loops per second: 91526.00 microseconds per loop 10.93
+quat	0.67	0.12	-0.72	0.12
+euler	-100.59	70.09	-99.89
+ypr	-100.59	86.42	-1.28
+aa	7682	-175	-456
+areal	35	-4	-8
+aworld	6	-1	35
+gravity	1.00	-0.02	-0.06
+loops per second: 91529.00 microseconds per loop 10.93
+quat	0.67	0.12	-0.72	0.12
+euler	-100.59	70.11	-99.89
+ypr	-100.59	86.41	-1.28
+aa	7683	-165	-444
+areal	35	5	4
+aworld	-7	3	34
+gravity	1.00	-0.02	-0.06
+loops per second: 91528.00 microseconds per loop 10.93
+quat	0.67	0.12	-0.72	0.12
+euler	-100.61	70.09	-99.91
+ypr	-100.61	86.41	-1.28
+aa	7678	-172	-451
+areal	31	-1	-2
+aworld	0	0	31
+gravity	1.00	-0.02	-0.06
+loops per second: 91520.00 microseconds per loop 10.93
+quat	0.67	0.12	-0.72	0.12
+euler	-100.60	70.08	-99.90
+ypr	-100.60	86.41	-1.28
+aa	7686	-175	-449
+areal	39	-4	0
+aworld	-1	-3	39
+gravity	1.00	-0.02	-0.06
+loops per second: 91043.78 microseconds per loop 10.98
+quat	0.67	0.12	-0.72	0.12
+euler	-100.57	70.08	-99.86
+ypr	-100.57	86.41	-1.29
+aa	7685	-174	-449
+areal	37	-2	-1
+aworld	0	-1	37
+gravity	1.00	-0.02	-0.06
+loops per second: 91466.00 microseconds per loop 10.93
+quat	0.67	0.12	-0.72	0.12
+euler	-100.55	70.06	-99.85
+ypr	-100.55	86.42	-1.28
+aa	7688	-169	-443
+areal	41	1	3
+aworld	-5	0	40
+gravity	1.00	-0.02	-0.06
+loops per second: 91526.00 microseconds per loop 10.93
+quat	0.67	0.12	-0.72	0.12
+euler	-100.54	70.06	-99.84
+ypr	-100.54	86.42	-1.28
+aa	7684	-174	-444
+areal	36	-3	2
+aworld	-3	-3	35
+gravity	1.00	-0.02	-0.06
+loops per second: 91525.00 microseconds per loop 10.93
+quat	0.67	0.12	-0.72	0.12
+euler	-100.56	70.04	-99.86
+ypr	-100.56	86.41	-1.29
+aa	7687	-173	-451
+areal	40	0	-3
+aworld	0	1	40
+gravity	1.00	-0.02	-0.06
+loops per second: 91528.00 microseconds per loop 10.93
+quat	0.67	0.12	-0.72	0.12
+euler	-100.51	70.05	-99.80
+ypr	-100.51	86.43	-1.29
+aa	7685	-177	-437
+areal	37	-4	8
+aworld	-8	-6	36
+gravity	1.00	-0.02	-0.06
+loops per second: 91520.00 microseconds per loop 10.93
+quat	0.67	0.12	-0.72	0.12
+euler	-100.51	70.04	-99.80
+ypr	-100.51	86.43	-1.28
+aa	7683	-177	-454
+areal	36	-5	-9
+aworld	7	-1	36
+gravity	1.00	-0.02	-0.06
+loops per second: 91540.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.53	70.04	-99.83
+ypr	-100.53	86.43	-1.28
+aa	7683	-167	-453
+areal	36	3	-6
+aworld	2	4	36
+gravity	1.00	-0.02	-0.06
+loops per second: 91547.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.53	70.03	-99.83
+ypr	-100.53	86.43	-1.28
+aa	7689	-169	-442
+areal	42	2	3
+aworld	-6	0	41
+gravity	1.00	-0.02	-0.06
+loops per second: 91560.00 microseconds per loop 10.92
+quat	0.67	0.12	-0.72	0.12
+euler	-100.55	70.03	-99.85
+ypr	-100.55	86.41	-1.29
+aa	7687	-184	-428
+areal	40	-11	19
+aworld	-16	-16	39
+gravity	1.00	-0.02	-0.06
+loops per second: 91566.00 microseconds per loop 10.92
+quat	0.66	0.18	-0.71	0.17
+euler	-96.80	61.26	-97.08
+ypr	-96.80	86.55	-0.58
+aa	7742	-69	-361
+areal	93	9	93
+aworld	-91	-38	87
+gravity	1.00	-0.01	-0.06
+loops per second: 91569.00 microseconds per loop 10.92
+quat	0.66	0.18	-0.70	0.18
+euler	-96.47	59.64	-96.44
+ypr	-96.47	86.63	-0.91
+aa	7687	-163	-453
+areal	38	-41	-18
+aworld	33	-26	39
+gravity	1.00	-0.02	-0.06
+loops per second: 91544.00 microseconds per loop 10.92
+quat	0.65	0.16	-0.73	0.16
+euler	-104.55	63.29	-104.45
+ypr	-104.55	83.37	-1.58
+aa	7914	-673	-392
+areal	303	-461	467
+aworld	-250	-625	261
+gravity	0.99	-0.03	-0.11
+loops per second: 91541.00 microseconds per loop 10.92
+quat	0.62	0.13	-0.77	0.12
+euler	-121.02	66.07	-121.66
+ypr	-121.02	77.60	-1.57
+aa	7573	-165	-1550
+areal	89	45	81
+aworld	-108	9	68
+gravity	0.98	-0.03	-0.21
+loops per second: 91536.00 microseconds per loop 10.92
+quat	0.66	0.21	-0.70	0.20
+euler	-95.17	56.02	-95.63
+ypr	-95.17	86.82	-0.49
+aa	7701	-196	-295
+areal	50	-130	125
+aworld	-33	-178	44
+gravity	1.00	-0.01	-0.05
+loops per second: 91072.71 microseconds per loop 10.98
+quat	0.63	0.29	-0.66	0.28
+euler	-92.85	42.53	-94.05
+ypr	-92.85	87.02	-0.11
+aa	7722	-178	-243
+areal	70	-163	155
+aworld	12	-226	62
+gravity	1.00	-0.00	-0.05
+loops per second: 91398.00 microseconds per loop 10.94
+quat	0.63	0.28	-0.67	0.27
+euler	-93.60	43.82	-94.26
+ypr	-93.60	86.86	-0.65
+aa	7691	-145	-418
+areal	40	-58	-8
+aworld	45	-35	41
+gravity	1.00	-0.01	-0.05
+loops per second: 91528.00 microseconds per loop 10.93
+quat	0.63	0.28	-0.67	0.27
+euler	-93.81	43.82	-94.23
+ypr	-93.81	86.83	-0.88
+aa	7690	-147	-399
+areal	39	-29	8
+aworld	13	-26	38
+gravity	1.00	-0.02	-0.05
+loops per second: 91521.00 microseconds per loop 10.93
+quat	0.64	0.26	-0.68	0.26
+euler	-94.41	46.55	-94.49
+ypr	-94.41	86.71	-1.14
+aa	7686	-149	-406
+areal	37	3	5
+aworld	-7	-2	36
+gravity	1.00	-0.02	-0.05
+loops per second: 91525.00 microseconds per loop 10.93
+quat	0.67	0.14	-0.72	0.16
+euler	-100.14	65.21	-98.54
+ypr	-100.14	85.72	-2.37
+aa	7682	-167	-420
+areal	41	149	56
+aworld	-115	112	31
+gravity	1.00	-0.04	-0.06
+loops per second: 91526.00 microseconds per loop 10.93
+quat	0.60	0.37	-0.63	0.34
+euler	-91.02	30.09	-93.52
+ypr	-91.02	86.86	0.75
+aa	7932	146	964
+areal	281	45	1371
+aworld	-730	-1176	208
+gravity	1.00	0.01	-0.05
+loops per second: 91527.00 microseconds per loop 10.93
+quat	0.47	0.54	-0.49	0.49
+euler	-87.82	-3.96	-93.82
+ypr	-87.82	85.73	1.91
+aa	7695	-86	-389
+areal	54	-341	120
+aworld	350	-98	34
+gravity	1.00	0.03	-0.07
+loops per second: 91533.00 microseconds per loop 10.93
+quat	0.50	0.50	-0.53	0.47
+euler	-89.99	3.06	-93.37
+ypr	-89.99	86.64	0.19
+aa	7693	-110	-427
+areal	44	-135	21
+aworld	133	-30	42
+gravity	1.00	0.00	-0.06
+loops per second: 91536.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.10	8.40	-93.31
+ypr	-91.10	86.68	-0.61
+aa	7683	-108	-423
+areal	34	-26	13
+aworld	23	-18	33
+gravity	1.00	-0.01	-0.06
+loops per second: 91524.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.55	0.45
+euler	-91.22	8.40	-93.26
+ypr	-91.22	86.70	-0.74
+aa	7683	-117	-431
+areal	34	-18	0
+aworld	17	-4	34
+gravity	1.00	-0.01	-0.06
+loops per second: 91549.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.30	8.72	-93.22
+ypr	-91.30	86.72	-0.81
+aa	7683	-108	-427
+areal	34	0	-1
+aworld	0	0	33
+gravity	1.00	-0.01	-0.06
+loops per second: 91555.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.32	8.71	-93.22
+ypr	-91.32	86.71	-0.83
+aa	7689	-110	-424
+areal	39	1	1
+aworld	-2	-2	38
+gravity	1.00	-0.01	-0.06
+loops per second: 91563.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.34	8.69	-93.22
+ypr	-91.34	86.71	-0.84
+aa	7685	-110	-424
+areal	36	2	0
+aworld	-2	-1	35
+gravity	1.00	-0.01	-0.06
+loops per second: 91575.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.34	8.69	-93.22
+ypr	-91.34	86.71	-0.85
+aa	7685	-119	-420
+areal	36	-5	4
+aworld	3	-6	35
+gravity	1.00	-0.01	-0.06
+loops per second: 91099.50 microseconds per loop 10.98
+quat	0.52	0.47	-0.55	0.45
+euler	-91.35	8.68	-93.21
+ypr	-91.35	86.71	-0.86
+aa	7688	-114	-431
+areal	38	1	-7
+aworld	0	5	38
+gravity	1.00	-0.02	-0.06
+loops per second: 91486.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.56	0.45
+euler	-91.36	8.84	-93.21
+ypr	-91.36	86.71	-0.87
+aa	7681	-111	-435
+areal	31	5	-10
+aworld	-4	9	31
+gravity	1.00	-0.02	-0.06
+loops per second: 91549.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.35	8.84	-93.21
+ypr	-91.35	86.71	-0.85
+aa	7686	-115	-418
+areal	36	0	6
+aworld	-1	-7	35
+gravity	1.00	-0.01	-0.06
+loops per second: 91542.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.35	8.84	-93.21
+ypr	-91.35	86.72	-0.86
+aa	7690	-112	-426
+areal	40	2	-2
+aworld	-2	0	40
+gravity	1.00	-0.01	-0.06
+loops per second: 91534.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.36	8.82	-93.20
+ypr	-91.36	86.72	-0.86
+aa	7681	-111	-426
+areal	31	4	-3
+aworld	-4	1	31
+gravity	1.00	-0.02	-0.06
+loops per second: 91567.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.36	8.82	-93.20
+ypr	-91.36	86.72	-0.86
+aa	7681	-111	-427
+areal	31	4	-4
+aworld	-4	2	31
+gravity	1.00	-0.02	-0.06
+loops per second: 91541.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.35	8.82	-93.21
+ypr	-91.35	86.72	-0.85
+aa	7690	-111	-430
+areal	40	2	-6
+aworld	-1	4	40
+gravity	1.00	-0.01	-0.06
+loops per second: 91530.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.56	0.45
+euler	-91.34	8.82	-93.19
+ypr	-91.34	86.73	-0.85
+aa	7684	-105	-419
+areal	34	9	2
+aworld	-9	-2	33
+gravity	1.00	-0.01	-0.06
+loops per second: 91538.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.35	8.81	-93.21
+ypr	-91.35	86.72	-0.86
+aa	7690	-107	-437
+areal	41	7	-13
+aworld	-5	11	41
+gravity	1.00	-0.01	-0.06
+loops per second: 91539.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.35	8.80	-93.22
+ypr	-91.35	86.71	-0.85
+aa	7688	-105	-437
+areal	39	8	-12
+aworld	-6	11	39
+gravity	1.00	-0.01	-0.06
+loops per second: 91538.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.35	8.81	-93.20
+ypr	-91.35	86.73	-0.85
+aa	7684	-110	-429
+areal	35	3	-6
+aworld	-2	4	35
+gravity	1.00	-0.01	-0.06
+loops per second: 91542.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.35	8.82	-93.22
+ypr	-91.35	86.71	-0.86
+aa	7681	-114	-424
+areal	31	0	0
+aworld	0	-1	30
+gravity	1.00	-0.01	-0.06
+loops per second: 91545.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.35	8.82	-93.20
+ypr	-91.35	86.73	-0.86
+aa	7692	-111	-428
+areal	42	3	-5
+aworld	-3	3	42
+gravity	1.00	-0.01	-0.06
+loops per second: 91534.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.34	8.82	-93.20
+ypr	-91.34	86.73	-0.85
+aa	7686	-121	-415
+areal	36	-7	7
+aworld	5	-9	35
+gravity	1.00	-0.01	-0.06
+loops per second: 91056.72 microseconds per loop 10.98
+quat	0.52	0.47	-0.56	0.45
+euler	-91.34	8.82	-93.19
+ypr	-91.34	86.74	-0.84
+aa	7686	-114	-429
+areal	36	-1	-7
+aworld	1	4	36
+gravity	1.00	-0.01	-0.05
+loops per second: 91554.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.34	8.82	-93.20
+ypr	-91.34	86.73	-0.85
+aa	7677	-119	-426
+areal	27	-5	-3
+aworld	4	0	27
+gravity	1.00	-0.01	-0.06
+loops per second: 91573.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.33	8.82	-93.20
+ypr	-91.33	86.73	-0.84
+aa	7683	-115	-414
+areal	33	-3	8
+aworld	0	-10	32
+gravity	1.00	-0.01	-0.06
+loops per second: 91580.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.33	8.82	-93.19
+ypr	-91.33	86.73	-0.84
+aa	7689	-116	-431
+areal	39	-3	-9
+aworld	3	6	39
+gravity	1.00	-0.01	-0.06
+loops per second: 91584.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.34	8.81	-93.21
+ypr	-91.34	86.72	-0.84
+aa	7690	-116	-430
+areal	41	-3	-6
+aworld	2	3	41
+gravity	1.00	-0.01	-0.06
+loops per second: 91558.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.32	8.81	-93.19
+ypr	-91.32	86.74	-0.83
+aa	7680	-112	-427
+areal	30	0	-6
+aworld	0	4	30
+gravity	1.00	-0.01	-0.05
+loops per second: 91559.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.32	8.81	-93.19
+ypr	-91.32	86.74	-0.83
+aa	7681	-105	-427
+areal	31	5	-5
+aworld	-4	4	31
+gravity	1.00	-0.01	-0.05
+loops per second: 91553.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.32	8.80	-93.19
+ypr	-91.32	86.75	-0.83
+aa	7685	-110	-426
+areal	35	0	-5
+aworld	0	3	35
+gravity	1.00	-0.01	-0.05
+loops per second: 91542.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.32	8.80	-93.19
+ypr	-91.32	86.75	-0.83
+aa	7682	-110	-427
+areal	32	0	-6
+aworld	0	4	32
+gravity	1.00	-0.01	-0.05
+loops per second: 91580.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.32	8.80	-93.19
+ypr	-91.32	86.74	-0.83
+aa	7698	-109	-416
+areal	48	2	5
+aworld	-3	-7	47
+gravity	1.00	-0.01	-0.06
+loops per second: 91544.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.33	8.79	-93.18
+ypr	-91.33	86.75	-0.84
+aa	7690	-118	-425
+areal	40	-5	-5
+aworld	4	2	40
+gravity	1.00	-0.01	-0.05
+loops per second: 91536.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.33	8.78	-93.17
+ypr	-91.33	86.75	-0.84
+aa	7685	-117	-417
+areal	35	-4	1
+aworld	2	-3	34
+gravity	1.00	-0.01	-0.05
+loops per second: 91541.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.33	8.78	-93.20
+ypr	-91.33	86.73	-0.84
+aa	7684	-107	-431
+areal	34	5	-9
+aworld	-4	7	34
+gravity	1.00	-0.01	-0.06
+loops per second: 91080.60 microseconds per loop 10.98
+quat	0.52	0.47	-0.55	0.45
+euler	-91.34	8.77	-93.20
+ypr	-91.34	86.74	-0.84
+aa	7682	-113	-426
+areal	33	0	-4
+aworld	0	2	33
+gravity	1.00	-0.01	-0.05
+loops per second: 91459.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.55	0.45
+euler	-91.34	8.76	-93.21
+ypr	-91.34	86.72	-0.85
+aa	7686	-117	-433
+areal	37	-3	-9
+aworld	3	6	37
+gravity	1.00	-0.01	-0.06
+loops per second: 91539.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.33	8.76	-93.20
+ypr	-91.33	86.73	-0.84
+aa	7696	-123	-420
+areal	47	-10	2
+aworld	8	-5	46
+gravity	1.00	-0.01	-0.06
+loops per second: 91544.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.33	8.75	-93.19
+ypr	-91.33	86.74	-0.84
+aa	7691	-115	-427
+areal	41	-2	-5
+aworld	1	2	41
+gravity	1.00	-0.01	-0.05
+loops per second: 91535.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.33	8.75	-93.19
+ypr	-91.33	86.74	-0.84
+aa	7687	-112	-434
+areal	37	0	-12
+aworld	0	9	37
+gravity	1.00	-0.01	-0.05
+loops per second: 91549.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.33	8.74	-93.18
+ypr	-91.33	86.75	-0.85
+aa	7690	-117	-419
+areal	40	-3	0
+aworld	2	-2	39
+gravity	1.00	-0.01	-0.05
+loops per second: 91552.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.35	8.73	-93.19
+ypr	-91.35	86.74	-0.86
+aa	7685	-122	-420
+areal	36	-7	0
+aworld	6	-2	36
+gravity	1.00	-0.01	-0.05
+loops per second: 91563.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.34	8.72	-93.19
+ypr	-91.34	86.73	-0.85
+aa	7679	-112	-421
+areal	29	1	0
+aworld	-1	-1	28
+gravity	1.00	-0.01	-0.05
+loops per second: 91571.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.34	8.72	-93.21
+ypr	-91.34	86.72	-0.84
+aa	7692	-114	-428
+areal	43	-1	-4
+aworld	0	1	43
+gravity	1.00	-0.01	-0.06
+loops per second: 91576.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.33	8.71	-93.19
+ypr	-91.33	86.74	-0.85
+aa	7683	-114	-430
+areal	34	0	-9
+aworld	0	7	34
+gravity	1.00	-0.01	-0.05
+loops per second: 91559.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.34	8.70	-93.19
+ypr	-91.34	86.74	-0.85
+aa	7681	-110	-427
+areal	31	3	-6
+aworld	-2	4	31
+gravity	1.00	-0.01	-0.05
+loops per second: 91553.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.34	8.69	-93.19
+ypr	-91.34	86.74	-0.86
+aa	7684	-117	-420
+areal	34	-2	0
+aworld	1	-2	33
+gravity	1.00	-0.01	-0.05
+loops per second: 91546.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.34	8.69	-93.19
+ypr	-91.34	86.74	-0.85
+aa	7691	-121	-427
+areal	41	-7	-6
+aworld	6	2	41
+gravity	1.00	-0.01	-0.05
+loops per second: 91535.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.34	8.68	-93.20
+ypr	-91.34	86.73	-0.85
+aa	7690	-112	-427
+areal	41	1	-4
+aworld	-1	1	41
+gravity	1.00	-0.01	-0.06
+loops per second: 91009.95 microseconds per loop 10.99
+quat	0.52	0.47	-0.55	0.45
+euler	-91.33	8.68	-93.20
+ypr	-91.33	86.73	-0.84
+aa	7686	-107	-417
+areal	36	5	5
+aworld	-6	-6	35
+gravity	1.00	-0.01	-0.06
+loops per second: 91510.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.55	0.45
+euler	-91.34	8.69	-93.19
+ypr	-91.34	86.74	-0.85
+aa	7683	-113	-418
+areal	33	0	2
+aworld	-1	-3	32
+gravity	1.00	-0.01	-0.05
+loops per second: 91524.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.55	0.45
+euler	-91.33	8.68	-93.17
+ypr	-91.33	86.75	-0.85
+aa	7690	-114	-423
+areal	40	0	-3
+aworld	0	0	40
+gravity	1.00	-0.01	-0.05
+loops per second: 91532.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.55	0.45
+euler	-91.34	8.68	-93.21
+ypr	-91.34	86.72	-0.85
+aa	7692	-110	-433
+areal	43	3	-9
+aworld	-2	7	43
+gravity	1.00	-0.01	-0.06
+loops per second: 91533.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.55	0.45
+euler	-91.34	8.67	-93.18
+ypr	-91.34	86.75	-0.85
+aa	7686	-120	-427
+areal	37	-6	-7
+aworld	6	4	37
+gravity	1.00	-0.01	-0.05
+loops per second: 91530.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.55	0.45
+euler	-91.36	8.71	-93.17
+ypr	-91.36	86.74	-0.87
+aa	7714	-100	-345
+areal	64	16	74
+aworld	-28	-73	59
+gravity	1.00	-0.02	-0.05
+loops per second: 91533.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.56	0.45
+euler	-91.36	8.92	-93.18
+ypr	-91.36	86.74	-0.86
+aa	7691	-112	-427
+areal	41	3	-7
+aworld	-2	5	41
+gravity	1.00	-0.02	-0.05
+loops per second: 91531.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.56	0.45
+euler	-91.35	8.92	-93.19
+ypr	-91.35	86.73	-0.85
+aa	7683	-111	-430
+areal	33	2	-8
+aworld	-1	6	33
+gravity	1.00	-0.01	-0.06
+loops per second: 91527.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.56	0.45
+euler	-91.35	8.91	-93.20
+ypr	-91.35	86.73	-0.85
+aa	7694	-113	-423
+areal	44	1	0
+aworld	-2	-2	43
+gravity	1.00	-0.01	-0.06
+loops per second: 91541.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.36	8.90	-93.20
+ypr	-91.36	86.72	-0.86
+aa	7687	-116	-431
+areal	38	0	-8
+aworld	0	5	38
+gravity	1.00	-0.02	-0.06
+loops per second: 91550.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.35	8.90	-93.19
+ypr	-91.35	86.74	-0.85
+aa	7695	-99	-411
+areal	45	14	9
+aworld	-16	-9	44
+gravity	1.00	-0.01	-0.05
+loops per second: 91561.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.33	8.89	-93.19
+ypr	-91.33	86.74	-0.84
+aa	7678	-108	-412
+areal	28	4	8
+aworld	-5	-8	27
+gravity	1.00	-0.01	-0.05
+loops per second: 91576.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.34	8.89	-93.20
+ypr	-91.34	86.74	-0.84
+aa	7688	-112	-426
+areal	39	0	-4
+aworld	0	1	39
+gravity	1.00	-0.01	-0.05
+loops per second: 91575.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.34	8.88	-93.19
+ypr	-91.34	86.74	-0.84
+aa	7681	-115	-416
+areal	31	-2	4
+aworld	0	-5	30
+gravity	1.00	-0.01	-0.05
+loops per second: 91064.74 microseconds per loop 10.98
+quat	0.52	0.47	-0.56	0.45
+euler	-91.33	8.87	-93.20
+ypr	-91.33	86.73	-0.84
+aa	7684	-114	-422
+areal	34	-1	0
+aworld	0	-1	33
+gravity	1.00	-0.01	-0.06
+loops per second: 91469.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.56	0.45
+euler	-91.33	8.85	-93.18
+ypr	-91.33	86.75	-0.84
+aa	7691	-113	-410
+areal	41	0	9
+aworld	-2	-11	40
+gravity	1.00	-0.01	-0.05
+loops per second: 91543.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.56	0.45
+euler	-91.34	8.84	-93.19
+ypr	-91.34	86.75	-0.84
+aa	7689	-116	-428
+areal	40	-3	-8
+aworld	3	5	40
+gravity	1.00	-0.01	-0.05
+loops per second: 91534.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.33	8.83	-93.18
+ypr	-91.33	86.75	-0.84
+aa	7686	-120	-425
+areal	36	-8	-5
+aworld	7	1	36
+gravity	1.00	-0.01	-0.05
+loops per second: 91528.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.55	0.45
+euler	-91.34	8.82	-93.18
+ypr	-91.34	86.75	-0.84
+aa	7685	-111	-435
+areal	35	1	-15
+aworld	0	13	35
+gravity	1.00	-0.01	-0.05
+loops per second: 91531.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.55	0.45
+euler	-91.33	8.81	-93.18
+ypr	-91.33	86.75	-0.84
+aa	7691	-113	-426
+areal	41	0	-6
+aworld	0	3	41
+gravity	1.00	-0.01	-0.05
+loops per second: 91529.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.55	0.45
+euler	-91.32	8.80	-93.17
+ypr	-91.32	86.76	-0.83
+aa	7691	-110	-428
+areal	41	0	-9
+aworld	0	6	41
+gravity	1.00	-0.01	-0.05
+loops per second: 91531.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.55	0.45
+euler	-91.32	8.79	-93.17
+ypr	-91.32	86.76	-0.83
+aa	7687	-108	-417
+areal	37	3	1
+aworld	-3	-2	36
+gravity	1.00	-0.01	-0.05
+loops per second: 91532.00 microseconds per loop 10.93
+quat	0.52	0.47	-0.55	0.45
+euler	-91.33	8.78	-93.17
+ypr	-91.33	86.76	-0.84
+aa	7682	-116	-421
+areal	33	-3	-2
+aworld	2	0	33
+gravity	1.00	-0.01	-0.05
+loops per second: 91540.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.32	8.78	-93.19
+ypr	-91.32	86.74	-0.83
+aa	7688	-114	-432
+areal	38	-2	-11
+aworld	2	8	38
+gravity	1.00	-0.01	-0.05
+loops per second: 91540.00 microseconds per loop 10.92
+quat	0.52	0.47	-0.55	0.45
+euler	-91.32	8.77	-93.18
+ypr	-91.32	86.75	-0.84
+aa	7680	-113	-421
+areal	30	0	-1
+aworld	0	0	30
+gravity	1.00	-0.01	-0.05
+loops per second: 91540.00 microseconds per loop 10.92
+quat	0.55	0.42	-0.59	0.41
+euler	-92.44	17.72	-93.41
+ypr	-92.44	86.46	-1.40
+aa	7717	-171	-296
+areal	69	15	138
+aworld	-59	-129	60
+gravity	1.00	-0.02	-0.06
+loops per second: 91533.00 microseconds per loop 10.93
+quat	0.58	0.38	-0.61	0.39
+euler	-92.28	23.98	-92.18
+ypr	-92.28	87.57	-1.39
+aa	7711	-19	-285
+areal	56	166	-19
+aworld	-145	83	52
+gravity	1.00	-0.02	-0.03
+loops per second: 91542.00 microseconds per loop 10.92
+quat	0.52	0.48	-0.55	0.45
+euler	-90.69	7.74	-93.05
+ypr	-90.69	86.97	-0.28
+aa	7688	-195	-442
+areal	36	-158	-38
+aworld	161	14	38
+gravity	1.00	-0.00	-0.05
+loops per second: 91030.85 microseconds per loop 10.99
+quat	0.53	0.45	-0.57	0.43
+euler	-91.49	12.46	-93.21
+ypr	-91.49	86.77	-0.80
+aa	7685	-148	-440
+areal	35	-41	-21
+aworld	43	9	36
+gravity	1.00	-0.01	-0.05
