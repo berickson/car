@@ -1,0 +1,2 @@
+g++ -o play_console main.cpp -std=c++11
+makefile:9: recipe for target 'play_console' failed
