@@ -23,6 +23,10 @@
 #define PIN_SPEAKER   9
 #define PIN_LED 13
 
+#define MUTE_SOUNDS
+
+#define TRACE_PINGS 1
+#define TRACE_ESC 1
 
 struct Blinker {
   int period_ms = 1000;
@@ -145,8 +149,10 @@ struct Beeper {
   }
 
   void beep(int note) {
+#ifndef MUTE_SOUNDS
     tone(pin, note, note_ms);
     delay(note_ms + gap_ms);
+#endif
   }
 
   void beep_ascending() {
@@ -315,7 +321,7 @@ struct Ping {
 
   double last_ping_distance_inches = 0.;
 
-  unsigned long ping_rate_ms = 50;
+  unsigned long ping_rate_ms = 100;
   const unsigned long ping_timeout_us = 20000; // 20000 microseconds should be about 10 feet
 
   enum {
@@ -397,27 +403,22 @@ struct SpeedControl {
 
   Servo * speed;
 
-  const unsigned long brake_ms = 500;
-  const unsigned long pause_ms = 200;
+  const unsigned long brake_ms = 200;
+  const unsigned long pause_ms = 500;
   unsigned long brake_start_ms = 0;
   unsigned long pause_start_ms = 0;
 
-#define quiet_mode
-#ifdef quiet_mode
-  const int forward_us =  1499;
-  const int reverse_us =  1501;
-#else
   const int forward_us =  1200;
-  const int reverse_us =  1800;
-#endif
+  const int reverse_us =  1700;
 
 
   const int neutral_us = 1500;
   int calibration_us = 0;
+  int current_us = -1;
 
   eSpeedCommand command = speed_neutral;
 
-  enum {
+  enum eState {
     stopped,
     forward_braking,
     reverse_braking,
@@ -425,6 +426,18 @@ struct SpeedControl {
     reverse,
     pausing
   } state;
+
+  const char * state_name(eState s) {
+    const char *names[]  = {
+      "stopped",
+      "forward_braking",
+      "reverse_braking",
+      "forward",
+      "reverse",
+      "pausing"
+    };
+    return names[s];
+  }
 
   // used to match the control stick settings.
   // Will use setting as the new pulse width for
@@ -441,24 +454,36 @@ struct SpeedControl {
 
   // sets pulse width, adjusted by calibration if any
   void set_pwm_us(int us) {
-    unsigned long c_us = us + calibration_us;
-    speed->writeMicroseconds(c_us);
+    int c_us = us + calibration_us;
+    if(c_us != current_us) {
+      current_us = c_us;
+      speed->writeMicroseconds(current_us);
+      Serial.print("ESC set pulse: ");
+      Serial.println(current_us);
+    }
   }
 
   void set_command(eSpeedCommand new_command) {
-    command = new_command;
+    if(command == new_command) {
+      return;
+    }
 
-    Serial.println(command);
+    command = new_command;
+    Serial.print("ESC Command: ");
+    Serial.println(speed_command_name(command));
+    Serial.print("OLD ESC State: ");
+    Serial.println(state_name(state));
+
     if(command == speed_forward) {
       switch(state) {
         case stopped:
-        case forward_braking:
         case forward:
           state = forward;
           set_pwm_us(forward_us);
           break;
 
         case pausing:
+        case forward_braking:
         case reverse_braking:
           break;
 
@@ -472,13 +497,13 @@ struct SpeedControl {
     if(command == speed_reverse) {
       switch(state) {
         case stopped:
-        case reverse_braking:
         case reverse:
           state = reverse;
           set_pwm_us(reverse_us);
           break;
 
         case pausing:
+        case reverse_braking:
         case forward_braking:
           break;
 
@@ -510,6 +535,8 @@ struct SpeedControl {
           break;
       }
     }
+    Serial.print("New ESC State: ");
+    Serial.println(state_name(state));
   }
 
   void execute() {
@@ -533,10 +560,12 @@ struct SpeedControl {
 
     if(state == stopped) {
       if(command == speed_forward) {
+        Serial.println("forward from stopped");
         set_pwm_us(forward_us);
         state = forward;
       }
       if(command == speed_reverse) {
+        Serial.println("reverse from stopped");
         set_pwm_us(reverse_us);
         state = reverse;
       }
@@ -657,11 +686,13 @@ void loop() {
   ping.scan();
 
   double inches = ping.inches();//ping_inches();
-  bool new_ping = ping.new_data_read();
-  if(0 && new_ping) {
+  bool new_ping = ping.new_data_ready();
+  #if(TRACE_PINGS)
+  if(new_ping) {
     Serial.print("ping inches:");
     Serial.println(inches);
   }
+  #endif
 
   if(0) {
     Serial.print("Speed: ");
