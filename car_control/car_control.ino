@@ -23,10 +23,10 @@
 #define PIN_SPEAKER   9
 #define PIN_LED 13
 
-#define MUTE_SOUNDS
+#define PLAY_SOUNDS 1
 
-#define TRACE_PINGS 1
-#define TRACE_ESC 1
+#define TRACE_PINGS 0
+#define TRACE_ESC 0
 
 struct Blinker {
   int period_ms = 1000;
@@ -64,8 +64,8 @@ struct PwmInput {
 
   // since we are dealing with standard RC,
   // anything out of of the below ranges should not occur and is ignored
-  unsigned long max_pulse_us = 1900;
-  unsigned long min_pulse_us = 1100;
+  unsigned long max_pulse_us = 2000;
+  unsigned long min_pulse_us = 1000;
 
   unsigned long last_pulse_ms = 0;  // time when last pulse occurred
 
@@ -149,7 +149,7 @@ struct Beeper {
   }
 
   void beep(int note) {
-#ifndef MUTE_SOUNDS
+#if(PLAY_SOUNDS)
     tone(pin, note, note_ms);
     delay(note_ms + gap_ms);
 #endif
