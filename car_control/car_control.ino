@@ -8,29 +8,25 @@
 
 #include <Servo.h>
 #include "mpu9150.h"
+#include "car_control.h"
 
 #define count_of(a) (sizeof(a)/sizeof(a[0]))
-
-/////////////////////////////////////////////////////
-// PIN / Wiring
-//
-// on the micro, interrupts must go on pins 2 and 3
-// interrupt 0 = pin 2
-// interrupt 1 = pin 3
 
 #define PIN_RX_SPEED 1
 #define PIN_RX_STEER 2
 
 #define PIN_U_SPEED 3
 #define PIN_U_STEER 4
-//#define PIN_SRC_SELECT 4
-
 #define PIN_PING_TRIG 6
 #define PIN_PING_ECHO 23
 
-#define PIN_SPEAKER   10
+#define PIN_SPEAKER   9
 #define PIN_LED 13
 
+#define MUTE_SOUNDS
+
+#define TRACE_PINGS 1
+#define TRACE_ESC 1
 
 struct Blinker {
   int period_ms = 1000;
@@ -68,8 +64,8 @@ struct PwmInput {
 
   // since we are dealing with standard RC,
   // anything out of of the below ranges should not occur and is ignored
-  unsigned long max_pulse_us = 1700;
-  unsigned long min_pulse_us = 1300;
+  unsigned long max_pulse_us = 1900;
+  unsigned long min_pulse_us = 1100;
 
   unsigned long last_pulse_ms = 0;  // time when last pulse occurred
 
@@ -148,9 +144,15 @@ struct Beeper {
     this->pin = pin;
   }
 
+  void play(int note) {
+    tone(pin,note);
+  }
+
   void beep(int note) {
+#ifndef MUTE_SOUNDS
     tone(pin, note, note_ms);
     delay(note_ms + gap_ms);
+#endif
   }
 
   void beep_ascending() {
@@ -279,9 +281,9 @@ struct RxEvents {
    char steer_code(int steer_us) {
     if (steer_us == 0)
       return '?';
-    if (steer_us < 1400)
+    if (steer_us < 1300)
       return 'R';
-    if (steer_us > 1600)
+    if (steer_us > 1700)
       return 'L';
     return 'C';
   }
@@ -319,7 +321,7 @@ struct Ping {
 
   double last_ping_distance_inches = 0.;
 
-  unsigned long ping_rate_ms = 50;
+  unsigned long ping_rate_ms = 100;
   const unsigned long ping_timeout_us = 20000; // 20000 microseconds should be about 10 feet
 
   enum {
@@ -401,19 +403,22 @@ struct SpeedControl {
 
   Servo * speed;
 
-  const unsigned long brake_ms = 500;
-  const unsigned long pause_ms = 200;
+  const unsigned long brake_ms = 200;
+  const unsigned long pause_ms = 500;
   unsigned long brake_start_ms = 0;
   unsigned long pause_start_ms = 0;
 
-  const int forward_us =  1300;
-  const int reverse_us =  1650;
+  const int forward_us =  1200;
+  const int reverse_us =  1700;
+
+
   const int neutral_us = 1500;
   int calibration_us = 0;
+  int current_us = -1;
 
-  char command = 'N';
+  eSpeedCommand command = speed_neutral;
 
-  enum {
+  enum eState {
     stopped,
     forward_braking,
     reverse_braking,
@@ -421,6 +426,18 @@ struct SpeedControl {
     reverse,
     pausing
   } state;
+
+  const char * state_name(eState s) {
+    const char *names[]  = {
+      "stopped",
+      "forward_braking",
+      "reverse_braking",
+      "forward",
+      "reverse",
+      "pausing"
+    };
+    return names[s];
+  }
 
   // used to match the control stick settings.
   // Will use setting as the new pulse width for
@@ -437,48 +454,89 @@ struct SpeedControl {
 
   // sets pulse width, adjusted by calibration if any
   void set_pwm_us(int us) {
-    unsigned long c_us = us + calibration_us;
-    speed->writeMicroseconds(c_us);
+    int c_us = us + calibration_us;
+    if(c_us != current_us) {
+      current_us = c_us;
+      speed->writeMicroseconds(current_us);
+      Serial.print("ESC set pulse: ");
+      Serial.println(current_us);
+    }
   }
 
-  void set_command(char speed_code) {
-    Serial.println(speed_code);
-    if(speed_code == 'F') {
-      if(state == stopped || state == forward_braking) {
-        state = forward;
-        set_pwm_us(forward_us);
-      }
-      if(state == reverse) {
-        set_pwm_us(forward_us);
-        state = reverse_braking;
-        brake_start_ms = millis();
-      }
-    }
-    if(speed_code == 'R') {
-      if(state == stopped || state == reverse_braking) {
-        state = reverse;
-        set_pwm_us(reverse_us);
-      }
-      if(state == forward) {
-        state = forward_braking;
-        set_pwm_us(reverse_us);
-        brake_start_ms = millis();
-      }
-    }
-    if(speed_code == 'N'){
-      if(state == forward){
-        state = forward_braking;
-        set_pwm_us(reverse_us);
-        brake_start_ms = millis();
-      }
-      if(state == reverse){
-        state = reverse_braking;
-        set_pwm_us(forward_us);
-        brake_start_ms = millis();
-      }
+  void set_command(eSpeedCommand new_command) {
+    if(command == new_command) {
+      return;
     }
 
-    command = speed_code;
+    command = new_command;
+    Serial.print("ESC Command: ");
+    Serial.println(speed_command_name(command));
+    Serial.print("OLD ESC State: ");
+    Serial.println(state_name(state));
+
+    if(command == speed_forward) {
+      switch(state) {
+        case stopped:
+        case forward:
+          state = forward;
+          set_pwm_us(forward_us);
+          break;
+
+        case pausing:
+        case forward_braking:
+        case reverse_braking:
+          break;
+
+        case reverse:
+          set_pwm_us(forward_us);
+          state = reverse_braking;
+          brake_start_ms = millis();
+          break;
+      }
+    }
+    if(command == speed_reverse) {
+      switch(state) {
+        case stopped:
+        case reverse:
+          state = reverse;
+          set_pwm_us(reverse_us);
+          break;
+
+        case pausing:
+        case reverse_braking:
+        case forward_braking:
+          break;
+
+        case forward:
+          state = forward_braking;
+          set_pwm_us(reverse_us);
+          brake_start_ms = millis();
+          break;
+      }
+    }
+    if(command == speed_neutral){
+      switch(state) {
+        case stopped:
+        case pausing:
+        case reverse_braking:
+        case forward_braking:
+          break;
+
+        case reverse:
+          state = reverse_braking;
+          set_pwm_us(forward_us);
+          brake_start_ms = millis();
+          break;
+
+        case forward:
+          state = forward_braking;
+          set_pwm_us(reverse_us);
+          brake_start_ms = millis();
+          break;
+      }
+    }
+    Serial.print("New ESC State: ");
+    Serial.println(state_name(state));
   }
 
   void execute() {
@@ -496,18 +554,24 @@ struct SpeedControl {
       unsigned long ms = millis();
       if(ms - pause_start_ms >= pause_ms) {
         Serial.println("Pausing complete");
-        if(command == 'F') {
-          set_pwm_us(forward_us);
-          state = forward;
-        }
-        if(command == 'R') {
-          set_pwm_us(reverse_us);
-          state = reverse;
-        }
-        if(command == 'N') {
-          set_pwm_us(neutral_us);
-          state = stopped;
-        }
+        state = stopped;
+      }
+    }
+
+    if(state == stopped) {
+      if(command == speed_forward) {
+        Serial.println("forward from stopped");
+        set_pwm_us(forward_us);
+        state = forward;
+      }
+      if(command == speed_reverse) {
+        Serial.println("reverse from stopped");
+        set_pwm_us(reverse_us);
+        state = reverse;
+      }
+      if(command == speed_neutral) {
+        set_pwm_us(neutral_us);
+        state = stopped;
       }
     }
   }
@@ -553,15 +617,17 @@ void rx_spd_handler() {
   rx_speed.handle_change();
 }
 
-char speed_for_ping_inches(double inches) {
+
+eSpeedCommand speed_for_ping_inches(double inches) {
+  if(inches ==0) return speed_neutral;
   // get closer if far
   if (inches > 25.)
-    return 'F';
+    return speed_forward;
   // back up if too close
   if (inches < 12.)
-    return 'R';
+    return speed_reverse;
 
-  return 'N';
+  return speed_neutral;
 }
 
 
@@ -581,20 +647,10 @@ void setup() {
   speed_control.init(&speed);
   blinker.init();
 
-#ifndef TEENSYDUINO
-  pinMode(PIN_SRC_SELECT, OUTPUT);
-  digitalWrite(PIN_SRC_SELECT, LOW);
-#endif
-
   ping.init(PIN_PING_TRIG, PIN_PING_ECHO);
 
-#ifdef TEENSYDUINO
   int int_str = PIN_RX_STEER;
   int int_esc = PIN_RX_SPEED;
-#else
-  int int_str = 0;
-  int int_esc = 1;
-#endif
 
   attachInterrupt(int_str, rx_str_handler, CHANGE);
   attachInterrupt(int_esc, rx_spd_handler, CHANGE);
@@ -613,7 +669,7 @@ void setup() {
   last_report_ms = millis();
 
   Serial.begin(9600);
-  Serial.println("car_control begun Nicole");
+  Serial.println("car_control begun");
   mpu9150.setup();
 }
 
@@ -630,10 +686,13 @@ void loop() {
   ping.scan();
 
   double inches = ping.inches();//ping_inches();
-  if(0 && ping.new_data_ready()) {
+  bool new_ping = ping.new_data_ready();
+  #if(TRACE_PINGS)
+  if(new_ping) {
     Serial.print("ping inches:");
     Serial.println(inches);
   }
+  #endif
 
   if(0) {
     Serial.print("Speed: ");
@@ -700,12 +759,15 @@ void loop() {
     if( ms_since_report >= 1000) {
       unsigned long loops_since_report = loop_count - last_report_loop_count;
       double seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
+      /*
       Serial.print("loops per second: ");
       Serial.print( loops_since_report / seconds_since_report );
       Serial.print(" microseconds per loop ");
       Serial.print( 1E6 * seconds_since_report / loops_since_report );
       Serial.println();
-      mpu9150.trace_status();
+      */
+      //mpu9150.trace_status();
+
 
       // remember stats for next report
       last_report_ms = loop_time_ms;
