@@ -23,10 +23,12 @@
 #define PIN_SPEAKER   9
 #define PIN_LED 13
 
-#define PLAY_SOUNDS 1
+#define PLAY_SOUNDS 0
 
 #define TRACE_PINGS 0
 #define TRACE_ESC 0
+#define TRACE_MPU 0
+#define TRACE_LOOP_SPEED 0
 
 struct Blinker {
   int period_ms = 1000;
@@ -223,7 +225,7 @@ struct RxEvent {
 
 
 struct EventQueue {
-  static const int size = 5;
+  static const int size = 10;
 
   RxEvent events[size];
 
@@ -602,7 +604,8 @@ unsigned long last_report_loop_count = 0;
 
 enum {
   mode_manual,
-  mode_automatic
+  mode_automatic,
+  mode_circle
 } mode;
 
 
@@ -630,14 +633,64 @@ eSpeedCommand speed_for_ping_inches(double inches) {
   return speed_neutral;
 }
 
+class CircleMode {
+public:
+  double last_angle;
+  double degrees_turned = 0;
+  Mpu9150 * mpu;
+  bool done = false;
+
+  bool is_done() {
+    return done; 
+  }
+
+  void init(Mpu9150 * _mpu) {
+    mpu = _mpu;
+    last_angle = mpu->ground_angle();
+    degrees_turned = 0;
+    done = false;
+  }
+
+  void end() {
+    speed_control.set_command(speed_neutral);
+    steering.writeMicroseconds(1500); // look straight ahead
+  }
+
+  void execute() {
+    Serial.print("circle has turned");
+    Serial.println(degrees_turned);
+    double ground_angle = mpu->ground_angle();
+    double angle_diff = last_angle-ground_angle;
+    if(abs(angle_diff) > 70){ 
+      last_angle = ground_angle; // cheating low tech way to avoid wrap around
+      return;
+    }
+    degrees_turned += angle_diff;
+    last_angle = ground_angle;
+    if(abs(degrees_turned) < 360) {
+      //speed_control.set_command(speed_forward);
+      steering.writeMicroseconds(1900); // turn right? todo: make steer commands
+    } else {
+      speed_control.set_command(speed_neutral);
+      steering.writeMicroseconds(1500); // look straight ahead
+      Serial.println("circle complete");
+    }
+  }
+};
+
 
 const RxEvent auto_pattern [] =
-  {{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'}};
+  {{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'}};
+const RxEvent circle_pattern [] =
+  {{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'L','N'}};
 
 
 Mpu9150 mpu9150;
 
 void setup() {
+  Serial.begin(9600);
+  delay(1000);
+  Serial.println("setup begun");
   steering.attach(PIN_U_STEER);
   speed.attach(PIN_U_SPEED);
 
@@ -668,11 +721,11 @@ void setup() {
 
   last_report_ms = millis();
 
-  Serial.begin(9600);
   Serial.println("car_control begun");
   mpu9150.setup();
 }
 
+CircleMode circle_mode;
 
 void loop() {
   mpu9150.loop();
@@ -717,6 +770,13 @@ void loop() {
         beeper.beep_ascending();
         Serial.print("switched to automatic");
       }
+      if (new_rx_event && rx_events.recent.matches(circle_pattern, count_of(circle_pattern))) {
+        mode = mode_circle;
+        circle_mode.init(&mpu9150);
+        beeper.beep_ascending();
+        Serial.print("switched to circle");
+      }
+
       break;
 
     case mode_automatic:
@@ -724,6 +784,25 @@ void loop() {
       steering.writeMicroseconds(1500);
       speed_control.set_command(speed_for_ping_inches(inches));
       speed_control.execute();
+      if (new_rx_event && rx_events.current.equals(RxEvent('L','N'))) {
+        mode = mode_manual;
+        steering.writeMicroseconds(1500);
+        speed.writeMicroseconds(1500);
+        beeper.beep_descending();
+        Serial.println("switched to manual - user initiated");
+      }
+      if (new_rx_event && rx_events.current.is_bad()) {
+        mode = mode_manual;
+        steering.writeMicroseconds(1500);
+        speed.writeMicroseconds(1500);
+        beeper.beep_warble();
+        Serial.println("switched to manual - no coms");
+      }
+      break;
+
+    case mode_circle:
+      circle_mode.execute();
+      // todo: merge this code into mode manager`
       if (new_rx_event && rx_events.current.equals(RxEvent('L','N'))) {
         mode = mode_manual;
         steering.writeMicroseconds(1500);
@@ -759,14 +838,16 @@ void loop() {
     if( ms_since_report >= 1000) {
       unsigned long loops_since_report = loop_count - last_report_loop_count;
       double seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
-      /*
+#if(TRACE_LOOP_SPEED)
       Serial.print("loops per second: ");
       Serial.print( loops_since_report / seconds_since_report );
       Serial.print(" microseconds per loop ");
       Serial.print( 1E6 * seconds_since_report / loops_since_report );
       Serial.println();
-      */
-      //mpu9150.trace_status();
+#endif
+#if(TRACE_MPU)
+      mpu9150.trace_status();
+#endif
 
 
       // remember stats for next report

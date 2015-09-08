@@ -50,7 +50,7 @@ public:
 
   void setup_mpu() {
     Wire.begin();
-    Serial.begin(115200);
+    //Serial.begin(115200);
 
     // initialize device
     Serial.println(F("Initializing I2C MPU devices..."));
@@ -95,17 +95,22 @@ public:
 
   }
 
-
-  void trace_mpu() {
-
+  double ground_angle() {
+    if(!initialReading) return 0.0;
+    
     Quaternion qdiff = diff(q,q0);
     double angle = rads2degrees(normal_angle(qdiff,gravity));
+    return angle;
+  }
+
+
+  void trace_mpu() {
 
     Serial.print(readingCount);
     Serial.print("\t");
     Serial.print("angle");
     Serial.print("\t");
-    Serial.print(angle);
+    Serial.print(ground_angle());
     Serial.print("\t");
     Serial.print("quat\t");
     Serial.print(q.w);
