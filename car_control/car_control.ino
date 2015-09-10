@@ -23,12 +23,12 @@
 #define PIN_SPEAKER   9
 #define PIN_LED 13
 
-#define PLAY_SOUNDS 0
+#define PLAY_SOUNDS 1
 
-#define TRACE_PINGS 0
-#define TRACE_ESC 0
-#define TRACE_MPU 0
-#define TRACE_LOOP_SPEED 0
+bool TRACE_PINGS = false;
+bool TRACE_ESC = false;
+bool TRACE_MPU = false;
+bool TRACE_LOOP_SPEED = false;
 
 struct Blinker {
   int period_ms = 1000;
@@ -580,6 +580,65 @@ struct SpeedControl {
 };
 
 
+typedef void (*voidfunction)();
+
+struct command {
+  const char * name;
+  voidfunction f;
+};
+
+
+bool verbose = true;
+void verbose_command() {
+  Serial.println("verbose turned on");
+  verbose = true;
+}
+
+void noverbose_command() {
+  Serial.println("verbose turned off");
+  verbose = false;
+}
+
+
+
+class CommandInterpreter{
+public:
+  String buffer;
+  const command * commands;
+  int command_count;
+
+  void init(const command * _commands, int _command_count)
+  {
+    commands = _commands;
+    command_count = _command_count;
+  }
+
+  void execute() {
+    while(Serial.available()>0) {
+      char c = Serial.read();
+      if( c == '\n') {
+        process_command(buffer);
+        buffer = "";
+      } else {
+        buffer += c;
+      }
+    }
+  }
+
+  void process_command(String s) {
+    for(int i = 0; i < command_count; i++) {
+      if(s.equals(commands[i].name)) {
+        Serial.print("Executing command ");
+        Serial.println(commands[i].name);
+        commands[i].f();
+        return;
+      }
+    }
+    Serial.print("Unknown command: ");
+    Serial.println(s);
+  }
+};
+
 
 //////////////////////////
 // Globals
@@ -594,6 +653,7 @@ RxEvents rx_events;
 Ping ping;
 Beeper beeper;
 Blinker blinker;
+CommandInterpreter interpreter;
 
 
 // diagnostics for reporting loop speeds
@@ -641,7 +701,7 @@ public:
   bool done = false;
 
   bool is_done() {
-    return done; 
+    return done;
   }
 
   void init(Mpu9150 * _mpu) {
@@ -661,7 +721,7 @@ public:
     Serial.println(degrees_turned);
     double ground_angle = mpu->ground_angle();
     double angle_diff = last_angle-ground_angle;
-    if(abs(angle_diff) > 70){ 
+    if(abs(angle_diff) > 70){
       last_angle = ground_angle; // cheating low tech way to avoid wrap around
       return;
     }
@@ -685,11 +745,59 @@ const RxEvent circle_pattern [] =
   {{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'L','N'}};
 
 
+
+void trace_ping_on() {
+  TRACE_PINGS = true;
+}
+
+void trace_ping_off() {
+  TRACE_PINGS = false;
+}
+
+void trace_esc_on() {
+  TRACE_ESC = true;
+}
+
+void trace_esc_off() {
+  TRACE_ESC = false;
+}
+
+void trace_mpu_on() {
+  TRACE_MPU = true;
+}
+
+void trace_mpu_off() {
+  TRACE_MPU = false;
+}
+
+void trace_loop_speed_on() {
+  TRACE_LOOP_SPEED = true;
+}
+
+void trace_loop_speed_off() {
+  TRACE_LOOP_SPEED = false;
+}
+
+
+
+const command commands[] = {
+  {"trace ping on", trace_ping_on},
+  {"trace ping off", trace_ping_off},
+  {"trace esc on", trace_esc_on},
+  {"trace esc off", trace_esc_off},
+  {"trace mpu on", trace_mpu_on},
+  {"trace mpu off", trace_mpu_off},
+  {"trace loop speed on", trace_loop_speed_on},
+  {"trace loop speed off", trace_loop_speed_off}
+};
+
+
 Mpu9150 mpu9150;
 
 void setup() {
   Serial.begin(9600);
   delay(1000);
+  interpreter.init(commands,count_of(commands));
   Serial.println("setup begun");
   steering.attach(PIN_U_STEER);
   speed.attach(PIN_U_SPEED);
@@ -728,24 +836,26 @@ void setup() {
 CircleMode circle_mode;
 
 void loop() {
+  ping.scan();
+  if(ping.state != ping.no_ping_pending) 
+    return;
+
   mpu9150.loop();
   blinker.execute();
+  interpreter.execute();
 
   unsigned long loop_time_ms = millis();
   loop_count++;
 
   rx_events.process_pulses(rx_steer.pulse_us(), rx_speed.pulse_us());
   bool new_rx_event = rx_events.get_event();
-  ping.scan();
 
   double inches = ping.inches();//ping_inches();
   bool new_ping = ping.new_data_ready();
-  #if(TRACE_PINGS)
-  if(new_ping) {
+  if(TRACE_PINGS && new_ping) {
     Serial.print("ping inches:");
     Serial.println(inches);
   }
-  #endif
 
   if(0) {
     Serial.print("Speed: ");
@@ -833,27 +943,25 @@ void loop() {
   //  12,300 loops per second as of 8/18 9:30
   // 153,400 loops per second on Teensy 3.1 @ 96MHz 8/29
   //  60,900 loops per second on Teensy 3.1 @ 24MHz 8/29
-  if(1) {
-    unsigned long ms_since_report = loop_time_ms - last_report_ms;
-    if( ms_since_report >= 1000) {
-      unsigned long loops_since_report = loop_count - last_report_loop_count;
-      double seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
-#if(TRACE_LOOP_SPEED)
-      Serial.print("loops per second: ");
-      Serial.print( loops_since_report / seconds_since_report );
-      Serial.print(" microseconds per loop ");
-      Serial.print( 1E6 * seconds_since_report / loops_since_report );
-      Serial.println();
-#endif
-#if(TRACE_MPU)
-      mpu9150.trace_status();
-#endif
-
-
-      // remember stats for next report
-      last_report_ms = loop_time_ms;
-      last_report_loop_count = loop_count;
+  unsigned long ms_since_report = loop_time_ms - last_report_ms;
+  if( ms_since_report >= 1000) {
+    unsigned long loops_since_report = loop_count - last_report_loop_count;
+    double seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
+    if(TRACE_LOOP_SPEED) {
+          Serial.print("loops per second: ");
+          Serial.print( loops_since_report / seconds_since_report );
+          Serial.print(" microseconds per loop ");
+          Serial.print( 1E6 * seconds_since_report / loops_since_report );
+          Serial.println();
     }
+    if(TRACE_MPU) {
+      mpu9150.trace_status();
+    }
+
+
+    // remember stats for next report
+    last_report_ms = loop_time_ms;
+    last_report_loop_count = loop_count;
   }
 
 }
