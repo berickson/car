@@ -1,7 +1,7 @@
+#!/usr/bin/env python2.7
+
 import cv2
 import numpy as np
-#sudo apt-get install python-matplotlib
-from matplotlib import pyplot as plt
 
 
 
@@ -25,25 +25,25 @@ ports = [1,2]
 cams = []
 
 for port in ports:
-    cam = cv2.VideoCapture(port)
+    cams.append(cv2.VideoCapture(port))
 
-while(cv2.waitKey(1000)==-1):
+while(cv2.waitKey(2000)==-1):
     images = []
-    for port in ports:
-        retval,im = cam.read()
+    for cam in [0,1]:
+        retval,im = cams[cam].read()
         if retval == False:
             print 'Image read failed'
         images.append(im)
-        cv2.imshow('image'+str(port),im)
-    #stereo = cv2.StereoBM(cv2.STEREO_BM_BASIC_PRESET,16,15)
-    stereo = cv2.StereoBM(cv2.STEREO_BM_BASIC_PRESET,32,15)
+        cv2.imshow('image'+str(cam),im)
+    stereo = cv2.StereoBM(cv2.STEREO_BM_BASIC_PRESET,16,15)
+    #stereo = cv2.StereoBM(cv2.STEREO_BM_BASIC_PRESET,64,31)
 
-    greyL = cv2.cvtColor(images[0], cv2.COLOR_BGR2GRAY)
-    greyR = cv2.cvtColor(images[1], cv2.COLOR_BGR2GRAY)
+    greyL = cv2.cvtColor(images[1], cv2.COLOR_BGR2GRAY)
+    greyR = cv2.cvtColor(images[0], cv2.COLOR_BGR2GRAY)
     cv2.imshow('greyL', greyL)
-    cv2.imshow('greyR', greyL)
+    cv2.imshow('greyR', greyR)
 
-    disparity = stereo.compute(greyR,greyL)
+    disparity = stereo.compute(greyL,greyR)
     cv2.imshow('disparity', disparity)
     cv2.imshow('equalized disparity', histeq(disparity))
 
