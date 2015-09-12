@@ -588,19 +588,6 @@ struct command {
 };
 
 
-bool verbose = true;
-void verbose_command() {
-  Serial.println("verbose turned on");
-  verbose = true;
-}
-
-void noverbose_command() {
-  Serial.println("verbose turned off");
-  verbose = false;
-}
-
-
-
 class CommandInterpreter{
 public:
   String buffer;
@@ -729,7 +716,7 @@ public:
     last_angle = ground_angle;
     if(abs(degrees_turned) < 360) {
       //speed_control.set_command(speed_forward);
-      steering.writeMicroseconds(1900); // turn right? todo: make steer commands
+      steering.writeMicroseconds(1900); // turn left todo: make steer commands
     } else {
       speed_control.set_command(speed_neutral);
       steering.writeMicroseconds(1500); // look straight ahead
@@ -778,9 +765,12 @@ void trace_loop_speed_off() {
   TRACE_LOOP_SPEED = false;
 }
 
+void help();
+
 
 
 const command commands[] = {
+  {"help", help},
   {"trace ping on", trace_ping_on},
   {"trace ping off", trace_ping_off},
   {"trace esc on", trace_esc_on},
@@ -790,6 +780,11 @@ const command commands[] = {
   {"trace loop speed on", trace_loop_speed_on},
   {"trace loop speed off", trace_loop_speed_off}
 };
+
+void help() {
+  for(unsigned int i = 0; i < count_of(commands); i++)
+    Serial.println(commands[i].name);
+}
 
 
 Mpu9150 mpu9150;
@@ -837,8 +832,6 @@ CircleMode circle_mode;
 
 void loop() {
   ping.scan();
-  if(ping.state != ping.no_ping_pending) 
-    return;
 
   mpu9150.loop();
   blinker.execute();
