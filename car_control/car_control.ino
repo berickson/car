@@ -19,6 +19,7 @@
 #define PIN_U_STEER 4
 #define PIN_PING_TRIG 6
 #define PIN_PING_ECHO 23
+#include "ping.h"
 
 #define PIN_SPEAKER   9
 #define PIN_LED 13
@@ -314,91 +315,6 @@ struct RxEvents {
 };
 
 
-struct Ping {
-  int ping_pin, echo_pin;
-  unsigned long ping_start_ms = 0;
-  unsigned long ping_start_us = 0;
-  unsigned long reply_start_us = 0;
-  bool _new_data_ready = false;
-
-  double last_ping_distance_inches = 0.;
-
-  unsigned long ping_rate_ms = 100;
-  const unsigned long ping_timeout_us = 20000; // 20000 microseconds should be about 10 feet
-
-  enum {
-    no_ping_pending,
-    waiting_for_reply_start,
-    waiting_for_reply_end
-  } state;
-
-
-
-  void init(int _ping_pin, int _echo_pin){
-    ping_pin = _ping_pin;
-    echo_pin = _echo_pin;
-    digitalWrite(ping_pin, LOW);
-    state = no_ping_pending;
-  }
-
-  bool new_data_ready() {
-    bool rv = _new_data_ready;
-    _new_data_ready = false;
-    return rv;
-  }
-
-  void set_distance_from_us(int us) {
-      double ping_distance_inches = (double) us / 148.; // 148 microseconds for ping round trip per inch
-      if(last_ping_distance_inches != ping_distance_inches) {
-         last_ping_distance_inches = ping_distance_inches;
-         _new_data_ready = true;
-      }
-  }
-
-  void scan(){
-    unsigned long ms = millis();
-    unsigned long  us = micros();
-
-    switch(state) {
-      case no_ping_pending:
-        if( ms - ping_start_ms >= ping_rate_ms) {
-          ping_start_ms = ms;
-          ping_start_us = us;
-          // The sensor is triggered by a HIGH pulse of 10 or more microseconds.
-          digitalWrite(ping_pin, HIGH);
-          delayMicroseconds(10);  // todo: can we get rid of this delay or maybe it's ok?
-          digitalWrite(ping_pin, LOW);
-          state = waiting_for_reply_start;
-        }
-        break;
-
-      case waiting_for_reply_start:
-        if(digitalRead(echo_pin) == HIGH) {
-          reply_start_us = us;
-          state = waiting_for_reply_end;
-        }  else if (us - ping_start_us >  ping_timeout_us) {
-          set_distance_from_us(0); // zero on timeout
-          state = no_ping_pending;
-        }
-        break;
-
-      case waiting_for_reply_end:
-        if(digitalRead(echo_pin) == LOW) {
-          set_distance_from_us(us - reply_start_us);
-          state = no_ping_pending;
-        } else if (us - reply_start_us > ping_timeout_us) {
-          set_distance_from_us(0); // zero on timeout
-          state = no_ping_pending;
-        }
-
-        break;
-    }
-  }
-
-  inline double inches() {
-    return last_ping_distance_inches;
-  }
-};
 
 
 struct SpeedControl {
@@ -410,7 +326,7 @@ struct SpeedControl {
   unsigned long brake_start_ms = 0;
   unsigned long pause_start_ms = 0;
 
-  const int forward_us =  1200;
+  const int forward_us =  1300;
   const int reverse_us =  1700;
 
 
