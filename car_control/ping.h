@@ -45,20 +45,19 @@ struct Ping {
          _new_data_ready = true;
       }
   }
-  void scan(){
+  void execute(){
     _new_data_ready = false;
     unsigned long ms = millis();
     unsigned long  us = micros();
     if(_waiting_for_reply) {
 
        // transfer volatile variables from interrupts
-       cli();
-       unsigned long reply_start_us = g_ping_reply_start_us;
-       unsigned long reply_end_us = g_ping_reply_end_us;
-       bool reply_ready = g_ping_reply_ready;
-       sei();
+       if(g_ping_reply_ready) {
+         cli();
+         unsigned long reply_start_us = g_ping_reply_start_us;
+         unsigned long reply_end_us = g_ping_reply_end_us;
+         sei();
 
-       if(reply_ready) {
          if(0) {
            Serial.print("reply_start_us");
            Serial.println(reply_start_us);

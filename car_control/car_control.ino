@@ -24,14 +24,16 @@
 #define PIN_SPEAKER   9
 #define PIN_LED 13
 
-#define PLAY_SOUNDS 1
+#define PLAY_SOUNDS 0
 
+bool TRACE_RX = false;
 bool TRACE_PINGS = false;
 bool TRACE_ESC = false;
-bool TRACE_MPU = false;
+bool TRACE_MPU = true;
 bool TRACE_LOOP_SPEED = false;
 
-struct Blinker {
+class Blinker {
+public:
   int period_ms = 1000;
   int on_ms = 1;
   int pin = PIN_LED;
@@ -61,7 +63,8 @@ struct Blinker {
 };
 
 // computer steering and speed
-struct PwmInput {
+class PwmInput {
+public:
   unsigned long last_trigger_us = 0;
   unsigned long pulse_width_us = 0;
 
@@ -85,7 +88,7 @@ struct PwmInput {
   }
 
   // interrupt handler
-  void handle_change() {
+  inline void handle_change() {
     unsigned long us = micros();
     if(digitalRead(pin)) {
       last_trigger_us = us;
@@ -127,7 +130,8 @@ struct PwmInput {
 };
 
 
-struct Beeper {
+class Beeper {
+public:
   int pin;
 
   // hz of notes
@@ -203,7 +207,8 @@ enum rx_event {
 }
 */
 
-struct RxEvent {
+class RxEvent {
+public:
   char speed;
   char steer;
 
@@ -225,7 +230,8 @@ struct RxEvent {
 };
 
 
-struct EventQueue {
+class EventQueue {
+public:
   static const int size = 10;
 
   RxEvent events[size];
@@ -236,7 +242,7 @@ struct EventQueue {
     }
     events[0] = new_event;
 
-    if(0) {
+    if(TRACE_RX) {
       for(int i = 0; i < size; i++) {
         Serial.print(events[i].steer);
         Serial.print(events[i].speed);
@@ -257,7 +263,8 @@ struct EventQueue {
 };
 
 
-struct RxEvents {
+class RxEvents {
+public:
   RxEvent current, pending;
   bool new_event = false;
   EventQueue recent;
@@ -284,9 +291,9 @@ struct RxEvents {
    char steer_code(int steer_us) {
     if (steer_us == 0)
       return '?';
-    if (steer_us < 1300)
+    if (steer_us < 1400)
       return 'R';
-    if (steer_us > 1700)
+    if (steer_us > 1600)
       return 'L';
     return 'C';
   }
@@ -317,12 +324,13 @@ struct RxEvents {
 
 
 
-struct SpeedControl {
+class Esc {
+public:
 
   Servo * speed;
 
-  const unsigned long brake_ms = 200;
-  const unsigned long pause_ms = 500;
+  const unsigned long brake_ms = 500;
+  const unsigned long pause_ms = 200;
   unsigned long brake_start_ms = 0;
   unsigned long pause_start_ms = 0;
 
@@ -394,6 +402,7 @@ struct SpeedControl {
 
     if(command == speed_forward) {
       switch(state) {
+        case forward_braking:
         case stopped:
         case forward:
           state = forward;
@@ -401,10 +410,12 @@ struct SpeedControl {
           break;
 
         case pausing:
-        case forward_braking:
-        case reverse_braking:
           break;
 
+        case reverse_braking:
+          set_pwm_us(forward_us);
+          break;
+        
         case reverse:
           set_pwm_us(forward_us);
           state = reverse_braking;
@@ -414,6 +425,7 @@ struct SpeedControl {
     }
     if(command == speed_reverse) {
       switch(state) {
+        case reverse_braking:
         case stopped:
         case reverse:
           state = reverse;
@@ -421,10 +433,12 @@ struct SpeedControl {
           break;
 
         case pausing:
-        case reverse_braking:
-        case forward_braking:
           break;
 
+        case forward_braking:
+          set_pwm_us(reverse_us);
+          break;
+          
         case forward:
           state = forward_braking;
           set_pwm_us(reverse_us);
@@ -436,8 +450,15 @@ struct SpeedControl {
       switch(state) {
         case stopped:
         case pausing:
-        case reverse_braking:
+          set_pwm_us(neutral_us);
+          break;
+          
         case forward_braking:
+          set_pwm_us(reverse_us);
+          break;
+
+        case reverse_braking:
+          set_pwm_us(forward_us);
           break;
 
         case reverse:
@@ -548,7 +569,7 @@ public:
 
 Servo steering;
 Servo speed;
-SpeedControl speed_control;
+Esc esc;
 
 PwmInput rx_steer;
 PwmInput rx_speed;
@@ -587,10 +608,10 @@ void rx_spd_handler() {
 eSpeedCommand speed_for_ping_inches(double inches) {
   if(inches ==0) return speed_neutral;
   // get closer if far
-  if (inches > 25.)
+  if (inches > 30.)
     return speed_forward;
   // back up if too close
-  if (inches < 12.)
+  if (inches < 20.)
     return speed_reverse;
 
   return speed_neutral;
@@ -615,13 +636,13 @@ public:
   }
 
   void end() {
-    speed_control.set_command(speed_neutral);
+    esc.set_command(speed_neutral);
     steering.writeMicroseconds(1500); // look straight ahead
   }
 
   void execute() {
-    Serial.print("circle has turned");
-    Serial.println(degrees_turned);
+//    Serial.print("circle has turned");
+//    Serial.println(degrees_turned);
     double ground_angle = mpu->ground_angle();
     double angle_diff = last_angle-ground_angle;
     if(abs(angle_diff) > 70){
@@ -630,11 +651,12 @@ public:
     }
     degrees_turned += angle_diff;
     last_angle = ground_angle;
-    if(abs(degrees_turned) < 360) {
-      //speed_control.set_command(speed_forward);
+    if(abs(degrees_turned) < 90) {
       steering.writeMicroseconds(1900); // turn left todo: make steer commands
+      //delay(500);
+      esc.set_command(speed_forward);
     } else {
-      speed_control.set_command(speed_neutral);
+      esc.set_command(speed_neutral);
       steering.writeMicroseconds(1500); // look straight ahead
       Serial.println("circle complete");
     }
@@ -645,7 +667,7 @@ public:
 const RxEvent auto_pattern [] =
   {{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'}};
 const RxEvent circle_pattern [] =
-  {{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'L','N'}};
+  {{'L','N'},{'C','N'},{'L','N'},{'C','N'},{'L','N'},{'C','N'},{'L','N'}};
 
 
 
@@ -711,12 +733,14 @@ void setup() {
   interpreter.init(commands,count_of(commands));
   Serial.println("setup begun");
   steering.attach(PIN_U_STEER);
+  steering.writeMicroseconds(1500);
   speed.attach(PIN_U_SPEED);
+  speed.writeMicroseconds(1500);
 
 
   rx_steer.attach(PIN_RX_STEER);
   rx_speed.attach(PIN_RX_SPEED);
-  speed_control.init(&speed);
+  esc.init(&speed);
   blinker.init();
 
   ping.init(PIN_PING_TRIG, PIN_PING_ECHO);
@@ -747,9 +771,8 @@ void setup() {
 CircleMode circle_mode;
 
 void loop() {
-  ping.scan();
-
-  mpu9150.loop();
+  ping.execute();
+  mpu9150.execute();
   blinker.execute();
   interpreter.execute();
 
@@ -785,11 +808,12 @@ void loop() {
 
       if (new_rx_event && rx_events.recent.matches(auto_pattern, count_of(auto_pattern))) {
         mode = mode_automatic;
-        speed_control.set_neutral_pwm_us(rx_speed.pulse_us());
+        esc.set_command(speed_neutral);
         beeper.beep_ascending();
         Serial.print("switched to automatic");
       }
       if (new_rx_event && rx_events.recent.matches(circle_pattern, count_of(circle_pattern))) {
+        esc.set_command(speed_neutral);
         mode = mode_circle;
         circle_mode.init(&mpu9150);
         beeper.beep_ascending();
@@ -801,10 +825,11 @@ void loop() {
     case mode_automatic:
 
       steering.writeMicroseconds(1500);
-      speed_control.set_command(speed_for_ping_inches(inches));
-      speed_control.execute();
+      esc.set_command(speed_for_ping_inches(inches));
+      esc.execute();
       if (new_rx_event && rx_events.current.equals(RxEvent('L','N'))) {
         mode = mode_manual;
+        esc.set_command(speed_neutral);
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
         beeper.beep_descending();
@@ -812,6 +837,7 @@ void loop() {
       }
       if (new_rx_event && rx_events.current.is_bad()) {
         mode = mode_manual;
+        esc.set_command(speed_neutral);
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
         beeper.beep_warble();
@@ -821,9 +847,11 @@ void loop() {
 
     case mode_circle:
       circle_mode.execute();
+      esc.execute();
       // todo: merge this code into mode manager`
-      if (new_rx_event && rx_events.current.equals(RxEvent('L','N'))) {
+      if (new_rx_event && rx_events.current.equals(RxEvent('R','N'))) {
         mode = mode_manual;
+        esc.set_command(speed_neutral);
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
         beeper.beep_descending();
@@ -831,6 +859,7 @@ void loop() {
       }
       if (new_rx_event && rx_events.current.is_bad()) {
         mode = mode_manual;
+        esc.set_command(speed_neutral);
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
         beeper.beep_warble();

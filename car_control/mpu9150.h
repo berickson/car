@@ -97,7 +97,7 @@ public:
 
   double ground_angle() {
     if(!initialReading) return 0.0;
-    
+
     Quaternion qdiff = diff(q,q0);
     double angle = rads2degrees(normal_angle(qdiff,gravity));
     return angle;
@@ -193,7 +193,7 @@ public:
   void setup(){
     setup_mpu();
   }
-  inline void loop(){
+  inline void execute(){
     process_mpu();
   }
   void trace_status() {
