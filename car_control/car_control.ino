@@ -335,8 +335,8 @@ public:
   unsigned long brake_start_ms = 0;
   unsigned long pause_start_ms = 0;
 
-  const int forward_us =  1400;
-  const int reverse_us =  1600;
+  const int forward_us =  1390;
+  const int reverse_us =  1610;
 
 
   const int neutral_us = 1500;
@@ -656,11 +656,11 @@ public:
     last_angle = ground_angle;
     if(abs(degrees_turned) < 90) {
       steering.writeMicroseconds(1900); // turn left todo: make steer commands
-      //delay(500);
       esc.set_command(speed_forward);
     } else {
       esc.set_command(speed_neutral);
       steering.writeMicroseconds(1500); // look straight ahead
+      done = true;
       Serial.println("circle complete");
     }
   }
@@ -882,6 +882,14 @@ void loop() {
       circle_mode.execute();
       esc.execute();
       // todo: merge this code into mode manager`
+      if (circle_mode.is_done()) {
+        mode = mode_manual;
+        esc.set_command(speed_neutral);
+        steering.writeMicroseconds(1500);
+        speed.writeMicroseconds(1500);
+        beeper.beep_descending();
+        Serial.println("switched to manual - circle complete");
+      }
       if (new_rx_event && rx_events.current.equals(RxEvent('R','N'))) {
         mode = mode_manual;
         esc.set_command(speed_neutral);
