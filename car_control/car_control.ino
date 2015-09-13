@@ -29,8 +29,9 @@
 bool TRACE_RX = false;
 bool TRACE_PINGS = false;
 bool TRACE_ESC = false;
-bool TRACE_MPU = true;
+bool TRACE_MPU = false;
 bool TRACE_LOOP_SPEED = false;
+bool TRACE_DYNAMICS = true;
 
 class Blinker {
 public:
@@ -291,9 +292,9 @@ public:
    char steer_code(int steer_us) {
     if (steer_us == 0)
       return '?';
-    if (steer_us < 1400)
+    if (steer_us < 1300)
       return 'R';
-    if (steer_us > 1600)
+    if (steer_us > 1700)
       return 'L';
     return 'C';
   }
@@ -334,8 +335,8 @@ public:
   unsigned long brake_start_ms = 0;
   unsigned long pause_start_ms = 0;
 
-  const int forward_us =  1300;
-  const int reverse_us =  1700;
+  const int forward_us =  1400;
+  const int reverse_us =  1600;
 
 
   const int neutral_us = 1500;
@@ -582,6 +583,8 @@ CommandInterpreter interpreter;
 
 // diagnostics for reporting loop speeds
 unsigned long loop_count = 0;
+unsigned long loop_time_ms = 0;
+unsigned long last_loop_time_ms = 0;
 unsigned long last_report_ms = 0;
 unsigned long last_report_loop_count = 0;
 
@@ -703,12 +706,24 @@ void trace_loop_speed_off() {
   TRACE_LOOP_SPEED = false;
 }
 
+
+void trace_dynamics_on() {
+  TRACE_DYNAMICS = true;
+}
+
+void trace_dynamics_off() {
+  TRACE_DYNAMICS = false;
+}
+
+
 void help();
 
 
 
 const command commands[] = {
   {"help", help},
+  {"trace dynamics on", trace_dynamics_on},
+  {"trace dynamics off", trace_dynamics_off},
   {"trace ping on", trace_ping_on},
   {"trace ping off", trace_ping_off},
   {"trace esc on", trace_esc_on},
@@ -766,20 +781,38 @@ void setup() {
 
   Serial.println("car_control begun");
   mpu9150.setup();
+  delay(1000);
+  mpu9150.zero();
 }
 
 CircleMode circle_mode;
 
+// returns true if loop time passes through n ms boundary
+bool every_n_ms(unsigned long last_loop_ms, unsigned long loop_ms, unsigned long ms) {
+  return (last_loop_ms % ms) + (loop_ms - last_loop_ms) >= ms;
+
+}
+
 void loop() {
+  // set global loop values
+  loop_count++;
+  last_loop_time_ms = loop_time_ms;
+  loop_time_ms = millis();
+
+  // get common execution times
+  bool every_second = every_n_ms(last_loop_time_ms, loop_time_ms, 1000); 
+  bool every_100_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 100); 
+
+  // get commands from usb
+  interpreter.execute();
+
+
   ping.execute();
   mpu9150.execute();
   blinker.execute();
-  interpreter.execute();
-
-  unsigned long loop_time_ms = millis();
-  loop_count++;
 
   rx_events.process_pulses(rx_steer.pulse_us(), rx_speed.pulse_us());
+
   bool new_rx_event = rx_events.get_event();
 
   double inches = ping.inches();//ping_inches();
@@ -869,6 +902,7 @@ void loop() {
   }
 
 
+
   // state tracing
   if (0) {
     rx_steer.trace();
@@ -876,27 +910,47 @@ void loop() {
     rx_speed.trace();
     Serial.println();
   }
+  if(every_100_ms && TRACE_DYNAMICS) {
+    Serial.print("str");
+    Serial.print(", ");
+    Serial.print(steering.readMicroseconds());
+    Serial.print(", ");
+    Serial.print("esc");
+    Serial.print(", ");
+    Serial.print(speed.readMicroseconds());
+    Serial.print(", ");
+    Serial.print("aa");
+    Serial.print(", ");
+    Serial.print(mpu9150.aa.x - mpu9150.a0.x);
+    Serial.print(", ");
+    Serial.print(mpu9150.aa.y  - mpu9150.a0.y);
+    Serial.print(", ");
+    Serial.print(mpu9150.aa.z  - mpu9150.a0.z);
+    Serial.print(", ");
+    Serial.print("angle");
+    Serial.print(", ");
+    Serial.print(mpu9150.ground_angle());
+    Serial.println();
+  }
+
+  if(every_second && TRACE_MPU) {
+      mpu9150.trace_status();
+  }
 
   // loop speed reporting
   //  12,300 loops per second as of 8/18 9:30
   // 153,400 loops per second on Teensy 3.1 @ 96MHz 8/29
   //  60,900 loops per second on Teensy 3.1 @ 24MHz 8/29
-  unsigned long ms_since_report = loop_time_ms - last_report_ms;
-  if( ms_since_report >= 1000) {
+  if(every_second && TRACE_LOOP_SPEED) {
     unsigned long loops_since_report = loop_count - last_report_loop_count;
     double seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
-    if(TRACE_LOOP_SPEED) {
-          Serial.print("loops per second: ");
-          Serial.print( loops_since_report / seconds_since_report );
-          Serial.print(" microseconds per loop ");
-          Serial.print( 1E6 * seconds_since_report / loops_since_report );
-          Serial.println();
-    }
-    if(TRACE_MPU) {
-      mpu9150.trace_status();
-    }
 
-
+    Serial.print("loops per second: ");
+    Serial.print( loops_since_report / seconds_since_report );
+    Serial.print(" microseconds per loop ");
+    Serial.print( 1E6 * seconds_since_report / loops_since_report );
+    Serial.println();
+    
     // remember stats for next report
     last_report_ms = loop_time_ms;
     last_report_loop_count = loop_count;

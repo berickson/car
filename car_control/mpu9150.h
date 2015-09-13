@@ -183,7 +183,7 @@ public:
 
       // get initial quaternion and gravity
       if(!initialReading) {
-        mpu.dmpGetAccel(&a0, fifoBuffer);
+        zero();
         initialReading = true;
       }
     }
@@ -198,5 +198,8 @@ public:
   }
   void trace_status() {
     trace_mpu();
+  }
+  void zero() {
+    mpu.dmpGetAccel(&a0, fifoBuffer);
   }
 };
