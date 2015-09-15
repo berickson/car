@@ -1,9 +1,13 @@
 #include <I2Cdev.h>
 #include <Servo.h>
 #include "Pins.h"
+#include "LogFlags.h"
 #include "Blinker.h"
 #include "Mpu9150.h"
 #include "Car.h"
+#include "EventQueue.h"
+#include "PwmInput.h"
+#include "Esc.h"
 
 #define count_of(a) (sizeof(a)/sizeof(a[0]))
 
@@ -11,15 +15,13 @@
 
 #define PLAY_SOUNDS 0
 
+
 bool TRACE_RX = false;
 bool TRACE_PINGS = false;
 bool TRACE_ESC = false;
 bool TRACE_MPU = false;
 bool TRACE_LOOP_SPEED = false;
 bool TRACE_DYNAMICS = true;
-
-
-
 
 
 class Beeper {
@@ -101,37 +103,6 @@ enum rx_event {
 
 
 
-class EventQueue {
-public:
-  static const int size = 10;
-
-  RxEvent events[size];
-
-  void add(RxEvent new_event) {
-    for(int i = size-1; i > 0; --i) {
-      events[i]=events[i-1];
-    }
-    events[0] = new_event;
-
-    if(TRACE_RX) {
-      for(int i = 0; i < size; i++) {
-        Serial.print(events[i].steer);
-        Serial.print(events[i].speed);
-        Serial.print(",");
-      }
-      Serial.println();
-    }
-  }
-
-  bool matches(const RxEvent * pattern, int count) {
-    for(int i = 0; i < count; ++i) {
-      if(!events[i].equals(pattern[count-1 - i])) {
-        return false;
-      }
-    }
-    return true;
-  }
-};
 
 
 class RxEvents {
@@ -194,198 +165,6 @@ public:
 
 
 
-
-class Esc {
-public:
-
-  Servo * speed;
-
-  const unsigned long brake_ms = 500;
-  const unsigned long pause_ms = 200;
-  unsigned long brake_start_ms = 0;
-  unsigned long pause_start_ms = 0;
-
-  const int forward_us =  1390;
-  const int reverse_us =  1610;
-
-
-  const int neutral_us = 1500;
-  int calibration_us = 0;
-  int current_us = -1;
-
-  eSpeedCommand command = speed_neutral;
-
-  enum eState {
-    stopped,
-    forward_braking,
-    reverse_braking,
-    forward,
-    reverse,
-    pausing
-  } state;
-
-  const char * state_name(eState s) {
-    const char *names[]  = {
-      "stopped",
-      "forward_braking",
-      "reverse_braking",
-      "forward",
-      "reverse",
-      "pausing"
-    };
-    return names[s];
-  }
-
-  // used to match the control stick settings.
-  // Will use setting as the new pulse width for
-  // neutral
-  void set_neutral_pwm_us(unsigned long us) {
-    calibration_us = us - neutral_us;
-  }
-
-  void init(Servo * speed) {
-    this->speed = speed;
-    state = stopped;
-    set_pwm_us(neutral_us);
-  }
-
-  // sets pulse width, adjusted by calibration if any
-  void set_pwm_us(int us) {
-    int c_us = us + calibration_us;
-    if(c_us != current_us) {
-      current_us = c_us;
-      speed->writeMicroseconds(current_us);
-      Serial.print("ESC set pulse: ");
-      Serial.println(current_us);
-    }
-  }
-
-  void set_command(eSpeedCommand new_command) {
-    if(command == new_command) {
-      return;
-    }
-
-    command = new_command;
-    Serial.print("ESC Command: ");
-    Serial.println(speed_command_name(command));
-    Serial.print("OLD ESC State: ");
-    Serial.println(state_name(state));
-
-    if(command == speed_forward) {
-      switch(state) {
-        case forward_braking:
-        case stopped:
-        case forward:
-          state = forward;
-          set_pwm_us(forward_us);
-          break;
-
-        case pausing:
-          break;
-
-        case reverse_braking:
-          set_pwm_us(forward_us);
-          break;
-
-        case reverse:
-          set_pwm_us(forward_us);
-          state = reverse_braking;
-          brake_start_ms = millis();
-          break;
-      }
-    }
-    if(command == speed_reverse) {
-      switch(state) {
-        case reverse_braking:
-        case stopped:
-        case reverse:
-          state = reverse;
-          set_pwm_us(reverse_us);
-          break;
-
-        case pausing:
-          break;
-
-        case forward_braking:
-          set_pwm_us(reverse_us);
-          break;
-
-        case forward:
-          state = forward_braking;
-          set_pwm_us(reverse_us);
-          brake_start_ms = millis();
-          break;
-      }
-    }
-    if(command == speed_neutral){
-      switch(state) {
-        case stopped:
-        case pausing:
-          set_pwm_us(neutral_us);
-          break;
-
-        case forward_braking:
-          set_pwm_us(reverse_us);
-          break;
-
-        case reverse_braking:
-          set_pwm_us(forward_us);
-          break;
-
-        case reverse:
-          state = reverse_braking;
-          set_pwm_us(forward_us);
-          brake_start_ms = millis();
-          break;
-
-        case forward:
-          state = forward_braking;
-          set_pwm_us(reverse_us);
-          brake_start_ms = millis();
-          break;
-      }
-    }
-    Serial.print("New ESC State: ");
-    Serial.println(state_name(state));
-  }
-
-  void execute() {
-    if(state == forward_braking || state == reverse_braking) {
-      unsigned long ms = millis();
-      if(ms - brake_start_ms >= brake_ms) {
-        Serial.println("Braking complete");
-        state = pausing;
-        pause_start_ms = ms;
-        set_pwm_us(neutral_us);
-      }
-    }
-
-    if(state == pausing) {
-      unsigned long ms = millis();
-      if(ms - pause_start_ms >= pause_ms) {
-        Serial.println("Pausing complete");
-        state = stopped;
-      }
-    }
-
-    if(state == stopped) {
-      if(command == speed_forward) {
-        Serial.println("forward from stopped");
-        set_pwm_us(forward_us);
-        state = forward;
-      }
-      if(command == speed_reverse) {
-        Serial.println("reverse from stopped");
-        set_pwm_us(reverse_us);
-        state = reverse;
-      }
-      if(command == speed_neutral) {
-        set_pwm_us(neutral_us);
-        state = stopped;
-      }
-    }
-  }
-};
 
 
 class CommandInterpreter{
@@ -470,16 +249,16 @@ void rx_spd_handler() {
 }
 
 
-eSpeedCommand speed_for_ping_inches(double inches) {
-  if(inches ==0) return speed_neutral;
+Esc::eSpeedCommand speed_for_ping_inches(double inches) {
+  if(inches ==0) return Esc::speed_neutral;
   // get closer if far
   if (inches > 30.)
-    return speed_forward;
+    return Esc::speed_forward;
   // back up if too close
   if (inches < 20.)
-    return speed_reverse;
+    return Esc::speed_reverse;
 
-  return speed_neutral;
+  return Esc::speed_neutral;
 }
 
 class CircleMode {
@@ -501,7 +280,7 @@ public:
   }
 
   void end() {
-    esc.set_command(speed_neutral);
+    esc.set_command(Esc::speed_neutral);
     steering.writeMicroseconds(1500); // look straight ahead
   }
 
@@ -518,9 +297,9 @@ public:
     last_angle = ground_angle;
     if(abs(degrees_turned) < 90) {
       steering.writeMicroseconds(1900); // turn left todo: make steer commands
-      esc.set_command(speed_forward);
+      esc.set_command(Esc::speed_forward);
     } else {
-      esc.set_command(speed_neutral);
+      esc.set_command(Esc::speed_neutral);
       steering.writeMicroseconds(1500); // look straight ahead
       done = true;
       Serial.println("circle complete");
@@ -703,12 +482,12 @@ void loop() {
 
       if (new_rx_event && rx_events.recent.matches(auto_pattern, count_of(auto_pattern))) {
         mode = mode_automatic;
-        esc.set_command(speed_neutral);
+        esc.set_command(Esc::speed_neutral);
         beeper.beep_ascending();
         Serial.print("switched to automatic");
       }
       if (new_rx_event && rx_events.recent.matches(circle_pattern, count_of(circle_pattern))) {
-        esc.set_command(speed_neutral);
+        esc.set_command(Esc::speed_neutral);
         mode = mode_circle;
         circle_mode.init(&mpu9150);
         beeper.beep_ascending();
@@ -724,7 +503,7 @@ void loop() {
       esc.execute();
       if (new_rx_event && rx_events.current.equals(RxEvent('L','N'))) {
         mode = mode_manual;
-        esc.set_command(speed_neutral);
+        esc.set_command(Esc::speed_neutral);
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
         beeper.beep_descending();
@@ -732,7 +511,7 @@ void loop() {
       }
       if (new_rx_event && rx_events.current.is_bad()) {
         mode = mode_manual;
-        esc.set_command(speed_neutral);
+        esc.set_command(Esc::speed_neutral);
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
         beeper.beep_warble();
@@ -746,7 +525,7 @@ void loop() {
       // todo: merge this code into mode manager`
       if (circle_mode.is_done()) {
         mode = mode_manual;
-        esc.set_command(speed_neutral);
+        esc.set_command(Esc::speed_neutral);
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
         beeper.beep_descending();
@@ -754,7 +533,7 @@ void loop() {
       }
       if (new_rx_event && rx_events.current.equals(RxEvent('R','N'))) {
         mode = mode_manual;
-        esc.set_command(speed_neutral);
+        esc.set_command(Esc::speed_neutral);
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
         beeper.beep_descending();
@@ -762,7 +541,7 @@ void loop() {
       }
       if (new_rx_event && rx_events.current.is_bad()) {
         mode = mode_manual;
-        esc.set_command(speed_neutral);
+        esc.set_command(Esc::speed_neutral);
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
         beeper.beep_warble();

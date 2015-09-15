@@ -21,7 +21,7 @@ public:
 
   void attach(int pin);
   // interrupt handler
-  inline void handle_change();
+  void handle_change();
   bool is_valid();
 
   // safe method to return pulse width in microseconds

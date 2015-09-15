@@ -9,7 +9,7 @@ void PwmInput::attach(int pin) {
 }
 
 // interrupt handler
-inline void PwmInput::handle_change() {
+void PwmInput::handle_change() {
   unsigned long us = micros();
   if(digitalRead(pin)) {
     last_trigger_us = us;
