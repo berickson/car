@@ -1,3 +1,7 @@
+# Hidden files
+.*
+!/.gitignore
+
 # Object files
 *.o
 *.ko
