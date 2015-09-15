@@ -19,18 +19,22 @@
 #define PIN_U_STEER 4
 #define PIN_PING_TRIG 6
 #define PIN_PING_ECHO 23
+#include "ping.h"
 
 #define PIN_SPEAKER   9
 #define PIN_LED 13
 
 #define PLAY_SOUNDS 0
 
-#define TRACE_PINGS 0
-#define TRACE_ESC 0
-#define TRACE_MPU 0
-#define TRACE_LOOP_SPEED 0
+bool TRACE_RX = false;
+bool TRACE_PINGS = false;
+bool TRACE_ESC = false;
+bool TRACE_MPU = false;
+bool TRACE_LOOP_SPEED = false;
+bool TRACE_DYNAMICS = true;
 
-struct Blinker {
+class Blinker {
+public:
   int period_ms = 1000;
   int on_ms = 1;
   int pin = PIN_LED;
@@ -60,7 +64,8 @@ struct Blinker {
 };
 
 // computer steering and speed
-struct PwmInput {
+class PwmInput {
+public:
   unsigned long last_trigger_us = 0;
   unsigned long pulse_width_us = 0;
 
@@ -84,7 +89,7 @@ struct PwmInput {
   }
 
   // interrupt handler
-  void handle_change() {
+  inline void handle_change() {
     unsigned long us = micros();
     if(digitalRead(pin)) {
       last_trigger_us = us;
@@ -126,7 +131,8 @@ struct PwmInput {
 };
 
 
-struct Beeper {
+class Beeper {
+public:
   int pin;
 
   // hz of notes
@@ -202,7 +208,8 @@ enum rx_event {
 }
 */
 
-struct RxEvent {
+class RxEvent {
+public:
   char speed;
   char steer;
 
@@ -224,7 +231,8 @@ struct RxEvent {
 };
 
 
-struct EventQueue {
+class EventQueue {
+public:
   static const int size = 10;
 
   RxEvent events[size];
@@ -235,7 +243,7 @@ struct EventQueue {
     }
     events[0] = new_event;
 
-    if(0) {
+    if(TRACE_RX) {
       for(int i = 0; i < size; i++) {
         Serial.print(events[i].steer);
         Serial.print(events[i].speed);
@@ -256,7 +264,8 @@ struct EventQueue {
 };
 
 
-struct RxEvents {
+class RxEvents {
+public:
   RxEvent current, pending;
   bool new_event = false;
   EventQueue recent;
@@ -314,104 +323,20 @@ struct RxEvents {
 };
 
 
-struct Ping {
-  int ping_pin, echo_pin;
-  unsigned long ping_start_ms = 0;
-  unsigned long ping_start_us = 0;
-  unsigned long reply_start_us = 0;
-  bool _new_data_ready = false;
-
-  double last_ping_distance_inches = 0.;
-
-  unsigned long ping_rate_ms = 100;
-  const unsigned long ping_timeout_us = 20000; // 20000 microseconds should be about 10 feet
-
-  enum {
-    no_ping_pending,
-    waiting_for_reply_start,
-    waiting_for_reply_end
-  } state;
 
 
-
-  void init(int _ping_pin, int _echo_pin){
-    ping_pin = _ping_pin;
-    echo_pin = _echo_pin;
-    digitalWrite(ping_pin, LOW);
-    state = no_ping_pending;
-  }
-
-  bool new_data_ready() {
-    bool rv = _new_data_ready;
-    _new_data_ready = false;
-    return rv;
-  }
-
-  void set_distance_from_us(int us) {
-      double ping_distance_inches = (double) us / 148.; // 148 microseconds for ping round trip per inch
-      if(last_ping_distance_inches != ping_distance_inches) {
-         last_ping_distance_inches = ping_distance_inches;
-         _new_data_ready = true;
-      }
-  }
-
-  void scan(){
-    unsigned long ms = millis();
-    unsigned long  us = micros();
-
-    switch(state) {
-      case no_ping_pending:
-        if( ms - ping_start_ms >= ping_rate_ms) {
-          ping_start_ms = ms;
-          ping_start_us = us;
-          // The sensor is triggered by a HIGH pulse of 10 or more microseconds.
-          digitalWrite(ping_pin, HIGH);
-          delayMicroseconds(10);  // todo: can we get rid of this delay or maybe it's ok?
-          digitalWrite(ping_pin, LOW);
-          state = waiting_for_reply_start;
-        }
-        break;
-
-      case waiting_for_reply_start:
-        if(digitalRead(echo_pin) == HIGH) {
-          reply_start_us = us;
-          state = waiting_for_reply_end;
-        }  else if (us - ping_start_us >  ping_timeout_us) {
-          set_distance_from_us(0); // zero on timeout
-          state = no_ping_pending;
-        }
-        break;
-
-      case waiting_for_reply_end:
-        if(digitalRead(echo_pin) == LOW) {
-          set_distance_from_us(us - reply_start_us);
-          state = no_ping_pending;
-        } else if (us - reply_start_us > ping_timeout_us) {
-          set_distance_from_us(0); // zero on timeout
-          state = no_ping_pending;
-        }
-
-        break;
-    }
-  }
-
-  inline double inches() {
-    return last_ping_distance_inches;
-  }
-};
-
-
-struct SpeedControl {
+class Esc {
+public:
 
   Servo * speed;
 
-  const unsigned long brake_ms = 200;
-  const unsigned long pause_ms = 500;
+  const unsigned long brake_ms = 500;
+  const unsigned long pause_ms = 200;
   unsigned long brake_start_ms = 0;
   unsigned long pause_start_ms = 0;
 
-  const int forward_us =  1200;
-  const int reverse_us =  1700;
+  const int forward_us =  1390;
+  const int reverse_us =  1610;
 
 
   const int neutral_us = 1500;
@@ -478,6 +403,7 @@ struct SpeedControl {
 
     if(command == speed_forward) {
       switch(state) {
+        case forward_braking:
         case stopped:
         case forward:
           state = forward;
@@ -485,10 +411,12 @@ struct SpeedControl {
           break;
 
         case pausing:
-        case forward_braking:
-        case reverse_braking:
           break;
 
+        case reverse_braking:
+          set_pwm_us(forward_us);
+          break;
+        
         case reverse:
           set_pwm_us(forward_us);
           state = reverse_braking;
@@ -498,6 +426,7 @@ struct SpeedControl {
     }
     if(command == speed_reverse) {
       switch(state) {
+        case reverse_braking:
         case stopped:
         case reverse:
           state = reverse;
@@ -505,10 +434,12 @@ struct SpeedControl {
           break;
 
         case pausing:
-        case reverse_braking:
-        case forward_braking:
           break;
 
+        case forward_braking:
+          set_pwm_us(reverse_us);
+          break;
+          
         case forward:
           state = forward_braking;
           set_pwm_us(reverse_us);
@@ -520,8 +451,15 @@ struct SpeedControl {
       switch(state) {
         case stopped:
         case pausing:
-        case reverse_braking:
+          set_pwm_us(neutral_us);
+          break;
+          
         case forward_braking:
+          set_pwm_us(reverse_us);
+          break;
+
+        case reverse_braking:
+          set_pwm_us(forward_us);
           break;
 
         case reverse:
@@ -580,13 +518,59 @@ struct SpeedControl {
 };
 
 
+typedef void (*voidfunction)();
+
+struct command {
+  const char * name;
+  voidfunction f;
+};
+
+
+class CommandInterpreter{
+public:
+  String buffer;
+  const command * commands;
+  int command_count;
+
+  void init(const command * _commands, int _command_count)
+  {
+    commands = _commands;
+    command_count = _command_count;
+  }
+
+  void execute() {
+    while(Serial.available()>0) {
+      char c = Serial.read();
+      if( c == '\n') {
+        process_command(buffer);
+        buffer = "";
+      } else {
+        buffer += c;
+      }
+    }
+  }
+
+  void process_command(String s) {
+    for(int i = 0; i < command_count; i++) {
+      if(s.equals(commands[i].name)) {
+        Serial.print("Executing command ");
+        Serial.println(commands[i].name);
+        commands[i].f();
+        return;
+      }
+    }
+    Serial.print("Unknown command: ");
+    Serial.println(s);
+  }
+};
+
 
 //////////////////////////
 // Globals
 
 Servo steering;
 Servo speed;
-SpeedControl speed_control;
+Esc esc;
 
 PwmInput rx_steer;
 PwmInput rx_speed;
@@ -594,10 +578,13 @@ RxEvents rx_events;
 Ping ping;
 Beeper beeper;
 Blinker blinker;
+CommandInterpreter interpreter;
 
 
 // diagnostics for reporting loop speeds
 unsigned long loop_count = 0;
+unsigned long loop_time_ms = 0;
+unsigned long last_loop_time_ms = 0;
 unsigned long last_report_ms = 0;
 unsigned long last_report_loop_count = 0;
 
@@ -624,10 +611,10 @@ void rx_spd_handler() {
 eSpeedCommand speed_for_ping_inches(double inches) {
   if(inches ==0) return speed_neutral;
   // get closer if far
-  if (inches > 25.)
+  if (inches > 30.)
     return speed_forward;
   // back up if too close
-  if (inches < 12.)
+  if (inches < 20.)
     return speed_reverse;
 
   return speed_neutral;
@@ -641,7 +628,7 @@ public:
   bool done = false;
 
   bool is_done() {
-    return done; 
+    return done;
   }
 
   void init(Mpu9150 * _mpu) {
@@ -652,27 +639,28 @@ public:
   }
 
   void end() {
-    speed_control.set_command(speed_neutral);
+    esc.set_command(speed_neutral);
     steering.writeMicroseconds(1500); // look straight ahead
   }
 
   void execute() {
-    Serial.print("circle has turned");
-    Serial.println(degrees_turned);
+//    Serial.print("circle has turned");
+//    Serial.println(degrees_turned);
     double ground_angle = mpu->ground_angle();
     double angle_diff = last_angle-ground_angle;
-    if(abs(angle_diff) > 70){ 
+    if(abs(angle_diff) > 70){
       last_angle = ground_angle; // cheating low tech way to avoid wrap around
       return;
     }
     degrees_turned += angle_diff;
     last_angle = ground_angle;
-    if(abs(degrees_turned) < 360) {
-      //speed_control.set_command(speed_forward);
-      steering.writeMicroseconds(1900); // turn right? todo: make steer commands
+    if(abs(degrees_turned) < 90) {
+      steering.writeMicroseconds(1900); // turn left todo: make steer commands
+      esc.set_command(speed_forward);
     } else {
-      speed_control.set_command(speed_neutral);
+      esc.set_command(speed_neutral);
       steering.writeMicroseconds(1500); // look straight ahead
+      done = true;
       Serial.println("circle complete");
     }
   }
@@ -682,7 +670,74 @@ public:
 const RxEvent auto_pattern [] =
   {{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'}};
 const RxEvent circle_pattern [] =
-  {{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'L','N'}};
+  {{'L','N'},{'C','N'},{'L','N'},{'C','N'},{'L','N'},{'C','N'},{'L','N'}};
+
+
+
+void trace_ping_on() {
+  TRACE_PINGS = true;
+}
+
+void trace_ping_off() {
+  TRACE_PINGS = false;
+}
+
+void trace_esc_on() {
+  TRACE_ESC = true;
+}
+
+void trace_esc_off() {
+  TRACE_ESC = false;
+}
+
+void trace_mpu_on() {
+  TRACE_MPU = true;
+}
+
+void trace_mpu_off() {
+  TRACE_MPU = false;
+}
+
+void trace_loop_speed_on() {
+  TRACE_LOOP_SPEED = true;
+}
+
+void trace_loop_speed_off() {
+  TRACE_LOOP_SPEED = false;
+}
+
+
+void trace_dynamics_on() {
+  TRACE_DYNAMICS = true;
+}
+
+void trace_dynamics_off() {
+  TRACE_DYNAMICS = false;
+}
+
+
+void help();
+
+
+
+const command commands[] = {
+  {"help", help},
+  {"trace dynamics on", trace_dynamics_on},
+  {"trace dynamics off", trace_dynamics_off},
+  {"trace ping on", trace_ping_on},
+  {"trace ping off", trace_ping_off},
+  {"trace esc on", trace_esc_on},
+  {"trace esc off", trace_esc_off},
+  {"trace mpu on", trace_mpu_on},
+  {"trace mpu off", trace_mpu_off},
+  {"trace loop speed on", trace_loop_speed_on},
+  {"trace loop speed off", trace_loop_speed_off}
+};
+
+void help() {
+  for(unsigned int i = 0; i < count_of(commands); i++)
+    Serial.println(commands[i].name);
+}
 
 
 Mpu9150 mpu9150;
@@ -690,14 +745,17 @@ Mpu9150 mpu9150;
 void setup() {
   Serial.begin(9600);
   delay(1000);
+  interpreter.init(commands,count_of(commands));
   Serial.println("setup begun");
   steering.attach(PIN_U_STEER);
+  steering.writeMicroseconds(1500);
   speed.attach(PIN_U_SPEED);
+  speed.writeMicroseconds(1500);
 
 
   rx_steer.attach(PIN_RX_STEER);
   rx_speed.attach(PIN_RX_SPEED);
-  speed_control.init(&speed);
+  esc.init(&speed);
   blinker.init();
 
   ping.init(PIN_PING_TRIG, PIN_PING_ECHO);
@@ -723,29 +781,46 @@ void setup() {
 
   Serial.println("car_control begun");
   mpu9150.setup();
+  delay(1000);
+  mpu9150.zero();
 }
 
 CircleMode circle_mode;
 
+// returns true if loop time passes through n ms boundary
+bool every_n_ms(unsigned long last_loop_ms, unsigned long loop_ms, unsigned long ms) {
+  return (last_loop_ms % ms) + (loop_ms - last_loop_ms) >= ms;
+
+}
+
 void loop() {
-  mpu9150.loop();
+  // set global loop values
+  loop_count++;
+  last_loop_time_ms = loop_time_ms;
+  loop_time_ms = millis();
+
+  // get common execution times
+  bool every_second = every_n_ms(last_loop_time_ms, loop_time_ms, 1000); 
+  bool every_100_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 100); 
+
+  // get commands from usb
+  interpreter.execute();
+
+
+  ping.execute();
+  mpu9150.execute();
   blinker.execute();
 
-  unsigned long loop_time_ms = millis();
-  loop_count++;
-
   rx_events.process_pulses(rx_steer.pulse_us(), rx_speed.pulse_us());
+
   bool new_rx_event = rx_events.get_event();
-  ping.scan();
 
   double inches = ping.inches();//ping_inches();
   bool new_ping = ping.new_data_ready();
-  #if(TRACE_PINGS)
-  if(new_ping) {
+  if(TRACE_PINGS && new_ping) {
     Serial.print("ping inches:");
     Serial.println(inches);
   }
-  #endif
 
   if(0) {
     Serial.print("Speed: ");
@@ -766,11 +841,12 @@ void loop() {
 
       if (new_rx_event && rx_events.recent.matches(auto_pattern, count_of(auto_pattern))) {
         mode = mode_automatic;
-        speed_control.set_neutral_pwm_us(rx_speed.pulse_us());
+        esc.set_command(speed_neutral);
         beeper.beep_ascending();
         Serial.print("switched to automatic");
       }
       if (new_rx_event && rx_events.recent.matches(circle_pattern, count_of(circle_pattern))) {
+        esc.set_command(speed_neutral);
         mode = mode_circle;
         circle_mode.init(&mpu9150);
         beeper.beep_ascending();
@@ -782,10 +858,11 @@ void loop() {
     case mode_automatic:
 
       steering.writeMicroseconds(1500);
-      speed_control.set_command(speed_for_ping_inches(inches));
-      speed_control.execute();
+      esc.set_command(speed_for_ping_inches(inches));
+      esc.execute();
       if (new_rx_event && rx_events.current.equals(RxEvent('L','N'))) {
         mode = mode_manual;
+        esc.set_command(speed_neutral);
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
         beeper.beep_descending();
@@ -793,6 +870,7 @@ void loop() {
       }
       if (new_rx_event && rx_events.current.is_bad()) {
         mode = mode_manual;
+        esc.set_command(speed_neutral);
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
         beeper.beep_warble();
@@ -802,9 +880,19 @@ void loop() {
 
     case mode_circle:
       circle_mode.execute();
+      esc.execute();
       // todo: merge this code into mode manager`
-      if (new_rx_event && rx_events.current.equals(RxEvent('L','N'))) {
+      if (circle_mode.is_done()) {
         mode = mode_manual;
+        esc.set_command(speed_neutral);
+        steering.writeMicroseconds(1500);
+        speed.writeMicroseconds(1500);
+        beeper.beep_descending();
+        Serial.println("switched to manual - circle complete");
+      }
+      if (new_rx_event && rx_events.current.equals(RxEvent('R','N'))) {
+        mode = mode_manual;
+        esc.set_command(speed_neutral);
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
         beeper.beep_descending();
@@ -812,6 +900,7 @@ void loop() {
       }
       if (new_rx_event && rx_events.current.is_bad()) {
         mode = mode_manual;
+        esc.set_command(speed_neutral);
         steering.writeMicroseconds(1500);
         speed.writeMicroseconds(1500);
         beeper.beep_warble();
@@ -821,6 +910,7 @@ void loop() {
   }
 
 
+
   // state tracing
   if (0) {
     rx_steer.trace();
@@ -828,32 +918,50 @@ void loop() {
     rx_speed.trace();
     Serial.println();
   }
+  if(every_100_ms && TRACE_DYNAMICS) {
+    Serial.print("str");
+    Serial.print(", ");
+    Serial.print(steering.readMicroseconds());
+    Serial.print(", ");
+    Serial.print("esc");
+    Serial.print(", ");
+    Serial.print(speed.readMicroseconds());
+    Serial.print(", ");
+    Serial.print("aa");
+    Serial.print(", ");
+    Serial.print(mpu9150.aa.x - mpu9150.a0.x);
+    Serial.print(", ");
+    Serial.print(mpu9150.aa.y  - mpu9150.a0.y);
+    Serial.print(", ");
+    Serial.print(mpu9150.aa.z  - mpu9150.a0.z);
+    Serial.print(", ");
+    Serial.print("angle");
+    Serial.print(", ");
+    Serial.print(mpu9150.ground_angle());
+    Serial.println();
+  }
+
+  if(every_second && TRACE_MPU) {
+      mpu9150.trace_status();
+  }
 
   // loop speed reporting
   //  12,300 loops per second as of 8/18 9:30
   // 153,400 loops per second on Teensy 3.1 @ 96MHz 8/29
   //  60,900 loops per second on Teensy 3.1 @ 24MHz 8/29
-  if(1) {
-    unsigned long ms_since_report = loop_time_ms - last_report_ms;
-    if( ms_since_report >= 1000) {
-      unsigned long loops_since_report = loop_count - last_report_loop_count;
-      double seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
-#if(TRACE_LOOP_SPEED)
-      Serial.print("loops per second: ");
-      Serial.print( loops_since_report / seconds_since_report );
-      Serial.print(" microseconds per loop ");
-      Serial.print( 1E6 * seconds_since_report / loops_since_report );
-      Serial.println();
-#endif
-#if(TRACE_MPU)
-      mpu9150.trace_status();
-#endif
+  if(every_second && TRACE_LOOP_SPEED) {
+    unsigned long loops_since_report = loop_count - last_report_loop_count;
+    double seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
 
-
-      // remember stats for next report
-      last_report_ms = loop_time_ms;
-      last_report_loop_count = loop_count;
-    }
+    Serial.print("loops per second: ");
+    Serial.print( loops_since_report / seconds_since_report );
+    Serial.print(" microseconds per loop ");
+    Serial.print( 1E6 * seconds_since_report / loops_since_report );
+    Serial.println();
+    
+    // remember stats for next report
+    last_report_ms = loop_time_ms;
+    last_report_loop_count = loop_count;
   }
 
 }

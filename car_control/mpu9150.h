@@ -97,7 +97,7 @@ public:
 
   double ground_angle() {
     if(!initialReading) return 0.0;
-    
+
     Quaternion qdiff = diff(q,q0);
     double angle = rads2degrees(normal_angle(qdiff,gravity));
     return angle;
@@ -183,7 +183,7 @@ public:
 
       // get initial quaternion and gravity
       if(!initialReading) {
-        mpu.dmpGetAccel(&a0, fifoBuffer);
+        zero();
         initialReading = true;
       }
     }
@@ -193,10 +193,13 @@ public:
   void setup(){
     setup_mpu();
   }
-  inline void loop(){
+  inline void execute(){
     process_mpu();
   }
   void trace_status() {
     trace_mpu();
+  }
+  void zero() {
+    mpu.dmpGetAccel(&a0, fifoBuffer);
   }
 };
