@@ -19,72 +19,7 @@ bool TRACE_LOOP_SPEED = false;
 bool TRACE_DYNAMICS = true;
 
 
-// computer steering and speed
-class PwmInput {
-public:
-  unsigned long last_trigger_us = 0;
-  unsigned long pulse_width_us = 0;
 
-  // since we are dealing with standard RC,
-  // anything out of of the below ranges should not occur and is ignored
-  unsigned long max_pulse_us = 2000;
-  unsigned long min_pulse_us = 1000;
-
-  unsigned long last_pulse_ms = 0;  // time when last pulse occurred
-
-
-  // milliseconds without a pulse to consider a timeout
-  unsigned long timeout_ms = 500;
-  int pin;
-
-  void attach(int pin) {
-    this->pin = pin;
-    last_trigger_us = 0;
-    pulse_width_us = 0;
-    pinMode(pin, INPUT);
-  }
-
-  // interrupt handler
-  inline void handle_change() {
-    unsigned long us = micros();
-    if(digitalRead(pin)) {
-      last_trigger_us = us;
-    }
-    else {
-      unsigned long width = us - last_trigger_us;
-      // only accept pulses in acceptable range
-      if(width >= min_pulse_us && width <= max_pulse_us) {
-        pulse_width_us = width;
-        last_pulse_ms = millis();
-      }
-    }
-  }
-
-  bool is_valid() {
-    return millis() - last_pulse_ms < timeout_ms;
-  }
-
-  // safe method to return pulse width in microseconds
-  // returns 0 if invalid
-  int pulse_us() {
-    if(is_valid())
-      return pulse_width_us;
-    else
-      return 0;
-  }
-
-
-
-  void trace() {
-    Serial.print(pin);
-    Serial.print(" ");
-    Serial.print(pulse_width_us);
-    if(is_valid())
-      Serial.print(" valid");
-    else
-      Serial.print(" invalid");
-  }
-};
 
 
 class Beeper {
