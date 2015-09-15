@@ -208,27 +208,6 @@ enum rx_event {
 }
 */
 
-class RxEvent {
-public:
-  char speed;
-  char steer;
-
-  RxEvent():RxEvent('0','0'){
-  }
-
-  RxEvent(char steer, char speed) {
-    this->steer = steer;
-    this->speed = speed;
-  }
-
-  bool equals(RxEvent other) {
-    return speed == other.speed && steer == other.steer;
-  }
-
-  bool is_bad(){
-    return speed == '?' || steer == '?';
-  }
-};
 
 
 class EventQueue {
@@ -416,7 +395,7 @@ public:
         case reverse_braking:
           set_pwm_us(forward_us);
           break;
-        
+
         case reverse:
           set_pwm_us(forward_us);
           state = reverse_braking;
@@ -439,7 +418,7 @@ public:
         case forward_braking:
           set_pwm_us(reverse_us);
           break;
-          
+
         case forward:
           state = forward_braking;
           set_pwm_us(reverse_us);
@@ -453,7 +432,7 @@ public:
         case pausing:
           set_pwm_us(neutral_us);
           break;
-          
+
         case forward_braking:
           set_pwm_us(reverse_us);
           break;
@@ -518,21 +497,13 @@ public:
 };
 
 
-typedef void (*voidfunction)();
-
-struct command {
-  const char * name;
-  voidfunction f;
-};
-
-
 class CommandInterpreter{
 public:
   String buffer;
-  const command * commands;
+  const Command * commands;
   int command_count;
 
-  void init(const command * _commands, int _command_count)
+  void init(const Command * _commands, int _command_count)
   {
     commands = _commands;
     command_count = _command_count;
@@ -720,7 +691,7 @@ void help();
 
 
 
-const command commands[] = {
+const Command commands[] = {
   {"help", help},
   {"trace dynamics on", trace_dynamics_on},
   {"trace dynamics off", trace_dynamics_off},
@@ -800,8 +771,8 @@ void loop() {
   loop_time_ms = millis();
 
   // get common execution times
-  bool every_second = every_n_ms(last_loop_time_ms, loop_time_ms, 1000); 
-  bool every_100_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 100); 
+  bool every_second = every_n_ms(last_loop_time_ms, loop_time_ms, 1000);
+  bool every_100_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 100);
 
   // get commands from usb
   interpreter.execute();
@@ -958,7 +929,7 @@ void loop() {
     Serial.print(" microseconds per loop ");
     Serial.print( 1E6 * seconds_since_report / loops_since_report );
     Serial.println();
-    
+
     // remember stats for next report
     last_report_ms = loop_time_ms;
     last_report_loop_count = loop_count;

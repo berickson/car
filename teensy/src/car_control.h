@@ -1,3 +1,6 @@
+#include "RxEvent.h"
+#include "Command.h"
+
 enum eSpeedCommand : char{
   speed_forward,
   speed_reverse,
