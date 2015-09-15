@@ -1,28 +1,13 @@
-#include "MPU6050_9Axis_MotionApps41.h"
-#include <MPU6050.h>
-#include <helper_3dmath.h>
-
-#include <Wire.h>
-
 #include <I2Cdev.h>
-
 #include <Servo.h>
-#include "mpu9150.h"
-#include "car_control.h"
+#include "Pins.h"
+#include "Blinker.h"
+#include "Mpu9150.h"
+#include "Car.h"
 
 #define count_of(a) (sizeof(a)/sizeof(a[0]))
 
-#define PIN_RX_SPEED 1
-#define PIN_RX_STEER 2
-
-#define PIN_U_SPEED 3
-#define PIN_U_STEER 4
-#define PIN_PING_TRIG 6
-#define PIN_PING_ECHO 23
-#include "ping.h"
-
-#define PIN_SPEAKER   9
-#define PIN_LED 13
+#include "Ping.h"
 
 #define PLAY_SOUNDS 0
 
@@ -33,35 +18,6 @@ bool TRACE_MPU = false;
 bool TRACE_LOOP_SPEED = false;
 bool TRACE_DYNAMICS = true;
 
-class Blinker {
-public:
-  int period_ms = 1000;
-  int on_ms = 1;
-  int pin = PIN_LED;
-  unsigned long wait_ms = 0;
-  unsigned long last_change_ms = 0;
-  bool is_on = false;
-
-  void init(int _pin = PIN_LED) {
-    pin = _pin;
-    pinMode(pin, OUTPUT);
-  }
-
-  void execute() {
-    unsigned long ms = millis();
-    if(ms - last_change_ms <= wait_ms)
-      return;
-    is_on = !is_on;
-    last_change_ms = ms;
-    digitalWrite(pin, is_on);
-    if(is_on) {
-      wait_ms =on_ms;
-    }
-    else {
-      wait_ms = period_ms - on_ms;
-    }
-  }
-};
 
 // computer steering and speed
 class PwmInput {
