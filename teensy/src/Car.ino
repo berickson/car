@@ -8,6 +8,7 @@
 #include "EventQueue.h"
 #include "PwmInput.h"
 #include "Esc.h"
+#include "Beeper.h"
 
 #define count_of(a) (sizeof(a)/sizeof(a[0]))
 
@@ -24,67 +25,6 @@ bool TRACE_LOOP_SPEED = false;
 bool TRACE_DYNAMICS = true;
 
 
-class Beeper {
-public:
-  int pin;
-
-  // hz of notes
-  const int note_c5 = 523;
-  const int note_d5 = 587;
-  const int note_e5 = 659;
-  const int note_f5 = 698;
-  const int note_g5 = 784;
-  const int note_a5 = 880;
-  const int note_b5 = 988;
-
-  // duration of notes
-  const unsigned long note_ms = 500;
-  const unsigned long gap_ms = 10;
-
-  void attach(int pin) {
-    this->pin = pin;
-  }
-
-  void play(int note) {
-    tone(pin,note);
-  }
-
-  void beep(int note) {
-#if(PLAY_SOUNDS)
-    tone(pin, note, note_ms);
-    delay(note_ms + gap_ms);
-#endif
-  }
-
-  void beep_ascending() {
-    beep(note_c5);
-    beep(note_e5);
-    beep(note_g5);
-  }
-
-  void beep_descending() {
-    beep(note_g5);
-    beep(note_e5);
-    beep(note_c5);
-  }
-
-  void beep_nbc() {
-    beep(note_c5);
-    beep(note_a5);
-    beep(note_f5);
-  }
-
-  void beep_warble() {
-    beep(note_a5);
-    beep(note_f5);
-    beep(note_a5);
-    beep(note_f5);
-    beep(note_a5);
-    beep(note_f5);
-    beep(note_a5);
-    beep(note_f5);
-  }
-};
 
 /*
 enum rx_event {
