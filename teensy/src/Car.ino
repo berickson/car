@@ -9,6 +9,8 @@
 #include "PwmInput.h"
 #include "Esc.h"
 #include "Beeper.h"
+#include "RxEvents.h"
+#include "CircleMode.h"
 
 #define count_of(a) (sizeof(a)/sizeof(a[0]))
 
@@ -40,72 +42,6 @@ enum rx_event {
 
 }
 */
-
-
-
-
-
-class RxEvents {
-public:
-  RxEvent current, pending;
-  bool new_event = false;
-  EventQueue recent;
-
-  // number of different readings before a new event is triggered
-  // this is used to de-bounce the system
-  const int change_count_threshold = 5;
-  int change_count = 0;
-
-  void process_pulses(int steer_us, int speed_us) {
-    pending.steer = steer_code(steer_us);
-    pending.speed = speed_code(speed_us);
-    if (! pending.equals(current)) {
-      if(++change_count >= change_count_threshold) {
-        current = pending;
-        change_count = 0;
-        recent.add(current);
-        new_event = true;
-      }
-    }
-  }
-
-
-   char steer_code(int steer_us) {
-    if (steer_us == 0)
-      return '?';
-    if (steer_us < 1300)
-      return 'R';
-    if (steer_us > 1700)
-      return 'L';
-    return 'C';
-  }
-
-  char speed_code(int speed_us) {
-    if (speed_us == 0)
-      return '?';
-    if (speed_us < 1300)
-      return 'F';
-    if (speed_us > 1700)
-      return 'V';
-    return 'N';
-  }
-
-  // returns true if new event received since last call
-  bool get_event() {
-    bool rv = new_event;
-    new_event = false;
-    return rv;
-  }
-
-  void trace() {
-    Serial.write(current.steer);
-    Serial.write(current.speed);
-  }
-};
-
-
-
-
 
 class CommandInterpreter{
 public:
@@ -201,51 +137,7 @@ Esc::eSpeedCommand speed_for_ping_inches(double inches) {
   return Esc::speed_neutral;
 }
 
-class CircleMode {
-public:
-  double last_angle;
-  double degrees_turned = 0;
-  Mpu9150 * mpu;
-  bool done = false;
 
-  bool is_done() {
-    return done;
-  }
-
-  void init(Mpu9150 * _mpu) {
-    mpu = _mpu;
-    last_angle = mpu->ground_angle();
-    degrees_turned = 0;
-    done = false;
-  }
-
-  void end() {
-    esc.set_command(Esc::speed_neutral);
-    steering.writeMicroseconds(1500); // look straight ahead
-  }
-
-  void execute() {
-//    Serial.print("circle has turned");
-//    Serial.println(degrees_turned);
-    double ground_angle = mpu->ground_angle();
-    double angle_diff = last_angle-ground_angle;
-    if(abs(angle_diff) > 70){
-      last_angle = ground_angle; // cheating low tech way to avoid wrap around
-      return;
-    }
-    degrees_turned += angle_diff;
-    last_angle = ground_angle;
-    if(abs(degrees_turned) < 90) {
-      steering.writeMicroseconds(1900); // turn left todo: make steer commands
-      esc.set_command(Esc::speed_forward);
-    } else {
-      esc.set_command(Esc::speed_neutral);
-      steering.writeMicroseconds(1500); // look straight ahead
-      done = true;
-      Serial.println("circle complete");
-    }
-  }
-};
 
 
 const RxEvent auto_pattern [] =
