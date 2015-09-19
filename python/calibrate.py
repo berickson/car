@@ -64,13 +64,17 @@ newcameramtx, roi=cv2.getOptimalNewCameraMatrix(mtx,dist,(w,h),1,(w,h))
 
 ##################################
 # Re-project corners to test paramters
+print imgpoints[0].size
 tot_error = 0.
+tot_obj_error = 0.
 for i in xrange(len(objpoints)):
     imgpoints2, _ = cv2.projectPoints(objpoints[i], rvecs[i], tvecs[i], mtx, dist)
-    error = cv2.norm(imgpoints[i],imgpoints2, cv2.NORM_L2)/len(imgpoints2)
-    tot_error += error
+    print imgpoints2.size
+    #tot_obj_error += cv2.norm(objpoints[i],imgpoints2, cv2.NORM_L2)
+    tot_error +=  cv2.norm(imgpoints[i],imgpoints2, cv2.NORM_L2)
 
-print "mean error: ", tot_error/len(objpoints)
+print "original error: ", tot_obj_error/len(objpoints)
+print "corrected error: ", tot_error/len(objpoints)
 
 
 print "undistoring images"
