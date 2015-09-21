@@ -2,6 +2,9 @@
 .*
 !/.gitignore
 
+#output folders
+output/
+
 # Object files
 *.o
 *.ko
