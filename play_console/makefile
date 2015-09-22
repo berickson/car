@@ -7,5 +7,5 @@ test_output.txt: play_console makefile
 	./play_console > test_output.txt
 
 
-play_console: main.cpp
-	g++ -o play_console main.cpp -std=c++11
+play_console: *.cpp *.h
+	g++ -o play_console *.cpp -std=c++11

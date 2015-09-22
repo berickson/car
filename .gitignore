@@ -5,6 +5,9 @@
 #output folders
 output/
 
+#temporary files
+*~
+
 # Object files
 *.o
 *.ko
