@@ -2,6 +2,8 @@
 .*
 !/.gitignore
 
+test/test
+
 #output folders
 output/
 
