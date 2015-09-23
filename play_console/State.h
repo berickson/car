@@ -1,3 +1,5 @@
+#pragma once
+
 class State {
 public:
   const char * name = 0;
@@ -6,4 +8,3 @@ public:
   virtual void execute();
   virtual bool done();
 };
-

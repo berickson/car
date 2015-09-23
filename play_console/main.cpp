@@ -8,9 +8,11 @@ using namespace std;
 #include "BeeperTest.h"
 
 #include "SequenceTest.h"
+#include "BeepTest.h"
 
 int main(int argc, char ** argv) {
   //PidTest();
   //BeeperTest();
-  SequenceTest();
+  //SequenceTest();
+  BeepTest();
 }

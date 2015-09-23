@@ -1,4 +1,24 @@
+tone(12, 20);
 i: 0
-current state: state1
+current state: beep1
 i: 1
-current state: state2
+current state: beep1
+i: 2
+current state: beep1
+i: 3
+current state: beep1
+i: 4
+current state: beep1
+notone(12);
+tone(12, 20);
+i: 5
+current state: beep2
+i: 6
+current state: beep2
+i: 7
+current state: beep2
+i: 8
+current state: beep2
+i: 9
+current state: beep2
+notone(12);

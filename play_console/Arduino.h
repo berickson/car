@@ -1,24 +1,9 @@
 // fake file to make compile work
 #include <iostream>
 
-void tone(int pin, int note, int duration) {
-  std::cout << "tone(" << pin << ", " << note << ", " << duration << ");" << std::endl;
-  //throw("This command should not be used");
-}
-
-
-void tone(int pin, int note) {
-  std::cout << "tone(" << pin << ", " << note <<");" << std::endl;
-}
-
-void notone(int pin) {
-  std::cout << "notone(" << pin << ");" << std::endl;
-}
-
-void delay(int ms) {
-  std::cout << "delay(" << ms << ");" << std::endl;
-}
-unsigned long g_millis = 0;
-unsigned long millis() {
-  return g_millis;
-}
+void tone(int pin, int note, int duration);
+void tone(int pin, int note);
+void notone(int pin);
+void delay(int ms);
+extern unsigned long g_millis;
+unsigned long millis();

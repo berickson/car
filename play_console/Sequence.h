@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstddef>
 #include "State.h"
 class Sequence : public State {
@@ -13,4 +15,3 @@ class Sequence : public State {
   bool done();
   void exit();
 };
-
