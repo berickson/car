@@ -3,9 +3,9 @@ always: test_output.txt
 	@echo ------------
 	@cat test_output.txt
 
-test_output.txt: play_console makefile
-	./play_console > test_output.txt
+test_output.txt: test makefile
+	./test > test_output.txt
 
 
-play_console: *.cpp *.h
-	g++ -o play_console *.cpp -std=c++11
+test: *.cpp *.h
+	g++ -o test *.cpp -std=c++11
