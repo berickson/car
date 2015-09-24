@@ -22,6 +22,7 @@ void CircleMode::init(Mpu9150 * _mpu) {
   pid.set_pv(abs(degrees_turned), 0.0);
   pid.kp = 1/25.; // full power until 25 degrees
   pid.ki = 0;//1/30.; // 30 degrees per second
+  pid.kd = 0;//1/30.; // 30 degrees per second
   pid.set_min_max_output(-1,1);
   start_millis = millis();
   done = false;
