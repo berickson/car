@@ -1,40 +1,15 @@
-clamped output: 1
-output: 10
-output without kd: 5
-output with kd: 0
-output with ki: 0.5
-running beeper test
-tone(22, 523, 500);
-delay(510);
-tone(22, 880, 500);
-delay(510);
-tone(22, 698, 500);
-delay(510);
-i: 0
-current state: state1
-i: 1
-current state: state2
-tone(12, 20);
-i: 0
-current state: beep1
-i: 1
-current state: beep1
-i: 2
-current state: beep1
-i: 3
-current state: beep1
-i: 4
-current state: beep1
-notone(12);
-tone(12, 20);
-i: 5
-current state: beep2
-i: 6
-current state: beep2
-i: 7
-current state: beep2
-i: 8
-current state: beep2
-i: 9
-current state: beep2
-notone(12);
+FsmTest
+fsm state -  done: 0 current task: task1
+no events
+fsm state -  done: 0 current task: task1
+set task1 bad
+fsm state -  done: 0 current task: task1
+set task1 ok
+fsm state -  done: 0 current task: task2
+set task2 bad
+fsm state -  done: 0 current task: task1
+set task1 ok
+fsm state -  done: 0 current task: task2
+set task2 ok
+fsm state -  done: 1 current task: fsm
+test complete

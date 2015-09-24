@@ -6,18 +6,19 @@ using namespace std;
 
 
 void SequenceTest() {
-  State state1,state2;
-  state1.name = "state1";
-  state2.name = "state2";
-  State * states[] = {&state1, &state2};
-  Sequence sequence(states,2);
+  cout << "SequenceTest" << endl;
+  Task task1,task2;
+  task1.name = "task1";
+  task2.name = "task2";
+  Task * tasks[] = {&task1, &task2};
+  Sequence sequence(tasks,2);
 
   sequence.enter();
   for(int i = 0; i < 1000; i++) {
     cout << "i: " << i << endl;
-    cout << "current state: " << sequence.current_state->name << endl;
+    cout << "current task: " << sequence.current_task->name << endl;
     sequence.execute();
-    if(sequence.done())
+    if(sequence.is_done())
         break;
   }
 

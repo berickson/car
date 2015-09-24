@@ -1,7 +1,7 @@
 #pragma once
-#include "State.h"
+#include "Task.h"
 
-class Beep : public State {
+class Beep : public Task {
 public:
   int pin;
   int note;

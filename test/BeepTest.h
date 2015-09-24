@@ -10,15 +10,15 @@ void BeepTest() {
   Beep beep1(12,20,3), beep2(12,20,4);
   beep1.name = "beep1";
   beep2.name = "beep2";
-  State * states[] = {&beep1, &beep2};
-  Sequence sequence(states,2);
+  Task * tasks[] = {&beep1, &beep2};
+  Sequence sequence(tasks,2);
   sequence.enter();
   for(unsigned long i = 0; i < 1000; i++) {
     g_millis = i;
     cout << "i: " << i << endl;
-    cout << "current state: " << sequence.current_state->name << endl;
+    cout << "current task: " << sequence.current_task->name << endl;
     sequence.execute();
-    if(sequence.done())
+    if(sequence.is_done())
         break;
   }
   sequence.exit();

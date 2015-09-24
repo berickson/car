@@ -1,17 +1,17 @@
 #pragma once
 
 #include <cstddef>
-#include "State.h"
-class Sequence : public State {
+#include "Task.h"
+class Sequence : public Task {
   public:
-  State ** states;
-  int state_count = -1;
+  Task ** tasks;
+  int task_count = -1;
   int current_step = -1;
-  State * current_state = NULL;
+  Task * current_task = NULL;
 
-  Sequence(State ** _states, int _state_count);
+  Sequence(Task ** _tasks, int _task_count);
   void enter();
   void execute();
-  bool done();
   void exit();
+  bool is_done();
 };
