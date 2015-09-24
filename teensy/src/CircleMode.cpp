@@ -5,6 +5,7 @@
 
 extern Esc esc;
 extern Servo steering;
+extern Servo speed;
 
 bool CircleMode::is_done() {
   return done;
@@ -14,6 +15,15 @@ void CircleMode::init(Mpu9150 * _mpu) {
   mpu = _mpu;
   last_angle = mpu->ground_angle();
   degrees_turned = 0;
+
+  // assumes power is -1 to 1 range
+  // assumes per second (not millis)
+  pid.set_sp(90);
+  pid.set_pv(abs(degrees_turned), 0.0);
+  pid.kp = 1/25.; // full power until 25 degrees
+  pid.ki = 1/30.; // 30 degrees per second
+  pid.set_min_max_output(-1,1);
+  start_millis = millis();
   done = false;
 }
 
@@ -33,6 +43,11 @@ void CircleMode::execute() {
   }
   degrees_turned += angle_diff;
   last_angle = ground_angle;
+  pid.set_pv(abs(degrees_turned),(millis()-start_millis)/1000.);
+  double v = pid.get_output();  // will be in range 0-1
+  const double max_speed_ms = 250;
+  speed.writeMicroseconds(1500-v*max_speed_ms);
+  /*
   if(abs(degrees_turned) < 90) {
     steering.writeMicroseconds(1900); // turn left todo: make steer commands
     esc.set_command(Esc::speed_forward);
@@ -42,4 +57,5 @@ void CircleMode::execute() {
     done = true;
     Serial.println("circle complete");
   }
+  */
 }
