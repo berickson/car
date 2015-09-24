@@ -48,6 +48,12 @@ void FsmTest() {
   fsm.execute();
   PrintFsmState(fsm);
 
+  cout << "set task1 nonsense" << endl;
+  task1.set_event("nonsense");
+  fsm.execute();
+  PrintFsmState(fsm);
+
+
   cout << "set task1 ok" << endl;
   task1.set_event("ok");
   fsm.execute();
@@ -55,6 +61,10 @@ void FsmTest() {
 
   cout << "set task2 ok" << endl;
   task2.set_event("ok");
+  fsm.execute();
+  PrintFsmState(fsm);
+
+  cout << "execute complete machine" << endl;
   fsm.execute();
   PrintFsmState(fsm);
 
