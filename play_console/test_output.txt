@@ -1,9 +1,0 @@
-q0 = qw: 0.69 x: 0.11 y: -0.72 z: 0.06
-q1 = qw: 0.53 x: -0.43 y: -0.59 z: -0.43
-q0.getProduct(q1) = qw: 0.014 x: 0.1066 y: -0.7672 z: -0.6394
-q0.getProduct(q0.getConjugate()) = qw: 1.0102 x: 0 y: 2.23517e-08 z: 0
-q1.getProduct(q0.getConjugate()) = qw: 0.7174 x: -0.00999996 y: -0.00399999 z: -0.703
-dot(q0,q1) = 0.7174
-angle(q0,q1) = 1.54147
-degrees(angle(q0,q1)) = 88.3195
-degrees(normal_angle(diff(q1,q0),VectorFloat(1,0,0))) = 88.347

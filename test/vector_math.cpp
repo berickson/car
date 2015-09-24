@@ -1,3 +1,4 @@
+#if 0
 #include "math.h"
 #include "stdint.h"
 
@@ -20,7 +21,7 @@ int main(int argc, char ** argv) {
   Quaternion q0(0.69,0.11,-0.72,0.06);
   Quaternion q1(0.53,-0.43,-0.59,-0.43);
 
-  trace_eval(q0);
+  trace_eval(q0);i
   trace_eval(q1);
   trace_eval(q0.getProduct(q1));
   trace_eval(q0.getProduct(q0.getConjugate()));
@@ -32,3 +33,4 @@ int main(int argc, char ** argv) {
 
   return 0;
 }
+#endif
