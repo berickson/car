@@ -11,8 +11,8 @@ using namespace std;
 #include "BeepTest.h"
 
 int main(int argc, char ** argv) {
-  //PidTest();
-  //BeeperTest();
-  //SequenceTest();
+  PidTest();
+  BeeperTest();
+  SequenceTest();
   BeepTest();
 }
