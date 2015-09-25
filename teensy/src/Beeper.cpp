@@ -1,5 +1,5 @@
 #include "Beeper.h"
-#include "Arduino.h"
+#include <Arduino.h>
 
 void Beeper::attach(int pin) {
   this->pin = pin;

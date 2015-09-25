@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Beeper.h"
+#include "../Beeper.h"
 
 using namespace std;
 void BeeperTest() {
