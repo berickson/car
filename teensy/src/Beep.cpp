@@ -15,7 +15,7 @@ void Beep::enter() {
 }
 
 void Beep::exit() {
-  notone(pin);
+  noTone(pin);
 }
 
 void Beep::execute() {
