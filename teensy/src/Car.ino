@@ -275,6 +275,7 @@ void loop() {
   // get common execution times
   bool every_second = every_n_ms(last_loop_time_ms, loop_time_ms, 1000);
   bool every_100_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 100);
+  bool every_20_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 20);
 
   // get commands from usb
   interpreter.execute();
@@ -352,7 +353,7 @@ void loop() {
       break;
 
     case mode_circle:
-      circle_mode.execute();
+      if(every_20_ms) circle_mode.execute();
       //esc.execute();
       // todo: merge this code into mode manager`
       if (circle_mode.is_done()) {

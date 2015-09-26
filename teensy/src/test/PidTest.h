@@ -13,9 +13,9 @@ void PidTest() {
   Pid pid;
   pid.set_sp(10.);
   pid.set_pv(0,0);
-  cout << "clamped output: " << pid.get_output() << endl;
+  cout << "default clamped output: " << pid.get_output() << endl;
   pid.set_min_max_output(-1000,1000);
-  cout << "output: " << pid.get_output() << endl;
+  cout << "clamped to 1000 output: " << pid.get_output() << endl;
   pid.set_pv(5,1);
   cout << "output without kd: " << pid.get_output() << endl;
   pid.kd = 1;

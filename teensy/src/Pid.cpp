@@ -1,5 +1,15 @@
 #include "Pid.h"
 
+
+// resets all input, configuration stays the same
+void Pid::reset() {
+  sum_error = 0.0;
+  pv = NAN;
+  t = NAN;
+  prev_pv = NAN;
+  prev_t = NAN;
+}
+
 void Pid::set_pv(double _pv, double _t) {
   prev_pv = pv;
   prev_t = t;

@@ -17,6 +17,7 @@ public:
   double prev_pv = NAN;
   double prev_t = NAN;
 
+  void reset();
   void set_pv(double _pv, double _t);
   void set_min_max_output(double _min_output, double _max_output);
   void set_sp(double _sp);
