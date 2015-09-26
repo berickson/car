@@ -33,34 +33,34 @@ void FsmTest() {
   PrintFsmState(fsm);
 
   
-  cout << "set task1 bad" << endl;
-  task1.set_event("bad");
+  cout << "set bad" << endl;
+  fsm.set_event("bad");
   fsm.execute();
   PrintFsmState(fsm);
 
-  cout << "set task1 ok" << endl;
-  task1.set_event("ok");
+  cout << "set ok" << endl;
+  fsm.set_event("ok");
   fsm.execute();
   PrintFsmState(fsm);
 
-  cout << "set task2 bad" << endl;
-  task2.set_event("bad");
+  cout << "set bad" << endl;
+  fsm.set_event("bad");
   fsm.execute();
   PrintFsmState(fsm);
 
-  cout << "set task1 nonsense" << endl;
-  task1.set_event("nonsense");
+  cout << "set nonsense" << endl;
+  fsm.set_event("nonsense");
   fsm.execute();
   PrintFsmState(fsm);
 
 
-  cout << "set task1 ok" << endl;
-  task1.set_event("ok");
+  cout << "set ok" << endl;
+  fsm.set_event("ok");
   fsm.execute();
   PrintFsmState(fsm);
 
-  cout << "set task2 ok" << endl;
-  task2.set_event("ok");
+  cout << "set ok" << endl;
+  fsm.set_event("ok");
   fsm.execute();
   PrintFsmState(fsm);
 

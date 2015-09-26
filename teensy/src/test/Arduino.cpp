@@ -11,7 +11,7 @@ void tone(int pin, int note) {
   std::cout << "tone(" << pin << ", " << note <<");" << std::endl;
 }
 
-void notone(int pin) {
+void noTone(int pin) {
   std::cout << "notone(" << pin << ");" << std::endl;
 }
 

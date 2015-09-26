@@ -25,4 +25,5 @@ class Fsm : public Task {
   void execute();
   bool is_done();
   void exit();
+  void set_event(const char * event);
 };

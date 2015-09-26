@@ -7,11 +7,15 @@ using namespace std;
 
 void BeepTest() {
   g_millis = 0;
-  Beep beep1(12,20,3), beep2(12,20,4);
+  Beep beep1, beep2;
+  beep1.init(12,20,3);
+  beep2.init(12,20,4);
   beep1.name = "beep1";
   beep2.name = "beep2";
-  Task * tasks[] = {&beep1, &beep2};
-  Sequence sequence(tasks,2);
+  Sequence sequence;
+  sequence.init();
+  sequence.add_task(&beep1);
+  sequence.add_task(&beep2);
   sequence.enter();
   for(unsigned long i = 0; i < 1000; i++) {
     g_millis = i;

@@ -2,9 +2,24 @@
 
 #include <cstddef>
 
-Sequence::Sequence(Task ** _tasks, int _task_count) {
-  tasks = _tasks;
-  task_count = _task_count;
+Sequence::Sequence() {
+  task_count = -1;
+  current_step = -1;
+  current_task = NULL;
+}
+
+void Sequence::init() {
+  exit(); // in case were are in the middle of something
+  task_count = 0;
+}
+
+void Sequence::add_task(Task * task) {
+  // silently fail if there isn't room for one more
+  if(task_count+1 >= max_tasks) {
+    return;
+  }
+  tasks[task_count] = task;
+  task_count++;
 }
 
 void Sequence::enter() {

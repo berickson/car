@@ -1,3 +1,6 @@
+TESTED_CPPS = ../Task.cpp ../Sequence.cpp ../Pid.cpp ../Fsm.cpp ../Beep.cpp ../Beeper.cpp 
+
+
 always: test_output.txt
 	@echo Test Output
 	@echo ------------
@@ -7,8 +10,5 @@ test_output.txt: test makefile
 	./test > test_output.txt
 
 
-test: *.cpp *.h ../Pid.cpp
-	g++ -o test *.cpp -I . -I .. \
-	  ../Task.cpp ../Sequence.cpp ../Pid.cpp \
-	  ../Fsm.cpp ../Beep.cpp ../Beeper.cpp \
-	  -std=c++11
+test: *.cpp $(TESTED_CPPS) *.h 
+	g++ -o test *.cpp $(TESTED_CPPS) -I . -I .. -std=c++11 

@@ -10,8 +10,10 @@ void SequenceTest() {
   Task task1,task2;
   task1.name = "task1";
   task2.name = "task2";
-  Task * tasks[] = {&task1, &task2};
-  Sequence sequence(tasks,2);
+  Sequence sequence;
+  sequence.init();
+  sequence.add_task(&task1);
+  sequence.add_task(&task2);
 
   sequence.enter();
   for(int i = 0; i < 1000; i++) {

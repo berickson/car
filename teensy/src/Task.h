@@ -8,8 +8,4 @@ public:
   virtual void exit();
   virtual void execute();
   virtual bool is_done();
-  void set_event(const char * event);
-  const char * get_event();
-private:
-  const char * event;
 };

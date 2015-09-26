@@ -2,6 +2,8 @@
 
 #include <cstddef>
 #include <string.h>
+#include <string.h> // including for strcomp had no impact on firmware size
+
 
 bool equals(const char * p, const char * q) {
   return strcmp(p,q)==0;
@@ -32,20 +34,6 @@ void Fsm::execute() {
   }
 
   current_task->execute();
-  
-  // see if we have any events to process
-  const char * event = current_task->get_event();
-  if( event == NULL) {
-    return;
-  }
-  
-  // move based on event
-  for(int i = 0; i < edge_count; i++) {
-    if(equals( edges[i].from, current_task->name ) && equals( edges[i].event, event )) {
-      set_current_task(edges[i].to);
-      break;
-    }
-  }
 }
 
 void Fsm::set_current_task(const char * name) {
@@ -56,8 +44,10 @@ void Fsm::set_current_task(const char * name) {
   }
   for(int i = 0; i < task_count; i++) {
     Task * task = tasks[i];
-    if(equals(task->name,name)){
+    if(equals(task->name,name) && task != current_task){
+      current_task->exit();
       current_task = task;
+      current_task->enter();
       break;
     }
   }
@@ -73,5 +63,15 @@ void Fsm::exit() {
 
 bool Fsm::is_done() {
   return done;;
+}
+
+void Fsm::set_event(const char * event) {
+  // move based on event
+  for(int i = 0; i < edge_count; i++) {
+    if(equals( edges[i].from, current_task->name ) && equals( edges[i].event, event )) {
+      set_current_task(edges[i].to);
+      break;
+    }
+  }
 }
 
