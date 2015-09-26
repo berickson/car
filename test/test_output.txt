@@ -1,5 +1,0 @@
-default clamped output: 1
-clamped to 1000 output: 10
-output without kd: 5
-output with kd: 0
-output with ki: 0.5
