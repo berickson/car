@@ -354,7 +354,7 @@ void loop() {
 
     case mode_circle:
       if(every_20_ms) circle_mode.execute();
-      //esc.execute();
+      esc.execute();
       // todo: merge this code into mode manager`
       if (circle_mode.is_done()) {
         mode = mode_manual;

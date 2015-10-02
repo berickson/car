@@ -13,8 +13,8 @@ public:
   unsigned long brake_start_ms = 0;
   unsigned long pause_start_ms = 0;
 
-  const int forward_us =  1390;
-  const int reverse_us =  1610;
+  const int forward_us =  1440;
+  const int reverse_us =  1560;
 
 
   const int neutral_us = 1500;

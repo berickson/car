@@ -46,19 +46,22 @@ void CircleMode::execute() {
   }
   degrees_turned += angle_diff;
   last_angle = ground_angle;
-  pid.set_pv(abs(degrees_turned),(millis()-start_millis)/1000.);
-  double v = pid.get_output();  // will be in range 0-1
-  const double max_speed_ms = 150;
-  speed.writeMicroseconds(1500-(v*max_speed_ms));
-  /*
-  if(abs(degrees_turned) < 90) {
-    steering.writeMicroseconds(1900); // turn left todo: make steer commands
-    esc.set_command(Esc::speed_forward);
+
+  const bool use_pid = false;
+  if(use_pid) {
+      pid.set_pv(abs(degrees_turned),(millis()-start_millis)/1000.);
+      double v = pid.get_output();  // will be in range (-1,1)
+      const double max_speed_ms = 60;
+      speed.writeMicroseconds(1500-(v*max_speed_ms));
   } else {
-    esc.set_command(Esc::speed_neutral);
-    steering.writeMicroseconds(1500); // look straight ahead
-    done = true;
-    Serial.println("circle complete");
+      if(abs(degrees_turned) < 90) {
+        steering.writeMicroseconds(1900); // turn left todo: make steer commands
+        esc.set_command(Esc::speed_forward);
+      } else {
+        esc.set_command(Esc::speed_neutral);
+        steering.writeMicroseconds(1500); // look straight ahead
+        done = true;
+        Serial.println("circle complete");
+      }
   }
-  */
 }
