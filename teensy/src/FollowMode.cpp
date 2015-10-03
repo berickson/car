@@ -11,7 +11,7 @@ extern Ping ping;
 Esc::eSpeedCommand speed_for_ping_inches(double inches) {
   if(inches ==0) return Esc::speed_neutral;
   // get closer if far
-  if (inches > 30.)
+  if (inches > 40.)
     return Esc::speed_forward;
   // back up if too close
   if (inches < 20.)
