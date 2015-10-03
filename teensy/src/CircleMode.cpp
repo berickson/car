@@ -55,7 +55,7 @@ void CircleMode::execute() {
       speed.writeMicroseconds(1500-(v*max_speed_ms));
   } else {
       if(abs(degrees_turned) < 90) {
-        steering.writeMicroseconds(1900); // turn left todo: make steer commands
+        steering.writeMicroseconds(1100); // turn left todo: make steer commands
         esc.set_command(Esc::speed_forward);
       } else {
         esc.set_command(Esc::speed_neutral);

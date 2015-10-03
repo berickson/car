@@ -19,9 +19,9 @@ void RxEvents::process_pulses(int steer_us, int speed_us) {
  char RxEvents::steer_code(int steer_us) {
   if (steer_us == 0)
     return '?';
-  if (steer_us < 1700)
+  if (steer_us > 1700)
     return 'R';
-  if (steer_us > 1300)
+  if (steer_us < 1300)
     return 'L';
   return 'C';
 }
