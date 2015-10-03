@@ -44,7 +44,7 @@ void CircleMode::execute() {
   degrees_turned += angle_diff;
   last_angle = ground_angle;
 
-  const bool use_pid = false;
+  const bool use_pid = true;
   if(use_pid) {
       pid.set_pv(abs(degrees_turned),(millis()-start_millis)/1000.);
       double v = pid.get_output();  // will be in range (-1,1)
