@@ -262,6 +262,7 @@ void setup() {
   mpu9150.setup();
   delay(1000);
   mpu9150.zero();
+  circle_mode.init(&mpu9150);
   beeper.beep_nbc();
   modes.begin();
 }

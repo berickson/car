@@ -1,7 +1,7 @@
 #include "Fsm.h"
 
 #include <cstddef>
-#include <string.h>
+#include "Arduino.h"
 #include <string.h> // including for strcomp had no impact on firmware size
 
 
@@ -37,6 +37,9 @@ void Fsm::execute() {
 }
 
 void Fsm::set_current_task(const char * name) {
+  Serial.print("Switching to task ");
+  Serial.println(name);
+  
   if(equals(name,"done")) {
     done = true;
     current_task = this;
