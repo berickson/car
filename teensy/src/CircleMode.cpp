@@ -61,7 +61,7 @@ void CircleMode::execute() {
 }
 
 void CircleMode::end() {
-    writeMicroseconds.writeMicroseconds(1500);
+    speed.writeMicroseconds(1500);
     esc.set_command(Esc::speed_neutral);
     steering.writeMicroseconds(1500); // look straight ahead
     done = true;
