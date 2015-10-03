@@ -9,8 +9,8 @@ public:
 
   // since we are dealing with standard RC,
   // anything out of of the below ranges should not occur and is ignored
-  unsigned long max_pulse_us = 2000;
-  unsigned long min_pulse_us = 1000;
+  unsigned long max_pulse_us = 2200;
+  unsigned long min_pulse_us = 800;
 
   unsigned long last_pulse_ms = 0;  // time when last pulse occurred
 

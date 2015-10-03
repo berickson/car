@@ -1,8 +1,9 @@
 #pragma once
 #include "Pid.h"
+#include "Task.h"
 class Mpu9150;
 
-class CircleMode {
+class CircleMode : public Task {
 public:
   Pid pid;
   double last_angle;
@@ -13,6 +14,7 @@ public:
 
   bool is_done();
   void init(Mpu9150 * _mpu);
-  void end();
-  void execute();
+  virtual void begin();
+  virtual void end();
+  virtual void execute();
 };

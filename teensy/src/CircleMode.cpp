@@ -13,6 +13,9 @@ bool CircleMode::is_done() {
 
 void CircleMode::init(Mpu9150 * _mpu) {
   mpu = _mpu;
+}
+
+void CircleMode::begin() {
   last_angle = mpu->ground_angle();
   degrees_turned = 0;
 
@@ -27,12 +30,6 @@ void CircleMode::init(Mpu9150 * _mpu) {
   pid.set_min_max_output(-1,1);
   start_millis = millis();
   done = false;
-}
-
-void CircleMode::end() {
-  speed.writeMicroseconds(1500);
-  esc.set_command(Esc::speed_neutral);
-  steering.writeMicroseconds(1500); // look straight ahead
 }
 
 void CircleMode::execute() {
@@ -58,10 +55,14 @@ void CircleMode::execute() {
         steering.writeMicroseconds(1100); // turn left todo: make steer commands
         esc.set_command(Esc::speed_forward);
       } else {
-        esc.set_command(Esc::speed_neutral);
-        steering.writeMicroseconds(1500); // look straight ahead
-        done = true;
-        Serial.println("circle complete");
+        end();
       }
   }
+}
+
+void CircleMode::end() {
+    esc.set_command(Esc::speed_neutral);
+    steering.writeMicroseconds(1500); // look straight ahead
+    done = true;
+    Serial.println("circle complete"); 
 }

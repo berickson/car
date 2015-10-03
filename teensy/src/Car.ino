@@ -11,6 +11,9 @@
 #include "Beeper.h"
 #include "RxEvents.h"
 #include "CircleMode.h"
+#include "ManualMode.h"
+#include "FollowMode.h"
+#include "Fsm.h"
 
 #define count_of(a) (sizeof(a)/sizeof(a[0]))
 
@@ -125,25 +128,10 @@ void rx_spd_handler() {
 }
 
 
-Esc::eSpeedCommand speed_for_ping_inches(double inches) {
-  if(inches ==0) return Esc::speed_neutral;
-  // get closer if far
-  if (inches > 30.)
-    return Esc::speed_forward;
-  // back up if too close
-  if (inches < 20.)
-    return Esc::speed_reverse;
-
-  return Esc::speed_neutral;
-}
-
-
-
-
 const RxEvent auto_pattern [] =
-  {{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'}};
+  {{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'},{'C','N'},{'R','N'},{'C','N'}};
 const RxEvent circle_pattern [] =
-  {{'L','N'},{'C','N'},{'L','N'},{'C','N'},{'L','N'},{'C','N'},{'L','N'}};
+  {{'L','N'},{'C','N'},{'L','N'},{'C','N'},{'L','N'},{'C','N'},{'L','N'},{'C','N'}};
 
 
 
@@ -215,11 +203,30 @@ void help() {
 
 Mpu9150 mpu9150;
 
+CircleMode circle_mode;
+ManualMode manual_mode;
+FollowMode follow_mode;
+
+Task * tasks[] = {&manual_mode, &circle_mode, &follow_mode};
+
+Fsm::Edge edges[] = {{"circle", "non-neutral", "manual"},
+                     {"follow", "non-neutral", "manual"},
+                     {"manual", "circle", "circle"},
+                     {"manual", "follow", "follow"},
+                  };
+
+Fsm modes(tasks, count_of(tasks), edges, count_of(edges));
+
 void setup() {
   Serial.begin(9600);
-  delay(1000);
+
   interpreter.init(commands,count_of(commands));
   Serial.println("setup begun");
+
+  circle_mode.name = "circle";
+  manual_mode.name = "manual";
+  follow_mode.name = "follow";
+
   steering.attach(PIN_U_STEER);
   steering.writeMicroseconds(1500);
   speed.attach(PIN_U_SPEED);
@@ -248,7 +255,6 @@ void setup() {
   mode = mode_manual;
 
   beeper.attach(PIN_SPEAKER);
-  beeper.beep_nbc();
 
   last_report_ms = millis();
 
@@ -256,9 +262,10 @@ void setup() {
   mpu9150.setup();
   delay(1000);
   mpu9150.zero();
+  beeper.beep_nbc();
+  modes.begin();
 }
 
-CircleMode circle_mode;
 
 // returns true if loop time passes through n ms boundary
 bool every_n_ms(unsigned long last_loop_ms, unsigned long loop_ms, unsigned long ms) {
@@ -304,6 +311,22 @@ void loop() {
     Serial.print(rx_steer.pulse_us());
     Serial.println();
   }
+  
+  // send events through modes state machine
+  if(new_rx_event) {
+    if(rx_events.recent.matches(circle_pattern, count_of(circle_pattern))) {
+      modes.set_event("circle");
+    }
+    if(rx_events.recent.matches(auto_pattern, count_of(auto_pattern))) {
+      modes.set_event("follow");
+    }
+    if(!rx_events.current.equals(RxEvent('C','N'))) {
+      modes.set_event("non-neutral");
+    }
+  }
+  
+  modes.execute();
+#if 0
   switch (mode) {
     case mode_manual:
       if(rx_steer.pulse_us() > 0 && rx_speed.pulse_us() > 0) {
@@ -383,7 +406,7 @@ void loop() {
       }
       break;
   }
-
+#endif
 
 
   // state tracing
