@@ -284,6 +284,7 @@ void loop() {
   ping.execute();
   mpu9150.execute();
   blinker.execute();
+  beeper.execute();
 
   rx_events.process_pulses(rx_steer.pulse_us(), rx_speed.pulse_us());
 
