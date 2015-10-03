@@ -23,7 +23,7 @@ void CircleMode::begin() {
   // assumes per second (not millis)
   pid.set_sp(90);
   pid.set_pv(abs(degrees_turned), 0.0);
-  pid.kp = 1/90.; // full power until 25 degrees
+  pid.kp = 1/25.; // full power until 25 degrees
   pid.ki = 0.0;
   pid.kd = 0.0;
 
@@ -49,7 +49,7 @@ void CircleMode::execute() {
       pid.set_pv(abs(degrees_turned),(millis()-start_millis)/1000.);
       double v = pid.get_output();  // will be in range (-1,1)
       const double max_speed_ms = 60;
-      speed.writeMicroseconds(1500-(v*max_speed_ms));
+      speed.writeMicroseconds(1500+(v*max_speed_ms));
       steering.writeMicroseconds(1100); // turn left todo: make steer commands
   } else {
       if(abs(degrees_turned) < 90) {
