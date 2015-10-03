@@ -8,8 +8,8 @@ public:
 
   Servo * speed;
 
-  const unsigned long brake_ms = 500;
-  const unsigned long pause_ms = 200;
+  const unsigned long brake_ms = 0;//500;
+  const unsigned long pause_ms = 0;//200;
   unsigned long brake_start_ms = 0;
   unsigned long pause_start_ms = 0;
 
