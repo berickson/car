@@ -35,7 +35,7 @@ public:
   void reset();
   void add_note(int note);
   
-  void enter();
+  void begin();
   void execute();
   
 };

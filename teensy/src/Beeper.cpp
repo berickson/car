@@ -8,7 +8,7 @@ void Beeper::attach(int pin) {
 void Beeper::beep(int note) {
   reset();
   add_note(note);
-  enter();
+  begin();
 }
 
 void Beeper::beep_ascending() {
@@ -16,7 +16,7 @@ void Beeper::beep_ascending() {
   add_note(note_c5);
   add_note(note_e5);
   add_note(note_g5);
-  enter();
+  begin();
 }
 
 void Beeper::beep_descending() {
@@ -24,7 +24,7 @@ void Beeper::beep_descending() {
   add_note(note_g5);
   add_note(note_e5);
   add_note(note_c5);
-  enter();
+  begin();
 }
 
 void Beeper::beep_nbc() {
@@ -32,11 +32,11 @@ void Beeper::beep_nbc() {
   add_note(note_c5);
   add_note(note_a5);
   add_note(note_f5);
-  enter();
+  begin();
 }
 
-void Beeper::enter() {
-  beep_sequence.enter();
+void Beeper::begin() {
+  beep_sequence.begin();
 }
 
 void Beeper::beep_warble() {
@@ -49,7 +49,7 @@ void Beeper::beep_warble() {
   add_note(note_f5);
   add_note(note_a5);
   add_note(note_f5);
-  enter();
+  begin();
 }
 
 void Beeper::add_note(int note) {

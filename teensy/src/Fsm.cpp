@@ -23,9 +23,9 @@ Fsm::Fsm(Task ** _tasks, int _task_count, Edge * _edges, int _edge_count) {
   name="fsm";
 }
 
-void Fsm::enter() {
+void Fsm::begin() {
   current_task = tasks[0];
-  current_task->enter();
+  current_task->begin();
 }
 
 void Fsm::execute() {
@@ -45,17 +45,17 @@ void Fsm::set_current_task(const char * name) {
   for(int i = 0; i < task_count; i++) {
     Task * task = tasks[i];
     if(equals(task->name,name) && task != current_task){
-      current_task->exit();
+      current_task->end();
       current_task = task;
-      current_task->enter();
+      current_task->begin();
       break;
     }
   }
 }
 
-void Fsm::exit() {
+void Fsm::end() {
   if(current_task && current_task != this) {
-    current_task->exit();
+    current_task->end();
   }
   current_task = this;
   done = true;

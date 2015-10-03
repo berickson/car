@@ -24,7 +24,7 @@ void FsmTest() {
                        {"task2", "ok", "done"},
                       };
   Fsm fsm(tasks, count_of(tasks), edges, count_of(edges));
-  fsm.enter();
+  fsm.begin();
   fsm.execute();
   PrintFsmState(fsm);
   
@@ -69,6 +69,6 @@ void FsmTest() {
   PrintFsmState(fsm);
 
   
-  fsm.exit();
+  fsm.end();
   cout << "test complete"<< endl;
 }

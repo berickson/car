@@ -15,7 +15,7 @@ void SequenceTest() {
   sequence.add_task(&task1);
   sequence.add_task(&task2);
 
-  sequence.enter();
+  sequence.begin();
   for(int i = 0; i < 1000; i++) {
     cout << "i: " << i << endl;
     cout << "current task: " << sequence.current_task->name << endl;
@@ -24,5 +24,5 @@ void SequenceTest() {
         break;
   }
 
-  sequence.exit();
+  sequence.end();
 }

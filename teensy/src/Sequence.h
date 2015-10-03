@@ -12,8 +12,8 @@ class Sequence : public Task {
   Sequence();
   void init();
   void add_task(Task * task);
-  void enter();
+  void begin();
   void execute();
-  void exit();
+  void end();
   bool is_done();
 };

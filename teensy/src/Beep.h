@@ -11,8 +11,8 @@ public:
   Beep();
   void init(int pin, int note, unsigned long ms);
   
-  virtual void enter();
-  virtual void exit();
+  virtual void begin();
+  virtual void end();
   virtual void execute();
   virtual bool is_done();
   

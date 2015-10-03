@@ -10,5 +10,5 @@ test_output.txt: test makefile
 	./test > test_output.txt
 
 
-test: *.cpp $(TESTED_CPPS) *.h 
+test: *.cpp $(TESTED_CPPS) *.h  ../*.cpp ../*.h
 	g++ -o test *.cpp $(TESTED_CPPS) -I . -I .. -std=c++11 

@@ -3,8 +3,8 @@
 #include <cstddef>
 #include "Arduino.h"
 
-void Task::enter() {}
-void Task::exit() {}
+void Task::begin() {}
+void Task::end() {}
 void Task::execute() {
 }
 

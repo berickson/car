@@ -16,7 +16,7 @@ void BeepTest() {
   sequence.init();
   sequence.add_task(&beep1);
   sequence.add_task(&beep2);
-  sequence.enter();
+  sequence.begin();
   for(unsigned long i = 0; i < 1000; i++) {
     g_millis = i;
     cout << "i: " << i << endl;
@@ -25,6 +25,6 @@ void BeepTest() {
     if(sequence.is_done())
         break;
   }
-  sequence.exit();
+  sequence.end();
 
 }

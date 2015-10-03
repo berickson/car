@@ -21,9 +21,9 @@ class Fsm : public Task {
   void set_current_task(const char * name);
 
   Fsm(Task ** _tasks, int _task_count, Edge * _edges, int _edge_count);
-  void enter();
+  void begin();
   void execute();
   bool is_done();
-  void exit();
+  void end();
   void set_event(const char * event);
 };

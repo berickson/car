@@ -14,13 +14,13 @@ void Beep::init(int _pin, int _note, unsigned long _ms) {
   playing = false;
 }
 
-void Beep::enter() {
+void Beep::begin() {
   tone(pin, note);
   start_ms = millis();
   playing = true;
 }
 
-void Beep::exit() {
+void Beep::end() {
   stop();
 }
 

@@ -9,7 +9,7 @@ Sequence::Sequence() {
 }
 
 void Sequence::init() {
-  exit(); // in case were are in the middle of something
+  end(); // in case were are in the middle of something
   task_count = 0;
 }
 
@@ -22,10 +22,10 @@ void Sequence::add_task(Task * task) {
   task_count++;
 }
 
-void Sequence::enter() {
+void Sequence::begin() {
   current_step = 0;
   current_task = tasks[current_step];
-  current_task->enter();
+  current_task->begin();
 }
 
 void Sequence::execute() {
@@ -35,11 +35,11 @@ void Sequence::execute() {
 
   current_task->execute();
   if(current_task->is_done()){
-    current_task->exit();
+    current_task->end();
     current_step++;
     if(current_step < task_count) {
       current_task = tasks[current_step];
-      current_task->enter();
+      current_task->begin();
     } else {
       current_task = NULL;
       done = true;
@@ -47,9 +47,9 @@ void Sequence::execute() {
   }
 }
 
-void Sequence::exit() {
+void Sequence::end() {
   if(current_task) {
-    current_task->exit();
+    current_task->end();
   }
   current_task = NULL;
   current_step = -1;
