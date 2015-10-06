@@ -27,7 +27,7 @@ bool TRACE_PINGS = false;
 bool TRACE_ESC = false;
 bool TRACE_MPU = false;
 bool TRACE_LOOP_SPEED = false;
-bool TRACE_DYNAMICS = true;
+bool TRACE_DYNAMICS = false;
 
 
 
@@ -326,88 +326,10 @@ void loop() {
     }
   }
   
-  modes.execute();
-#if 0
-  switch (mode) {
-    case mode_manual:
-      if(rx_steer.pulse_us() > 0 && rx_speed.pulse_us() > 0) {
-        steering.writeMicroseconds(rx_steer.pulse_us());
-        speed.writeMicroseconds(rx_speed.pulse_us());
-      } else {
-        steering.writeMicroseconds(1500);
-        speed.writeMicroseconds(1500);
-      }
-
-      if (new_rx_event && rx_events.recent.matches(auto_pattern, count_of(auto_pattern))) {
-        mode = mode_automatic;
-        esc.set_command(Esc::speed_neutral);
-        beeper.beep_ascending();
-        Serial.print("switched to automatic");
-      }
-      if (new_rx_event && rx_events.recent.matches(circle_pattern, count_of(circle_pattern))) {
-        esc.set_command(Esc::speed_neutral);
-        mode = mode_circle;
-        circle_mode.init(&mpu9150);
-        beeper.beep_ascending();
-        Serial.print("switched to circle");
-      }
-
-      break;
-
-    case mode_automatic:
-
-      steering.writeMicroseconds(1500);
-      esc.set_command(speed_for_ping_inches(inches));
-      esc.execute();
-      if (new_rx_event && rx_events.current.equals(RxEvent('L','N'))) {
-        mode = mode_manual;
-        esc.set_command(Esc::speed_neutral);
-        steering.writeMicroseconds(1500);
-        speed.writeMicroseconds(1500);
-        beeper.beep_descending();
-        Serial.println("switched to manual - user initiated");
-      }
-      if (new_rx_event && rx_events.current.is_bad()) {
-        mode = mode_manual;
-        esc.set_command(Esc::speed_neutral);
-        steering.writeMicroseconds(1500);
-        speed.writeMicroseconds(1500);
-        beeper.beep_warble();
-        Serial.println("switched to manual - no coms");
-      }
-      break;
-
-    case mode_circle:
-      if(every_20_ms) circle_mode.execute();
-      esc.execute();
-      // todo: merge this code into mode manager`
-      if (circle_mode.is_done()) {
-        mode = mode_manual;
-        esc.set_command(Esc::speed_neutral);
-        steering.writeMicroseconds(1500);
-        speed.writeMicroseconds(1500);
-        beeper.beep_descending();
-        Serial.println("switched to manual - circle complete");
-      }
-      if (new_rx_event && rx_events.current.equals(RxEvent('R','N'))) {
-        mode = mode_manual;
-        esc.set_command(Esc::speed_neutral);
-        steering.writeMicroseconds(1500);
-        speed.writeMicroseconds(1500);
-        beeper.beep_descending();
-        Serial.println("switched to manual - user initiated");
-      }
-      if (new_rx_event && rx_events.current.is_bad()) {
-        mode = mode_manual;
-        esc.set_command(Esc::speed_neutral);
-        steering.writeMicroseconds(1500);
-        speed.writeMicroseconds(1500);
-        beeper.beep_warble();
-        Serial.println("switched to manual - no coms");
-      }
-      break;
+  if(every_20_ms) {
+    modes.execute();
   }
-#endif
+
 
 
   // state tracing
