@@ -8,18 +8,23 @@ public:
 
   Servo * speed;
 
-  const unsigned long brake_ms = 0;//500;
-  const unsigned long pause_ms = 0;//200;
-  unsigned long brake_start_ms = 0;
-  unsigned long pause_start_ms = 0;
-
+  const int min_forward_us = 1550;
+  const int max_forward_us = 1600;
+  const int min_reverse_us = 1450;
+  const int max_reverse_us = 1400;
+  
   const int forward_us =  1560;
   const int reverse_us =  1440;
 
 
   const int neutral_us = 1500;
+  const int deadband_us = 100;
+  
   int calibration_us = 0;
   int current_us = -1;
+  
+  // set speed between -1.0 and 1.0
+  void set_velocity(double v);
 
   enum eSpeedCommand : char{
     speed_forward,
@@ -30,17 +35,6 @@ public:
   static const char * speed_command_name(eSpeedCommand);
 
   eSpeedCommand command = speed_neutral;
-
-  enum eState {
-    stopped,
-    forward_braking,
-    reverse_braking,
-    forward,
-    reverse,
-    pausing
-  } state;
-
-  const char * state_name(eState s);
 
   // used to match the control stick settings.
   // Will use setting as the new pulse width for

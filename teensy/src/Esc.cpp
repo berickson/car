@@ -12,17 +12,6 @@ const char * Esc::speed_command_name( Esc::eSpeedCommand e) {
   return names[e];
 }
 
-const char * Esc::state_name(eState s) {
-  const char *names[]  = {
-    "stopped",
-    "forward_braking",
-    "reverse_braking",
-    "forward",
-    "reverse",
-    "pausing"
-  };
-  return names[s];
-}
 
 // used to match the control stick settings.
 // Will use setting as the new pulse width for
@@ -33,8 +22,28 @@ void Esc::set_neutral_pwm_us(unsigned long us) {
 
 void Esc::init(Servo * speed) {
   this->speed = speed;
-  state = stopped;
   set_pwm_us(neutral_us);
+}
+
+// set velocity between -1.0 and 1.0
+void Esc::set_velocity(double v) {
+  // clamp
+  if(v < -1.0) {
+    v = -1.0;
+  } else if (v  > 1.0) {
+    v = 1.0;
+  } 
+  
+  // set speeds
+  unsigned long us = neutral_us;
+  if(abs(v)<0.1) {
+     us = neutral_us;
+  } else if (v > 0) {
+    us = min_forward_us + (max_forward_us - min_forward_us ) * v;
+  } else if (v < 0) {
+    us = min_reverse_us + (max_reverse_us - min_reverse_us ) * abs(v);
+  }
+  set_pwm_us(us);
 }
 
 // sets pulse width, adjusted by calibration if any
@@ -56,120 +65,17 @@ void Esc::set_command(eSpeedCommand new_command) {
   command = new_command;
   Serial.print("ESC Command: ");
   Serial.println(speed_command_name(command));
-  Serial.print("OLD ESC State: ");
-  Serial.println(state_name(state));
 
   if(command == speed_forward) {
-    switch(state) {
-      case forward_braking:
-      case stopped:
-      case forward:
-        state = forward;
-        set_pwm_us(forward_us);
-        break;
-
-      case pausing:
-        break;
-
-      case reverse_braking:
-        set_pwm_us(forward_us);
-        break;
-
-      case reverse:
-        set_pwm_us(forward_us);
-        state = reverse_braking;
-        brake_start_ms = millis();
-        break;
-    }
+      set_pwm_us(forward_us);
   }
   if(command == speed_reverse) {
-    switch(state) {
-      case reverse_braking:
-      case stopped:
-      case reverse:
-        state = reverse;
-        set_pwm_us(reverse_us);
-        break;
-
-      case pausing:
-        break;
-
-      case forward_braking:
-        set_pwm_us(reverse_us);
-        break;
-
-      case forward:
-        state = forward_braking;
-        set_pwm_us(reverse_us);
-        brake_start_ms = millis();
-        break;
-    }
+      set_pwm_us(reverse_us);
   }
   if(command == speed_neutral){
-    switch(state) {
-      case stopped:
-      case pausing:
-        set_pwm_us(neutral_us);
-        break;
-
-      case forward_braking:
-        set_pwm_us(reverse_us);
-        break;
-
-      case reverse_braking:
-        set_pwm_us(forward_us);
-        break;
-
-      case reverse:
-        state = reverse_braking;
-        set_pwm_us(forward_us);
-        brake_start_ms = millis();
-        break;
-
-      case forward:
-        state = forward_braking;
-        set_pwm_us(reverse_us);
-        brake_start_ms = millis();
-        break;
-    }
+      set_pwm_us(neutral_us);
   }
-  Serial.print("New ESC State: ");
-  Serial.println(state_name(state));
 }
-
+  
 void Esc::execute() {
-  if(state == forward_braking || state == reverse_braking) {
-    unsigned long ms = millis();
-    if(ms - brake_start_ms >= brake_ms) {
-      Serial.println("Braking complete");
-      state = pausing;
-      pause_start_ms = ms;
-      set_pwm_us(neutral_us);
-    }
-  }
-
-  if(state == pausing) {
-    unsigned long ms = millis();
-    if(ms - pause_start_ms >= pause_ms) {
-      Serial.println("Pausing complete");
-      state = stopped;
-    }
-  }
-
-  if(state == stopped) {
-    if(command == speed_forward) {
-      Serial.println("forward from stopped");
-      set_pwm_us(forward_us);
-      state = forward;
-    }
-    if(command == speed_reverse) {
-      Serial.println("reverse from stopped");
-      set_pwm_us(reverse_us);
-      state = reverse;
-    }
-    if(command == speed_neutral) {
-      set_pwm_us(neutral_us);
-      state = stopped;
-    }
-  }
 }

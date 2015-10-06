@@ -48,8 +48,9 @@ void CircleMode::execute() {
   if(use_pid) {
       pid.set_pv(abs(degrees_turned),(millis()-start_millis)/1000.);
       double v = pid.get_output();  // will be in range (-1,1)
-      const double max_speed_ms = 60;
-      speed.writeMicroseconds(1500+(v*max_speed_ms));
+      esc.set_velocity(v);
+//      const double max_speed_ms = 60;
+//      speed.writeMicroseconds(1500+(v*max_speed_ms));
       steering.writeMicroseconds(1100); // turn left todo: make steer commands
   } else {
       if(abs(degrees_turned) < 90) {
