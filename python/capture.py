@@ -2,7 +2,8 @@
 import numpy as np
 import cv2
 
-fps = 15.0
+seconds = 30
+fps = 30.0
 width = 320
 height = 240
 size = (width, height)
@@ -45,8 +46,7 @@ print 2
 frames_grabbed = 0
 ret, buffer1 = cap1.read()
 ret, buffer2 = cap1.read()
-while(cap.isOpened() and frames_grabbed < 50):
-    print '.',
+while(cap.isOpened() and frames_grabbed < seconds * fps):
     for cap in caps: cap.grab()
     ret, frame = cap1.retrieve(buffer1)
     ret, frame = cap2.retrieve(buffer2)
