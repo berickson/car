@@ -25,7 +25,7 @@ void CircleMode::begin() {
   pid.set_pv(abs(degrees_turned), 0.0);
   pid.kp = 1/25.; // full power until 25 degrees
   pid.ki = 0.0;
-  pid.kd = 0.0;
+  pid.kd = 1./45; // 45 degrees per second
 
   pid.set_min_max_output(-1,1);
   start_millis = millis();
