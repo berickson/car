@@ -21,11 +21,12 @@ void CircleMode::begin() {
 
   // assumes power is -1 to 1 range
   // assumes per second (not millis)
+  pid.reset();
   pid.set_sp(90);
   pid.set_pv(abs(degrees_turned), 0.0);
   pid.kp = 1/25.; // full power until 25 degrees
   pid.ki = 0.0;
-  pid.kd = 1./45; // 45 degrees per second
+  pid.kd = 1./90; // 90 degrees per second
 
   pid.set_min_max_output(-1,1);
   start_millis = millis();
@@ -44,27 +45,14 @@ void CircleMode::execute() {
   degrees_turned += angle_diff;
   last_angle = ground_angle;
 
-  const bool use_pid = true;
-  if(use_pid) {
-      pid.set_pv(abs(degrees_turned),(millis()-start_millis)/1000.);
-      double v = pid.get_output();  // will be in range (-1,1)
-      esc.set_velocity(v);
-//      const double max_speed_ms = 60;
-//      speed.writeMicroseconds(1500+(v*max_speed_ms));
-      steering.writeMicroseconds(1100); // turn left todo: make steer commands
-  } else {
-      if(abs(degrees_turned) < 90) {
-        steering.writeMicroseconds(1100); // turn left todo: make steer commands
-        esc.set_command(Esc::speed_forward);
-      } else {
-        end();
-      }
-  }
+  pid.set_pv(abs(degrees_turned),(millis()-start_millis)/1000.);
+  double v = pid.get_output();  // will be in range (-1,1)
+  esc.set_velocity(v);
+  steering.writeMicroseconds(1100); // turn left todo: make steer commands
 }
 
 void CircleMode::end() {
-    speed.writeMicroseconds(1500);
-    esc.set_command(Esc::speed_neutral);
+    esc.set_velocity(0);
     steering.writeMicroseconds(1500); // look straight ahead
     done = true;
     Serial.println("circle complete"); 
