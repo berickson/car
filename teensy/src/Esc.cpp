@@ -36,12 +36,13 @@ void Esc::set_velocity(double v) {
   
   // set speeds
   unsigned long us = neutral_us;
-  if(abs(v)<0.1) {
+  const double neutral_v = 0.1; // small numbers are considered zero
+  if(abs(v)<neutral_v) {
      us = neutral_us;
   } else if (v > 0) {
-    us = min_forward_us + (max_forward_us - min_forward_us ) * v;
+    us = min_forward_us + (max_forward_us - min_forward_us ) * (v-neutral_v);
   } else if (v < 0) {
-    us = min_reverse_us + (max_reverse_us - min_reverse_us ) * abs(v);
+    us = min_reverse_us + (max_reverse_us - min_reverse_us ) * (abs(v)-neutral_v);
   }
   set_pwm_us(us);
 }

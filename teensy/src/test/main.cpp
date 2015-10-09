@@ -10,12 +10,15 @@ using namespace std;
 #include "SequenceTest.h"
 #include "BeepTest.h"
 #include "FsmTest.h"
+#include "StatisticsTest.h"
 
 int main(int argc, char ** argv) {
+  StatisticsTest();
+  /*
   PidTest();
   BeeperTest();
   SequenceTest();
   BeepTest();
   FsmTest();
-
+  */
 }

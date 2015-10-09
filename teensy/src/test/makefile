@@ -1,4 +1,4 @@
-TESTED_CPPS = ../Task.cpp ../Sequence.cpp ../Pid.cpp ../Fsm.cpp ../Beep.cpp ../Beeper.cpp 
+TESTED_CPPS = ../Task.cpp ../Sequence.cpp ../Pid.cpp ../Fsm.cpp ../Beep.cpp ../Beeper.cpp ../Statistics.cpp
 
 
 always: test_output.txt
