@@ -4,8 +4,6 @@
 #include "Arduino.h"
 #include <string.h> // including for strcomp had no impact on firmware size
 
-SerialClass Serial;
-
 bool equals(const char * p, const char * q) {
   return strcmp(p,q)==0;
 }
