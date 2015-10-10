@@ -1,5 +1,7 @@
 // fake file to make compile work
 #include <iostream>
+#include "Arduino.h"
+SerialClass Serial;
 
 void tone(int pin, int note, int duration) {
   std::cout << "tone(" << pin << ", " << note << ", " << duration << ");" << std::endl;
