@@ -99,6 +99,7 @@ Ping ping;
 Beeper beeper;
 Blinker blinker;
 CommandInterpreter interpreter;
+unsigned long motor_pulses = 0;
 
 
 // diagnostics for reporting loop speeds
@@ -133,6 +134,10 @@ const RxEvent auto_pattern [] =
 const RxEvent circle_pattern [] =
   {{'L','N'},{'C','N'},{'L','N'},{'C','N'},{'L','N'},{'C','N'},{'L','N'},{'C','N'}};
 
+
+void motor_rpm_handler() {
+  motor_pulses++;
+}
 
 
 void trace_ping_on() {
@@ -245,6 +250,8 @@ void setup() {
 
   attachInterrupt(int_str, rx_str_handler, CHANGE);
   attachInterrupt(int_esc, rx_spd_handler, CHANGE);
+  
+  attachInterrupt(PIN_MOTOR_RPM, motor_rpm_handler, RISING);
 
 
   pinMode(PIN_PING_TRIG, OUTPUT);
@@ -284,6 +291,11 @@ void loop() {
   bool every_second = every_n_ms(last_loop_time_ms, loop_time_ms, 1000);
   bool every_100_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 100);
   bool every_20_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 20);
+  
+  if(every_second) {
+    Serial.print("motor_pulses: ");
+    Serial.println(motor_pulses);
+  }
 
   // get commands from usb
   interpreter.execute();
