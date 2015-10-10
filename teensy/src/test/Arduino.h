@@ -1,3 +1,4 @@
+#pragma once
 // fake file to make compile work
 #include <iostream>
 
@@ -7,3 +8,11 @@ void noTone(int pin);
 void delay(int ms);
 extern unsigned long g_millis;
 unsigned long millis();
+class SerialClass {
+public:
+  inline void print(const char *) {};
+  inline void println(const char *) {};
+};
+
+extern SerialClass Serial;
+
