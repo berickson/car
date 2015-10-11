@@ -173,6 +173,7 @@ extern CircleMode circle_mode;
 void command_circle() {
   double angle;
   String & args = interpreter.command_args;
+  Serial.println((String)"circle args" + args);
   if(args.length() > 0) {
     angle = 90.0;
   } else {
