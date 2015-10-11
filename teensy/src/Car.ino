@@ -35,6 +35,7 @@ public:
   String buffer;
   const Command * commands;
   int command_count;
+  String command_args;
 
   void init(const Command * _commands, int _command_count)
   {
@@ -56,9 +57,10 @@ public:
 
   void process_command(String s) {
     for(int i = 0; i < command_count; i++) {
-      if(s.startsWith(commands[i].name)) {
-        Serial.print("Executing command ");
-        Serial.println(commands[i].name);
+      String name = commands[i].name;
+      if(s.startsWith(name)) {
+        command_args = s.substring(name.length());
+        Serial.println("Executing command " + name + " with args (" + command_args + ")");
         commands[i].f();
         return;
       }
@@ -166,7 +168,17 @@ void trace_dynamics_off() {
 }
 
 extern Fsm modes;
+
+extern CircleMode circle_mode;
 void command_circle() {
+  double angle;
+  String & args = interpreter.command_args;
+  if(args.length() > 0) {
+    angle = 90.0;
+  } else {
+    angle = args.toFloat();
+  }
+  circle_mode.angle_to_turn = angle;
   modes.set_event("circle");
 }
 

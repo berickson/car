@@ -22,7 +22,7 @@ void CircleMode::begin() {
   // assumes power is -1 to 1 range
   // assumes per second (not millis)
   pid.reset();
-  pid.set_sp(90);
+  pid.set_sp(angle_to_turn);
   pid.set_pv(abs(degrees_turned), 0.0);
   pid.kp = 1/25.; // full power until 25 degrees
   pid.ki = 0.0;
