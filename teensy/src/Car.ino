@@ -250,8 +250,9 @@ void setup() {
 
   attachInterrupt(int_str, rx_str_handler, CHANGE);
   attachInterrupt(int_esc, rx_spd_handler, CHANGE);
-  
-  attachInterrupt(PIN_MOTOR_RPM, motor_rpm_handler, RISING);
+
+  pinMode(PIN_MOTOR_RPM, INPUT);  
+  attachInterrupt(PIN_MOTOR_RPM, motor_rpm_handler, CHANGE);
 
 
   pinMode(PIN_PING_TRIG, OUTPUT);
@@ -295,6 +296,7 @@ void loop() {
   if(every_second) {
     Serial.print("motor_pulses: ");
     Serial.println(motor_pulses);
+    motor_pulses = 0;
   }
 
   // get commands from usb
