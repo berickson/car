@@ -30,22 +30,6 @@ bool TRACE_LOOP_SPEED = false;
 bool TRACE_DYNAMICS = false;
 
 
-
-/*
-enum rx_event {
-  uninitialized = 0;
-  steer_unknown = 1;
-  steer_left = 2;
-  steer_center = 4;
-  steer_right = 8;
-  power_unknown = 16;
-  power_reverse = 32;
-  power_neutral = 64;
-  power_forward = 128;
-
-}
-*/
-
 class CommandInterpreter{
 public:
   String buffer;
@@ -181,6 +165,21 @@ void trace_dynamics_off() {
   TRACE_DYNAMICS = false;
 }
 
+extern Fsm modes;
+void command_circle() {
+  modes.set_event("circle");
+}
+
+void command_follow() {
+  modes.set_event("follow");
+}
+
+void command_manual() {
+  modes.set_event("manual");
+}
+
+
+
 
 void help();
 
@@ -197,7 +196,10 @@ const Command commands[] = {
   {"trace mpu on", trace_mpu_on},
   {"trace mpu off", trace_mpu_off},
   {"trace loop speed on", trace_loop_speed_on},
-  {"trace loop speed off", trace_loop_speed_off}
+  {"trace loop speed off", trace_loop_speed_off},
+  {"circle", command_circle},
+  {"manual", command_manual},
+  {"follow", command_follow}
 };
 
 void help() {
