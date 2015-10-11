@@ -56,7 +56,7 @@ public:
 
   void process_command(String s) {
     for(int i = 0; i < command_count; i++) {
-      if(s.equals(commands[i].name)) {
+      if(s.startsWith(commands[i].name)) {
         Serial.print("Executing command ");
         Serial.println(commands[i].name);
         commands[i].f();
@@ -186,25 +186,27 @@ void help();
 
 
 const Command commands[] = {
-  {"help", help},
-  {"trace dynamics on", trace_dynamics_on},
-  {"trace dynamics off", trace_dynamics_off},
-  {"trace ping on", trace_ping_on},
-  {"trace ping off", trace_ping_off},
-  {"trace esc on", trace_esc_on},
-  {"trace esc off", trace_esc_off},
-  {"trace mpu on", trace_mpu_on},
-  {"trace mpu off", trace_mpu_off},
-  {"trace loop speed on", trace_loop_speed_on},
-  {"trace loop speed off", trace_loop_speed_off},
-  {"circle", command_circle},
-  {"manual", command_manual},
-  {"follow", command_follow}
+  {"?", "help", help},
+  {"td+", "trace dynamics on", trace_dynamics_on},
+  {"td-", "trace dynamics off", trace_dynamics_off},
+  {"tp+", "trace ping on", trace_ping_on},
+  {"tp-", "trace ping off", trace_ping_off},
+  {"te+", "trace esc on", trace_esc_on},
+  {"te-", "trace esc off", trace_esc_off},
+  {"tm+", "trace mpu on", trace_mpu_on},
+  {"tm-", "trace mpu off", trace_mpu_off},
+  {"tl+", "trace loop speed on", trace_loop_speed_on},
+  {"tl-", "trace loop speed off", trace_loop_speed_off},
+  {"c", "circle", command_circle},
+  {"m", "manual", command_manual},
+  {"f", "follow", command_follow}
 };
 
 void help() {
-  for(unsigned int i = 0; i < count_of(commands); i++)
-    Serial.println(commands[i].name);
+  for(unsigned int i = 0; i < count_of(commands); i++) {
+    const Command &c = commands[i];
+    Serial.println(String(c.name)+ " - " + c.description);
+  }
 }
 
 
@@ -217,7 +219,9 @@ FollowMode follow_mode;
 Task * tasks[] = {&manual_mode, &circle_mode, &follow_mode};
 
 Fsm::Edge edges[] = {{"circle", "non-neutral", "manual"},
+                     {"circle", "manual", "manual"},
                      {"follow", "non-neutral", "manual"},
+                     {"follow", "manual", "manual"},
                      {"manual", "circle", "circle"},
                      {"manual", "follow", "follow"},
                   };
