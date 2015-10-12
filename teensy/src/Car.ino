@@ -1,7 +1,7 @@
 #include <I2Cdev.h>
 #include <Servo.h>
 #include "Pins.h"
-#include "LogFlags.h"
+#include "Logger.h"
 #include "Blinker.h"
 #include "Mpu9150.h"
 #include "Car.h"
@@ -19,9 +19,10 @@
 
 #include "Ping.h"
 
-#define PLAY_SOUNDS 0
-
-
+bool LOG_RPM = false;
+bool LOG_ERROR = true;
+bool LOG_INFO = false;
+bool LOG_TRACE = false;
 bool TRACE_RX = false;
 bool TRACE_PINGS = false;
 bool TRACE_ESC = false;
@@ -60,13 +61,12 @@ public:
       String name = commands[i].name;
       if(s.startsWith(name)) {
         command_args = s.substring(name.length());
-        Serial.println("Executing command " + name + " with args (" + command_args + ")");
+        log(LOG_INFO, "Executing command " + name + " with args (" + command_args + ")");
         commands[i].f();
         return;
       }
     }
-    Serial.print("Unknown command: ");
-    Serial.println(s);
+    log(LOG_ERROR, "Unknown command: ");
   }
 };
 
@@ -173,7 +173,7 @@ extern CircleMode circle_mode;
 void command_circle() {
   double angle;
   String & args = interpreter.command_args;
-  Serial.println((String)"circle args" + args);
+  log(LOG_TRACE,"circle args" + args);
   if(args.length() == 0) {
     angle = 90.0;
   } else {
@@ -245,7 +245,7 @@ void setup() {
   Serial.begin(9600);
 
   interpreter.init(commands,count_of(commands));
-  Serial.println("setup begun");
+  log(LOG_INFO, "setup begun");
 
   circle_mode.name = "circle";
   manual_mode.name = "manual";
@@ -285,7 +285,7 @@ void setup() {
 
   last_report_ms = millis();
 
-  Serial.println("car_control begun");
+  log(LOG_INFO, "car_control begun");
   mpu9150.setup();
   delay(1000);
   mpu9150.zero();
@@ -313,8 +313,7 @@ void loop() {
   bool every_20_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 20);
   
   if(every_second) {
-    Serial.print("motor_pulses: ");
-    Serial.println(motor_pulses);
+    log(LOG_RPM, "motor_pulses: " + motor_pulses ) ;
     motor_pulses = 0;
   }
 
@@ -334,17 +333,10 @@ void loop() {
   double inches = ping.inches();//ping_inches();
   bool new_ping = ping.new_data_ready();
   if(TRACE_PINGS && new_ping) {
-    Serial.print("ping inches:");
-    Serial.println(inches);
+    log(TRACE_PINGS, "ping inches: " + inches);
   }
 
-  if(0) {
-    Serial.print("Speed: ");
-    Serial.print(rx_speed.pulse_us());
-    Serial.print("Steer: ");
-    Serial.print(rx_steer.pulse_us());
-    Serial.println();
-  }
+  log(TRACE_RX, "rx_speed: " + rx_speed.pulse_us() + "rx_steer: " + rx_steer.pulse_us());
   
   // send events through modes state machine
   if(new_rx_event) {
@@ -373,30 +365,15 @@ void loop() {
     Serial.println();
   }
   if(every_100_ms && TRACE_DYNAMICS) {
-    Serial.print("str");
-    Serial.print(", ");
-    Serial.print(steering.readMicroseconds());
-    Serial.print(", ");
-    Serial.print("esc");
-    Serial.print(", ");
-    Serial.print(speed.readMicroseconds());
-    Serial.print(", ");
-    Serial.print("aa");
-    Serial.print(", ");
-    Serial.print(mpu9150.aa.x - mpu9150.a0.x);
-    Serial.print(", ");
-    Serial.print(mpu9150.aa.y  - mpu9150.a0.y);
-    Serial.print(", ");
-    Serial.print(mpu9150.aa.z  - mpu9150.a0.z);
-    Serial.print(", ");
-    Serial.print("angle");
-    Serial.print(", ");
-    Serial.print(mpu9150.ground_angle());
-    Serial.println();
+    log(TRACE_DYNAMICS, 
+       "str, " + steering.readMicroseconds() 
+       + ", esc," + speed.readMicroseconds() 
+       + ", aa, "+ (mpu9150.aa.x - mpu9150.a0.x) + ", " + (mpu9150.aa.y  - mpu9150.a0.y)+", "+ (mpu9150.aa.z  - mpu9150.a0.z)
+       +", angle, "+mpu9150.ground_angle());
   }
 
-  if(every_second && TRACE_MPU) {
-      mpu9150.trace_status();
+  if(every_second ) {
+    mpu9150.trace_status();
   }
 
   // loop speed reporting
@@ -407,11 +384,7 @@ void loop() {
     unsigned long loops_since_report = loop_count - last_report_loop_count;
     double seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
 
-    Serial.print("loops per second: ");
-    Serial.print( loops_since_report / seconds_since_report );
-    Serial.print(" microseconds per loop ");
-    Serial.print( 1E6 * seconds_since_report / loops_since_report );
-    Serial.println();
+    log(TRACE_LOOP_SPEED, "loops per second: "+ (loops_since_report / seconds_since_report ) + " microseconds per loop "+ (1E6 * seconds_since_report / loops_since_report) );
 
     // remember stats for next report
     last_report_ms = loop_time_ms;
