@@ -1,5 +1,6 @@
 #include "Esc.h"
 #include "Arduino.h"
+#include "Logger.h"
 
 
 const char * Esc::speed_command_name( Esc::eSpeedCommand e) {
@@ -53,8 +54,7 @@ void Esc::set_pwm_us(int us) {
   if(c_us != current_us) {
     current_us = c_us;
     speed->writeMicroseconds(current_us);
-    Serial.print("ESC set pulse: ");
-    Serial.println(current_us);
+    log(TRACE_ESC, "ESC set pulse: " + current_us);
   }
 }
 
@@ -64,8 +64,7 @@ void Esc::set_command(eSpeedCommand new_command) {
   }
 
   command = new_command;
-  Serial.print("ESC Command: ");
-  Serial.println(speed_command_name(command));
+  log(TRACE_ESC, "ESC Command: " + speed_command_name(command));
 
   if(command == speed_forward) {
       set_pwm_us(forward_us);

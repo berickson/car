@@ -1,5 +1,6 @@
 #pragma once
 #include "RxEvent.h"
+#include "Arduino.h"
 
 class EventQueue {
 public:
@@ -9,4 +10,5 @@ public:
 
   void add(RxEvent new_event);
   bool matches(const RxEvent * pattern, int count);
+  String to_string();
 };

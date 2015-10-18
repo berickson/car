@@ -1,7 +1,7 @@
 #include <I2Cdev.h>
 #include <Servo.h>
 #include "Pins.h"
-#include "LogFlags.h"
+#include "Logger.h"
 #include "Blinker.h"
 #include "Mpu9150.h"
 #include "Car.h"
@@ -19,38 +19,13 @@
 
 #include "Ping.h"
 
-#define PLAY_SOUNDS 0
-
-
-bool TRACE_RX = false;
-bool TRACE_PINGS = false;
-bool TRACE_ESC = false;
-bool TRACE_MPU = false;
-bool TRACE_LOOP_SPEED = false;
-bool TRACE_DYNAMICS = false;
-
-
-
-/*
-enum rx_event {
-  uninitialized = 0;
-  steer_unknown = 1;
-  steer_left = 2;
-  steer_center = 4;
-  steer_right = 8;
-  power_unknown = 16;
-  power_reverse = 32;
-  power_neutral = 64;
-  power_forward = 128;
-
-}
-*/
 
 class CommandInterpreter{
 public:
   String buffer;
   const Command * commands;
   int command_count;
+  String command_args;
 
   void init(const Command * _commands, int _command_count)
   {
@@ -72,15 +47,15 @@ public:
 
   void process_command(String s) {
     for(int i = 0; i < command_count; i++) {
-      if(s.equals(commands[i].name)) {
-        Serial.print("Executing command ");
-        Serial.println(commands[i].name);
+      String name = commands[i].name;
+      if(s.startsWith(name)) {
+        command_args = s.substring(name.length());
+        log(LOG_INFO, "Executing command " + name + " with args (" + command_args + ")");
         commands[i].f();
         return;
       }
     }
-    Serial.print("Unknown command: ");
-    Serial.println(s);
+    log(LOG_ERROR, "Unknown command: ");
   }
 };
 
@@ -99,6 +74,7 @@ Ping ping;
 Beeper beeper;
 Blinker blinker;
 CommandInterpreter interpreter;
+unsigned long motor_pulses = 0;
 
 
 // diagnostics for reporting loop speeds
@@ -133,6 +109,10 @@ const RxEvent auto_pattern [] =
 const RxEvent circle_pattern [] =
   {{'L','N'},{'C','N'},{'L','N'},{'C','N'},{'L','N'},{'C','N'},{'L','N'},{'C','N'}};
 
+
+void motor_rpm_handler() {
+  motor_pulses++;
+}
 
 
 void trace_ping_on() {
@@ -176,28 +156,59 @@ void trace_dynamics_off() {
   TRACE_DYNAMICS = false;
 }
 
+extern Fsm modes;
+
+extern CircleMode circle_mode;
+void command_circle() {
+  double angle;
+  String & args = interpreter.command_args;
+  log(LOG_TRACE,"circle args" + args);
+  if(args.length() == 0) {
+    angle = 90.0;
+  } else {
+    angle = args.toFloat();
+  }
+  circle_mode.angle_to_turn = angle;
+  modes.set_event("circle");
+}
+
+void command_follow() {
+  modes.set_event("follow");
+}
+
+void command_manual() {
+  modes.set_event("manual");
+}
+
+
+
 
 void help();
 
 
 
 const Command commands[] = {
-  {"help", help},
-  {"trace dynamics on", trace_dynamics_on},
-  {"trace dynamics off", trace_dynamics_off},
-  {"trace ping on", trace_ping_on},
-  {"trace ping off", trace_ping_off},
-  {"trace esc on", trace_esc_on},
-  {"trace esc off", trace_esc_off},
-  {"trace mpu on", trace_mpu_on},
-  {"trace mpu off", trace_mpu_off},
-  {"trace loop speed on", trace_loop_speed_on},
-  {"trace loop speed off", trace_loop_speed_off}
+  {"?", "help", help},
+  {"td+", "trace dynamics on", trace_dynamics_on},
+  {"td-", "trace dynamics off", trace_dynamics_off},
+  {"tp+", "trace ping on", trace_ping_on},
+  {"tp-", "trace ping off", trace_ping_off},
+  {"te+", "trace esc on", trace_esc_on},
+  {"te-", "trace esc off", trace_esc_off},
+  {"tm+", "trace mpu on", trace_mpu_on},
+  {"tm-", "trace mpu off", trace_mpu_off},
+  {"tl+", "trace loop speed on", trace_loop_speed_on},
+  {"tl-", "trace loop speed off", trace_loop_speed_off},
+  {"c", "circle", command_circle},
+  {"m", "manual", command_manual},
+  {"f", "follow", command_follow}
 };
 
 void help() {
-  for(unsigned int i = 0; i < count_of(commands); i++)
-    Serial.println(commands[i].name);
+  for(unsigned int i = 0; i < count_of(commands); i++) {
+    const Command &c = commands[i];
+    Serial.println(String(c.name)+ " - " + c.description);
+  }
 }
 
 
@@ -210,7 +221,9 @@ FollowMode follow_mode;
 Task * tasks[] = {&manual_mode, &circle_mode, &follow_mode};
 
 Fsm::Edge edges[] = {{"circle", "non-neutral", "manual"},
+                     {"circle", "manual", "manual"},
                      {"follow", "non-neutral", "manual"},
+                     {"follow", "manual", "manual"},
                      {"manual", "circle", "circle"},
                      {"manual", "follow", "follow"},
                   };
@@ -221,7 +234,7 @@ void setup() {
   Serial.begin(9600);
 
   interpreter.init(commands,count_of(commands));
-  Serial.println("setup begun");
+  log(LOG_INFO, "setup begun");
 
   circle_mode.name = "circle";
   manual_mode.name = "manual";
@@ -246,6 +259,9 @@ void setup() {
   attachInterrupt(int_str, rx_str_handler, CHANGE);
   attachInterrupt(int_esc, rx_spd_handler, CHANGE);
 
+  pinMode(PIN_MOTOR_RPM, INPUT);  
+  attachInterrupt(PIN_MOTOR_RPM, motor_rpm_handler, CHANGE);
+
 
   pinMode(PIN_PING_TRIG, OUTPUT);
   pinMode(PIN_PING_ECHO, INPUT);
@@ -258,7 +274,7 @@ void setup() {
 
   last_report_ms = millis();
 
-  Serial.println("car_control begun");
+  log(LOG_INFO, "car_control begun");
   mpu9150.setup();
   delay(1000);
   mpu9150.zero();
@@ -284,6 +300,11 @@ void loop() {
   bool every_second = every_n_ms(last_loop_time_ms, loop_time_ms, 1000);
   bool every_100_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 100);
   bool every_20_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 20);
+  
+  if(every_second) {
+    log(LOG_RPM, "motor_pulses: " + motor_pulses ) ;
+    motor_pulses = 0;
+  }
 
   // get commands from usb
   interpreter.execute();
@@ -301,17 +322,10 @@ void loop() {
   double inches = ping.inches();//ping_inches();
   bool new_ping = ping.new_data_ready();
   if(TRACE_PINGS && new_ping) {
-    Serial.print("ping inches:");
-    Serial.println(inches);
+    log(TRACE_PINGS, "ping inches: " + inches);
   }
 
-  if(0) {
-    Serial.print("Speed: ");
-    Serial.print(rx_speed.pulse_us());
-    Serial.print("Steer: ");
-    Serial.print(rx_steer.pulse_us());
-    Serial.println();
-  }
+  log(TRACE_RX, "rx_speed: " + rx_speed.pulse_us() + "rx_steer: " + rx_steer.pulse_us());
   
   // send events through modes state machine
   if(new_rx_event) {
@@ -340,30 +354,15 @@ void loop() {
     Serial.println();
   }
   if(every_100_ms && TRACE_DYNAMICS) {
-    Serial.print("str");
-    Serial.print(", ");
-    Serial.print(steering.readMicroseconds());
-    Serial.print(", ");
-    Serial.print("esc");
-    Serial.print(", ");
-    Serial.print(speed.readMicroseconds());
-    Serial.print(", ");
-    Serial.print("aa");
-    Serial.print(", ");
-    Serial.print(mpu9150.aa.x - mpu9150.a0.x);
-    Serial.print(", ");
-    Serial.print(mpu9150.aa.y  - mpu9150.a0.y);
-    Serial.print(", ");
-    Serial.print(mpu9150.aa.z  - mpu9150.a0.z);
-    Serial.print(", ");
-    Serial.print("angle");
-    Serial.print(", ");
-    Serial.print(mpu9150.ground_angle());
-    Serial.println();
+    log(TRACE_DYNAMICS, 
+       "str, " + steering.readMicroseconds() 
+       + ", esc," + speed.readMicroseconds() 
+       + ", aa, "+ (mpu9150.aa.x - mpu9150.a0.x) + ", " + (mpu9150.aa.y  - mpu9150.a0.y)+", "+ (mpu9150.aa.z  - mpu9150.a0.z)
+       +", angle, "+mpu9150.ground_angle());
   }
 
-  if(every_second && TRACE_MPU) {
-      mpu9150.trace_status();
+  if(every_second && TRACE_MPU ) {
+    mpu9150.trace_status();
   }
 
   // loop speed reporting
@@ -374,11 +373,7 @@ void loop() {
     unsigned long loops_since_report = loop_count - last_report_loop_count;
     double seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
 
-    Serial.print("loops per second: ");
-    Serial.print( loops_since_report / seconds_since_report );
-    Serial.print(" microseconds per loop ");
-    Serial.print( 1E6 * seconds_since_report / loops_since_report );
-    Serial.println();
+    log(TRACE_LOOP_SPEED, "loops per second: "+ (loops_since_report / seconds_since_report ) + " microseconds per loop "+ (1E6 * seconds_since_report / loops_since_report) );
 
     // remember stats for next report
     last_report_ms = loop_time_ms;

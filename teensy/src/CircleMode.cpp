@@ -2,6 +2,7 @@
 #include "CircleMode.h"
 #include "Esc.h"
 #include "Mpu9150.h"
+#include "Logger.h"
 
 extern Esc esc;
 extern Servo steering;
@@ -22,8 +23,9 @@ void CircleMode::begin() {
   // assumes power is -1 to 1 range
   // assumes per second (not millis)
   pid.reset();
-  pid.set_sp(90);
-  pid.set_pv(abs(degrees_turned), 0.0);
+  pid.set_sp(angle_to_turn);
+  log(LOG_INFO, "angle_to_turn: " + angle_to_turn);
+  pid.set_pv(degrees_turned, 0.0);
   pid.kp = 1/25.; // full power until 25 degrees
   pid.ki = 0.0;
   pid.kd = 1./90; // 90 degrees per second
@@ -34,8 +36,7 @@ void CircleMode::begin() {
 }
 
 void CircleMode::execute() {
-//    Serial.print("circle has turned");
-//    Serial.println(degrees_turned);
+  log(LOG_TRACE, "circle has turned " + degrees_turned);
   double ground_angle = mpu->ground_angle();
   double angle_diff = last_angle-ground_angle;
   if(abs(angle_diff) > 70){
@@ -45,7 +46,7 @@ void CircleMode::execute() {
   degrees_turned += angle_diff;
   last_angle = ground_angle;
 
-  pid.set_pv(abs(degrees_turned),(millis()-start_millis)/1000.);
+  pid.set_pv(degrees_turned,(millis()-start_millis)/1000.);
   double v = pid.get_output();  // will be in range (-1,1)
   esc.set_velocity(v);
   steering.writeMicroseconds(1100); // turn left todo: make steer commands

@@ -6,6 +6,7 @@ class Mpu9150;
 class CircleMode : public Task {
 public:
   Pid pid;
+  double angle_to_turn = 90;
   double last_angle;
   double degrees_turned = 0;
   Mpu9150 * mpu;

@@ -22,7 +22,7 @@ public:
   const int note_b5 = 988;
 
   // duration of notes
-  const unsigned long note_ms = 500;
+  const unsigned long note_ms = 100;
   const unsigned long gap_ms = 10;
 
   void attach(int pin);

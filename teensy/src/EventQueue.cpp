@@ -1,6 +1,6 @@
 #include "EventQueue.h"
 #include "Arduino.h"
-#include "LogFlags.h"
+#include "Logger.h"
 
 
 extern bool TRACE_RX;
@@ -10,6 +10,8 @@ void EventQueue::add(RxEvent new_event) {
     events[i]=events[i-1];
   }
   events[0] = new_event;
+  
+  log(TRACE_RX, to_string());
 
   if(TRACE_RX) {
     for(int i = 0; i < size; i++) {
@@ -28,4 +30,15 @@ bool EventQueue::matches(const RxEvent * pattern, int count) {
     }
   }
   return true;
+}
+
+String EventQueue::to_string() {
+  String s;
+  for(int i = 0; i < size; i++) {
+    if(i>0) {
+      s += ",";
+    }
+    s = s + events[i].steer + events[i].speed;
+  }
+  return s;
 }
