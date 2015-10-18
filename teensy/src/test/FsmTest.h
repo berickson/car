@@ -13,7 +13,7 @@ void PrintFsmState(Fsm & fsm) {
   cout << " current task: " << fsm.current_task->name  << endl;
 }
 
-void FsmTest() {
+TEST(Fsm,FsmTest) {
   cout << "FsmTest" << endl;
   FakeTask task1,task2;
   task1.name = "task1";

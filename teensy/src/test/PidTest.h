@@ -9,7 +9,7 @@ using namespace std;
 #define trace_eval(t) cout << str(t) << " = " << t << endl
 
 
-void PidTest() {
+TEST(Pid,PidTest) {
   Pid pid;
   pid.set_sp(10.);
   pid.set_pv(0,0);

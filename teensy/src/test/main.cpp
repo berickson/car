@@ -1,24 +1,33 @@
+#include "gtest/gtest.h"
 #include <iostream>
-#include <math.h>
 
 
-using namespace std;
 
-#include "PidTest.h"
+
 #include "BeeperTest.h"
-
-#include "SequenceTest.h"
 #include "BeepTest.h"
 #include "FsmTest.h"
+#include "PidTest.h"
+#include "SequenceTest.h"
 #include "StatisticsTest.h"
 
-int main(int argc, char ** argv) {
-  StatisticsTest();
-  /*
-  PidTest();
-  BeeperTest();
-  SequenceTest();
-  BeepTest();
-  FsmTest();
-  */
+using namespace std;
+TEST(Statistics, unity_slope) {
+  Statistics s;
+  s.add(3,3);
+  s.add(5,5);
+  EXPECT_EQ(s.slope(),1) << "two points with slope of one";
+  cout << "the slope was " << s.slope() << endl;
+}
+
+
+
+TEST(ListenersTest, LeaksWater) {
+  bool x = true;
+  EXPECT_TRUE(x);
+}
+
+int main(int argc, char **argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

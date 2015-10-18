@@ -5,7 +5,7 @@
 #include <iostream>
 using namespace std;
 
-void BeepTest() {
+TEST(Beep, Beep) {
   g_millis = 0;
   Beep beep1, beep2;
   beep1.init(12,20,3);

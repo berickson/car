@@ -4,7 +4,7 @@
 #include "Arduino.h"
 
 using namespace std;
-void BeeperTest() {
+TEST(Beeper,BeeperTest) {
   g_millis = 0;
   cout << "running beeper test" << endl;
   Beeper beeper;

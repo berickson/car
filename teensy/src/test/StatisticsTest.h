@@ -12,8 +12,7 @@ void print_stats(Statistics & s) {
   
 }
 
-void StatisticsTest()
-{
+TEST(Statistics,StatisticsTest) {
    cout << "this is the statistics test" << endl;
    Statistics s;
    

@@ -5,7 +5,7 @@
 using namespace std;
 
 
-void SequenceTest() {
+TEST(Sequence,SequenceTest) {
   cout << "SequenceTest" << endl;
   Task task1,task2;
   task1.name = "task1";

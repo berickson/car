@@ -1,3 +1,2088 @@
+[==========] Running 8 tests from 7 test cases.
+[----------] Global test environment set-up.
+[----------] 1 test from Beeper
+[ RUN      ] Beeper.BeeperTest
+running beeper test
+tone(22, 523);
+....................................................................................................notone(22);
+tone(22, 880);
+.....................................................................................................notone(22);
+tone(22, 698);
+.....................................................................................................notone(22);
+..................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................[       OK ] Beeper.BeeperTest (0 ms)
+[----------] 1 test from Beeper (0 ms total)
+
+[----------] 1 test from Beep
+[ RUN      ] Beep.Beep
+tone(12, 20);
+i: 0
+current task: beep1
+i: 1
+current task: beep1
+i: 2
+current task: beep1
+i: 3
+current task: beep1
+i: 4
+current task: beep1
+notone(12);
+tone(12, 20);
+i: 5
+current task: beep2
+i: 6
+current task: beep2
+i: 7
+current task: beep2
+i: 8
+current task: beep2
+i: 9
+current task: beep2
+notone(12);
+[       OK ] Beep.Beep (0 ms)
+[----------] 1 test from Beep (0 ms total)
+
+[----------] 1 test from Fsm
+[ RUN      ] Fsm.FsmTest
+FsmTest
+fsm state -  done: 0 current task: task1
+no events
+fsm state -  done: 0 current task: task1
+set bad
+fsm state -  done: 0 current task: task1
+set ok
+fsm state -  done: 0 current task: task2
+set bad
+fsm state -  done: 0 current task: task1
+set nonsense
+fsm state -  done: 0 current task: task1
+set ok
+fsm state -  done: 0 current task: task2
+set ok
+fsm state -  done: 1 current task: fsm
+execute complete machine
+fsm state -  done: 1 current task: fsm
+test complete
+[       OK ] Fsm.FsmTest (0 ms)
+[----------] 1 test from Fsm (0 ms total)
+
+[----------] 1 test from Pid
+[ RUN      ] Pid.PidTest
+default clamped output: 1
+clamped to 1000 output: 10
+output without kd: 5
+output with kd: 0
+output with ki: 0.5
+[       OK ] Pid.PidTest (1 ms)
+[----------] 1 test from Pid (1 ms total)
+
+[----------] 1 test from Sequence
+[ RUN      ] Sequence.SequenceTest
+SequenceTest
+i: 0
+current task: task1
+i: 1
+current task: task1
+i: 2
+current task: task1
+i: 3
+current task: task1
+i: 4
+current task: task1
+i: 5
+current task: task1
+i: 6
+current task: task1
+i: 7
+current task: task1
+i: 8
+current task: task1
+i: 9
+current task: task1
+i: 10
+current task: task1
+i: 11
+current task: task1
+i: 12
+current task: task1
+i: 13
+current task: task1
+i: 14
+current task: task1
+i: 15
+current task: task1
+i: 16
+current task: task1
+i: 17
+current task: task1
+i: 18
+current task: task1
+i: 19
+current task: task1
+i: 20
+current task: task1
+i: 21
+current task: task1
+i: 22
+current task: task1
+i: 23
+current task: task1
+i: 24
+current task: task1
+i: 25
+current task: task1
+i: 26
+current task: task1
+i: 27
+current task: task1
+i: 28
+current task: task1
+i: 29
+current task: task1
+i: 30
+current task: task1
+i: 31
+current task: task1
+i: 32
+current task: task1
+i: 33
+current task: task1
+i: 34
+current task: task1
+i: 35
+current task: task1
+i: 36
+current task: task1
+i: 37
+current task: task1
+i: 38
+current task: task1
+i: 39
+current task: task1
+i: 40
+current task: task1
+i: 41
+current task: task1
+i: 42
+current task: task1
+i: 43
+current task: task1
+i: 44
+current task: task1
+i: 45
+current task: task1
+i: 46
+current task: task1
+i: 47
+current task: task1
+i: 48
+current task: task1
+i: 49
+current task: task1
+i: 50
+current task: task1
+i: 51
+current task: task1
+i: 52
+current task: task1
+i: 53
+current task: task1
+i: 54
+current task: task1
+i: 55
+current task: task1
+i: 56
+current task: task1
+i: 57
+current task: task1
+i: 58
+current task: task1
+i: 59
+current task: task1
+i: 60
+current task: task1
+i: 61
+current task: task1
+i: 62
+current task: task1
+i: 63
+current task: task1
+i: 64
+current task: task1
+i: 65
+current task: task1
+i: 66
+current task: task1
+i: 67
+current task: task1
+i: 68
+current task: task1
+i: 69
+current task: task1
+i: 70
+current task: task1
+i: 71
+current task: task1
+i: 72
+current task: task1
+i: 73
+current task: task1
+i: 74
+current task: task1
+i: 75
+current task: task1
+i: 76
+current task: task1
+i: 77
+current task: task1
+i: 78
+current task: task1
+i: 79
+current task: task1
+i: 80
+current task: task1
+i: 81
+current task: task1
+i: 82
+current task: task1
+i: 83
+current task: task1
+i: 84
+current task: task1
+i: 85
+current task: task1
+i: 86
+current task: task1
+i: 87
+current task: task1
+i: 88
+current task: task1
+i: 89
+current task: task1
+i: 90
+current task: task1
+i: 91
+current task: task1
+i: 92
+current task: task1
+i: 93
+current task: task1
+i: 94
+current task: task1
+i: 95
+current task: task1
+i: 96
+current task: task1
+i: 97
+current task: task1
+i: 98
+current task: task1
+i: 99
+current task: task1
+i: 100
+current task: task1
+i: 101
+current task: task1
+i: 102
+current task: task1
+i: 103
+current task: task1
+i: 104
+current task: task1
+i: 105
+current task: task1
+i: 106
+current task: task1
+i: 107
+current task: task1
+i: 108
+current task: task1
+i: 109
+current task: task1
+i: 110
+current task: task1
+i: 111
+current task: task1
+i: 112
+current task: task1
+i: 113
+current task: task1
+i: 114
+current task: task1
+i: 115
+current task: task1
+i: 116
+current task: task1
+i: 117
+current task: task1
+i: 118
+current task: task1
+i: 119
+current task: task1
+i: 120
+current task: task1
+i: 121
+current task: task1
+i: 122
+current task: task1
+i: 123
+current task: task1
+i: 124
+current task: task1
+i: 125
+current task: task1
+i: 126
+current task: task1
+i: 127
+current task: task1
+i: 128
+current task: task1
+i: 129
+current task: task1
+i: 130
+current task: task1
+i: 131
+current task: task1
+i: 132
+current task: task1
+i: 133
+current task: task1
+i: 134
+current task: task1
+i: 135
+current task: task1
+i: 136
+current task: task1
+i: 137
+current task: task1
+i: 138
+current task: task1
+i: 139
+current task: task1
+i: 140
+current task: task1
+i: 141
+current task: task1
+i: 142
+current task: task1
+i: 143
+current task: task1
+i: 144
+current task: task1
+i: 145
+current task: task1
+i: 146
+current task: task1
+i: 147
+current task: task1
+i: 148
+current task: task1
+i: 149
+current task: task1
+i: 150
+current task: task1
+i: 151
+current task: task1
+i: 152
+current task: task1
+i: 153
+current task: task1
+i: 154
+current task: task1
+i: 155
+current task: task1
+i: 156
+current task: task1
+i: 157
+current task: task1
+i: 158
+current task: task1
+i: 159
+current task: task1
+i: 160
+current task: task1
+i: 161
+current task: task1
+i: 162
+current task: task1
+i: 163
+current task: task1
+i: 164
+current task: task1
+i: 165
+current task: task1
+i: 166
+current task: task1
+i: 167
+current task: task1
+i: 168
+current task: task1
+i: 169
+current task: task1
+i: 170
+current task: task1
+i: 171
+current task: task1
+i: 172
+current task: task1
+i: 173
+current task: task1
+i: 174
+current task: task1
+i: 175
+current task: task1
+i: 176
+current task: task1
+i: 177
+current task: task1
+i: 178
+current task: task1
+i: 179
+current task: task1
+i: 180
+current task: task1
+i: 181
+current task: task1
+i: 182
+current task: task1
+i: 183
+current task: task1
+i: 184
+current task: task1
+i: 185
+current task: task1
+i: 186
+current task: task1
+i: 187
+current task: task1
+i: 188
+current task: task1
+i: 189
+current task: task1
+i: 190
+current task: task1
+i: 191
+current task: task1
+i: 192
+current task: task1
+i: 193
+current task: task1
+i: 194
+current task: task1
+i: 195
+current task: task1
+i: 196
+current task: task1
+i: 197
+current task: task1
+i: 198
+current task: task1
+i: 199
+current task: task1
+i: 200
+current task: task1
+i: 201
+current task: task1
+i: 202
+current task: task1
+i: 203
+current task: task1
+i: 204
+current task: task1
+i: 205
+current task: task1
+i: 206
+current task: task1
+i: 207
+current task: task1
+i: 208
+current task: task1
+i: 209
+current task: task1
+i: 210
+current task: task1
+i: 211
+current task: task1
+i: 212
+current task: task1
+i: 213
+current task: task1
+i: 214
+current task: task1
+i: 215
+current task: task1
+i: 216
+current task: task1
+i: 217
+current task: task1
+i: 218
+current task: task1
+i: 219
+current task: task1
+i: 220
+current task: task1
+i: 221
+current task: task1
+i: 222
+current task: task1
+i: 223
+current task: task1
+i: 224
+current task: task1
+i: 225
+current task: task1
+i: 226
+current task: task1
+i: 227
+current task: task1
+i: 228
+current task: task1
+i: 229
+current task: task1
+i: 230
+current task: task1
+i: 231
+current task: task1
+i: 232
+current task: task1
+i: 233
+current task: task1
+i: 234
+current task: task1
+i: 235
+current task: task1
+i: 236
+current task: task1
+i: 237
+current task: task1
+i: 238
+current task: task1
+i: 239
+current task: task1
+i: 240
+current task: task1
+i: 241
+current task: task1
+i: 242
+current task: task1
+i: 243
+current task: task1
+i: 244
+current task: task1
+i: 245
+current task: task1
+i: 246
+current task: task1
+i: 247
+current task: task1
+i: 248
+current task: task1
+i: 249
+current task: task1
+i: 250
+current task: task1
+i: 251
+current task: task1
+i: 252
+current task: task1
+i: 253
+current task: task1
+i: 254
+current task: task1
+i: 255
+current task: task1
+i: 256
+current task: task1
+i: 257
+current task: task1
+i: 258
+current task: task1
+i: 259
+current task: task1
+i: 260
+current task: task1
+i: 261
+current task: task1
+i: 262
+current task: task1
+i: 263
+current task: task1
+i: 264
+current task: task1
+i: 265
+current task: task1
+i: 266
+current task: task1
+i: 267
+current task: task1
+i: 268
+current task: task1
+i: 269
+current task: task1
+i: 270
+current task: task1
+i: 271
+current task: task1
+i: 272
+current task: task1
+i: 273
+current task: task1
+i: 274
+current task: task1
+i: 275
+current task: task1
+i: 276
+current task: task1
+i: 277
+current task: task1
+i: 278
+current task: task1
+i: 279
+current task: task1
+i: 280
+current task: task1
+i: 281
+current task: task1
+i: 282
+current task: task1
+i: 283
+current task: task1
+i: 284
+current task: task1
+i: 285
+current task: task1
+i: 286
+current task: task1
+i: 287
+current task: task1
+i: 288
+current task: task1
+i: 289
+current task: task1
+i: 290
+current task: task1
+i: 291
+current task: task1
+i: 292
+current task: task1
+i: 293
+current task: task1
+i: 294
+current task: task1
+i: 295
+current task: task1
+i: 296
+current task: task1
+i: 297
+current task: task1
+i: 298
+current task: task1
+i: 299
+current task: task1
+i: 300
+current task: task1
+i: 301
+current task: task1
+i: 302
+current task: task1
+i: 303
+current task: task1
+i: 304
+current task: task1
+i: 305
+current task: task1
+i: 306
+current task: task1
+i: 307
+current task: task1
+i: 308
+current task: task1
+i: 309
+current task: task1
+i: 310
+current task: task1
+i: 311
+current task: task1
+i: 312
+current task: task1
+i: 313
+current task: task1
+i: 314
+current task: task1
+i: 315
+current task: task1
+i: 316
+current task: task1
+i: 317
+current task: task1
+i: 318
+current task: task1
+i: 319
+current task: task1
+i: 320
+current task: task1
+i: 321
+current task: task1
+i: 322
+current task: task1
+i: 323
+current task: task1
+i: 324
+current task: task1
+i: 325
+current task: task1
+i: 326
+current task: task1
+i: 327
+current task: task1
+i: 328
+current task: task1
+i: 329
+current task: task1
+i: 330
+current task: task1
+i: 331
+current task: task1
+i: 332
+current task: task1
+i: 333
+current task: task1
+i: 334
+current task: task1
+i: 335
+current task: task1
+i: 336
+current task: task1
+i: 337
+current task: task1
+i: 338
+current task: task1
+i: 339
+current task: task1
+i: 340
+current task: task1
+i: 341
+current task: task1
+i: 342
+current task: task1
+i: 343
+current task: task1
+i: 344
+current task: task1
+i: 345
+current task: task1
+i: 346
+current task: task1
+i: 347
+current task: task1
+i: 348
+current task: task1
+i: 349
+current task: task1
+i: 350
+current task: task1
+i: 351
+current task: task1
+i: 352
+current task: task1
+i: 353
+current task: task1
+i: 354
+current task: task1
+i: 355
+current task: task1
+i: 356
+current task: task1
+i: 357
+current task: task1
+i: 358
+current task: task1
+i: 359
+current task: task1
+i: 360
+current task: task1
+i: 361
+current task: task1
+i: 362
+current task: task1
+i: 363
+current task: task1
+i: 364
+current task: task1
+i: 365
+current task: task1
+i: 366
+current task: task1
+i: 367
+current task: task1
+i: 368
+current task: task1
+i: 369
+current task: task1
+i: 370
+current task: task1
+i: 371
+current task: task1
+i: 372
+current task: task1
+i: 373
+current task: task1
+i: 374
+current task: task1
+i: 375
+current task: task1
+i: 376
+current task: task1
+i: 377
+current task: task1
+i: 378
+current task: task1
+i: 379
+current task: task1
+i: 380
+current task: task1
+i: 381
+current task: task1
+i: 382
+current task: task1
+i: 383
+current task: task1
+i: 384
+current task: task1
+i: 385
+current task: task1
+i: 386
+current task: task1
+i: 387
+current task: task1
+i: 388
+current task: task1
+i: 389
+current task: task1
+i: 390
+current task: task1
+i: 391
+current task: task1
+i: 392
+current task: task1
+i: 393
+current task: task1
+i: 394
+current task: task1
+i: 395
+current task: task1
+i: 396
+current task: task1
+i: 397
+current task: task1
+i: 398
+current task: task1
+i: 399
+current task: task1
+i: 400
+current task: task1
+i: 401
+current task: task1
+i: 402
+current task: task1
+i: 403
+current task: task1
+i: 404
+current task: task1
+i: 405
+current task: task1
+i: 406
+current task: task1
+i: 407
+current task: task1
+i: 408
+current task: task1
+i: 409
+current task: task1
+i: 410
+current task: task1
+i: 411
+current task: task1
+i: 412
+current task: task1
+i: 413
+current task: task1
+i: 414
+current task: task1
+i: 415
+current task: task1
+i: 416
+current task: task1
+i: 417
+current task: task1
+i: 418
+current task: task1
+i: 419
+current task: task1
+i: 420
+current task: task1
+i: 421
+current task: task1
+i: 422
+current task: task1
+i: 423
+current task: task1
+i: 424
+current task: task1
+i: 425
+current task: task1
+i: 426
+current task: task1
+i: 427
+current task: task1
+i: 428
+current task: task1
+i: 429
+current task: task1
+i: 430
+current task: task1
+i: 431
+current task: task1
+i: 432
+current task: task1
+i: 433
+current task: task1
+i: 434
+current task: task1
+i: 435
+current task: task1
+i: 436
+current task: task1
+i: 437
+current task: task1
+i: 438
+current task: task1
+i: 439
+current task: task1
+i: 440
+current task: task1
+i: 441
+current task: task1
+i: 442
+current task: task1
+i: 443
+current task: task1
+i: 444
+current task: task1
+i: 445
+current task: task1
+i: 446
+current task: task1
+i: 447
+current task: task1
+i: 448
+current task: task1
+i: 449
+current task: task1
+i: 450
+current task: task1
+i: 451
+current task: task1
+i: 452
+current task: task1
+i: 453
+current task: task1
+i: 454
+current task: task1
+i: 455
+current task: task1
+i: 456
+current task: task1
+i: 457
+current task: task1
+i: 458
+current task: task1
+i: 459
+current task: task1
+i: 460
+current task: task1
+i: 461
+current task: task1
+i: 462
+current task: task1
+i: 463
+current task: task1
+i: 464
+current task: task1
+i: 465
+current task: task1
+i: 466
+current task: task1
+i: 467
+current task: task1
+i: 468
+current task: task1
+i: 469
+current task: task1
+i: 470
+current task: task1
+i: 471
+current task: task1
+i: 472
+current task: task1
+i: 473
+current task: task1
+i: 474
+current task: task1
+i: 475
+current task: task1
+i: 476
+current task: task1
+i: 477
+current task: task1
+i: 478
+current task: task1
+i: 479
+current task: task1
+i: 480
+current task: task1
+i: 481
+current task: task1
+i: 482
+current task: task1
+i: 483
+current task: task1
+i: 484
+current task: task1
+i: 485
+current task: task1
+i: 486
+current task: task1
+i: 487
+current task: task1
+i: 488
+current task: task1
+i: 489
+current task: task1
+i: 490
+current task: task1
+i: 491
+current task: task1
+i: 492
+current task: task1
+i: 493
+current task: task1
+i: 494
+current task: task1
+i: 495
+current task: task1
+i: 496
+current task: task1
+i: 497
+current task: task1
+i: 498
+current task: task1
+i: 499
+current task: task1
+i: 500
+current task: task1
+i: 501
+current task: task1
+i: 502
+current task: task1
+i: 503
+current task: task1
+i: 504
+current task: task1
+i: 505
+current task: task1
+i: 506
+current task: task1
+i: 507
+current task: task1
+i: 508
+current task: task1
+i: 509
+current task: task1
+i: 510
+current task: task1
+i: 511
+current task: task1
+i: 512
+current task: task1
+i: 513
+current task: task1
+i: 514
+current task: task1
+i: 515
+current task: task1
+i: 516
+current task: task1
+i: 517
+current task: task1
+i: 518
+current task: task1
+i: 519
+current task: task1
+i: 520
+current task: task1
+i: 521
+current task: task1
+i: 522
+current task: task1
+i: 523
+current task: task1
+i: 524
+current task: task1
+i: 525
+current task: task1
+i: 526
+current task: task1
+i: 527
+current task: task1
+i: 528
+current task: task1
+i: 529
+current task: task1
+i: 530
+current task: task1
+i: 531
+current task: task1
+i: 532
+current task: task1
+i: 533
+current task: task1
+i: 534
+current task: task1
+i: 535
+current task: task1
+i: 536
+current task: task1
+i: 537
+current task: task1
+i: 538
+current task: task1
+i: 539
+current task: task1
+i: 540
+current task: task1
+i: 541
+current task: task1
+i: 542
+current task: task1
+i: 543
+current task: task1
+i: 544
+current task: task1
+i: 545
+current task: task1
+i: 546
+current task: task1
+i: 547
+current task: task1
+i: 548
+current task: task1
+i: 549
+current task: task1
+i: 550
+current task: task1
+i: 551
+current task: task1
+i: 552
+current task: task1
+i: 553
+current task: task1
+i: 554
+current task: task1
+i: 555
+current task: task1
+i: 556
+current task: task1
+i: 557
+current task: task1
+i: 558
+current task: task1
+i: 559
+current task: task1
+i: 560
+current task: task1
+i: 561
+current task: task1
+i: 562
+current task: task1
+i: 563
+current task: task1
+i: 564
+current task: task1
+i: 565
+current task: task1
+i: 566
+current task: task1
+i: 567
+current task: task1
+i: 568
+current task: task1
+i: 569
+current task: task1
+i: 570
+current task: task1
+i: 571
+current task: task1
+i: 572
+current task: task1
+i: 573
+current task: task1
+i: 574
+current task: task1
+i: 575
+current task: task1
+i: 576
+current task: task1
+i: 577
+current task: task1
+i: 578
+current task: task1
+i: 579
+current task: task1
+i: 580
+current task: task1
+i: 581
+current task: task1
+i: 582
+current task: task1
+i: 583
+current task: task1
+i: 584
+current task: task1
+i: 585
+current task: task1
+i: 586
+current task: task1
+i: 587
+current task: task1
+i: 588
+current task: task1
+i: 589
+current task: task1
+i: 590
+current task: task1
+i: 591
+current task: task1
+i: 592
+current task: task1
+i: 593
+current task: task1
+i: 594
+current task: task1
+i: 595
+current task: task1
+i: 596
+current task: task1
+i: 597
+current task: task1
+i: 598
+current task: task1
+i: 599
+current task: task1
+i: 600
+current task: task1
+i: 601
+current task: task1
+i: 602
+current task: task1
+i: 603
+current task: task1
+i: 604
+current task: task1
+i: 605
+current task: task1
+i: 606
+current task: task1
+i: 607
+current task: task1
+i: 608
+current task: task1
+i: 609
+current task: task1
+i: 610
+current task: task1
+i: 611
+current task: task1
+i: 612
+current task: task1
+i: 613
+current task: task1
+i: 614
+current task: task1
+i: 615
+current task: task1
+i: 616
+current task: task1
+i: 617
+current task: task1
+i: 618
+current task: task1
+i: 619
+current task: task1
+i: 620
+current task: task1
+i: 621
+current task: task1
+i: 622
+current task: task1
+i: 623
+current task: task1
+i: 624
+current task: task1
+i: 625
+current task: task1
+i: 626
+current task: task1
+i: 627
+current task: task1
+i: 628
+current task: task1
+i: 629
+current task: task1
+i: 630
+current task: task1
+i: 631
+current task: task1
+i: 632
+current task: task1
+i: 633
+current task: task1
+i: 634
+current task: task1
+i: 635
+current task: task1
+i: 636
+current task: task1
+i: 637
+current task: task1
+i: 638
+current task: task1
+i: 639
+current task: task1
+i: 640
+current task: task1
+i: 641
+current task: task1
+i: 642
+current task: task1
+i: 643
+current task: task1
+i: 644
+current task: task1
+i: 645
+current task: task1
+i: 646
+current task: task1
+i: 647
+current task: task1
+i: 648
+current task: task1
+i: 649
+current task: task1
+i: 650
+current task: task1
+i: 651
+current task: task1
+i: 652
+current task: task1
+i: 653
+current task: task1
+i: 654
+current task: task1
+i: 655
+current task: task1
+i: 656
+current task: task1
+i: 657
+current task: task1
+i: 658
+current task: task1
+i: 659
+current task: task1
+i: 660
+current task: task1
+i: 661
+current task: task1
+i: 662
+current task: task1
+i: 663
+current task: task1
+i: 664
+current task: task1
+i: 665
+current task: task1
+i: 666
+current task: task1
+i: 667
+current task: task1
+i: 668
+current task: task1
+i: 669
+current task: task1
+i: 670
+current task: task1
+i: 671
+current task: task1
+i: 672
+current task: task1
+i: 673
+current task: task1
+i: 674
+current task: task1
+i: 675
+current task: task1
+i: 676
+current task: task1
+i: 677
+current task: task1
+i: 678
+current task: task1
+i: 679
+current task: task1
+i: 680
+current task: task1
+i: 681
+current task: task1
+i: 682
+current task: task1
+i: 683
+current task: task1
+i: 684
+current task: task1
+i: 685
+current task: task1
+i: 686
+current task: task1
+i: 687
+current task: task1
+i: 688
+current task: task1
+i: 689
+current task: task1
+i: 690
+current task: task1
+i: 691
+current task: task1
+i: 692
+current task: task1
+i: 693
+current task: task1
+i: 694
+current task: task1
+i: 695
+current task: task1
+i: 696
+current task: task1
+i: 697
+current task: task1
+i: 698
+current task: task1
+i: 699
+current task: task1
+i: 700
+current task: task1
+i: 701
+current task: task1
+i: 702
+current task: task1
+i: 703
+current task: task1
+i: 704
+current task: task1
+i: 705
+current task: task1
+i: 706
+current task: task1
+i: 707
+current task: task1
+i: 708
+current task: task1
+i: 709
+current task: task1
+i: 710
+current task: task1
+i: 711
+current task: task1
+i: 712
+current task: task1
+i: 713
+current task: task1
+i: 714
+current task: task1
+i: 715
+current task: task1
+i: 716
+current task: task1
+i: 717
+current task: task1
+i: 718
+current task: task1
+i: 719
+current task: task1
+i: 720
+current task: task1
+i: 721
+current task: task1
+i: 722
+current task: task1
+i: 723
+current task: task1
+i: 724
+current task: task1
+i: 725
+current task: task1
+i: 726
+current task: task1
+i: 727
+current task: task1
+i: 728
+current task: task1
+i: 729
+current task: task1
+i: 730
+current task: task1
+i: 731
+current task: task1
+i: 732
+current task: task1
+i: 733
+current task: task1
+i: 734
+current task: task1
+i: 735
+current task: task1
+i: 736
+current task: task1
+i: 737
+current task: task1
+i: 738
+current task: task1
+i: 739
+current task: task1
+i: 740
+current task: task1
+i: 741
+current task: task1
+i: 742
+current task: task1
+i: 743
+current task: task1
+i: 744
+current task: task1
+i: 745
+current task: task1
+i: 746
+current task: task1
+i: 747
+current task: task1
+i: 748
+current task: task1
+i: 749
+current task: task1
+i: 750
+current task: task1
+i: 751
+current task: task1
+i: 752
+current task: task1
+i: 753
+current task: task1
+i: 754
+current task: task1
+i: 755
+current task: task1
+i: 756
+current task: task1
+i: 757
+current task: task1
+i: 758
+current task: task1
+i: 759
+current task: task1
+i: 760
+current task: task1
+i: 761
+current task: task1
+i: 762
+current task: task1
+i: 763
+current task: task1
+i: 764
+current task: task1
+i: 765
+current task: task1
+i: 766
+current task: task1
+i: 767
+current task: task1
+i: 768
+current task: task1
+i: 769
+current task: task1
+i: 770
+current task: task1
+i: 771
+current task: task1
+i: 772
+current task: task1
+i: 773
+current task: task1
+i: 774
+current task: task1
+i: 775
+current task: task1
+i: 776
+current task: task1
+i: 777
+current task: task1
+i: 778
+current task: task1
+i: 779
+current task: task1
+i: 780
+current task: task1
+i: 781
+current task: task1
+i: 782
+current task: task1
+i: 783
+current task: task1
+i: 784
+current task: task1
+i: 785
+current task: task1
+i: 786
+current task: task1
+i: 787
+current task: task1
+i: 788
+current task: task1
+i: 789
+current task: task1
+i: 790
+current task: task1
+i: 791
+current task: task1
+i: 792
+current task: task1
+i: 793
+current task: task1
+i: 794
+current task: task1
+i: 795
+current task: task1
+i: 796
+current task: task1
+i: 797
+current task: task1
+i: 798
+current task: task1
+i: 799
+current task: task1
+i: 800
+current task: task1
+i: 801
+current task: task1
+i: 802
+current task: task1
+i: 803
+current task: task1
+i: 804
+current task: task1
+i: 805
+current task: task1
+i: 806
+current task: task1
+i: 807
+current task: task1
+i: 808
+current task: task1
+i: 809
+current task: task1
+i: 810
+current task: task1
+i: 811
+current task: task1
+i: 812
+current task: task1
+i: 813
+current task: task1
+i: 814
+current task: task1
+i: 815
+current task: task1
+i: 816
+current task: task1
+i: 817
+current task: task1
+i: 818
+current task: task1
+i: 819
+current task: task1
+i: 820
+current task: task1
+i: 821
+current task: task1
+i: 822
+current task: task1
+i: 823
+current task: task1
+i: 824
+current task: task1
+i: 825
+current task: task1
+i: 826
+current task: task1
+i: 827
+current task: task1
+i: 828
+current task: task1
+i: 829
+current task: task1
+i: 830
+current task: task1
+i: 831
+current task: task1
+i: 832
+current task: task1
+i: 833
+current task: task1
+i: 834
+current task: task1
+i: 835
+current task: task1
+i: 836
+current task: task1
+i: 837
+current task: task1
+i: 838
+current task: task1
+i: 839
+current task: task1
+i: 840
+current task: task1
+i: 841
+current task: task1
+i: 842
+current task: task1
+i: 843
+current task: task1
+i: 844
+current task: task1
+i: 845
+current task: task1
+i: 846
+current task: task1
+i: 847
+current task: task1
+i: 848
+current task: task1
+i: 849
+current task: task1
+i: 850
+current task: task1
+i: 851
+current task: task1
+i: 852
+current task: task1
+i: 853
+current task: task1
+i: 854
+current task: task1
+i: 855
+current task: task1
+i: 856
+current task: task1
+i: 857
+current task: task1
+i: 858
+current task: task1
+i: 859
+current task: task1
+i: 860
+current task: task1
+i: 861
+current task: task1
+i: 862
+current task: task1
+i: 863
+current task: task1
+i: 864
+current task: task1
+i: 865
+current task: task1
+i: 866
+current task: task1
+i: 867
+current task: task1
+i: 868
+current task: task1
+i: 869
+current task: task1
+i: 870
+current task: task1
+i: 871
+current task: task1
+i: 872
+current task: task1
+i: 873
+current task: task1
+i: 874
+current task: task1
+i: 875
+current task: task1
+i: 876
+current task: task1
+i: 877
+current task: task1
+i: 878
+current task: task1
+i: 879
+current task: task1
+i: 880
+current task: task1
+i: 881
+current task: task1
+i: 882
+current task: task1
+i: 883
+current task: task1
+i: 884
+current task: task1
+i: 885
+current task: task1
+i: 886
+current task: task1
+i: 887
+current task: task1
+i: 888
+current task: task1
+i: 889
+current task: task1
+i: 890
+current task: task1
+i: 891
+current task: task1
+i: 892
+current task: task1
+i: 893
+current task: task1
+i: 894
+current task: task1
+i: 895
+current task: task1
+i: 896
+current task: task1
+i: 897
+current task: task1
+i: 898
+current task: task1
+i: 899
+current task: task1
+i: 900
+current task: task1
+i: 901
+current task: task1
+i: 902
+current task: task1
+i: 903
+current task: task1
+i: 904
+current task: task1
+i: 905
+current task: task1
+i: 906
+current task: task1
+i: 907
+current task: task1
+i: 908
+current task: task1
+i: 909
+current task: task1
+i: 910
+current task: task1
+i: 911
+current task: task1
+i: 912
+current task: task1
+i: 913
+current task: task1
+i: 914
+current task: task1
+i: 915
+current task: task1
+i: 916
+current task: task1
+i: 917
+current task: task1
+i: 918
+current task: task1
+i: 919
+current task: task1
+i: 920
+current task: task1
+i: 921
+current task: task1
+i: 922
+current task: task1
+i: 923
+current task: task1
+i: 924
+current task: task1
+i: 925
+current task: task1
+i: 926
+current task: task1
+i: 927
+current task: task1
+i: 928
+current task: task1
+i: 929
+current task: task1
+i: 930
+current task: task1
+i: 931
+current task: task1
+i: 932
+current task: task1
+i: 933
+current task: task1
+i: 934
+current task: task1
+i: 935
+current task: task1
+i: 936
+current task: task1
+i: 937
+current task: task1
+i: 938
+current task: task1
+i: 939
+current task: task1
+i: 940
+current task: task1
+i: 941
+current task: task1
+i: 942
+current task: task1
+i: 943
+current task: task1
+i: 944
+current task: task1
+i: 945
+current task: task1
+i: 946
+current task: task1
+i: 947
+current task: task1
+i: 948
+current task: task1
+i: 949
+current task: task1
+i: 950
+current task: task1
+i: 951
+current task: task1
+i: 952
+current task: task1
+i: 953
+current task: task1
+i: 954
+current task: task1
+i: 955
+current task: task1
+i: 956
+current task: task1
+i: 957
+current task: task1
+i: 958
+current task: task1
+i: 959
+current task: task1
+i: 960
+current task: task1
+i: 961
+current task: task1
+i: 962
+current task: task1
+i: 963
+current task: task1
+i: 964
+current task: task1
+i: 965
+current task: task1
+i: 966
+current task: task1
+i: 967
+current task: task1
+i: 968
+current task: task1
+i: 969
+current task: task1
+i: 970
+current task: task1
+i: 971
+current task: task1
+i: 972
+current task: task1
+i: 973
+current task: task1
+i: 974
+current task: task1
+i: 975
+current task: task1
+i: 976
+current task: task1
+i: 977
+current task: task1
+i: 978
+current task: task1
+i: 979
+current task: task1
+i: 980
+current task: task1
+i: 981
+current task: task1
+i: 982
+current task: task1
+i: 983
+current task: task1
+i: 984
+current task: task1
+i: 985
+current task: task1
+i: 986
+current task: task1
+i: 987
+current task: task1
+i: 988
+current task: task1
+i: 989
+current task: task1
+i: 990
+current task: task1
+i: 991
+current task: task1
+i: 992
+current task: task1
+i: 993
+current task: task1
+i: 994
+current task: task1
+i: 995
+current task: task1
+i: 996
+current task: task1
+i: 997
+current task: task1
+i: 998
+current task: task1
+i: 999
+current task: task1
+[       OK ] Sequence.SequenceTest (4 ms)
+[----------] 1 test from Sequence (4 ms total)
+
+[----------] 2 tests from Statistics
+[ RUN      ] Statistics.StatisticsTest
 this is the statistics test
 (3,2),(4,3)
 slope : 1
@@ -24,3 +2109,17 @@ stdx : 61.9282
 stdy : -nan
 correlation : 1
 predicty(0) : -17.7778
+[       OK ] Statistics.StatisticsTest (0 ms)
+[ RUN      ] Statistics.unity_slope
+the slope was 1
+[       OK ] Statistics.unity_slope (0 ms)
+[----------] 2 tests from Statistics (0 ms total)
+
+[----------] 1 test from ListenersTest
+[ RUN      ] ListenersTest.LeaksWater
+[       OK ] ListenersTest.LeaksWater (0 ms)
+[----------] 1 test from ListenersTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 8 tests from 7 test cases ran. (5 ms total)
+[  PASSED  ] 8 tests.
