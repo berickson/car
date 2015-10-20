@@ -12,6 +12,7 @@ public:
   Mpu9150 * mpu;
   bool done = false;
   unsigned long start_millis;
+  unsigned long last_activity_ms = 0;
 
   bool is_done();
   void init(Mpu9150 * _mpu);

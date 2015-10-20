@@ -33,15 +33,13 @@ void CircleMode::begin() {
 
   pid.set_min_max_output(-1,1);
   start_millis = millis();
+  last_activity_ms = start_millis;
   done = false;
 }
 
 void CircleMode::execute() {
   if(done) {
     return;
-  }
-  if(abs(degrees_turned-angle_to_turn) < 1) { // todo: maybe put some logic about slow velocity
-    end();
   }
   log(LOG_TRACE, "circle has turned " + degrees_turned);
   double ground_angle = mpu->ground_angle();
@@ -57,6 +55,14 @@ void CircleMode::execute() {
   double v = pid.get_output();  // will be in range (-1,1)
   esc.set_velocity(v);
   steering.writeMicroseconds(1100); // turn left todo: make steer commands
+  if(abs(v)>0.1) {
+    last_activity_ms = millis();
+  }
+  // end if we haven't done anything for 0.5 seconds
+  if(millis() - last_activity_ms > 500) { 
+    end();
+  }
+
 }
 
 void CircleMode::end() {
