@@ -9,7 +9,7 @@ extern PwmInput rx_steer;
 extern PwmInput rx_speed;
 
 void ManualMode::begin() {
-  Serial.write("begin of manual mode");
+  Serial.println("begin of manual mode");
 }
 
 void ManualMode::end() {
