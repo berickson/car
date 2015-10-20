@@ -2078,8 +2078,8 @@ i: 998
 current task: task1
 i: 999
 current task: task1
-[       OK ] Sequence.SequenceTest (22 ms)
-[----------] 1 test from Sequence (22 ms total)
+[       OK ] Sequence.SequenceTest (2 ms)
+[----------] 1 test from Sequence (2 ms total)
 
 [----------] 4 tests from Statistics
 [ RUN      ] Statistics.large_x_values
@@ -2118,5 +2118,5 @@ the slope was 1
 [----------] 4 tests from Statistics (1 ms total)
 
 [----------] Global test environment tear-down
-[==========] 9 tests from 6 test cases ran. (24 ms total)
+[==========] 9 tests from 6 test cases ran. (4 ms total)
 [  PASSED  ] 9 tests.

@@ -222,6 +222,7 @@ Task * tasks[] = {&manual_mode, &circle_mode, &follow_mode};
 
 Fsm::Edge edges[] = {{"circle", "non-neutral", "manual"},
                      {"circle", "manual", "manual"},
+                     {"circle", "done", "manual"},
                      {"follow", "non-neutral", "manual"},
                      {"follow", "manual", "manual"},
                      {"manual", "circle", "circle"},

@@ -36,6 +36,12 @@ void CircleMode::begin() {
 }
 
 void CircleMode::execute() {
+  if(done) {
+    return;
+  }
+  if(abs(degrees_turned-angle_to_turn) < 1) { // todo: maybe put some logic about slow velocity
+    end();
+  }
   log(LOG_TRACE, "circle has turned " + degrees_turned);
   double ground_angle = mpu->ground_angle();
   double angle_diff = last_angle-ground_angle;
