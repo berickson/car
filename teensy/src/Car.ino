@@ -231,7 +231,7 @@ Fsm::Edge edges[] = {{"circle", "non-neutral", "manual"},
 
 Fsm modes(tasks, count_of(tasks), edges, count_of(edges));
 
-void setup() {gr
+void setup() {
   Serial.begin(9600);
 
   interpreter.init(commands,count_of(commands));
