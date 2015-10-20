@@ -33,6 +33,9 @@ void Fsm::execute() {
   }
 
   current_task->execute();
+  if(current_task->is_done()) {
+    set_event("done");
+  }
 }
 
 void Fsm::set_current_task(const char * name) {
