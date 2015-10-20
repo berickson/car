@@ -8,9 +8,9 @@ public:
 
   Servo * speed;
 
-  const int min_forward_us = 1550;
+  const int min_forward_us = 1560;
   const int max_forward_us = 1600;
-  const int min_reverse_us = 1450;
+  const int min_reverse_us = 1440;
   const int max_reverse_us = 1400;
   
   const int forward_us =  1560;
