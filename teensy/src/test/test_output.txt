@@ -1,4 +1,4 @@
-[==========] Running 8 tests from 7 test cases.
+[==========] Running 9 tests from 6 test cases.
 [----------] Global test environment set-up.
 [----------] 1 test from Beeper
 [ RUN      ] Beeper.BeeperTest
@@ -72,8 +72,8 @@ clamped to 1000 output: 10
 output without kd: 5
 output with kd: 0
 output with ki: 0.5
-[       OK ] Pid.PidTest (1 ms)
-[----------] 1 test from Pid (1 ms total)
+[       OK ] Pid.PidTest (0 ms)
+[----------] 1 test from Pid (0 ms total)
 
 [----------] 1 test from Sequence
 [ RUN      ] Sequence.SequenceTest
@@ -2078,48 +2078,45 @@ i: 998
 current task: task1
 i: 999
 current task: task1
-[       OK ] Sequence.SequenceTest (4 ms)
-[----------] 1 test from Sequence (4 ms total)
+[       OK ] Sequence.SequenceTest (22 ms)
+[----------] 1 test from Sequence (22 ms total)
 
-[----------] 2 tests from Statistics
-[ RUN      ] Statistics.StatisticsTest
-this is the statistics test
+[----------] 4 tests from Statistics
+[ RUN      ] Statistics.large_x_values
 (3,2),(4,3)
 slope : 1
 stdx : 0.5
 stdy : 0.5
 correlation : 1
-predicty(0) : -1
-(pow(2.,33) ,0),pow(2.,33)+1,1
+predicty(0) : 2
 slope : 1
 stdx : 0.5
 stdy : 0.5
 correlation : 1
 predicty(0) : -1022
 predicty(1024) : 2
+[       OK ] Statistics.large_x_values (1 ms)
+[ RUN      ] Statistics.linear_regression
 below should be int 26.7808 slope 0.6438
 slope : 0.643836
 stdx : 12.083
 stdy : 7.34847
 correlation : 0.693053
 predicty(0) : 26.7808
-below should be slope 0.556 int 17.778
+[       OK ] Statistics.linear_regression (0 ms)
+[ RUN      ] Statistics.algebralab_example
+below should be slope 0.556 intercept -17.778
 slope : 0.555556
 stdx : 61.9282
 stdy : -nan
 correlation : 1
 predicty(0) : -17.7778
-[       OK ] Statistics.StatisticsTest (0 ms)
+[       OK ] Statistics.algebralab_example (0 ms)
 [ RUN      ] Statistics.unity_slope
 the slope was 1
 [       OK ] Statistics.unity_slope (0 ms)
-[----------] 2 tests from Statistics (0 ms total)
-
-[----------] 1 test from ListenersTest
-[ RUN      ] ListenersTest.LeaksWater
-[       OK ] ListenersTest.LeaksWater (0 ms)
-[----------] 1 test from ListenersTest (0 ms total)
+[----------] 4 tests from Statistics (1 ms total)
 
 [----------] Global test environment tear-down
-[==========] 8 tests from 7 test cases ran. (5 ms total)
-[  PASSED  ] 8 tests.
+[==========] 9 tests from 6 test cases ran. (24 ms total)
+[  PASSED  ] 9 tests.
