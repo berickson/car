@@ -17,7 +17,7 @@ void CircleMode::init(Mpu9150 * _mpu) {
 }
 
 void CircleMode::begin() {
-  Serial.trace("begin of circle mode");
+  Serial.write("begin of circle mode");
   last_angle = mpu->ground_angle();
   degrees_turned = 0;
 
