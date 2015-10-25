@@ -363,7 +363,7 @@ void loop() {
   }
 
   if(every_second && TRACE_MPU ) {
-    mpu9150.trace_status();
+    mpu9150.log_status();
   }
 
   // loop speed reporting

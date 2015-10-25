@@ -5,6 +5,7 @@
 #include "helper_3dmath.h"
 #include "MPU6050.h"
 #include "vector_math.h"
+#include "Logger.h"
 
 #define INTERRUPT_PIN 12
 #define INTERRUPT_NUMBER 12
@@ -34,7 +35,7 @@ public:
 
   void setup();
   double ground_angle();
-  void trace_status();
+  void log_status();
 
   void execute();
   void zero();

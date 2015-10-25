@@ -65,44 +65,13 @@ double Mpu9150::ground_angle() {
 }
 
 
-void Mpu9150::trace_status() {
-
-  Serial.print(readingCount);
-  Serial.print("\t");
-  Serial.print("angle");
-  Serial.print("\t");
-  Serial.print(ground_angle());
-  Serial.print("\t");
-  Serial.print("quat\t");
-  Serial.print(q.w);
-  Serial.print("\t");
-  Serial.print(q.x);
-  Serial.print("\t");
-  Serial.print(q.y);
-  Serial.print("\t");
-  Serial.print(q.z);
-  Serial.print("\t");
-  Serial.print("gravity\t");
-  Serial.print(gravity.x);
-  Serial.print("\t");
-  Serial.print(gravity.y);
-  Serial.print("\t");
-  Serial.print(gravity.z);
-  Serial.print("\t");
-  Serial.print("aa\t");
-  Serial.print(aa.x);
-  Serial.print("\t");
-  Serial.print(aa.y);
-  Serial.print("\t");
-  Serial.print(aa.z);
-  Serial.print("\t");
-  Serial.print("mag\t");
-  Serial.print(mag.x);
-  Serial.print("\t");
-  Serial.print(mag.y);
-  Serial.print("\t");
-  Serial.print(mag.z);
-  Serial.println();
+void Mpu9150::log_status() {
+  log(TRACE_MPU, readingCount + 
+    ",angle,"+ground_angle() +
+    ",quat,"+q.w+"," +q.x+"," +q.y+"," +q.z+
+    ",gravity,"+gravity.x+","+gravity.y+","+gravity.z+
+    ",aa,"+aa.x+","+aa.y+","+aa.z+
+    ",mag,"+mag.x+","+mag.y+","+mag.z);
 }
 
 

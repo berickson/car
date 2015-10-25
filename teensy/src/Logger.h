@@ -15,5 +15,5 @@ extern bool TRACE_DYNAMICS;
 
 #define log(flag,s)    \
 if(flag) {             \
-    Serial.println((String) #flag + ": " + s); \
+    Serial.println((String) #flag + "," + s); \
 } 
