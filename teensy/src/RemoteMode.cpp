@@ -36,7 +36,7 @@ void RemoteMode::execute() {
 void RemoteMode::command_steer_and_esc(unsigned int _steer_us, unsigned int _esc_us) {
   last_command_ms = millis();
   steer_us = _steer_us;
-  esc_us = esc_us;
+  esc_us = _esc_us;
   update_pulses();
 }
 
