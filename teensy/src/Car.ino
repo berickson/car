@@ -13,6 +13,7 @@
 #include "CircleMode.h"
 #include "ManualMode.h"
 #include "FollowMode.h"
+#include "RemoteMode.h"
 #include "Fsm.h"
 
 #define count_of(a) (sizeof(a)/sizeof(a[0]))
@@ -172,6 +173,28 @@ void command_circle() {
   modes.set_event("circle");
 }
 
+void command_remote_control() {
+  modes.set_event("remote");
+}
+
+extern RemoteMode remote_mode;
+
+void command_pulse_steer_and_esc() {
+  unsigned int steer_us;
+  unsigned int esc_us;
+  String & args = interpreter.command_args;
+  log(LOG_TRACE,"pse args" + args);
+  int i = args.indexOf(",");
+  if(i == -1) {
+    log(LOG_ERROR,"invalid args to pse " + args);
+    return;
+  }
+  String s_str = args.substring(0, i);
+  String s_esc = args.substring(i+1);
+    
+  remote_mode.command_steer_and_esc(s_str.toInt(),  s_esc.toInt());
+}
+
 void command_follow() {
   modes.set_event("follow");
 }
@@ -201,7 +224,9 @@ const Command commands[] = {
   {"tl-", "trace loop speed off", trace_loop_speed_off},
   {"c", "circle", command_circle},
   {"m", "manual", command_manual},
-  {"f", "follow", command_follow}
+  {"f", "follow", command_follow},
+  {"rc", "remote control", command_remote_control},
+  {"pse", "pulse steer, esc", command_pulse_steer_and_esc}
 };
 
 void help() {
@@ -217,8 +242,9 @@ Mpu9150 mpu9150;
 CircleMode circle_mode;
 ManualMode manual_mode;
 FollowMode follow_mode;
+RemoteMode remote_mode;
 
-Task * tasks[] = {&manual_mode, &circle_mode, &follow_mode};
+Task * tasks[] = {&manual_mode, &circle_mode, &follow_mode, &remote_mode};
 
 Fsm::Edge edges[] = {{"circle", "non-neutral", "manual"},
                      {"circle", "manual", "manual"},
@@ -227,6 +253,10 @@ Fsm::Edge edges[] = {{"circle", "non-neutral", "manual"},
                      {"follow", "manual", "manual"},
                      {"manual", "circle", "circle"},
                      {"manual", "follow", "follow"},
+                     {"manual", "remote", "remote"},
+                     {"remote", "manual", "manual"},
+                     {"remote", "non-neutral", "manual"},
+                     {"remote", "done", "manual"}
                   };
 
 Fsm modes(tasks, count_of(tasks), edges, count_of(edges));
@@ -240,6 +270,7 @@ void setup() {
   circle_mode.name = "circle";
   manual_mode.name = "manual";
   follow_mode.name = "follow";
+  remote_mode.name = "remote";
 
   steering.attach(PIN_U_STEER);
   steering.writeMicroseconds(1500);
