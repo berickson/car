@@ -8,9 +8,10 @@ import glob
 import os
 from select import select
 
+sleep_time = 0.01
+
 def log(l):
   try:
-
     log_file = open('/var/log/car/output.log','a')
     ts = datetime.datetime.now()
     log_file.write("{0},{1}\n".format(ts,l.strip()))
@@ -22,18 +23,18 @@ def log(l):
 
 def get_commands(command_file):
   while True:
-    l = os.read(command_file,1000).strip()
-    if(l != ''):
-      log('COMMAND: {0}'.format(l))
-      yield(l)
+    buffer = os.read(command_file,1000).strip()
+    if(buffer != ''):
+      for l in buffer.split('\n'):
+        log('COMMAND,{0}'.format(l))
+        yield(l)
     else:
       return
       
 def get_output(s):
-  if(s.inWaiting() > 0):
-    while(s.inWaiting() > 0):
-      l = s.readline()
-      yield l
+  while(s.inWaiting() > 0):
+    yield s.readline()
+
       
 def run(command_file):
   connected = False
@@ -53,9 +54,9 @@ def run(command_file):
               log(o)
               did_work = True
             if did_work == False:
-              time.sleep(0.001)
+              time.sleep(sleep_time)
         except IOError:
-          time.sleep(0.001)
+          time.sleep(sleep_time)
           if (connected):
             log('serial disconnected')
             connected = False    
@@ -65,5 +66,6 @@ def run(command_file):
         connected = False
       
 command_file = os.open('/dev/car/command',os.O_RDONLY | os.O_NONBLOCK)
+
 run(command_file)
 
