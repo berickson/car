@@ -191,7 +191,7 @@ void command_pulse_steer_and_esc() {
   }
   String s_str = args.substring(0, i);
   String s_esc = args.substring(i+1);
-    
+
   remote_mode.command_steer_and_esc(s_str.toInt(),  s_esc.toInt());
 }
 
@@ -291,7 +291,7 @@ void setup() {
   attachInterrupt(int_str, rx_str_handler, CHANGE);
   attachInterrupt(int_esc, rx_spd_handler, CHANGE);
 
-  pinMode(PIN_MOTOR_RPM, INPUT);  
+  pinMode(PIN_MOTOR_RPM, INPUT);
   attachInterrupt(PIN_MOTOR_RPM, motor_rpm_handler, CHANGE);
 
 
@@ -332,7 +332,7 @@ void loop() {
   bool every_second = every_n_ms(last_loop_time_ms, loop_time_ms, 1000);
   bool every_100_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 100);
   bool every_20_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 20);
-  
+
   if(every_second) {
     log(LOG_RPM, "motor_pulses: " + motor_pulses ) ;
     motor_pulses = 0;
@@ -358,7 +358,7 @@ void loop() {
   }
 
   log(TRACE_RX, "rx_speed: " + rx_speed.pulse_us() + "rx_steer: " + rx_steer.pulse_us());
-  
+
   // send events through modes state machine
   if(new_rx_event) {
     if(rx_events.recent.matches(circle_pattern, count_of(circle_pattern))) {
@@ -371,7 +371,7 @@ void loop() {
       modes.set_event("non-neutral");
     }
   }
-  
+
   if(every_20_ms) {
     modes.execute();
   }
@@ -385,10 +385,10 @@ void loop() {
     rx_speed.trace();
     Serial.println();
   }
-  if(every_100_ms && TRACE_DYNAMICS) {
-    log(TRACE_DYNAMICS, 
-       "str, " + steering.readMicroseconds() 
-       + ", esc," + speed.readMicroseconds() 
+  if(every_20_ms && TRACE_DYNAMICS) {
+    log(TRACE_DYNAMICS,
+       "str, " + steering.readMicroseconds()
+       + ", esc," + speed.readMicroseconds()
        + ", aa, "+ (mpu9150.aa.x - mpu9150.a0.x) + ", " + (mpu9150.aa.y  - mpu9150.a0.y)+", "+ (mpu9150.aa.z  - mpu9150.a0.z)
        +", angle, "+mpu9150.ground_angle());
   }
