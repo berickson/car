@@ -25,31 +25,30 @@ def kbhit():
   dr,dw,de = select([sys.stdin],[],[],0)
   return dr <> []
 
-output = open('/var/log/car/output.log','r')
-output.seek(0,2) # go to end of file
+#output = open('/var/log/car/output.log','r')
+#output.seek(0,2) # go to end of file
 
-write_command_to_car('td+\n')
-
-
-recording = open(recording_file_path,'w')
+#write_command_to_car('td+\n')
 
 
-print('recording, press any key to stop')
-while not kbhit():
-  s = output.readline()
-  if s:
-    fields = s.split(',')
-    if len(fields) > 1:
-      if fields[1] == 'TRACE_DYNAMICS':
-#        print('str: {0} esc: {1}'.format(fields[3], fields[5]))
-        recording.write(s);
-  else:
-    time.sleep(0.01)
+#recording = open(recording_file_path,'w')
 
-recording.close()
 
-print('stopped recording, press any key to play back')
-getch()
+#print('recording, press any key to stop')
+#while not kbhit():
+#  s = output.readline()
+#  if s:
+#    fields = s.split(',')
+#    if len(fields) > 1:
+#      if fields[1] == 'TRACE_DYNAMICS':
+#        recording.write(s);
+#  else:
+#    time.sleep(0.01)
+
+#recording.close()
+
+#print('stopped recording, press any key to play back')
+#getch()
 
 print('playing back recording')
 
