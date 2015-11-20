@@ -1,6 +1,6 @@
 #pragma once
 
-extern bool LOG_RPM;
+
 extern bool LOG_ERROR;
 extern bool LOG_INFO;
 extern bool LOG_TRACE;

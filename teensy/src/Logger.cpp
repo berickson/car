@@ -1,4 +1,3 @@
-bool LOG_RPM = false;
 bool LOG_ERROR = true;
 bool LOG_INFO = false;
 bool LOG_TRACE = false;

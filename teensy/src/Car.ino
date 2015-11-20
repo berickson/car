@@ -333,10 +333,6 @@ void loop() {
   bool every_100_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 100);
   bool every_20_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 20);
 
-  if(every_second) {
-    log(LOG_RPM, "motor_pulses: " + motor_pulses ) ;
-    motor_pulses = 0;
-  }
 
   // get commands from usb
   interpreter.execute();
@@ -390,7 +386,8 @@ void loop() {
        "str, " + steering.readMicroseconds()
        + ", esc," + speed.readMicroseconds()
        + ", aa, "+ (mpu9150.aa.x - mpu9150.a0.x) + ", " + (mpu9150.aa.y  - mpu9150.a0.y)+", "+ (mpu9150.aa.z  - mpu9150.a0.z)
-       +", angle, "+mpu9150.ground_angle());
+       +", angle, "+mpu9150.ground_angle())
+       +",rpm,"+motor_pulses;
   }
 
   if(every_second && TRACE_MPU ) {

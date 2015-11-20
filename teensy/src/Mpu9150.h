@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Wire.h"
+//#include "i2c_t3.h"
 #include "I2Cdev.h"
 #include "helper_3dmath.h"
 #include "MPU6050.h"
