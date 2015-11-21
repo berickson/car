@@ -438,11 +438,19 @@ void loop() {
   }
   if(every_20_ms && TRACE_DYNAMICS) {
     unsigned long pulses = motor_pulses;
-    unsigned long rpm_pps = ((pulses - last_reported_motor_pulses)* 1000) / (loop_time_ms - last_reported_motor_pulses_ms);
+    unsigned long elapsed_pulses = pulses - last_reported_motor_pulses;
+    unsigned long rpm_pps = ((elapsed_pulses)* 1000) / (loop_time_ms - last_reported_motor_pulses_ms);
     last_reported_motor_pulses = pulses;
     last_reported_motor_pulses_ms = loop_time_ms;
     unsigned long esc = speed.readMicroseconds();
     calculated_rpm_pps = calculate_rpm_pps(esc,rpm_pps, calculated_rpm_pps);
+    long delta_pulse = elapsed_pulses;
+    if(calculated_rpm_pps < 0) {
+      delta_pulse = -delta_pulse;
+    }
+    if(calculated_rpm_pps == 0) {
+      delta_pulse = 0;
+    }
     
     
     log(TRACE_DYNAMICS,
@@ -450,7 +458,7 @@ void loop() {
        + ", esc," + esc
        + ", aa, "+ (mpu9150.aa.x - mpu9150.a0.x) + ", " + (mpu9150.aa.y  - mpu9150.a0.y)+", "+ (mpu9150.aa.z  - mpu9150.a0.z)
        +", angle, "+mpu9150.ground_angle()
-       +",rpm_pps(meas,calc),"+ rpm_pps + "," + calculated_rpm_pps
+       +",rpm_pps(meas,calc),"+ rpm_pps + "," + calculated_rpm_pps + ", " + delta_pulse
        );
   }
 
