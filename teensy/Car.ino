@@ -387,7 +387,7 @@ void loop() {
   }
   if(every_20_ms && TRACE_DYNAMICS) {
     unsigned long pulses = motor_pulses;
-    unsigned long rpm_pps = (pulses - last_reported_motor_pulses)* 1000 / (last_reported_motor_pulses - loop_time_ms);
+    unsigned long rpm_pps = ((pulses - last_reported_motor_pulses)* 1000) / (loop_time_ms - last_reported_motor_pulses);
     last_reported_motor_pulses = pulses;
     last_reported_motor_pulses_ms = loop_time_ms;
     
