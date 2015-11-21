@@ -78,6 +78,7 @@ CommandInterpreter interpreter;
 unsigned long motor_pulses = 0;
 unsigned long last_reported_motor_pulses = 0;
 unsigned long last_reported_motor_pulses_ms = 0;
+long calculated_rpm_pps = 0;
 
 
 
@@ -183,8 +184,6 @@ void command_remote_control() {
 extern RemoteMode remote_mode;
 
 void command_pulse_steer_and_esc() {
-  unsigned int steer_us;
-  unsigned int esc_us;
   String & args = interpreter.command_args;
   log(LOG_TRACE,"pse args" + args);
   int i = args.indexOf(",");
@@ -322,9 +321,61 @@ void setup() {
 // returns true if loop time passes through n ms boundary
 bool every_n_ms(unsigned long last_loop_ms, unsigned long loop_ms, unsigned long ms) {
   return (last_loop_ms % ms) + (loop_ms - last_loop_ms) >= ms;
-
 }
 
+
+int calculate_rpm_pps(unsigned int esc, unsigned int rpm_pps, int last_calculated_rpm_pps) {
+
+  bool reverse_esc = esc <= 1450;
+  bool forward_esc = esc >= 1550;
+  bool neutral_esc = !forward_esc && !reverse_esc;
+  bool ambiguous_pps = rpm_pps < 600;
+  bool was_reverse = last_calculated_rpm_pps < 0;
+  bool increasing_pps = rpm_pps > abs(last_calculated_rpm_pps);
+  bool decreasing_pps = rpm_pps < abs(last_calculated_rpm_pps);
+  
+  ///////////////////////////////////////////////////////////
+  // see if we are sitting still
+  // zero returns zero
+  if(rpm_pps == 0)
+    return 0;
+  
+  // was zero, not accelerating
+  if(last_calculated_rpm_pps == 0 && neutral_esc && ambiguous_pps)  {
+    return 0;
+  }
+  
+  ///////////////////////////////////////////////////////////
+  // see if we have changed direction from zero
+
+  // check for reverse from zero
+  if(reverse_esc && last_calculated_rpm_pps == 0) {
+    return -rpm_pps;
+  }
+  // check for forward from zero
+  if(forward_esc && last_calculated_rpm_pps == 0) {
+    return rpm_pps;
+  }
+  
+  //////////////////////////////////////////////////////
+  // see if we have changed direction from close to zero
+  if(abs(last_calculated_rpm_pps) < 200) {
+    if(increasing_pps && reverse_esc) {
+      return -rpm_pps;
+    }
+    if(increasing_pps && forward_esc) {
+      return rpm_pps;
+    }
+  }
+  
+  
+  // assume we are going in the same direction as before
+  if(last_calculated_rpm_pps < 0)
+    return -rpm_pps;
+  else
+    return rpm_pps;
+  
+}
 
 void loop() {
   // set global loop values
@@ -390,13 +441,16 @@ void loop() {
     unsigned long rpm_pps = ((pulses - last_reported_motor_pulses)* 1000) / (loop_time_ms - last_reported_motor_pulses_ms);
     last_reported_motor_pulses = pulses;
     last_reported_motor_pulses_ms = loop_time_ms;
+    unsigned long esc = speed.readMicroseconds();
+    calculated_rpm_pps = calculate_rpm_pps(esc,rpm_pps, calculated_rpm_pps);
+    
     
     log(TRACE_DYNAMICS,
        "str, " + steering.readMicroseconds()
-       + ", esc," + speed.readMicroseconds()
+       + ", esc," + esc
        + ", aa, "+ (mpu9150.aa.x - mpu9150.a0.x) + ", " + (mpu9150.aa.y  - mpu9150.a0.y)+", "+ (mpu9150.aa.z  - mpu9150.a0.z)
        +", angle, "+mpu9150.ground_angle()
-       +",rpm_pps,"+ rpm_pps
+       +",rpm_pps(meas,calc),"+ rpm_pps + "," + calculated_rpm_pps
        );
   }
 
