@@ -76,6 +76,9 @@ Beeper beeper;
 Blinker blinker;
 CommandInterpreter interpreter;
 unsigned long motor_pulses = 0;
+unsigned long last_reported_motor_pulses = 0;
+unsigned long last_reported_motor_pulses_ms = 0;
+
 
 
 // diagnostics for reporting loop speeds
@@ -322,6 +325,7 @@ bool every_n_ms(unsigned long last_loop_ms, unsigned long loop_ms, unsigned long
 
 }
 
+
 void loop() {
   // set global loop values
   loop_count++;
@@ -382,12 +386,18 @@ void loop() {
     Serial.println();
   }
   if(every_20_ms && TRACE_DYNAMICS) {
+    unsigned long pulses = motor_pulses;
+    unsigned long rpm_pps = (pulses - last_reported_motor_pulses)* 1000 / (last_reported_motor_pulses - loop_time_ms);
+    last_reported_motor_pulses = pulses;
+    last_reported_motor_pulses_ms = loop_time_ms;
+    
     log(TRACE_DYNAMICS,
        "str, " + steering.readMicroseconds()
        + ", esc," + speed.readMicroseconds()
        + ", aa, "+ (mpu9150.aa.x - mpu9150.a0.x) + ", " + (mpu9150.aa.y  - mpu9150.a0.y)+", "+ (mpu9150.aa.z  - mpu9150.a0.z)
        +", angle, "+mpu9150.ground_angle()
-       +",rpm,"+motor_pulses);
+       +",rpm_pps,"+ rpm_pps
+       );
   }
 
   if(every_second && TRACE_MPU ) {
