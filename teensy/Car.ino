@@ -329,7 +329,7 @@ int calculate_rpm_pps(unsigned int esc, unsigned int rpm_pps, int last_calculate
   bool reverse_esc = esc <= 1450;
   bool forward_esc = esc >= 1550;
   bool neutral_esc = !forward_esc && !reverse_esc;
-  bool ambiguous_pps = rpm_pps < 100;
+  bool ambiguous_pps = rpm_pps < 1000;
   bool was_reverse = last_calculated_rpm_pps < 0;
   bool increasing_pps = rpm_pps > abs(last_calculated_rpm_pps);
   bool decreasing_pps = rpm_pps < abs(last_calculated_rpm_pps);
