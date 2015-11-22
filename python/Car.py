@@ -2,6 +2,9 @@ import time
 import dateutil.parser
 import threading
 
+#returns theta2-theta1 in range of [-180,180)
+def angle_diff(theta1, theta2):
+  return (theta2 - theta1  + 180 )% 360 - 180
 
 class Dynamics:
   def __init__(self):
@@ -19,14 +22,13 @@ class Dynamics:
       self.rpm_pps = int(fields[14])
       self.rpm_ticks = int(fields[15])
       self.odometer = int(fields[16])
+      self.ping_inches = float(fields[18])
       self.reading_count = self.reading_count + 1
     except (IndexError, ValueError) as e:
       pass
-   
+
 
 class Car:
-
-
   def __init__(self):
     print 'car init'
     print 'enabling dynamics output'
@@ -36,6 +38,11 @@ class Car:
     self.output_thread = threading.Thread(target=self._monitor_output, args = ())
     self.output_thread.daemon = True
     self.output_thread.start()
+    
+    self.min_forward_speed = 1545
+    self.min_reverse_speed = 1445
+
+    
     
     
   def __del__(self):
@@ -56,9 +63,10 @@ class Car:
       s = self.output.readline()
       if s:
         fields = s.split(',')
-        if len(fields) > 1:
-          if fields[1] == 'TRACE_DYNAMICS':
-            self.dynamics.set_from_log(fields)
+        if fields != None:
+          if len(fields) > 1:
+            if fields[1] == 'TRACE_DYNAMICS':
+              self.dynamics.set_from_log(fields)
       else:
         time.sleep(0.001)
         
@@ -92,10 +100,10 @@ class Car:
     self.set_rc_mode()
     
     while self.dynamics.odometer < goal_odometer:
-      speed = 1550
+      speed = self.min_forward_speed + 5
     
       # adjust steering
-      heading_error = self.dynamics.heading - goal_heading;
+      heading_error = angle_diff(goal_heading, self.dynamics.heading)
       print('current ticks {0}  goal ticks {1} heading_error {2} rpm_pps {3}'.format(self.dynamics.odometer, goal_odometer, heading_error, self.dynamics.rpm_pps))
       if (heading_error) > 1.0:
         print "heading error > 1.0"
@@ -108,7 +116,7 @@ class Car:
      
       # adjust speed
       if self.dynamics.rpm_pps > 350:
-        speed = 1540
+        speed = self.min_forward_speed
       
        
       self.set_speed_and_steering(speed, steering)

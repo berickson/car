@@ -327,8 +327,8 @@ bool every_n_ms(unsigned long last_loop_ms, unsigned long loop_ms, unsigned long
 
 int calculate_rpm_pps(unsigned int esc, unsigned int rpm_pps, int last_calculated_rpm_pps) {
 
-  bool reverse_esc = esc <= 1450;
-  bool forward_esc = esc >= 1550;
+  bool reverse_esc = esc <= 1446;
+  bool forward_esc = esc >= 1544;
   bool neutral_esc = !forward_esc && !reverse_esc;
   bool ambiguous_pps = rpm_pps < 1000;
   bool was_reverse = last_calculated_rpm_pps < 0;
@@ -461,6 +461,7 @@ void loop() {
        + ", aa, "+ (mpu9150.aa.x - mpu9150.a0.x) + ", " + (mpu9150.aa.y  - mpu9150.a0.y)+", "+ (mpu9150.aa.z  - mpu9150.a0.z)
        +", angle, "+mpu9150.ground_angle()
        +",rpm,"+ rpm_pps + "," + calculated_rpm_pps + ", " + delta_pulse + "," + motor_pulse_odometer
+       +",ping,"+ping.inches()
        );
   }
 
