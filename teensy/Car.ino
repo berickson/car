@@ -79,6 +79,7 @@ unsigned long motor_pulses = 0;
 unsigned long last_reported_motor_pulses = 0;
 unsigned long last_reported_motor_pulses_ms = 0;
 long calculated_rpm_pps = 0;
+long motor_pulse_odometer = 0;
 
 
 
@@ -451,6 +452,7 @@ void loop() {
     if(calculated_rpm_pps == 0) {
       delta_pulse = 0;
     }
+    motor_pulse_odometer += delta_pulse;
     
     
     log(TRACE_DYNAMICS,
@@ -458,7 +460,7 @@ void loop() {
        + ", esc," + esc
        + ", aa, "+ (mpu9150.aa.x - mpu9150.a0.x) + ", " + (mpu9150.aa.y  - mpu9150.a0.y)+", "+ (mpu9150.aa.z  - mpu9150.a0.z)
        +", angle, "+mpu9150.ground_angle()
-       +",rpm,"+ rpm_pps + "," + calculated_rpm_pps + ", " + delta_pulse
+       +",rpm,"+ rpm_pps + "," + calculated_rpm_pps + ", " + delta_pulse + "," + motor_pulse_odometer
        );
   }
 

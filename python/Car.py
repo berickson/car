@@ -18,9 +18,9 @@ class Dynamics:
       self.rpm_pps_raw = int(fields[13])
       self.rpm_pps = int(fields[14])
       self.rpm_ticks = int(fields[15])
+      self.odometer = int(fields[16])
       self.reading_count = self.reading_count + 1
     except (IndexError, ValueError) as e:
-      #print fields
       pass
    
 
@@ -29,9 +29,8 @@ class Car:
 
   def __init__(self):
     print 'car init'
-    print 'enabling dyanics output'
+    print 'enabling dynamics output'
     self.quit = False
-    self.odometer = 0
     self.write_command('td+')
     self.dynamics = Dynamics()
     self.output_thread = threading.Thread(target=self._monitor_output, args = ())
@@ -60,7 +59,6 @@ class Car:
         if len(fields) > 1:
           if fields[1] == 'TRACE_DYNAMICS':
             self.dynamics.set_from_log(fields)
-            self.odometer += self.dynamics.rpm_ticks
       else:
         time.sleep(0.001)
         
@@ -86,31 +84,37 @@ class Car:
   def forward(self, ticks):
     print('going forward {0} ticks'.format(ticks))
     
-    goal_odometer = self.odometer + ticks
+    center = 1450
+    
+    goal_odometer = self.dynamics.odometer + ticks
     goal_heading = self.dynamics.heading
-    steering = 1500
-    speed = 1550
+    steering = center
     self.set_rc_mode()
     
-    while self.odometer < goal_odometer:
+    while self.dynamics.odometer < goal_odometer:
+      speed = 1550
     
       # adjust steering
       heading_error = self.dynamics.heading - goal_heading;
-      print('current ticks {0}  goal ticks {1} heading_error {2}'.format(self.odometer, goal_odometer, heading_error))
+      print('current ticks {0}  goal ticks {1} heading_error {2} rpm_pps {3}'.format(self.dynamics.odometer, goal_odometer, heading_error, self.dynamics.rpm_pps))
       if (heading_error) > 1.0:
         print "heading error > 1.0"
-        steering = 1450
+        steering = center - 50
       elif (heading_error) < -1.0:
         print "heading error < -1.0"
-        steering = 1550
+        steering = center + 50
       else:
-        steering = 1500
+        steering = center
+     
+      # adjust speed
+      if self.dynamics.rpm_pps > 350:
+        speed = 1540
       
        
       self.set_speed_and_steering(speed, steering)
       time.sleep(.02)
     print('forward mode complete')
-    self.set_speed_and_steering(1500,1500)
+    self.set_speed_and_steering(1500,center)
     self.set_manual_mode()
 
 
