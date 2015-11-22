@@ -79,23 +79,46 @@ class Car:
   def set_speed_and_steering(self, speed, steering):
      self.write_command('pse {0},{1}'.format(steering, speed))
      
-  
-  # this is a test for centering
-  def wait_for_left(self):
+  def reverse(self, ticks, goal_heading = None):
+    print('going reverse {0} ticks'.format(ticks))
+    
+    center = 1450
+    
+    goal_odometer = self.dynamics.odometer - ticks
+    if goal_heading == None:
+      goal_heading = self.dynamics.heading
+    steering = center
     self.set_rc_mode()
-    while self.dynamics.str > 1200:
-      self.set_speed_and_steering(1500,1500) # in loop to keep car rc logic from timout
+    
+    while self.dynamics.odometer > goal_odometer:
+      speed = self.min_reverse_speed - 3
+    
+      # adjust steering
+      heading_error = angle_diff(goal_heading, self.dynamics.heading)
+      print('current ticks {0}  goal ticks {1} heading_error {2} rpm_pps {3}'.format(self.dynamics.odometer, goal_odometer, heading_error, self.dynamics.rpm_pps))
+      steering = center +heading_error * 5
+      
+      # adjust speed
+      if self.dynamics.rpm_pps <- 350:
+        speed = self.min_reverse_speed
+      if self.dynamics.rpm_pps <- 400:
+        speed = self.min_reverse_speed+2
+      
+       
+      self.set_speed_and_steering(speed, steering)
+      time.sleep(.02)
+    print('forward mode complete')
+    self.set_speed_and_steering(1500,center)
     self.set_manual_mode()
-    
-    
-
-  def forward(self, ticks):
+ 
+  def forward(self, ticks, goal_heading = None):
     print('going forward {0} ticks'.format(ticks))
     
     center = 1450
     
     goal_odometer = self.dynamics.odometer + ticks
-    goal_heading = self.dynamics.heading
+    if goal_heading == None:
+      goal_heading = self.dynamics.heading
     steering = center
     self.set_rc_mode()
     
@@ -105,14 +128,7 @@ class Car:
       # adjust steering
       heading_error = angle_diff(goal_heading, self.dynamics.heading)
       print('current ticks {0}  goal ticks {1} heading_error {2} rpm_pps {3}'.format(self.dynamics.odometer, goal_odometer, heading_error, self.dynamics.rpm_pps))
-      if (heading_error) > 1.0:
-        print "heading error > 1.0"
-        steering = center - 50
-      elif (heading_error) < -1.0:
-        print "heading error < -1.0"
-        steering = center + 50
-      else:
-        steering = center
+      steering = center - heading_error * 5
      
       # adjust speed
       if self.dynamics.rpm_pps > 350:
