@@ -115,69 +115,51 @@ class Car:
     
   def set_speed_and_steering(self, speed, steering):
      self.write_command('pse {0},{1}'.format(steering, speed))
-     
-  def reverse(self, ticks, goal_heading = None):
-    print('going reverse {0} ticks'.format(ticks))
-    
-    center = 1450
-    
-    goal_odometer = self.dynamics.odometer - ticks
-    if goal_heading == None:
-      goal_heading = self.dynamics.heading
-    steering = center
-    self.set_rc_mode()
-    
-    while self.dynamics.odometer > goal_odometer:
-      speed = self.min_reverse_speed - 3
-    
-      # adjust steering
-      heading_error = angle_diff(goal_heading, self.dynamics.heading)
-      #print('ticks {0} ticks {1} heading_error {2:0.2f} rpm_pps {3}'.format(self.dynamics.odometer, goal_odometer, heading_error, self.dynamics.rpm_pps))
-      steering = self.steering_for_angle(heading_error)
-      
-      # adjust speed
-      if self.dynamics.rpm_pps <- 350:
-        speed = self.min_reverse_speed
-      if self.dynamics.rpm_pps <- 400:
-        speed = self.min_reverse_speed+1
-      
-       
-      self.set_speed_and_steering(speed, steering)
-      time.sleep(.02)
-    print('reverse mode complete')
-    self.set_speed_and_steering(1500,center)
-    self.set_manual_mode()
+
  
   def forward(self, ticks, goal_heading = None):
     print('going forward {0} ticks'.format(ticks))
     
-    center = 1450
-    
-    goal_odometer = self.dynamics.odometer + ticks
     if goal_heading == None:
       goal_heading = self.dynamics.heading
-    steering = center
-    self.set_rc_mode()
     
-    while self.dynamics.odometer < goal_odometer:
-      speed = self.min_forward_speed + 5
+    #use a direction of 1 / -1 to help with the math for forward / reverse
+    if ticks > 0:
+      direction = 1
+      min_speed = self.min_forward_speed - 3
+      max_speed = self.min_forward_speed + 5
+    else:
+      direction = -1
+      min_speed = self.min_reverse_speed + 1
+      max_speed = self.min_reverse_speed - 3
+    
+    goal_odometer = self.dynamics.odometer + ticks
+
+    self.set_rc_mode()
+    while self.dynamics.odometer * direction < goal_odometer * direction:
+      speed = max_speed
     
       # adjust steering
       heading_error = angle_diff(goal_heading, self.dynamics.heading)
-      steering = self.steering_for_angle(-heading_error)
-
-      #print('current ticks {0}  goal ticks {1} heading_error {2} rpm_pps {3}'.format(self.dynamics.odometer, goal_odometer, heading_error, self.dynamics.rpm_pps))
-      #steering = center - heading_error * 5
-     
+      steering = self.steering_for_angle(-direction * heading_error)
+   
       # adjust speed
-      if self.dynamics.rpm_pps > 350:
-        speed = self.min_forward_speed
-      
-       
+      if abs(self.dynamics.rpm_pps) > 350:
+        speed = min_speed
+             
       self.set_speed_and_steering(speed, steering)
       time.sleep(.02)
+    
+    print 'it should slow down here'
+    self.set_speed_and_steering(1500,steering)
+    slowdown_start = time.time()
+    while (time.time()-slowdown_start < 3):
+      heading_error = angle_diff(goal_heading, self.dynamics.heading)
+      steering = self.steering_for_angle(-direction * heading_error)
+      self.set_speed_and_steering(1500,steering)
+      time.sleep(0.01)
+      
     print('forward mode complete')
-    self.set_speed_and_steering(1500,center)
     self.set_manual_mode()
 
 
