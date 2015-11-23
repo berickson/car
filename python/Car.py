@@ -132,7 +132,7 @@ class Car:
     
       # adjust steering
       heading_error = angle_diff(goal_heading, self.dynamics.heading)
-      print('current ticks {0}  goal ticks {1} heading_error {2} rpm_pps {3}'.format(self.dynamics.odometer, goal_odometer, heading_error, self.dynamics.rpm_pps))
+      #print('ticks {0} ticks {1} heading_error {2:0.2f} rpm_pps {3}'.format(self.dynamics.odometer, goal_odometer, heading_error, self.dynamics.rpm_pps))
       steering = self.steering_for_angle(heading_error)
       
       # adjust speed
@@ -144,7 +144,7 @@ class Car:
        
       self.set_speed_and_steering(speed, steering)
       time.sleep(.02)
-    print('forward mode complete')
+    print('reverse mode complete')
     self.set_speed_and_steering(1500,center)
     self.set_manual_mode()
  
@@ -166,7 +166,7 @@ class Car:
       heading_error = angle_diff(goal_heading, self.dynamics.heading)
       steering = self.steering_for_angle(-heading_error)
 
-      print('current ticks {0}  goal ticks {1} heading_error {2} rpm_pps {3}'.format(self.dynamics.odometer, goal_odometer, heading_error, self.dynamics.rpm_pps))
+      #print('current ticks {0}  goal ticks {1} heading_error {2} rpm_pps {3}'.format(self.dynamics.odometer, goal_odometer, heading_error, self.dynamics.rpm_pps))
       #steering = center - heading_error * 5
      
       # adjust speed
