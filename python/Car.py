@@ -6,6 +6,15 @@ import threading
 def angle_diff(theta1, theta2):
   return (theta2 - theta1  + 180 )% 360 - 180
 
+#returns y for given x based on x1,y1,x2,y2
+def interpolate(x, x1, y1, x2, y2):
+  #print("x:{} x1:{} y1:{} x2:{} y2:{}".format(x,x1,y1,x2,y2))
+  m = (y2 - y1)/( x2 - x1 )
+  y = y1 + m * (x-x1)
+  return y
+
+
+
 class Dynamics:
   def __init__(self):
     self.reading_count = 0
@@ -52,7 +61,7 @@ class Car:
     
   def write_command(self, s):
     command = open('/dev/car/command','w')
-    print 'Sending command "{0}"'.format(s)
+    #print 'Sending command "{0}"'.format(s)
     command.write("{0}\n".format(s))
     
   def _monitor_output(self):
@@ -75,6 +84,34 @@ class Car:
 
   def set_manual_mode(self):
     self.write_command('m')
+  
+  # returns the steering pulse for give steering angle
+  # of the outside wheel
+  def steering_for_angle(self, theta):
+    data = [
+      (-30,1000),
+      (-25,1104),
+      (-20,1189),
+      (-15,1235),
+      (-10,1268),
+      (-5, 1390),
+      (0, 1450),
+      (5, 1528),
+      (10, 1607),
+      (15,1688),
+      (20, 1723),
+      (25, 1768),
+      (30, 1858)]
+    last = len(data)-1
+    if theta <= data[0][0]:
+      return data[0][1]
+    if theta >= data[last][0]:
+      return data[last][1]
+    for i in range(0,last):
+      if theta <= data[i+1][0]:
+        return interpolate(
+          theta, data[i][0], data[i][1], data[i+1][0], data[i+1][1])
+     
     
   def set_speed_and_steering(self, speed, steering):
      self.write_command('pse {0},{1}'.format(steering, speed))
@@ -96,13 +133,13 @@ class Car:
       # adjust steering
       heading_error = angle_diff(goal_heading, self.dynamics.heading)
       print('current ticks {0}  goal ticks {1} heading_error {2} rpm_pps {3}'.format(self.dynamics.odometer, goal_odometer, heading_error, self.dynamics.rpm_pps))
-      steering = center +heading_error * 5
+      steering = self.steering_for_angle(heading_error)
       
       # adjust speed
       if self.dynamics.rpm_pps <- 350:
         speed = self.min_reverse_speed
       if self.dynamics.rpm_pps <- 400:
-        speed = self.min_reverse_speed+2
+        speed = self.min_reverse_speed+1
       
        
       self.set_speed_and_steering(speed, steering)
@@ -127,8 +164,10 @@ class Car:
     
       # adjust steering
       heading_error = angle_diff(goal_heading, self.dynamics.heading)
+      steering = self.steering_for_angle(-heading_error)
+
       print('current ticks {0}  goal ticks {1} heading_error {2} rpm_pps {3}'.format(self.dynamics.odometer, goal_odometer, heading_error, self.dynamics.rpm_pps))
-      steering = center - heading_error * 5
+      #steering = center - heading_error * 5
      
       # adjust speed
       if self.dynamics.rpm_pps > 350:

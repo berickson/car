@@ -16,6 +16,9 @@ output/
 *.obj
 *.elf
 
+#python compiled
+*.pyc
+
 # Precompiled Headers
 *.gch
 *.pch

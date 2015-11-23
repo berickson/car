@@ -42,6 +42,7 @@ void RemoteMode::command_steer_and_esc(unsigned int _steer_us, unsigned int _esc
 
 
 void RemoteMode::update_pulses() {
+  if(done) return;
   steering.writeMicroseconds(steer_us);
   speed.writeMicroseconds(esc_us);
 
