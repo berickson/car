@@ -4,6 +4,7 @@ import time
 import dateutil.parser
 from select import select
 
+
 recording_file_path = 'recording.csv'
 
 def write_command_to_car(s):

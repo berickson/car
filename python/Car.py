@@ -155,7 +155,7 @@ class Car:
     slowdown_start = time.time()
     while (time.time()-slowdown_start < 3):
       heading_error = angle_diff(goal_heading, self.dynamics.heading)
-      steering = self.steering_for_angle(-direction * heading_error)
+      steering = self.steering_for_angle(-direction * heading_error * 1.5)
       self.set_speed_and_steering(1500,steering)
       time.sleep(0.01)
       
