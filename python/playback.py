@@ -6,10 +6,11 @@ from select import select
 from Car import Car
 
 recording_file_path = 'recording.csv'
-
 recording = open(recording_file_path,'r');
 record_start_time = None
 playback_start_time = datetime.datetime.now()
+
+car = Car()
 car.set_rc_mode()
 while True:
   s = recording.readline()
