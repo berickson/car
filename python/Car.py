@@ -84,6 +84,32 @@ class Car:
 
   def set_manual_mode(self):
     self.write_command('m')
+
+
+  def angle_for_steering(self, str):
+    data = [
+      (-30,1000),
+      (-25,1104),
+      (-20,1189),
+      (-15,1235),
+      (-10,1268),
+      (-5, 1390),
+      (0, 1450),
+      (5, 1528),
+      (10, 1607),
+      (15,1688),
+      (20, 1723),
+      (25, 1768),
+      (30, 1858)]
+    last = len(data)-1
+    if str <= data[0][1]:
+      return data[0][0]
+    if str >= data[last][1]:
+      return data[last][0]
+    for i in range(0,last):
+      if str <= data[i+1][1]:
+        return interpolate(
+          str, data[i][1], data[i][0], data[i+1][1], data[i+1][0])
   
   # returns the steering pulse for give steering angle
   # of the outside wheel
