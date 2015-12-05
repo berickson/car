@@ -42,41 +42,11 @@ while not kbhit():
     fields = s.split(',')
     if len(fields) > 1:
       if fields[1] == 'TRACE_DYNAMICS':
-#        print('str: {0} esc: {1}'.format(fields[3], fields[5]))
         recording.write(s);
   else:
     time.sleep(0.01)
 
 recording.close()
 
-print('stopped recording, press any key to play back')
-getch()
-
-print('playing back recording')
-
-
-recording = open(recording_file_path,'r');
-record_start_time = None
-playback_start_time = datetime.datetime.now()
-write_command_to_car('rc') # set to remote control mode
-while True:
-  s = recording.readline()
-  if not s:
-    break
-  fields = s.split(',')
-  line_time = dateutil.parser.parse(fields[0])
-  if record_start_time == None:
-    record_start_time = line_time
-  
-  t_now = datetime.datetime.now()
-  t_wait = (line_time - record_start_time) - (t_now - playback_start_time)
-  if t_wait.total_seconds() > 0:
-    time.sleep(t_wait.total_seconds())
-
-  pse_command = 'pse{0},{1}'.format(fields[3], fields[5])
-  write_command_to_car(pse_command)
-
-write_command_to_car("m") # return to manual mode
-write_command_to_car('td-') # turn off loggin
 print 'all done'
 
