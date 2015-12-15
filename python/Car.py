@@ -50,6 +50,8 @@ class Car:
     
     self.min_forward_speed = 1545
     self.min_reverse_speed = 1445
+    while self.dynamics.reading_count == 0:
+      time.sleep(0.01) 
 
     
     
