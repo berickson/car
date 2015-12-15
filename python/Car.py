@@ -143,8 +143,10 @@ class Car:
      self.write_command('pse {0},{1}'.format(steering, speed))
 
  
-  def forward(self, ticks, goal_heading = None):
+  def forward(self, ticks, goal_heading = None, fixed_steering_us = None):
     print('going forward {0} ticks'.format(ticks))
+    
+    steering = fixed_steering_us
     
     if goal_heading == None:
       goal_heading = self.dynamics.heading
@@ -165,9 +167,10 @@ class Car:
     while self.dynamics.odometer * direction < goal_odometer * direction:
       speed = max_speed
     
-      # adjust steering
-      heading_error = angle_diff(goal_heading, self.dynamics.heading)
-      steering = self.steering_for_angle(-direction * heading_error)
+      # adjust steering if fixed steering wasn't selected
+      if fixed_steering_us != None:
+        heading_error = angle_diff(goal_heading, self.dynamics.heading)
+        steering = self.steering_for_angle(-direction * heading_error)
    
       # adjust speed
       if abs(self.dynamics.rpm_pps) > 350:
