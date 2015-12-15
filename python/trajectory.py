@@ -9,7 +9,7 @@ class trajectory_state:
     self.a = float('nan');
     
   def __repr__(self):
-    return "t: {:<5} x: {:<5.3} v: {:<5.3} a: {:<5}".format(self.t,self.x,self.v,self.a)
+    return "t: {:<5.3} x: {:<5.3} v: {:<5.3} a: {:<5}".format(self.t,self.x,self.v,self.a)
   
 class Trajectory:
   def __init__(self, accel = 1, decel = 1, speed_limit = 1, distance = 3):
@@ -44,6 +44,21 @@ class Trajectory:
         self.x_start_decel,
         self.t_end
         )
+  
+  def state_at_distance(self,x):
+    if x < 0:
+      return self.state_at_time(0)
+    if x >= self.distance:
+      return self.state_at_time(self.t_end)
+    if x >= self.x_start_decel:
+      t_to_end = math.sqrt(2*((self.distance-x)/self.decel))
+      return self.state_at_time(self.t_end - t_to_end)
+    if x >= self.x_end_accel:
+      t = self.t_end_accel + (x-self.x_end_accel)/self.speed_limit
+      return self.state_at_time(t)
+    # if we get here, we must be in first phase of accelerating
+    t = math.sqrt(2*x/self.accel)
+    return self.state_at_time(t)
   
   def state_at_time(self,t):
     s = trajectory_state()
@@ -118,6 +133,9 @@ def test(*args, **kwargs):
   print("--------------")
   for t in np.arange(0.,tragectory.t_end+0.1, 0.1):
     print (tragectory.state_at_time(t))
+  print("--------------")
+  for x in np.arange(0.,tragectory.distance+0.1, 0.1):
+    print (tragectory.state_at_distance(x))
   print("--------------")
 
 def main():
