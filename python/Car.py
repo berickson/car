@@ -148,7 +148,8 @@ class Car:
   def forward(self, ticks, goal_heading = None, fixed_steering_us = None):
     print('going forward {0} ticks'.format(ticks))
     
-    steering = fixed_steering_us
+    if fixed_steering_us != None:
+      steering = fixed_steering_us
     
     if goal_heading == None:
       goal_heading = self.dynamics.heading
@@ -170,7 +171,7 @@ class Car:
       speed = max_speed
     
       # adjust steering if fixed steering wasn't selected
-      if fixed_steering_us != None:
+      if fixed_steering_us == None:
         heading_error = angle_diff(goal_heading, self.dynamics.heading)
         steering = self.steering_for_angle(-direction * heading_error)
    
