@@ -1,9 +1,10 @@
 import time
+import sys
 from Car import Car
 car = Car()
 
 sleep_time = 5.0
-print "waiting {} seconds for things to settle".format(sleep_time)
+print("waiting {} seconds for things to settle\n".format(sleep_time))
 time.sleep(sleep_time)
 
 
@@ -12,25 +13,29 @@ neutral_steer = 1500
 
 increment = 10
 wait_seconds = 2.0
-move_threshold = 1.0
+move_threshold = 0.5
 
 
 
 def does_it_move(speed):
   car.set_rc_mode()
-  print 'does it move at {}?'.format(speed)
   car.set_speed_and_steering(speed,neutral_steer)
   current_test_start_time = time.time()
   moved = False
   start_inches = car.dynamics.ping_inches;
-  print "current ping is {} inches".format(start_inches)
   while time.time() - current_test_start_time < wait_seconds and not moved:
     car.set_speed_and_steering(speed,neutral_steer)
-    time.sleep(0.1)
+    time.sleep(0.05)
     new_inches = car.dynamics.ping_inches
-    print "current ping is {} inches".format(new_inches)
-    if abs(new_inches - start_inches) > move_threshold:
+    delta = abs(new_inches - start_inches)
+    sys.stdout.write("esc: {}  {:5.3} inches, delta is {:5.3} inches\r".format(
+      speed,
+      new_inches, 
+      delta))
+    sys.stdout.flush()
+    if delta > move_threshold:
       moved = True
+      print
   car.set_speed_and_steering(neutral_speed,neutral_steer)
   car.set_manual_mode()
   return moved

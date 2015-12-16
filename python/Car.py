@@ -146,8 +146,6 @@ class Car:
 
  
   def forward(self, ticks, goal_heading = None, fixed_steering_us = None):
-    print('going forward {0} ticks'.format(ticks))
-    
     if fixed_steering_us != None:
       steering = fixed_steering_us
     
@@ -181,18 +179,14 @@ class Car:
              
       self.set_speed_and_steering(speed, steering)
       time.sleep(.02)
-    
-    print 'it should slow down here'
     self.set_speed_and_steering(1500,steering)
     slowdown_start = time.time()
     while (time.time()-slowdown_start < 3):
-      heading_error = angle_diff(goal_heading, self.dynamics.heading)
-      steering = self.steering_for_angle(-direction * heading_error * 1.5)
-      self.set_speed_and_steering(1500,steering)
+      if fixed_steering_us == None:
+        heading_error = angle_diff(goal_heading, self.dynamics.heading)
+        steering = self.steering_for_angle(-direction * heading_error * 1.5)
       time.sleep(0.01)
       
-    print('forward mode complete')
-    self.set_manual_mode()
 
 
 def main():
