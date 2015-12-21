@@ -32,6 +32,7 @@ class Dynamics:
       self.rpm_ticks = int(fields[15])
       self.odometer = int(fields[16])
       self.ping_inches = float(fields[18])
+      self.odometer = int(fields[20])
       self.reading_count = self.reading_count + 1
     except (IndexError, ValueError) as e:
       pass

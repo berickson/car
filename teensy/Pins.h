@@ -6,6 +6,9 @@
 #define PIN_PING_TRIG 6
 #define PIN_PING_ECHO 23
 
+#define PIN_ODOMOTER_SENSOR_A 22
+#define PIN_ODOMOTER_SENSOR_B 7
+
 #define PIN_MOTOR_RPM 21
 
 #define PIN_SPEAKER   9
