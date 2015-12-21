@@ -1,6 +1,7 @@
 import time
 import dateutil.parser
 import threading
+import ConfigParser
 
 #returns theta2-theta1 in range of [-180,180)
 def angle_diff(theta1, theta2):
@@ -30,7 +31,7 @@ class Dynamics:
       self.rpm_pps_raw = int(fields[13])
       self.rpm_pps = int(fields[14])
       self.rpm_ticks = int(fields[15])
-      self.odometer = int(fields[16])
+      self.engine_odometer = int(fields[16])
       self.ping_inches = float(fields[18])
       self.odometer = int(fields[20])
       self.reading_count = self.reading_count + 1
@@ -40,8 +41,11 @@ class Dynamics:
 
 class Car:
   def __init__(self):
+
     print 'car init'
+
     print 'enabling dynamics output'
+    self.config_path = 'car.ini'
     self.quit = False
     self.write_command('td+')
     self.dynamics = Dynamics()
@@ -61,7 +65,24 @@ class Car:
     print 'car delete'
     self.quit = True
     self.output_thread.join()
-    
+
+  def get_option(self,section,option):
+    config = ConfigParser.ConfigParser()
+    with open(self.config_path, 'rwb+') as configfile:
+      config.readfp(configfile)
+    return config.get(section, option)
+        
+  def set_option(self,section,option,value):
+    config = ConfigParser.ConfigParser()
+    with open(self.config_path, 'rwb+') as configfile:
+        config.readfp(configfile)
+        
+    config.set(section,option,value)
+
+    with open(self.config_path, 'rwb+') as configfile:
+        config.write(configfile)
+        
+   
   def write_command(self, s):
     command = open('/dev/car/command','w')
     #print 'Sending command "{0}"'.format(s)
