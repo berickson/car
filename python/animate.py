@@ -3,6 +3,7 @@ import random
 import gobject
 import math
 from math import *
+from Car import Dynamics
 
 import pygtk
 pygtk.require('2.0')
@@ -36,7 +37,7 @@ class Screen(gtk.DrawingArea):
 # GTK mumbo-jumbo to show the widget in a window and quit when it's closed
 def run(Widget):
     window = gtk.Window()
-    window.set_default_size(1000,1000)
+    window.set_default_size(1000,500)
     window.connect("delete-event", gtk.main_quit)
     widget = Widget()
     widget.show()
@@ -72,8 +73,8 @@ class robot:
 
     def set(self, new_x, new_y, new_orientation):
 
-        if new_orientation < 0 or new_orientation >= 2 * pi:
-            raise ValueError, 'Orientation must be in [0..2pi]'
+        #if new_orientation < 0 or new_orientation >= 2 * pi:
+        #    raise ValueError, 'Orientation must be in [0..2pi]'
         self.x = float(new_x)
         self.y = float(new_y)
         self.orientation = float(new_orientation)
@@ -128,46 +129,56 @@ class robot:
 
 class World:
     def __init__(self):
-        self.width = 1000.
-        self.height = 1000.
-        self.cars = [Car(self) for i in range(100)]
+        self.width = 1800.
+        self.height = 800.
+        self.car = FakeCar(recording_file_path = 'data/recording_hall_and_back.csv')
 
     def move(self):
-        for car in self.cars:
-            car.move()
+        self.car.move()
     
-class Car:
-    def __init__(self, world):
-        self.world = world
-        self.x = random.random() * world.width
-        self.y = random.random() * world.height
-        self.length = 10.  + 20 * random.random()
-        self.width = 5 + 10 * random.random()
-        self.heading = self.random_heading()
-        self.wheels_angle = self.random_wheels_angle()
-        self.velocity = self.random_velocity()
+class FakeCar:
+    def __init__(self, recording_file_path):
+        self.recording_file_path = recording_file_path;
+        self.reset()
+        
+    def reset(self):
+        self.x = 250
+        self.y = 250
+        self.length = 60 # todo: use real car length in meters
+        self.width = 30 # todo: use real car width in meters
+        self.original_heading = 0
+        self.heading = 0
+        self.wheels_angle = 0
+        self.velocity = 0
+        self.dynamics_file = open(self.recording_file_path)
+        self.dynamics = Dynamics()
+        self.read_dynamics()
+        self.original_heading = self.dynamics.heading * pi/180. 
 
-    def random_wheels_angle(self):
-        return random.triangular(-pi/4, pi/4, 0)
-    def random_heading(self):
-        return random.random()*2.*pi
-    def random_velocity(self):
-        return random.gauss(5.,5.)
-
-    def change_randomly(self):
-        if(random.random() < 1/20.): #1 in 20 chance of changing wheel direction
-            self.wheels_angle = self.random_wheels_angle()
-        if(random.random() < 1/20.): #1 in 20 chance of changing velicty
-            self.velocity = self.random_velocity()
+    
+    def read_dynamics(self):
+        s = self.dynamics_file.readline()
+        if not s:
+          raise EOFError
+        fields = s.split(',')
+        self.dynamics.set_from_log(fields)
 
     def move(self):
-        self.change_randomly()
-        r = robot(self.length)
-        r.set(self.x, self.y, self.heading)
-        r = r.move([self.wheels_angle, self.velocity])
-        self.x = r.x % self.world.width
-        self.y = r.y % self.world.height
-        self.heading = r.orientation
+        try:
+          last_odometer = self.dynamics.odometer
+          self.read_dynamics();
+          self.velocity = self.dynamics.odometer - last_odometer
+          self.heading = self.dynamics.heading * pi/180. - self.original_heading
+    
+          r = robot(self.length)
+          r.set(self.x, self.y, self.heading)
+          wheels_angle = 0 # todo: compute from dynamics, from structure in car
+          r = r.move([0 , self.velocity])
+          self.x = r.x
+          self.y = r.y
+          self.heading = r.orientation
+        except:
+          self.reset()
 
 
 class CarView:
@@ -232,14 +243,12 @@ class Transform(Screen):
 
 
         carView = CarView()
-        for car in self.world.cars:
-            carView.draw(cr,car)
+        carView.draw(cr,self.world.car)
     
         cr.set_matrix(oldmatrix)
         cr.set_source_rgb(0,0,0)
         cr.set_font_size(11)
         cr.move_to(15,11)
         cr.show_text(str(self.draw_count))
-
 
 run(Transform)
