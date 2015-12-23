@@ -40,9 +40,10 @@ class Dynamics:
 
 
 class Car:
-  def __init__(self):
+  def __init__(self, online = True):
 
     print 'car init'
+    self.online = online
 
     print 'enabling dynamics output'
     self.config_path = 'car.ini'
@@ -108,9 +109,9 @@ class Car:
 
   def set_manual_mode(self):
     self.write_command('m')
-
-
-  def angle_for_steering(self, str):
+    
+  @staticmethod
+  def angle_for_steering(str):
     data = [
       (-30,1000),
       (-25,1104),

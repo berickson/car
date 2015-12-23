@@ -3,7 +3,7 @@ import random
 import gobject
 import math
 from math import *
-from Car import Dynamics
+from Car import Dynamics, Car
 
 import pygtk
 pygtk.require('2.0')
@@ -129,8 +129,8 @@ class robot:
 
 class World:
     def __init__(self):
-        self.width = 1800.
-        self.height = 800.
+        self.width = 8.
+        self.height = 4.
         self.car = FakeCar(recording_file_path = 'data/recording_hall_and_back.csv')
 
     def move(self):
@@ -142,10 +142,11 @@ class FakeCar:
         self.reset()
         
     def reset(self):
-        self.x = 250
-        self.y = 250
-        self.length = 60 # todo: use real car length in meters
-        self.width = 30 # todo: use real car width in meters
+        self.ticks_per_meter = 300. # todo: measure / calculate
+        self.x = 0
+        self.y = 0
+        self.length = .3302 # todo: use real car length in meters
+        self.width = .2413 # meters
         self.original_heading = 0
         self.heading = 0
         self.wheels_angle = 0
@@ -162,13 +163,17 @@ class FakeCar:
           raise EOFError
         fields = s.split(',')
         self.dynamics.set_from_log(fields)
+        self.odometer = self.dynamics.odometer / self.ticks_per_meter
+        self.heading = self.dynamics.heading * pi/180. - self.original_heading
+        self.ping = self.dynamics.ping_inches * 0.0254
+        self.wheels_angle = Car.angle_for_steering(self.dynamics.str) * pi/180.
+
 
     def move(self):
         try:
-          last_odometer = self.dynamics.odometer
+          last_odometer = self.odometer
           self.read_dynamics();
-          self.velocity = self.dynamics.odometer - last_odometer
-          self.heading = self.dynamics.heading * pi/180. - self.original_heading
+          self.velocity = self.odometer - last_odometer
     
           r = robot(self.length)
           r.set(self.x, self.y, self.heading)
@@ -177,38 +182,51 @@ class FakeCar:
           self.x = r.x
           self.y = r.y
           self.heading = r.orientation
-        except:
+        except EOFError:
           self.reset()
 
 
 class CarView:
-    def draw(self, cr, car):
-          oldmatrix = cr.get_matrix()
-          cr.translate(car.x,car.y)
-          cr.rotate(car.heading)
+  def draw(self, cr, car):
+    oldmatrix = cr.get_matrix()
+    cr.translate(car.x,car.y)
+    cr.rotate(car.heading)
 
-          # car position x,y is at center of rear
+    # car position x,y is at center of rear
 
-          # car outline
-          cr.set_source_rgb(0.5, 0.5, 0.5)
-          cr.rectangle(0, car.width/-2.,  car.length, car.width)
-          cr.fill()
+    # car outline
+    cr.set_line_width(0.01) # meters
+    cr.set_source_rgb(0.5, 0.5, 0.5)
+    cr.rectangle(0, car.width/-2.,  car.length, car.width)
+    cr.fill()
 
-          # car velocity arrow
-          cr.set_source_rgb(0,1,0)
-          cr.move_to(0,0)
-          cr.line_to(car.velocity, 0)
-          cr.stroke()
+    # car velocity arrow
+    cr.set_source_rgb(0,1,0)
+    cr.move_to(0,0)
+    cr.set_line_width(0.01)
+    cr.line_to(car.velocity, 0)
+    cr.stroke()
 
-          # car turn arrow
-          cr.set_source_rgb(0.5,0.5,1.)
-          cr.translate(car.length,0)
-          cr.rotate(car.wheels_angle)
-          cr.move_to(0,0)
-          cr.line_to(10,0)
-          cr.stroke()
+    # car turn arrow
+    s = cr.get_matrix()
+    cr.set_source_rgb(0.5,0.5,1.)
+    cr.set_line_width(0.05)
+    cr.translate(car.length,0)
+    cr.rotate(car.wheels_angle)
+    cr.move_to(0,0)
+    cr.line_to(car.length/2,0)
+    cr.stroke()
+    cr.set_matrix(s)
 
-          cr.set_matrix(oldmatrix)
+    # ping arrow
+    cr.set_source_rgb(1.,.5,.5)
+    cr.set_line_width(0.01)
+    cr.translate(car.length,0)
+    cr.move_to(0,0)
+    cr.line_to(car.ping,0)
+    cr.stroke()
+
+    cr.set_matrix(oldmatrix)
 
 
 class Transform(Screen):
@@ -236,9 +254,9 @@ class Transform(Screen):
         cr.fill()
 
         # set up a transform so that (0,0) to (world.width,world_heigth)
-        # maps to (20, 20) to (width - 40, height - 40)
+        # maps to middle of (20, 20) to (width - 40, height - 40)
         oldmatrix = cr.get_matrix()
-        cr.translate(20, 20)
+        cr.translate(width/3, height/2)
         cr.scale((width - 40) / self.world.width, (height - 40) / self.world.height)
 
 
