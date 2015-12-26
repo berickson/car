@@ -33,7 +33,7 @@ class Dynamics:
       self.rpm_ticks = int(fields[15])
       self.engine_odometer = int(fields[16])
       self.ping_inches = float(fields[18])
-      self.odometer = int(fields[20])
+      self.odometer_ticks = int(fields[20])
       self.reading_count = self.reading_count + 1
     except (IndexError, ValueError) as e:
       pass
@@ -43,10 +43,11 @@ class Car:
   def __init__(self, online = True):
 
     print 'car init'
+    self.config_path = 'car.ini'
+    self.read_configuration()
     self.online = online
 
     print 'enabling dynamics output'
-    self.config_path = 'car.ini'
     self.quit = False
     self.write_command('td+')
     self.dynamics = Dynamics()
@@ -56,12 +57,14 @@ class Car:
     
     self.min_forward_speed = 1545
     self.min_reverse_speed = 1445
+    
     while self.dynamics.reading_count == 0:
       time.sleep(0.01) 
 
-    
-    
-    
+  def read_configuration(self):
+    self.meters_per_odometer_tick = float(self.get_option('calibration','meters_per_odometer_tick'))
+    print 'meters_per_odometer_tick {}'.format(self.meters_per_odometer_tick)
+
   def __del__(self):
     print 'car delete'
     self.quit = True
@@ -168,7 +171,8 @@ class Car:
      self.write_command('pse {0},{1}'.format(steering, speed))
 
  
-  def forward(self, ticks, goal_heading = None, fixed_steering_us = None):
+  def forward(self, meters, goal_heading = None, fixed_steering_us = None):
+    ticks = int(meters*self.meters_per_odometer_tick)
     if fixed_steering_us != None:
       steering = fixed_steering_us
     
@@ -185,10 +189,10 @@ class Car:
       min_speed = self.min_reverse_speed + 1
       max_speed = self.min_reverse_speed - 3
     
-    goal_odometer = self.dynamics.odometer + ticks
+    goal_odometer = self.dynamics.odometer_ticks + ticks
 
     self.set_rc_mode()
-    while self.dynamics.odometer * direction < goal_odometer * direction:
+    while self.dynamics.odometer_ticks * direction < goal_odometer * direction:
       speed = max_speed
     
       # adjust steering if fixed steering wasn't selected

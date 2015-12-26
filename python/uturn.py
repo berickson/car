@@ -6,8 +6,8 @@ time.sleep(3)
 goal_heading = car.dynamics.heading+179
 
 while abs(angle_diff(goal_heading, car.dynamics.heading)) > 3:
-  car.forward(100, goal_heading = goal_heading)
+  car.forward(meters=0.3 , goal_heading = goal_heading)
   time.sleep(0.5)
-  car.forward(-120, goal_heading = goal_heading)
+  car.forward(meters=-0.3, goal_heading = goal_heading)
   time.sleep(0.5)
 
