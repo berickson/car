@@ -129,9 +129,10 @@ class robot:
 
 class World:
     def __init__(self):
-        self.width = 8.
-        self.height = 4.
-        self.car = FakeCar(recording_file_path = 'data/recording_hall_and_back.csv')
+        global args
+        self.width = 20.
+        self.height = 20.
+        self.car = FakeCar(recording_file_path = args.infile)
 
     def move(self):
         self.car.move()
@@ -256,7 +257,7 @@ class Transform(Screen):
         # set up a transform so that (0,0) to (world.width,world_heigth)
         # maps to middle of (20, 20) to (width - 40, height - 40)
         oldmatrix = cr.get_matrix()
-        cr.translate(width/3, height/2)
+        cr.translate(width/2, height/2)
         cr.scale((width - 40) / self.world.width, (height - 40) / self.world.height)
 
 
@@ -268,5 +269,16 @@ class Transform(Screen):
         cr.set_font_size(11)
         cr.move_to(15,11)
         cr.show_text(str(self.draw_count))
+
+
+import argparse
+parser = argparse.ArgumentParser(description = 'RC car control playback')
+parser.add_argument(
+  'infile',
+  nargs='?',
+#  type=argparse.FileType('r'),
+  default='recording.csv',
+  help='csv file recorded with recorder')
+args = parser.parse_args()
 
 run(Transform)
