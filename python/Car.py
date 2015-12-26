@@ -172,7 +172,7 @@ class Car:
 
  
   def forward(self, meters, goal_heading = None, fixed_steering_us = None):
-    ticks = int(meters*self.meters_per_odometer_tick)
+    ticks = int(meters/self.meters_per_odometer_tick)
     if fixed_steering_us != None:
       steering = fixed_steering_us
     
