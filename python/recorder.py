@@ -2,10 +2,14 @@ import sys,tty,termios
 import datetime
 import time
 import dateutil.parser
+import filenames
 from select import select
 
 
-recording_file_path = 'recording.csv'
+folder = 'recordings'
+prefix = 'recording'
+suffix = '.csv'
+recording_file_path = filenames.next_filename(folder=folder,prefix=prefix,suffix=suffix)
 
 def write_command_to_car(s):
   command = open('/dev/car/command','w')
