@@ -486,6 +486,8 @@ void loop() {
        +",rpm,"+ rpm_pps + "," + calculated_rpm_pps + ", " + delta_pulse + "," + motor_pulse_odometer
        +",ping,"+ping.inches()
        +",odo,"+odometer
+       +",ms,"+millis()
+       +",us,"+micros()
        );
   }
 
