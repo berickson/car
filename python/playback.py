@@ -4,8 +4,13 @@ import time
 import dateutil.parser
 from select import select
 from Car import Car, Dynamics, angle_diff
+import filenames
 
-recording_file_path = 'recording.csv'
+folder = 'recordings'
+prefix = 'recording'
+suffix = '.csv'
+recording_file_path = filenames.latest_filename(folder=folder,prefix=prefix,suffix=suffix)
+
 recording = open(recording_file_path,'r');
 record_start_time = None
 playback_start_time = datetime.datetime.now()
