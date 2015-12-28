@@ -52,7 +52,7 @@ class Ackerman :
       # make radius negative for right turns
       if outside_wheel_angle < 0:
         r_left = -r_left
-      if debug: print 'r_car: {} r_left: {}'.format(r_car, r_left)
+      if debug: print 'r_car: {:.4} r_left: {:.4}'.format(r_car, r_left)
       
       # calculate angle travelled
       turn_angle = wheel_distance / r_left

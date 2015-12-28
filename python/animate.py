@@ -95,7 +95,10 @@ class FakeCar:
           self.velocity = self.odometer - last_odometer
 
           self.ackerman.heading = self.heading
-          self.ackerman.move_left_wheel(outside_wheel_angle  = self.wheels_angle, wheel_distance = self.velocity)
+          self.ackerman.move_left_wheel(
+            outside_wheel_angle  = self.wheels_angle, 
+            wheel_distance = self.velocity,
+            debug = True)
 
         except EOFError:
           self.reset()
