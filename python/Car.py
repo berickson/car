@@ -34,6 +34,8 @@ class Dynamics:
       self.engine_odometer = int(fields[16])
       self.ping_inches = float(fields[18])
       self.odometer_ticks = int(fields[20])
+      self.ms = int(fields[22])
+      self.us = int(fields[24])
       self.reading_count = self.reading_count + 1
     except (IndexError, ValueError) as e:
       pass
@@ -62,8 +64,21 @@ class Car:
       time.sleep(0.01) 
 
   def read_configuration(self):
+  
+    # odometry
     self.meters_per_odometer_tick = float(self.get_option('calibration','meters_per_odometer_tick'))
-    print 'meters_per_odometer_tick {}'.format(self.meters_per_odometer_tick)
+    
+    # esc and steering
+    self.center_steering_us = int(self.get_option('calibration','center_steering_us'))
+    self.min_forward_speed = int(self.get_option('calibration','min_forward_speed'))
+    self.min_reverse_speed = int(self.get_option('calibration','min_reverse_speed'))
+    self.reverse_center_steering_us = int(self.get_option('calibration','reverse_center_steering_us'))
+    
+    # car dimensions
+    self.front_wheelbase_width_in_meters = float(self.get_option('calibration','front_wheelbase_width_in_meters'))
+    self.rear_wheelbase_width_in_meters = float(self.get_option('calibration','rear_wheelbase_width_in_meters'))
+    self.Wheelbase_length_in_meters = float(self.get_option('calibration','Wheelbase_length_in_meters'))
+
 
   def __del__(self):
     print 'car delete'

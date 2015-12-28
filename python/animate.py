@@ -4,6 +4,7 @@ import gobject
 import math
 from math import *
 from Car import Dynamics, Car
+import ackerman
 
 import pygtk
 pygtk.require('2.0')
@@ -45,88 +46,6 @@ def run(Widget):
     window.present()
     gtk.main()
 
-
-class robot:
-
-    # --------
-
-    # init: 
-    #	creates robot and initializes location/orientation 
-    #
-
-    def __init__(self, length = 10.0):
-        world_size = 100
-        self.x = random.random() * world_size # initial x position
-        self.y = random.random() * world_size # initial y position
-        self.orientation = random.random() * 2.0 * pi # initial orientation
-        self.length = length # length of robot
-        self.bearing_noise  = 0.0 # initialize bearing noise to zero
-        self.steering_noise = 0.0 # initialize steering noise to zero
-        self.distance_noise = 0.0 # initialize distance noise to zero
-    
-    def __repr__(self):
-        return '[x=%.6s y=%.6s orient=%.6s]' % (str(self.x), str(self.y), str(self.orientation))
-    # --------
-    # set: 
-    #	sets a robot coordinate
-    #
-
-    def set(self, new_x, new_y, new_orientation):
-
-        #if new_orientation < 0 or new_orientation >= 2 * pi:
-        #    raise ValueError, 'Orientation must be in [0..2pi]'
-        self.x = float(new_x)
-        self.y = float(new_y)
-        self.orientation = float(new_orientation)
-
-
-    # --------
-    # set_noise: 
-    #	sets the noise parameters
-    #
-
-    def set_noise(self, new_b_noise, new_s_noise, new_d_noise):
-        # makes it possible to change the noise parameters
-        # this is often useful in particle filters
-        self.bearing_noise  = float(new_b_noise)
-        self.steering_noise = float(new_s_noise)
-        self.distance_noise = float(new_d_noise)
-    
-    ############# ONLY ADD/MODIFY CODE BELOW HERE ###################
-
-    # --------
-    # move:
-    #   move along a section of a circular path according to motion
-    #
-    
-    def move(self, motion): # Do not change the name of this function
-        result = robot()
-        [alpha, d] = motion  # alpha is the steering angle, d is distance travelled
-        d=float(d)
-        alpha=float(alpha)
-        #print 'd: '  + str(d)
-        #print 'self.length: ' + str(self.length)
-        #print 'alpha: ' + str(alpha)
-        beta = d / self.length * tan(alpha)
-        #print 'beta: ' + str(beta)
-        if(abs(beta) < 0.001):
-            result.x = self.x + d * cos(self.orientation)
-            result.y = self.y + d * sin(self.orientation)
-        else:
-            R = d / beta
-            cx = self.x - sin(self.orientation )*R # center of turn
-            cy = self.y + cos(self.orientation)*R #
-            result.x = cx + sin(self.orientation + beta) * R
-            result.y = cy - cos(self.orientation + beta) * R
-            
-        result.orientation = (self.orientation+beta) % (2. * pi)
-        result.length = self.length
-        # ADD CODE HERE
-        
-        return result # make sure your move function returns an instance
-                      # of the robot class with the correct coordinates.
-
-
 class World:
     def __init__(self):
         global args
@@ -141,13 +60,12 @@ class FakeCar:
     def __init__(self, recording_file_path):
         self.recording_file_path = recording_file_path;
         self.reset()
+        self.ackerman = ackerman.Ackerman(front_wheelbase_width = self.width, wheelbase_length = self.length)
         
     def reset(self):
-        self.ticks_per_meter = 300. # todo: measure / calculate
-        self.x = 0
-        self.y = 0
-        self.length = .3302 # todo: use real car length in meters
-        self.width = .2413 # meters
+        self.ticks_per_meter = 293. # todo: read from car.ini
+        self.length = 0.33655 # todo: get from ini file instead of hardcoding
+        self.width = 0.2413 # meters
         self.original_heading = 0
         self.heading = 0
         self.wheels_angle = 0
@@ -164,7 +82,7 @@ class FakeCar:
           raise EOFError
         fields = s.split(',')
         self.dynamics.set_from_log(fields)
-        self.odometer = self.dynamics.odometer / self.ticks_per_meter
+        self.odometer = self.dynamics.odometer_ticks / self.ticks_per_meter
         self.heading = self.dynamics.heading * pi/180. - self.original_heading
         self.ping = self.dynamics.ping_inches * 0.0254
         self.wheels_angle = Car.angle_for_steering(self.dynamics.str) * pi/180.
@@ -175,14 +93,10 @@ class FakeCar:
           last_odometer = self.odometer
           self.read_dynamics();
           self.velocity = self.odometer - last_odometer
-    
-          r = robot(self.length)
-          r.set(self.x, self.y, self.heading)
-          wheels_angle = 0 # todo: compute from dynamics, from structure in car
-          r = r.move([0 , self.velocity])
-          self.x = r.x
-          self.y = r.y
-          self.heading = r.orientation
+
+          self.ackerman.heading = self.heading
+          self.ackerman.move_left_wheel(outside_wheel_angle  = self.wheels_angle, wheel_distance = self.velocity)
+
         except EOFError:
           self.reset()
 
@@ -190,8 +104,8 @@ class FakeCar:
 class CarView:
   def draw(self, cr, car):
     oldmatrix = cr.get_matrix()
-    cr.translate(car.x,car.y)
-    cr.rotate(car.heading)
+    cr.translate(car.ackerman.x,car.ackerman.y)
+    cr.rotate(car.ackerman.heading)
 
     # car position x,y is at center of rear
 
