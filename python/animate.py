@@ -168,7 +168,7 @@ class Transform(Screen):
         cr.rectangle(15, 15, width - 30, height - 30)
         cr.fill()
 
-        # set up a transform so that (0,0) to (world.width,world_heigth)
+        # set up a transform so that (0,0) to (world.width,world_height)
         # maps to middle of (20, 20) to (width - 40, height - 40)
         oldmatrix = cr.get_matrix()
         cr.translate(width/2, height/2)
