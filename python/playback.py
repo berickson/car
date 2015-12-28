@@ -3,7 +3,7 @@ import datetime
 import time
 import dateutil.parser
 from select import select
-from Car import Car, Dynamics, angle_diff
+from Car import Car, Dynamics, degrees_diff
 import filenames
 
 folder = 'recordings'
@@ -40,10 +40,10 @@ while True:
     time.sleep(t_wait.total_seconds())
   
   # adjust steering based on heading error
-  actual_turn = angle_diff(start_heading, car.dynamics.heading)
-  expected_turn = angle_diff(record_start_heading, dyn.heading)
+  actual_turn = degrees_diff(start_heading, car.dynamics.heading)
+  expected_turn = degrees_diff(record_start_heading, dyn.heading)
   original_steer_angle = car.angle_for_steering(dyn.str)
-  steer_angle = original_steer_angle + angle_diff(actual_turn, expected_turn)
+  steer_angle = original_steer_angle + degrees_diff(actual_turn, expected_turn)
   str = car.steering_for_angle(steer_angle)
     
   car.set_speed_and_steering(dyn.esc, str)
