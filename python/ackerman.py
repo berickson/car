@@ -2,13 +2,7 @@
 # coding: utf-8
           
 from math import *
-
-def radians_to_degrees(radians):
-  return radians * 180./pi
-
-def degrees_to_radians(degrees):
-  return degrees * pi / 180
-
+from Car import * # todo refactor to get math only
 
 class Ackerman :
   def __init__(self, front_wheelbase_width, wheelbase_length, x=0.0, y=0.0, heading_radians=0.0):
@@ -22,7 +16,7 @@ class Ackerman :
     return 'Ackerman x: {:.5} y: {:.5} heading: {:.5}°'.format(
       self.x,
       self.y,
-      radians_to_degrees(self.heading))
+      degrees(self.heading))
 
   def move_left_wheel(self, outside_wheel_angle, wheel_distance, debug = False):
   
@@ -31,7 +25,7 @@ class Ackerman :
       outside_wheel_angle = 0.
       
     if debug: print '\noutside_wheel_angle: {:.3} wheel_distance: {:.3}'.format(
-      radians_to_degrees(outside_wheel_angle), 
+      degrees(outside_wheel_angle), 
       wheel_distance)
 
     if outside_wheel_angle == 0.:
@@ -55,7 +49,7 @@ class Ackerman :
       if debug: print 'r_car: {:.4} r_left: {:.4}'.format(r_car, r_left)
       
       # calculate angle travelled
-      turn_angle = wheel_distance / r_left
+      turn_angle = wheel_distance / (2.*r_left)
       arc_distance = r_car * turn_angle
       forward = r_car * sin(turn_angle)
       left = r_car * (1.-cos(turn_angle))
@@ -67,14 +61,15 @@ class Ackerman :
     self.y += sin(self.heading)*forward
     self.x += sin(self.heading)*left
     self.y += cos(self.heading)*left
-    self.heading += turn_angle
+    self.heading = standardized_radians(self.heading + turn_angle)
+    
     if debug: print str(self)
 
 if __name__ == '__main__':
 
   angles = [45.]#[0, 0.0001, 1., 45., 90.]
   for outside_angle_degrees in angles:
-    outside_angle = degrees_to_radians(outside_angle_degrees)
+    outside_angle = radians(outside_angle_degrees)
     car = Ackerman(front_wheelbase_width = 10, wheelbase_length = 20)
     car.move_left_wheel(outside_angle, 10., debug = True)
     car.move_left_wheel(-outside_angle, 10., debug = True)

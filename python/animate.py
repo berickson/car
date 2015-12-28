@@ -83,9 +83,9 @@ class FakeCar:
         fields = s.split(',')
         self.dynamics.set_from_log(fields)
         self.odometer = self.dynamics.odometer_ticks / self.ticks_per_meter
-        self.heading = self.dynamics.heading * pi/180. - self.original_heading
+        self.heading = radians(self.dynamics.heading) - self.original_heading
         self.ping = self.dynamics.ping_inches * 0.0254
-        self.wheels_angle = Car.angle_for_steering(self.dynamics.str) * pi/180.
+        self.wheels_angle = radians(Car.angle_for_steering(self.dynamics.str))
 
 
     def move(self):
@@ -97,8 +97,7 @@ class FakeCar:
           self.ackerman.heading = self.heading
           self.ackerman.move_left_wheel(
             outside_wheel_angle  = self.wheels_angle, 
-            wheel_distance = self.velocity,
-            debug = True)
+            wheel_distance = self.velocity)
 
         except EOFError:
           self.reset()

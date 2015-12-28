@@ -2,10 +2,26 @@ import time
 import dateutil.parser
 import threading
 import ConfigParser
+from math import *
+
+
+
+#returns theta in range of [-pi,pi)
+def standardized_radians(theta):
+  return (theta + pi) % (2*pi) - pi
+
+#returns theta2-theta1 in range of [-pi,pi)
+def radians_diff(theta1, theta2):
+  return standardized_radians(theta2 - theta1)
+
+
+#returns theta in range of [-180,180)
+def standardized_degrees(theta):
+  return (theta + 180) % 360 - 180
 
 #returns theta2-theta1 in range of [-180,180)
-def angle_diff(theta1, theta2):
-  return (theta2 - theta1  + 180 )% 360 - 180
+def degrees_diff(theta1, theta2):
+  return standardized_degrees(theta2 - theta1)
 
 #returns y for given x based on x1,y1,x2,y2
 def interpolate(x, x1, y1, x2, y2):
@@ -218,7 +234,7 @@ class Car:
     
       # adjust steering if fixed steering wasn't selected
       if fixed_steering_us == None:
-        heading_error = angle_diff(goal_heading, self.dynamics.heading)
+        heading_error = degrees_diff(goal_heading, self.dynamics.heading)
         steering = self.steering_for_angle(-direction * heading_error)
    
       # adjust speed
@@ -231,7 +247,7 @@ class Car:
     slowdown_start = time.time()
     while (time.time()-slowdown_start < 3):
       if fixed_steering_us == None:
-        heading_error = angle_diff(goal_heading, self.dynamics.heading)
+        heading_error = degrees_diff(goal_heading, self.dynamics.heading)
         steering = self.steering_for_angle(-direction * heading_error * 1.5)
       time.sleep(0.01)
       
