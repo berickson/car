@@ -9,6 +9,12 @@ def angle_diff(theta1, theta2):
 
 #returns y for given x based on x1,y1,x2,y2
 def interpolate(x, x1, y1, x2, y2):
+  x = float(x)
+  x1 = float(x1)
+  x2 = float(x2)
+  y1 = float(y1)
+  y2 = float(y2)
+  
   #print("x:{} x1:{} y1:{} x2:{} y2:{}".format(x,x1,y1,x2,y2))
   m = (y2 - y1)/( x2 - x1 )
   y = y1 + m * (x-x1)
