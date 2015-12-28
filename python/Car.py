@@ -8,7 +8,7 @@ from math import *
 
 #returns theta in range of [-pi,pi)
 def standardized_radians(theta):
-  return (theta + pi) % (2*pi) - pi
+  return (theta + pi) % (2.*pi) - pi
 
 #returns theta2-theta1 in range of [-pi,pi)
 def radians_diff(theta1, theta2):
@@ -205,7 +205,7 @@ class Car:
      
     
   def set_speed_and_steering(self, speed, steering):
-     self.write_command('pse {0},{1}'.format(steering, speed))
+     self.write_command('pse {0},{1}'.format(int(steering), int(speed)))
 
  
   def forward(self, meters, goal_heading = None, fixed_steering_us = None):
