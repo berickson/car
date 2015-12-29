@@ -4,7 +4,7 @@
 #include "I2Cdev.h"
 #include "helper_3dmath.h"
 #include "MPU6050.h"
-#include "vector_math.h"
+//#include "vector_math.h"
 #include "Logger.h"
 
 #define INTERRUPT_PIN 12

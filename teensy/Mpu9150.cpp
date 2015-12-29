@@ -1,5 +1,15 @@
 #include "Mpu9150.h"
 
+#define rads2degrees(radians) (radians * 180. / M_PI)
+
+// ====== double2s(): print out up to 16 digits of input double-precision value
+// This version enables double-precision for Teensy 3, etc. 
+// by J.Beale March 2013
+// modified from original float2s() posted by davekw7x on December, 2010
+// http://arduino.cc/forum/index.php/topic,46931.0.html
+
+
+
 // ================================================================
 // ===               INTERRUPT DETECTION ROUTINE                ===
 // ================================================================
@@ -61,17 +71,29 @@ double Mpu9150::ground_angle() {
   return rads2degrees(yaw_pitch_roll[0]);
 }
 
-
-void Mpu9150::log_status() {
-  log(TRACE_MPU, readingCount + 
-    ",angle,"+ground_angle() +
-    ",quat,"+q.w+"," +q.x+"," +q.y+"," +q.z+
-    ",gravity,"+gravity.x+","+gravity.y+","+gravity.z+
-    ",aa,"+aa.x+","+aa.y+","+aa.z+
-    ",mag,"+mag.x+","+mag.y+","+mag.z+
-    ",ypr,"+rads2degrees(yaw)+","+rads2degrees(pitch)+","+rads2degrees(roll));
+String ftos(float f) {
+  char buffer[80];
+  sprintf(buffer,"%4g",f);
+  return buffer;
 }
 
+void Mpu9150::log_status() {
+  log(TRACE_MPU, (String)readingCount + 
+    ",angle,"+ground_angle() +
+    ",quat,"+ftos(q.w)+"," +ftos(q.x)+"," +ftos(q.y)+"," +ftos(q.z)+
+    ",gravity,"+ftos(gravity.x)+","+ftos(gravity.y)+","+ftos(gravity.z)+
+    ",aa,"+aa.x+","+aa.y+","+aa.z+
+    ",mag,"+mag.x+","+mag.y+","+mag.z+
+    ",ypr,"+ftos(rads2degrees(yaw))+","+ftos(rads2degrees(pitch))+","+ftos(rads2degrees(roll)) );
+}
+
+
+Quaternion qrotate(Quaternion q, Quaternion r) {
+  auto rc = r.getConjugate();
+  auto rq = r.getProduct(q);
+  auto rv = rq.getProduct(rc);
+  return rv;
+}
 
 void Mpu9150::execute(){
   // wait for MPU interrupt or extra packet(s) available
@@ -103,15 +125,17 @@ void Mpu9150::execute(){
     // (this lets us immediately read more without waiting for an interrupt)
     fifoCount -= packetSize;
     
-    Quaternion q_raw;
-    mpu.dmpGetQuaternion(&q_raw, fifoBuffer);
-    Quaternion rotate_y(-0.7071,0,0.7071,0); // rotate y 90 degrees
-    Quaternion rotate_z(.995396,-0.09584,0,0); // rotate z 11 degrees (roll from sloped car edge)
-    rotate_y.normalize();
-    // rotate because board is mounted tilted: todo, handle slight tilt of other axis
-    Quaternion q = q_raw.getProduct(rotate_z).getProduct(rotate_y);
+    mpu.dmpGetQuaternion(&q, fifoBuffer);
+    
+    auto rotate_x = Quaternion(0.7071067811865475,0.7071067811865475,0,0);
+    auto rotate_y = Quaternion(0.7071067811865475,0,0.7071067811865475,0);
+    auto rotate_z = Quaternion(0.7071067811865475,0,0,0.7071067811865475);
+    
+    Quaternion adjust = Quaternion(0.674316,0.0788574,0.731384,-0.0640259);
+    q = q.getProduct(adjust);
+    
+    
     mpu.dmpGetGravity(&gravity, &q);
-    gravity.rotate(&rotate_y);
     
     mpu.dmpGetMag(&mag, fifoBuffer);
     mpu.dmpGetAccel(&aa, fifoBuffer);
