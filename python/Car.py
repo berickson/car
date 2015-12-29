@@ -66,24 +66,24 @@ class Dynamics:
 class Car:
   def __init__(self, online = True):
 
-    print 'car init'
     self.config_path = 'car.ini'
     self.read_configuration()
     self.online = online
 
-    print 'enabling dynamics output'
-    self.quit = False
-    self.write_command('td+')
-    self.dynamics = Dynamics()
-    self.output_thread = threading.Thread(target=self._monitor_output, args = ())
-    self.output_thread.daemon = True
-    self.output_thread.start()
-    
     self.min_forward_speed = 1545
     self.min_reverse_speed = 1445
     
-    while self.dynamics.reading_count == 0:
-      time.sleep(0.01) 
+    if online:
+      self.quit = False
+      self.write_command('td+')
+      self.dynamics = Dynamics()
+      self.output_thread = threading.Thread(target=self._monitor_output, args = ())
+      self.output_thread.daemon = True
+      self.output_thread.start()
+      
+      
+      while self.dynamics.reading_count == 0:
+        time.sleep(0.01) 
 
   def read_configuration(self):
   
@@ -99,13 +99,13 @@ class Car:
     # car dimensions
     self.front_wheelbase_width_in_meters = float(self.get_option('calibration','front_wheelbase_width_in_meters'))
     self.rear_wheelbase_width_in_meters = float(self.get_option('calibration','rear_wheelbase_width_in_meters'))
-    self.Wheelbase_length_in_meters = float(self.get_option('calibration','Wheelbase_length_in_meters'))
+    self.wheelbase_length_in_meters = float(self.get_option('calibration','wheelbase_length_in_meters'))
 
 
   def __del__(self):
-    print 'car delete'
     self.quit = True
-    self.output_thread.join()
+    if self.online:
+      self.output_thread.join()
 
   def get_option(self,section,option):
     config = ConfigParser.ConfigParser()
@@ -125,6 +125,8 @@ class Car:
         
    
   def write_command(self, s):
+    if not online:
+      raise Exception("must be online")
     command = open('/dev/car/command','w')
     #print 'Sending command "{0}"'.format(s)
     command.write("{0}\n".format(s))
