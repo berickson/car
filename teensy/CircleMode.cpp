@@ -37,17 +37,19 @@ void CircleMode::begin() {
   done = false;
 }
 
+
+// returns theta in [-180,180)
+double standardized_degrees(double theta) {
+  return fmod((theta + 180), 360.) - 180.;
+}
+  
 void CircleMode::execute() {
   if(done) {
     return;
   }
   log(LOG_TRACE, "circle has turned " + degrees_turned);
   double ground_angle = mpu->ground_angle();
-  double angle_diff = last_angle-ground_angle;
-  if(abs(angle_diff) > 70){
-    last_angle = ground_angle; // cheating low tech way to avoid wrap around
-    return;
-  }
+  double angle_diff = standardized_degrees(ground_angle - last_angle);
   degrees_turned += angle_diff;
   last_angle = ground_angle;
 

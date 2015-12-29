@@ -59,7 +59,7 @@ void Mpu9150::setup() {
 double Mpu9150::ground_angle() {
   if(!initialReading) return 0.0;
 
-  Quaternion qdiff = diff(q,q0);
+  Quaternion qdiff = diff(q0,q);
   double angle = rads2degrees(normal_angle(qdiff,gravity));
   return angle;
 }
