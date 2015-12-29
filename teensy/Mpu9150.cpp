@@ -68,7 +68,8 @@ void Mpu9150::log_status() {
     ",quat,"+q.w+"," +q.x+"," +q.y+"," +q.z+
     ",gravity,"+gravity.x+","+gravity.y+","+gravity.z+
     ",aa,"+aa.x+","+aa.y+","+aa.z+
-    ",mag,"+mag.x+","+mag.y+","+mag.z);
+    ",mag,"+mag.x+","+mag.y+","+mag.z+
+    ",ypr,"+rads2degrees(yaw)+","+rads2degrees(pitch)+","+rads2degrees(roll));
 }
 
 
