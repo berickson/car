@@ -105,10 +105,11 @@ void Mpu9150::execute(){
     
     Quaternion q_raw;
     mpu.dmpGetQuaternion(&q_raw, fifoBuffer);
-    Quaternion rotate_y(-0.7071,0,0.7071,0);
+    Quaternion rotate_y(-0.7071,0,0.7071,0); // rotate y 90 degrees
+    Quaternion rotate_z(.995396,-0.09584,0,0); // rotate z 11 degrees (roll from sloped car edge)
     rotate_y.normalize();
     // rotate because board is mounted tilted: todo, handle slight tilt of other axis
-    Quaternion q = q_raw.getProduct(rotate_y);
+    Quaternion q = q_raw.getProduct(rotate_z).getProduct(rotate_y);
     mpu.dmpGetGravity(&gravity, &q);
     gravity.rotate(&rotate_y);
     
