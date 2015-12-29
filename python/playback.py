@@ -5,10 +5,6 @@ import dateutil.parser
 from select import select
 from Car import Car, Dynamics, degrees_diff
 from Recording import Recording
-import filenames
-from ackerman import Ackerman
-from math import *
-import copy
 
 def playback():
   record_start_time = None
@@ -16,8 +12,6 @@ def playback():
 
   car = Car()
   car.set_rc_mode()
-  while car.dynamics.reading_count == 0:
-    time.sleep(0.01) 
 
   start_heading = car.dynamics.heading
   recording = Recording()
