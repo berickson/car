@@ -58,10 +58,7 @@ void Mpu9150::setup() {
 
 double Mpu9150::ground_angle() {
   if(!initialReading) return 0.0;
-
-  Quaternion qdiff = diff(q0,q);
-  double angle = rads2degrees(normal_angle(qdiff,gravity));
-  return angle;
+  return rads2degrees(yaw_pitch_roll[0]);
 }
 
 
@@ -104,11 +101,21 @@ void Mpu9150::execute(){
     // track FIFO count here in case there is > 1 packet available
     // (this lets us immediately read more without waiting for an interrupt)
     fifoCount -= packetSize;
-
-    mpu.dmpGetQuaternion(&q, fifoBuffer);
+    
+    Quaternion q_raw;
+    mpu.dmpGetQuaternion(&q_raw, fifoBuffer);
+    Quaternion rotate_y(-0.7071,0,0.7071,0);
+    rotate_y.normalize();
+    // rotate because board is mounted tilted: todo, handle slight tilt of other axis
+    Quaternion q = q_raw.getProduct(rotate_y);
     mpu.dmpGetGravity(&gravity, &q);
+    gravity.rotate(&rotate_y);
+    
     mpu.dmpGetMag(&mag, fifoBuffer);
     mpu.dmpGetAccel(&aa, fifoBuffer);
+    
+    mpu.dmpGetYawPitchRoll(yaw_pitch_roll, &q, &gravity);
+    
     readingCount++;
 
     // get initial quaternion and gravity

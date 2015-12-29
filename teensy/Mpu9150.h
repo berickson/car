@@ -32,6 +32,7 @@ public:
   VectorInt16 a0;
   VectorInt16 mag;
   VectorFloat gravity;    // [x, y, z]            gravity vector
+  float yaw_pitch_roll[3];
 
   void setup();
   double ground_angle();
