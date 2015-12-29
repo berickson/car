@@ -73,7 +73,7 @@ class Car:
     self.min_forward_speed = 1545
     self.min_reverse_speed = 1445
     
-    if online:
+    if self.online:
       self.quit = False
       self.write_command('td+')
       self.dynamics = Dynamics()
@@ -125,7 +125,7 @@ class Car:
         
    
   def write_command(self, s):
-    if not online:
+    if not self.online:
       raise Exception("must be online")
     command = open('/dev/car/command','w')
     #print 'Sending command "{0}"'.format(s)
