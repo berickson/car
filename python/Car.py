@@ -2,26 +2,11 @@ import time
 import dateutil.parser
 import threading
 import ConfigParser
+from ackerman import Ackerman
 from math import *
+from geometry import *
 
 
-
-#returns theta in range of [-pi,pi)
-def standardized_radians(theta):
-  return (theta + pi) % (2.*pi) - pi
-
-#returns theta2-theta1 in range of [-pi,pi)
-def radians_diff(theta1, theta2):
-  return standardized_radians(theta2 - theta1)
-
-
-#returns theta in range of [-180,180)
-def standardized_degrees(theta):
-  return (theta + 180) % 360 - 180
-
-#returns theta2-theta1 in range of [-180,180)
-def degrees_diff(theta1, theta2):
-  return standardized_degrees(theta2 - theta1)
 
 #returns y for given x based on x1,y1,x2,y2
 def interpolate(x, x1, y1, x2, y2):
@@ -70,6 +55,7 @@ class Car:
     self.read_configuration()
     self.online = online
 
+    self.heading_adjustment = 0.
     self.min_forward_speed = 1545
     self.min_reverse_speed = 1445
     self.ackerman = Ackerman(
@@ -92,6 +78,7 @@ class Car:
   
     # odometry
     self.meters_per_odometer_tick = float(self.get_option('calibration','meters_per_odometer_tick'))
+    self.gyro_adjustment_factor = float(self.get_option('calibration','gyro_adjustment_factor'))
     
     # esc and steering
     self.center_steering_us = int(self.get_option('calibration','center_steering_us'))
@@ -144,29 +131,35 @@ class Car:
         if fields != None:
           if len(fields) > 1:
             if fields[1] == 'TRACE_DYNAMICS':
+              if len(fields) != 29:
+                print 'invalid TRACE_DYNAMICS packet'
+                continue
               # todo, handle contention with different threads
               # for now, make changeover quick and don't mess
               # with existing structures, maybe by keeping a big list
-              new_dynamics = Dynamics()
-              new_dynamics.set_from_log(fields)
-              self.previous_dynamics = self.dynamics
-              self.dynamics = new_dynamics
+              current = Dynamics()
+              current.set_from_log(fields)
+              previous = self.dynamics
+              self.dynamics = current
               self.reading_count += 1
               if self.reading_count > 1:
-                self.apply_dynamics(self.dynamics, self.previous_dynamics)
+                self.apply_dynamics(current, previous)
               else:
-                self.original_dynamics = new_dynamics
+                self.original_dynamics = current
               
       else:
         time.sleep(0.001)
   
   def apply_dynamics(self, current, previous):
-    relative_heading_radians = radians(self.original_dynamics.heading - current.dynamics.heading)
+
+    self.heading_adjustment += (1. - self.gyro_adjustment_factor) * standardized_degrees(current.heading - previous.heading)
+    relative_heading = standardized_degrees(self.original_dynamics.heading - current.heading + self.heading_adjustment)
+    relative_heading_radians = radians(relative_heading)
     outside_wheel_angle = radians(Car.angle_for_steering(previous.str))
-    wheel_distance = (current.odometer_ticks-previous.odometer_dicks)  / self.ticks_per_meter
+    wheel_distance = (current.odometer_ticks-previous.odometer_ticks)  * self.meters_per_odometer_tick
     self.ackerman.heading = relative_heading_radians
-    self.ackerman.move(outside_wheel_angle, wheel_distance)
-    print("x:{:.2} y:{:.12".format(self.ackerman.x, self.ackerman.y))
+    self.ackerman.move_left_wheel(outside_wheel_angle, wheel_distance)
+    print("x:{:.2f} y:{:.2f} heading:{:.2f}".format(self.ackerman.x, self.ackerman.y, relative_heading))
   
   def set_rc_mode(self):
     self.write_command('rc')
@@ -280,15 +273,9 @@ class Car:
 def main():
   print 'testing car'
   car = Car()
-  print ('waiting for first reading')
-  while car.dynamics.reading_count == 0:
+  # wait here so messages can come from thread and we can trap ctrl-c
+  while True:
     time.sleep(0.01) 
-  
-  print ('waiting for steering to go below 1200')
-  while car.dynamics.str > 1200:
-    print 'odometer: {0}'.format(car.odometer)
-    time.sleep(0.25) 
-  print ('it happened!')
   
 
 if __name__ == "__main__":

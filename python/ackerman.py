@@ -2,7 +2,7 @@
 # coding: utf-8
           
 from math import *
-from Car import * # todo refactor to get math only
+from geometry import *
 
 class Ackerman :
   def __init__(self, front_wheelbase_width, wheelbase_length, x=0.0, y=0.0, heading_radians=0.0):
