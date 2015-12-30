@@ -1,6 +1,7 @@
 from Car import *
 from Recording import Recording
 from ackerman import *
+from filenames import *
 
 def write_path_from_recording_file(inpath = None, outpath = None):
   odometer = 0
@@ -54,6 +55,7 @@ def write_path_from_recording_file(inpath = None, outpath = None):
       outfile.write(line+"\n")
        
 if __name__ == '__main__':
-  write_path_from_recording_file('recordings/recording_015.csv')
+  input_path = latest_filename('recordings','recording','csv')
+  write_path_from_recording_file(input_path)
        
 
