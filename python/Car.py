@@ -65,13 +65,16 @@ class Dynamics:
 
 class Car:
   def __init__(self, online = True):
-
+    self.reading_count = 0
     self.config_path = 'car.ini'
     self.read_configuration()
     self.online = online
 
     self.min_forward_speed = 1545
     self.min_reverse_speed = 1445
+    self.ackerman = Ackerman(
+      front_wheelbase_width = self.front_wheelbase_width_in_meters, 
+      wheelbase_length = self.wheelbase_length_in_meters)
     
     if self.online:
       self.quit = False
@@ -100,7 +103,6 @@ class Car:
     self.front_wheelbase_width_in_meters = float(self.get_option('calibration','front_wheelbase_width_in_meters'))
     self.rear_wheelbase_width_in_meters = float(self.get_option('calibration','rear_wheelbase_width_in_meters'))
     self.wheelbase_length_in_meters = float(self.get_option('calibration','wheelbase_length_in_meters'))
-
 
   def __del__(self):
     self.quit = True
@@ -142,10 +144,30 @@ class Car:
         if fields != None:
           if len(fields) > 1:
             if fields[1] == 'TRACE_DYNAMICS':
-              self.dynamics.set_from_log(fields)
+              # todo, handle contention with different threads
+              # for now, make changeover quick and don't mess
+              # with existing structures, maybe by keeping a big list
+              new_dynamics = Dynamics()
+              new_dynamics.set_from_log(fields)
+              self.previous_dynamics = self.dynamics
+              self.dynamics = new_dynamics
+              self.reading_count += 1
+              if self.reading_count > 1:
+                self.apply_dynamics(self.dynamics, self.previous_dynamics)
+              else:
+                self.original_dynamics = new_dynamics
+              
       else:
         time.sleep(0.001)
-        
+  
+  def apply_dynamics(self, current, previous):
+    relative_heading_radians = radians(self.original_dynamics.heading - current.dynamics.heading)
+    outside_wheel_angle = radians(Car.angle_for_steering(previous.str))
+    wheel_distance = (current.odometer_ticks-previous.odometer_dicks)  / self.ticks_per_meter
+    self.ackerman.heading = relative_heading_radians
+    self.ackerman.move(outside_wheel_angle, wheel_distance)
+    print("x:{:.2} y:{:.12".format(self.ackerman.x, self.ackerman.y))
+  
   def set_rc_mode(self):
     self.write_command('rc')
 
