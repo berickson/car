@@ -42,6 +42,7 @@ def write_path_from_recording_file(inpath = None):
        str(current.esc),
        str(current.str),
        str(wheel_meters_per_second)])
+    print next.datetime
        
 if __name__ == '__main__':
-  write_path_from_recording_file('recordings/recording_007.csv')
+  write_path_from_recording_file('recordings/recording_015.csv')
