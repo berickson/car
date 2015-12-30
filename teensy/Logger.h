@@ -17,3 +17,7 @@ extern bool TRACE_DYNAMICS;
 if(flag) {             \
     Serial.println((String) #flag + "," + s); \
 } 
+
+
+// returns float as string to overcome bug in Arduino castin
+String ftos(float f);

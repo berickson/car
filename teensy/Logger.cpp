@@ -8,3 +8,9 @@ bool TRACE_MPU = false;
 bool TRACE_LOOP_SPEED = false;
 bool TRACE_DYNAMICS = false;
 
+
+String ftos(float f) {
+  char buffer[80];
+  sprintf(buffer,"%4g",f);
+  return buffer;
+}
