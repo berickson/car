@@ -74,12 +74,6 @@ float Mpu9150::heading() {
   return rads2degrees(yaw_pitch_roll[0]);
 }
 
-String ftos(float f) {
-  char buffer[80];
-  sprintf(buffer,"%4g",f);
-  return buffer;
-}
-
 void Mpu9150::log_status() {
   log(TRACE_MPU, (String)readingCount + 
     ",heading,"+heading() +

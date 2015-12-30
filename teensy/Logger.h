@@ -18,6 +18,7 @@ if(flag) {             \
     Serial.println((String) #flag + "," + s); \
 } 
 
+#include "Arduino.h"
 
-// returns float as string to overcome bug in Arduino castin
+// returns float as string to overcome bug in Arduino casting
 String ftos(float f);

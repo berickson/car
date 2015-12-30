@@ -1,3 +1,5 @@
+#include "Logger.h"
+
 bool LOG_ERROR = true;
 bool LOG_INFO = false;
 bool LOG_TRACE = false;
@@ -11,6 +13,6 @@ bool TRACE_DYNAMICS = false;
 
 String ftos(float f) {
   char buffer[80];
-  sprintf(buffer,"%4g",f);
+  sprintf(buffer,"%.2f",f);
   return buffer;
 }

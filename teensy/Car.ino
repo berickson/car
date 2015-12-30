@@ -485,7 +485,7 @@ void loop() {
        +",odo,"+odometer
        +",ms,"+millis()
        +",us,"+micros()
-       +",ypr,"+ (double)mpu9150.yaw + ", " + (double)mpu9150.pitch + ", " + (double)mpu9150.roll // double cast to avoid float format bug
+       +",ypr,"+ ftos(mpu9150.yaw* 180. / M_PI) + ", " + ftos(mpu9150.pitch* 180. / M_PI) + ", " + ftos(mpu9150.roll* 180. / M_PI)
        );
   }
 
