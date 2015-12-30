@@ -125,6 +125,7 @@ void Mpu9150::execute(){
     // (this lets us immediately read more without waiting for an interrupt)
     fifoCount -= packetSize;
     
+<<<<<<< Updated upstream
     mpu.dmpGetQuaternion(&q, fifoBuffer);
     
     auto rotate_x = Quaternion(0.7071067811865475,0.7071067811865475,0,0);
@@ -135,6 +136,16 @@ void Mpu9150::execute(){
     q = q.getProduct(adjust);
     
     
+=======
+    Quaternion q_raw;
+    mpu.dmpGetQuaternion(&q_raw, fifoBuffer);
+    Quaternion rotate_y(-0.7071,0,0.7071,0); // rotate y 90 degrees
+    Quaternion rotate_z(.995396,-0.09584,0,0); // rotate z 11 degrees (roll from sloped car edge)
+    rotate_y.normalize();
+    rotate_z.normalize();
+    // rotate because board is mounted tilted: todo, handle slight tilt of other axis
+    Quaternion q = q_raw.getProduct(rotate_z).getProduct(rotate_y);
+>>>>>>> Stashed changes
     mpu.dmpGetGravity(&gravity, &q);
     
     mpu.dmpGetMag(&mag, fifoBuffer);
