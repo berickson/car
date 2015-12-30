@@ -1,5 +1,6 @@
 import time
-from Car import Car, angle_diff
+from car import Car
+from geometry import *
 
 #goal is to find a way to point the wheels straight ahead
 

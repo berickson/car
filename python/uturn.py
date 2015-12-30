@@ -1,5 +1,5 @@
 import time
-from Car import Car, angle_diff
+from car import Car, angle_diff
 car = Car()
 time.sleep(3)
 

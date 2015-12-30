@@ -1,5 +1,5 @@
-from Car import *
-from Recording import Recording
+from car import *
+from recording import Recording
 from ackerman import *
 from filenames import *
 

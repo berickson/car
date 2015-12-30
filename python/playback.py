@@ -3,8 +3,8 @@ import datetime
 import time
 import dateutil.parser
 from select import select
-from Car import Car, Dynamics, degrees_diff
-from Recording import Recording
+from car import Car, Dynamics, degrees_diff
+from recording import Recording
 
 def playback():
   record_start_time = None

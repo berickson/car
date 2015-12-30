@@ -1,4 +1,4 @@
-from Car import Car
+from car import Car
 car = Car()
 meters = 3.0
 

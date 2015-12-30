@@ -3,7 +3,7 @@ import datetime
 import time
 import dateutil.parser
 from select import select
-from Car import Car, Dynamics, degrees_diff
+from car import Car, Dynamics, degrees_diff
 import filenames
 from ackerman import Ackerman
 from math import *
