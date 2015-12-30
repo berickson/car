@@ -354,9 +354,7 @@ int calculate_rpm_pps(unsigned int esc, unsigned int rpm_pps, int last_calculate
   bool forward_esc = esc >= 1544;
   bool neutral_esc = !forward_esc && !reverse_esc;
   bool ambiguous_pps = rpm_pps < 1000;
-  bool was_reverse = last_calculated_rpm_pps < 0;
   bool increasing_pps = rpm_pps > abs(last_calculated_rpm_pps);
-  bool decreasing_pps = rpm_pps < abs(last_calculated_rpm_pps);
   
   ///////////////////////////////////////////////////////////
   // see if we are sitting still
@@ -409,7 +407,6 @@ void loop() {
 
   // get common execution times
   bool every_second = every_n_ms(last_loop_time_ms, loop_time_ms, 1000);
-  bool every_100_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 100);
   bool every_20_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 20);
 
 
@@ -482,12 +479,13 @@ void loop() {
        "str, " + steering.readMicroseconds()
        + ", esc," + esc
        + ", aa, "+ (mpu9150.aa.x - mpu9150.a0.x) + ", " + (mpu9150.aa.y  - mpu9150.a0.y)+", "+ (mpu9150.aa.z  - mpu9150.a0.z)
-       +", angle, "+mpu9150.ground_angle()
+       +", heading, "+mpu9150.heading()
        +",rpm,"+ rpm_pps + "," + calculated_rpm_pps + ", " + delta_pulse + "," + motor_pulse_odometer
        +",ping,"+ping.inches()
        +",odo,"+odometer
        +",ms,"+millis()
        +",us,"+micros()
+       +",ypr,"+ (double)mpu9150.yaw + ", " + (double)mpu9150.pitch + ", " + (double)mpu9150.roll // double cast to avoid float format bug
        );
   }
 

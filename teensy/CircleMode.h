@@ -7,7 +7,7 @@ class CircleMode : public Task {
 public:
   Pid pid;
   double angle_to_turn = 90;
-  double last_angle;
+  double last_heading;
   double degrees_turned = 0;
   Mpu9150 * mpu;
   bool done = false;

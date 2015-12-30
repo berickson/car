@@ -18,7 +18,7 @@ void CircleMode::init(Mpu9150 * _mpu) {
 
 void CircleMode::begin() {
   Serial.println("begin of circle mode");
-  last_angle = mpu->ground_angle();
+  last_heading = mpu->heading();
   degrees_turned = 0;
 
   // assumes power is -1 to 1 range
@@ -48,10 +48,10 @@ void CircleMode::execute() {
     return;
   }
   log(LOG_TRACE, "circle has turned " + degrees_turned);
-  double ground_angle = mpu->ground_angle();
-  double angle_diff = standardized_degrees(ground_angle - last_angle);
+  double heading = mpu->heading();
+  double angle_diff = standardized_degrees(heading - last_heading);
   degrees_turned += angle_diff;
-  last_angle = ground_angle;
+  last_heading = heading;
 
   pid.set_pv(degrees_turned,(millis()-start_millis)/1000.);
   double v = pid.get_output();  // will be in range (-1,1)

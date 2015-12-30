@@ -27,7 +27,6 @@ public:
 
   // orientation/motion vars
   Quaternion q;           // [w, x, y, z]         quaternion container
-  Quaternion q0;          // initial quaternion
   VectorInt16 aa;         // [x, y, z]            accel sensor measurements
   VectorInt16 a0;
   VectorInt16 mag;
@@ -38,7 +37,7 @@ public:
   float &roll = yaw_pitch_roll[2];
 
   void setup();
-  double ground_angle();
+  float heading();
   void log_status();
 
   void execute();

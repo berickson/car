@@ -66,9 +66,12 @@ void Mpu9150::setup() {
 
 }
 
-double Mpu9150::ground_angle() {
+
+// returns an inverted yaw value so rotation follows
+// standard of ccw being positive
+float Mpu9150::heading() {
   if(!initialReading) return 0.0;
-  return rads2degrees(yaw_pitch_roll[0]);
+  return rads2degrees(-yaw_pitch_roll[0]);
 }
 
 String ftos(float f) {
@@ -79,7 +82,7 @@ String ftos(float f) {
 
 void Mpu9150::log_status() {
   log(TRACE_MPU, (String)readingCount + 
-    ",angle,"+ground_angle() +
+    ",heading,"+heading() +
     ",quat,"+ftos(q.w)+"," +ftos(q.x)+"," +ftos(q.y)+"," +ftos(q.z)+
     ",gravity,"+ftos(gravity.x)+","+ftos(gravity.y)+","+ftos(gravity.z)+
     ",aa,"+aa.x+","+aa.y+","+aa.z+
@@ -125,27 +128,13 @@ void Mpu9150::execute(){
     // (this lets us immediately read more without waiting for an interrupt)
     fifoCount -= packetSize;
     
-<<<<<<< Updated upstream
     mpu.dmpGetQuaternion(&q, fifoBuffer);
-    
-    auto rotate_x = Quaternion(0.7071067811865475,0.7071067811865475,0,0);
-    auto rotate_y = Quaternion(0.7071067811865475,0,0.7071067811865475,0);
-    auto rotate_z = Quaternion(0.7071067811865475,0,0,0.7071067811865475);
-    
+
+    // the following adjusts for the orientation of the mpu mounted in the car
+    // while sitting flat on the ground
     Quaternion adjust = Quaternion(0.674316,0.0788574,0.731384,-0.0640259);
     q = q.getProduct(adjust);
-    
-    
-=======
-    Quaternion q_raw;
-    mpu.dmpGetQuaternion(&q_raw, fifoBuffer);
-    Quaternion rotate_y(-0.7071,0,0.7071,0); // rotate y 90 degrees
-    Quaternion rotate_z(.995396,-0.09584,0,0); // rotate z 11 degrees (roll from sloped car edge)
-    rotate_y.normalize();
-    rotate_z.normalize();
-    // rotate because board is mounted tilted: todo, handle slight tilt of other axis
-    Quaternion q = q_raw.getProduct(rotate_z).getProduct(rotate_y);
->>>>>>> Stashed changes
+
     mpu.dmpGetGravity(&gravity, &q);
     
     mpu.dmpGetMag(&mag, fifoBuffer);
