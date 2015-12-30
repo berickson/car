@@ -71,7 +71,7 @@ void Mpu9150::setup() {
 // standard of ccw being positive
 float Mpu9150::heading() {
   if(!initialReading) return 0.0;
-  return rads2degrees(-yaw_pitch_roll[0]);
+  return rads2degrees(yaw_pitch_roll[0]);
 }
 
 String ftos(float f) {
