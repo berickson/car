@@ -127,6 +127,10 @@ void Mpu9150::execute(){
     // the following adjusts for the orientation of the mpu mounted in the car
     // while sitting flat on the ground
     Quaternion adjust = Quaternion(0.674316,0.0788574,0.731384,-0.0640259);
+    Quaternon y_180 = Quaternion(0,0,1,0);
+    adjust = y_180.getProdut(adjust);
+
+
     q = q.getProduct(adjust);
 
     mpu.dmpGetGravity(&gravity, &q);
