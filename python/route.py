@@ -1,5 +1,13 @@
 class RouteNode:
-  def __init__(self, secs, x, y, heading_degrees, heading_degrees_adjustment, esc_ms, str_ms, meters_per_second):
+  def __init__:
+    self.x = 0.
+    self.y = 0.
+    
+  def set(x,y):
+    self.x = x
+    self.y = y
+  
+  def set_from_standard_file(self, secs, x, y, heading_degrees, heading_degrees_adjustment, esc_ms, str_ms, meters_per_second):
     self.secs = secs
     self.x = float(x)
     self.y = float(y)
@@ -15,7 +23,15 @@ class Route:
     self.nodes = []
     # a segment is from node[index] to node[index+1]
     self.index = 0
-    pass
+    
+  def add_node(x,y):
+    node = RouteNode()
+    node.set(x=x,y=y)
+    nodes.append(node)
+  
+  def done(self):
+    return self.index == len(nodes-2)
+    
   
   
   # analyse cross track error at current segment
@@ -25,19 +41,26 @@ class Route:
   # 
   # inspired by Udacity cs373 quiz_6_6.py and quiz_6_7.py
   def cross_track_error(x,y):
-    # some basic vector calculations
-    dx = nodes[index+1].x - nodes[index].x
-    dy = nodes[index+1].y - nodes[index].y
-    drx = x - nodes[index][0]
-    dry = y - nodes[index][1]
-    
-    # u is the robot estimate projected onto the path segment
-    progress = (drx * dx + dry * dy) / (dx * dx + dy * dy)
-    
-    # the cte is the estimate projected onto the normal of the path segment
-    cte = (dry * dx - drx * dy) / (dx * dx + dy * dy)
-    
-    return (progress, cte)
+    while True and note self.done():
+      # some basic vector calculations
+      dx = nodes[index+1].x - nodes[index].x
+      dy = nodes[index+1].y - nodes[index].y
+      drx = x - nodes[index][0]
+      dry = y - nodes[index][1]
+      
+      # u is the robot estimate projected onto the path segment
+      progress = (drx * dx + dry * dy) / (dx * dx + dy * dy)
+      
+      # the cte is the estimate projected onto the normal of the path segment
+      cte = (dry * dx - drx * dy) / (dx * dx + dy * dy)
+      
+      if progress > 1.0:
+        index += 1
+      else:
+        break
+
+    return None if done else cte
+
   
   def header_string(self):
     return ",".join(self.columns)
@@ -57,7 +80,8 @@ class Route:
         fields = l.split(',')
         if len(fields) != len(self.columns):
           raise Exception("wrong number of columns in data on line {}, expected {} was {}".format(line_number, len(self.columns), len(fields)));
-        self.nodes.append(RouteNode(*fields))
+
+        self.nodes.append(RouteNode().set_from_standard_file(*fields))
         
   def save_to_file(self, file_path):
     with open(file_path,'w') as f:

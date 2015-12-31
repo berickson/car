@@ -178,6 +178,11 @@ class Car:
     self.velocity = wheel_distance / elapsed_time
     print("x:{:.2f} y:{:.2f} heading:{:.2f}".format(self.ackerman.x, self.ackerman.y, relative_heading))
   
+  def position(self):
+    return (self.ackerman.x, self.ackerman.y)
+    
+    
+  
   def set_rc_mode(self):
     self.write_command('rc')
 
