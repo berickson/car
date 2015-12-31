@@ -3,6 +3,12 @@ from recording import Recording
 from ackerman import *
 from filenames import *
 
+
+       
+    
+    
+  
+
 def write_path_from_recording_file(inpath = None, outpath = None):
   odometer = 0
   car = Car(online=False)
