@@ -6,8 +6,8 @@ class RouteNode:
     self.y = 0.
     
   def set(self,x,y):
-    self.x = x
-    self.y = y
+    self.x = float(x)
+    self.y = float(y)
   
   def set_from_standard_file(self, secs, x, y, heading_degrees, heading_degrees_adjustment, esc_ms, str_ms, meters_per_second):
     self.secs = secs
@@ -45,11 +45,13 @@ class Route:
   def cross_track_error(self,x,y):
     cte = 0.0
     while not self.done():
+      p1 = self.nodes[self.index]
+      p2 = self.nodes[self.index+1]
       # some basic vector calculations
-      dx = self.nodes[self.index+1].x - self.nodes[self.index].x
-      dy = self.nodes[self.index+1].y - self.nodes[self.index].y
-      drx = x - self.nodes[self.index].x
-      dry = y - self.nodes[self.index].y
+      dx = p2.x - p1.x
+      dy = p2.y - p1.y
+      drx = x - p1.x
+      dry = y - p1.y
       
       # u is the robot estimate projected onto the path segment
       progress = (drx * dx + dry * dy) / (dx * dx + dy * dy)
@@ -68,7 +70,7 @@ class Route:
   def heading_radians(self):
     p1 = self.nodes[self.index]
     p2 = self.nodes[self.index+1]
-    return atan2(p2.y-p1.y,p2.x-p1.x)
+    return -atan2(p1.y-p2.y,p2.x-p1.x)
     
 
 

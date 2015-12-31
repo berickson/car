@@ -8,13 +8,20 @@ from recording import Recording
 from route import *
 from math import *
 
-desired_velocity = 0.
+automatic = True
+desired_velocity = 0.75
 
 def play_route():
   route = Route()
-  route.add_node(0.,0)
-  route.add_node(1.,-0.5)
-  route.add_node(3.,-0.5)
+  route.add_node(0.,0.)
+  route.add_node(3,0.)
+  route.add_node(4,.25)
+  route.add_node(5,.25)
+  route.add_node(6,.25)
+  route.add_node(6.5,.25)
+
+  #route.add_node(1.,-0.25)
+  #route.add_node(3.,-0.25)
   
 #  route.add_node(.5,-0.25)
 #  route.add_node(.8,-0.1)
@@ -22,29 +29,33 @@ def play_route():
 
   
   car = Car()
-  car.set_rc_mode()
+  if automatic: car.set_rc_mode()
 
   # keep going until we run out of track  
   while True:
-    (x,y) = car.position()
+    (x,y) = car.front_position()
+    
+    # positive cte means car is to the right of track
+    # None means eof
     cte = route.cross_track_error(x,y)
     if cte is None:
       break;
 
     # calculate speed 
     if car.velocity < desired_velocity:
-      esc_ms = car.min_forward_speed
+      esc_ms = car.min_forward_speed+3
     else:
-      esc_ms = 1500
+      esc_ms = car.min_forward_speed - 10
       
     # calculate steering
     segment_heading = degrees(route.heading_radians())
     car_heading = car.heading_degrees()
-    steering_angle = segment_heading - car_heading + 30. * cte
+    steering_angle = segment_heading - car_heading + 10. * cte
     
     str_ms = car.steering_for_angle(steering_angle)
  
-    print("x: {:.2f} y:{:.2f} cte:{:.2f} v:{:.2f} heading:{:.2f} segment_heading: {:.2f} steer_degrees: {:.2f}".format(
+    print("i: {:.2f} x: {:.2f} y:{:.2f} cte:{:.2f} v:{:.2f} heading:{:.2f} segment_heading: {:.2f} steer_degrees: {:.2f}".format(
+       route.index,
        x,
        y,
        cte,
@@ -55,7 +66,7 @@ def play_route():
    
     
     # send to car
-    car.set_speed_and_steering(esc_ms, str_ms)
+    if automatic: car.set_speed_and_steering(esc_ms, str_ms) 
     
     time.sleep(0.02)
 

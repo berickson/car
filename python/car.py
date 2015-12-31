@@ -142,7 +142,7 @@ class Car:
     fields = s.split(',')
     if fields == None:
       return
-    if len(fields) == 0:
+    if len(fields) < 10:
       return
     if fields[1] != 'TRACE_DYNAMICS':
       return
@@ -181,6 +181,12 @@ class Car:
   
   def position(self):
     return (self.ackerman.x, self.ackerman.y)
+  
+  # returns position of front of car (between two front wheels)
+  def front_position(self):
+    h = self.heading_degrees();
+    l = self.wheelbase_length_in_meters
+    return (self.ackerman.x + l * sin(h) , self.ackerman.y + l * cos(h))
     
   def heading_degrees(self):
     return standardized_degrees(self.dynamics.heading - self.original_dynamics.heading + self.heading_adjustment)
