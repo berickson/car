@@ -50,29 +50,28 @@ class Dynamics:
 
 class Car:
   def __init__(self, online = True):
-    self.reading_count = 0
     self.config_path = 'car.ini'
     self.read_configuration()
     self.online = online
-
-    self.heading_adjustment = 0.
-    self.min_forward_speed = 1545
-    self.min_reverse_speed = 1445
-    self.ackerman = Ackerman(
-      front_wheelbase_width = self.front_wheelbase_width_in_meters, 
-      wheelbase_length = self.wheelbase_length_in_meters)
+    self.reset_odometry()
     
     if self.online:
       self.quit = False
       self.write_command('td+')
-      self.dynamics = Dynamics()
       self.output_thread = threading.Thread(target=self._monitor_output, args = ())
       self.output_thread.daemon = True
       self.output_thread.start()
-      
-      
       while self.dynamics.reading_count == 0:
         time.sleep(0.01) 
+        
+  def reset_odometry(self):
+    self.reading_count = 0
+    self.dynamics = Dynamics()
+    self.velocity = 0.0
+    self.heading_adjustment = 0.
+    self.ackerman = Ackerman(
+      front_wheelbase_width = self.front_wheelbase_width_in_meters, 
+      wheelbase_length = self.wheelbase_length_in_meters)
 
   def read_configuration(self):
   
@@ -90,6 +89,12 @@ class Car:
     self.front_wheelbase_width_in_meters = float(self.get_option('calibration','front_wheelbase_width_in_meters'))
     self.rear_wheelbase_width_in_meters = float(self.get_option('calibration','rear_wheelbase_width_in_meters'))
     self.wheelbase_length_in_meters = float(self.get_option('calibration','wheelbase_length_in_meters'))
+    
+    # infer general dimensions
+    # todo: put these in config to get complete shape of car
+    self.length = self.wheelbase_length_in_meters
+    self.width = self.front_wheelbase_width_in_meters
+    
 
   def __del__(self):
     self.quit = True
@@ -127,31 +132,41 @@ class Car:
     while not self.quit:
       s = self.output.readline()
       if s:
-        fields = s.split(',')
-        if fields != None:
-          if len(fields) > 1:
-            if fields[1] == 'TRACE_DYNAMICS':
-              if len(fields) != 29:
-                print 'invalid TRACE_DYNAMICS packet'
-                continue
-              # todo, handle contention with different threads
-              # for now, make changeover quick and don't mess
-              # with existing structures, maybe by keeping a big list
-              current = Dynamics()
-              current.set_from_log(fields)
-              previous = self.dynamics
-              self.dynamics = current
-              self.reading_count += 1
-              if self.reading_count > 1:
-                self.apply_dynamics(current, previous)
-              else:
-                self.original_dynamics = current
-              
+        self.process_line_from_log(s)              
       else:
         time.sleep(0.001)
+
+  def process_line_from_log(self, s):
+    # sanity check.  Only process valid TRACE_DYNAMICS log lines
+    fields = s.split(',')
+    if fields == None:
+      return
+    if len(fields) == 0:
+      return
+    if fields[1] != 'TRACE_DYNAMICS':
+      return
+    if len(fields) != 29:
+      print 'invalid TRACE_DYNAMICS packet'
+      return
+      
+    # todo, handle contention with different threads
+    # for now, make changeover quick and don't mess
+    # with existing structures, maybe by keeping a big list
+    current = Dynamics()
+    current.set_from_log(fields)
+    previous = self.dynamics
+    self.dynamics = current
+    self.reading_count += 1
+    if self.reading_count > 1:
+      self.apply_dynamics(current, previous)
+    else:
+      self.original_dynamics = current
+  
+  # returns ping distance in meters
+  def ping_distance(self):
+    return self.dynamics.ping_inches * 0.0254
   
   def apply_dynamics(self, current, previous):
-
     self.heading_adjustment += (1. - self.gyro_adjustment_factor) * standardized_degrees(current.heading - previous.heading)
     relative_heading = standardized_degrees(self.original_dynamics.heading - current.heading + self.heading_adjustment)
     relative_heading_radians = radians(relative_heading)
@@ -159,6 +174,8 @@ class Car:
     wheel_distance = (current.odometer_ticks-previous.odometer_ticks)  * self.meters_per_odometer_tick
     self.ackerman.heading = relative_heading_radians
     self.ackerman.move_left_wheel(outside_wheel_angle, wheel_distance)
+    elapsed_time = ( current.ms - previous.ms ) / 1000.
+    self.velocity = wheel_distance / elapsed_time
     print("x:{:.2f} y:{:.2f} heading:{:.2f}".format(self.ackerman.x, self.ackerman.y, relative_heading))
   
   def set_rc_mode(self):
@@ -166,7 +183,10 @@ class Car:
 
   def set_manual_mode(self):
     self.write_command('m')
-    
+  
+  def wheels_angle(self):
+    return self.angle_for_steering(self.dynamics.str) 
+      
   @staticmethod
   def angle_for_steering(str):
     data = [
@@ -267,6 +287,28 @@ class Car:
         heading_error = degrees_diff(goal_heading, self.dynamics.heading)
         steering = self.steering_for_angle(-direction * heading_error * 1.5)
       time.sleep(0.01)
+
+
+class FakeCar(Car):
+    def __init__(self, recording_file_path):
+        self.recording_file_path = recording_file_path;
+        Car.__init__(self, online=False)
+        self.reset()
+        self.done = False
+        self.step()
+        
+    def reset(self):
+        self.dynamics_file = open(self.recording_file_path)
+        self.reset_odometry()
+        self.step()
+    
+    def step(self):
+        s = self.dynamics_file.readline()
+        if not s:
+          return False
+        self.process_line_from_log(s)
+        return True
+
       
 
 

@@ -3,8 +3,7 @@ import random
 import gobject
 import math
 from math import *
-from Car import Dynamics, Car
-import ackerman
+from car import Dynamics, FakeCar
 
 import pygtk
 pygtk.require('2.0')
@@ -54,54 +53,9 @@ class World:
         self.car = FakeCar(recording_file_path = args.infile)
 
     def move(self):
-        self.car.move()
+        if self.car.step() == False:
+          self.car.reset()
     
-class FakeCar:
-    def __init__(self, recording_file_path):
-        self.recording_file_path = recording_file_path;
-        self.reset()
-        self.ackerman = ackerman.Ackerman(front_wheelbase_width = self.width, wheelbase_length = self.length)
-        
-    def reset(self):
-        self.ticks_per_meter = 293. # todo: read from car.ini
-        self.length = 0.33655 # todo: get from ini file instead of hardcoding
-        self.width = 0.2413 # meters
-        self.original_heading = 0
-        self.heading = 0
-        self.wheels_angle = 0
-        self.velocity = 0
-        self.dynamics_file = open(self.recording_file_path)
-        self.dynamics = Dynamics()
-        self.read_dynamics()
-        self.original_heading = self.dynamics.heading * pi/180. 
-
-    
-    def read_dynamics(self):
-        s = self.dynamics_file.readline()
-        if not s:
-          raise EOFError
-        fields = s.split(',')
-        self.dynamics.set_from_log(fields)
-        self.odometer = self.dynamics.odometer_ticks / self.ticks_per_meter
-        self.heading = radians(self.dynamics.heading) - self.original_heading
-        self.ping = self.dynamics.ping_inches * 0.0254
-        self.wheels_angle = radians(Car.angle_for_steering(self.dynamics.str))
-
-
-    def move(self):
-        try:
-          last_odometer = self.odometer
-          self.read_dynamics();
-          self.velocity = self.odometer - last_odometer
-
-          self.ackerman.heading = self.heading
-          self.ackerman.move_left_wheel(
-            outside_wheel_angle  = self.wheels_angle, 
-            wheel_distance = self.velocity)
-
-        except EOFError:
-          self.reset()
-
 
 class CarView:
   def draw(self, cr, car):
@@ -114,22 +68,22 @@ class CarView:
     # car outline
     cr.set_line_width(0.01) # meters
     cr.set_source_rgb(0.5, 0.5, 0.5)
-    cr.rectangle(0, car.width/-2.,  car.length, car.width)
+    cr.rectangle(0, car.width/-2.,  car.width, car.length)
     cr.fill()
 
     # car velocity arrow
     cr.set_source_rgb(0,1,0)
     cr.move_to(0,0)
-    cr.set_line_width(0.01)
+    cr.set_line_width(0.1)
     cr.line_to(car.velocity, 0)
     cr.stroke()
 
     # car turn arrow
     s = cr.get_matrix()
     cr.set_source_rgb(0.5,0.5,1.)
-    cr.set_line_width(0.05)
+    cr.set_line_width(0.1)
     cr.translate(car.length,0)
-    cr.rotate(car.wheels_angle)
+    cr.rotate(radians(car.wheels_angle()))
     cr.move_to(0,0)
     cr.line_to(car.length/2,0)
     cr.stroke()
@@ -137,10 +91,10 @@ class CarView:
 
     # ping arrow
     cr.set_source_rgb(1.,.5,.5)
-    cr.set_line_width(0.01)
+    cr.set_line_width(0.1)
     cr.translate(car.length,0)
     cr.move_to(0,0)
-    cr.line_to(car.ping,0)
+    cr.line_to(car.ping_distance(),0)
     cr.stroke()
 
     cr.set_matrix(oldmatrix)
