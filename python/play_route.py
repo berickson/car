@@ -8,13 +8,13 @@ from recording import Recording
 from route import *
 from math import *
 
-desired_velocity = 0.5
+desired_velocity = 0.
 
 def play_route():
   route = Route()
   route.add_node(0.,0)
-  route.add_node(1.,-0.25)
-  route.add_node(2.,-0.25)
+  route.add_node(1.,-0.5)
+  route.add_node(3.,-0.5)
   
 #  route.add_node(.5,-0.25)
 #  route.add_node(.8,-0.1)
@@ -40,7 +40,7 @@ def play_route():
     # calculate steering
     segment_heading = degrees(route.heading_radians())
     car_heading = car.heading_degrees()
-    steering_angle = -(segment_heading - car_heading + 30. * cte)
+    steering_angle = segment_heading - car_heading + 30. * cte
     
     str_ms = car.steering_for_angle(steering_angle)
  

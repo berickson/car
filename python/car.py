@@ -183,7 +183,7 @@ class Car:
     return (self.ackerman.x, self.ackerman.y)
     
   def heading_degrees(self):
-    return standardized_degrees(self.original_dynamics.heading - self.dynamics.heading + self.heading_adjustment)
+    return standardized_degrees(self.dynamics.heading - self.original_dynamics.heading + self.heading_adjustment)
     
     
   
