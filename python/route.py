@@ -4,6 +4,10 @@ class RouteNode:
   def __init__(self):
     self.x = 0.
     self.y = 0.
+
+  def _repr__(self):
+    print "x: {:.2f} y: {:.2f}".format(self.x,self.y)
+  
     
   def set(self,x,y):
     self.x = float(x)
@@ -93,8 +97,10 @@ class Route:
         fields = l.split(',')
         if len(fields) != len(self.columns):
           raise Exception("wrong number of columns in data on line {}, expected {} was {}".format(line_number, len(self.columns), len(fields)));
-
-        self.nodes.append(RouteNode().set_from_standard_file(*fields))
+        node = RouteNode()
+        node.set_from_standard_file(*fields)
+        self.nodes.append(node)
+    self.index = 0
         
   def save_to_file(self, file_path):
     with open(file_path,'w') as f:

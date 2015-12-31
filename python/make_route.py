@@ -3,7 +3,10 @@ from recording import Recording
 from ackerman import *
 from filenames import *
 
-def write_path_from_recording_file(inpath = None, outpath = None):
+def distance(x1,y1,x2,y2):
+  return sqrt( (x2-x1)**2 + (y2-y1)**2 )
+
+def write_path_from_recording_file(inpath = None, outpath = None, min_length = 0.03):
   car = FakeCar(recording_file_path = inpath)
   if outpath == None:
     outpath = inpath + '.path'
@@ -17,17 +20,25 @@ def write_path_from_recording_file(inpath = None, outpath = None):
 #    start_heading = car.heading_degrees()
     next = car.dynamics
     start = car.dynamics
+    current = car.dynamics
+    (x,y) = car.front_position()
    
     while(car.step()):
+      (x_next,y_next) = car.front_position()
+      
+      # skip node if distance threshold hasn't been met
+      if distance(x_next,y_next,x,y) < min_length:
+        continue
+     
       current = next
+      (x,y) = (x_next,y_next)
       next = car.dynamics
       
       wheel_ticks = next.odometer_ticks - current.odometer_ticks
-      distance = wheel_ticks * car.meters_per_odometer_tick
-      wheel_meters_per_second = distance / ((next.ms - current.ms) / 1000.)
+      d = wheel_ticks * car.meters_per_odometer_tick
+      wheel_meters_per_second = d / ((next.ms - current.ms) / 1000.)
       
       seconds = (current.ms - start.ms)/1000.
-      (x,y) = car.front_position()
 
       line =  ",".join([
          str(seconds),
