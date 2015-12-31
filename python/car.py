@@ -63,7 +63,8 @@ class Car:
       self.output_thread.start()
       while self.dynamics.reading_count == 0:
         time.sleep(0.01) 
-        
+
+
   def reset_odometry(self):
     self.reading_count = 0
     self.dynamics = Dynamics()
@@ -176,10 +177,13 @@ class Car:
     self.ackerman.move_left_wheel(outside_wheel_angle, wheel_distance)
     elapsed_time = ( current.ms - previous.ms ) / 1000.
     self.velocity = wheel_distance / elapsed_time
-    print("x:{:.2f} y:{:.2f} heading:{:.2f}".format(self.ackerman.x, self.ackerman.y, relative_heading))
+    #print("x:{:.2f} y:{:.2f} heading:{:.2f}".format(self.ackerman.x, self.ackerman.y, relative_heading))
   
   def position(self):
     return (self.ackerman.x, self.ackerman.y)
+    
+  def heading_degrees(self):
+    return standardized_degrees(self.original_dynamics.heading - self.dynamics.heading + self.heading_adjustment)
     
     
   

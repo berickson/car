@@ -1,9 +1,11 @@
+from math import *
+
 class RouteNode:
-  def __init__:
+  def __init__(self):
     self.x = 0.
     self.y = 0.
     
-  def set(x,y):
+  def set(self,x,y):
     self.x = x
     self.y = y
   
@@ -24,13 +26,13 @@ class Route:
     # a segment is from node[index] to node[index+1]
     self.index = 0
     
-  def add_node(x,y):
+  def add_node(self,x,y):
     node = RouteNode()
     node.set(x=x,y=y)
-    nodes.append(node)
+    self.nodes.append(node)
   
   def done(self):
-    return self.index == len(nodes-2)
+    return self.index >= len(self.nodes)-1
     
   
   
@@ -40,13 +42,14 @@ class Route:
   #  if progress > 1.0 you have passed the current goal node
   # 
   # inspired by Udacity cs373 quiz_6_6.py and quiz_6_7.py
-  def cross_track_error(x,y):
-    while True and note self.done():
+  def cross_track_error(self,x,y):
+    cte = 0.0
+    while not self.done():
       # some basic vector calculations
-      dx = nodes[index+1].x - nodes[index].x
-      dy = nodes[index+1].y - nodes[index].y
-      drx = x - nodes[index][0]
-      dry = y - nodes[index][1]
+      dx = self.nodes[self.index+1].x - self.nodes[self.index].x
+      dy = self.nodes[self.index+1].y - self.nodes[self.index].y
+      drx = x - self.nodes[self.index].x
+      dry = y - self.nodes[self.index].y
       
       # u is the robot estimate projected onto the path segment
       progress = (drx * dx + dry * dy) / (dx * dx + dy * dy)
@@ -55,11 +58,19 @@ class Route:
       cte = (dry * dx - drx * dy) / (dx * dx + dy * dy)
       
       if progress > 1.0:
-        index += 1
+        self.index += 1
       else:
         break
+    if self.done():
+      return None
+    return cte
 
-    return None if done else cte
+  def heading_radians(self):
+    p1 = self.nodes[self.index]
+    p2 = self.nodes[self.index+1]
+    return atan2(p2.y-p1.y,p2.x-p1.x)
+    
+
 
   
   def header_string(self):

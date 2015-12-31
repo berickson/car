@@ -5,16 +5,23 @@ import dateutil.parser
 from select import select
 from car import Car, Dynamics, degrees_diff
 from recording import Recording
+from route import *
+from math import *
 
-desired_velocity = 0.3
+desired_velocity = 0.5
 
 def play_route():
   route = Route()
-  route.add_node(0.,0.)
-  route.add_node(1.,0.)
-  route.add_node(2.,0.5)
+  route.add_node(0.,0)
+  route.add_node(1.,-0.25)
+  route.add_node(2.,-0.25)
   
-  car = Car():
+#  route.add_node(.5,-0.25)
+#  route.add_node(.8,-0.1)
+#  route.add_node(1.3,1.)
+
+  
+  car = Car()
   car.set_rc_mode()
 
   # keep going until we run out of track  
@@ -25,15 +32,30 @@ def play_route():
       break;
 
     # calculate speed 
-    if car.velocity < velocity:
+    if car.velocity < desired_velocity:
       esc_ms = car.min_forward_speed
     else:
       esc_ms = 1500
       
     # calculate steering
-    str_ms = car.steering_for_angle(30 * cte)
-    car.set_speed_and_steering(str_ms, esc_ms)
+    segment_heading = degrees(route.heading_radians())
+    car_heading = car.heading_degrees()
+    steering_angle = -(segment_heading - car_heading + 30. * cte)
     
+    str_ms = car.steering_for_angle(steering_angle)
+ 
+    print("x: {:.2f} y:{:.2f} cte:{:.2f} v:{:.2f} heading:{:.2f} segment_heading: {:.2f} steer_degrees: {:.2f}".format(
+       x,
+       y,
+       cte,
+       car.velocity,
+       car_heading, 
+       segment_heading,
+       steering_angle))
+   
+    
+    # send to car
+    car.set_speed_and_steering(esc_ms, str_ms)
     
     time.sleep(0.02)
 

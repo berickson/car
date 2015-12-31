@@ -21,7 +21,7 @@ class Ackerman :
   def move_left_wheel(self, outside_wheel_angle, wheel_distance, debug = False):
   
     # avoid errors for very small angles
-    if abs(outside_wheel_angle) < 0.001:
+    if abs(outside_wheel_angle) < 0.00001:
       outside_wheel_angle = 0.
       
     if debug: print '\noutside_wheel_angle: {:.3} wheel_distance: {:.3}'.format(
@@ -50,9 +50,9 @@ class Ackerman :
       
       # calculate angle travelled
       turn_angle = wheel_distance / (2.*r_left)
-      arc_distance = r_car * turn_angle
-      forward = r_car * sin(turn_angle)
-      left = r_car * (1.-cos(turn_angle))
+      arc_distance = r_car * turn_angle * 2.
+      forward = r_car * sin(turn_angle) * 2.
+      left = r_car * (1.-cos(turn_angle)) * 2.
 
     if debug: print 'turn_angle: {:.4} arc_distance: {:.4} forward: {:.4} left: {:.4}'.format(turn_angle, arc_distance, forward, left)
     
@@ -67,7 +67,7 @@ class Ackerman :
 
 if __name__ == '__main__':
 
-  angles = [45.]#[0, 0.0001, 1., 45., 90.]
+  angles = [0., 0.0001, 1., 45., 90.]
   for outside_angle_degrees in angles:
     outside_angle = radians(outside_angle_degrees)
     car = Ackerman(front_wheelbase_width = 10, wheelbase_length = 20)
