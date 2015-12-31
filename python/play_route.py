@@ -9,7 +9,7 @@ from route import *
 from math import *
 
 automatic = True
-desired_velocity = 0.75
+desired_velocity = 1.75
 
 def play_route():
   route = Route()
