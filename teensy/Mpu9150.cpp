@@ -71,7 +71,7 @@ void Mpu9150::setup() {
 // standard of ccw being positive
 float Mpu9150::heading() {
   if(!initialReading) return 0.0;
-  return rads2degrees(yaw_pitch_roll[0]);
+  return -rads2degrees(yaw_pitch_roll[0]);
 }
 
 void Mpu9150::log_status() {
@@ -126,10 +126,9 @@ void Mpu9150::execute(){
 
     // the following adjusts for the orientation of the mpu mounted in the car
     // while sitting flat on the ground
+    // original measurement was (0.674316,-0.0788574,-0.731384,0.0640259)
+    // below is the conjugate which will set it to unity
     Quaternion adjust = Quaternion(0.674316,0.0788574,0.731384,-0.0640259);
-    Quaternon y_180 = Quaternion(0,0,1,0);
-    adjust = y_180.getProdut(adjust);
-
 
     q = q.getProduct(adjust);
 
