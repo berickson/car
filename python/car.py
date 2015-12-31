@@ -169,7 +169,7 @@ class Car:
   
   def apply_dynamics(self, current, previous):
     self.heading_adjustment += (1. - self.gyro_adjustment_factor) * standardized_degrees(current.heading - previous.heading)
-    relative_heading = standardized_degrees(self.original_dynamics.heading - current.heading + self.heading_adjustment)
+    relative_heading = self.heading_degrees()
     relative_heading_radians = radians(relative_heading)
     outside_wheel_angle = radians(Car.angle_for_steering(previous.str))
     wheel_distance = (current.odometer_ticks-previous.odometer_ticks)  * self.meters_per_odometer_tick
@@ -184,7 +184,7 @@ class Car:
   
   # returns position of front of car (between two front wheels)
   def front_position(self):
-    h = self.heading_degrees();
+    h = radians(self.heading_degrees());
     l = self.wheelbase_length_in_meters
     return (self.ackerman.x + l * cos(h) - l , self.ackerman.y + l * sin(h))
     
