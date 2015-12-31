@@ -186,7 +186,7 @@ class Car:
   def front_position(self):
     h = self.heading_degrees();
     l = self.wheelbase_length_in_meters
-    return (self.ackerman.x + l * sin(h) , self.ackerman.y + l * cos(h))
+    return (self.ackerman.x + l * cos(h) - l , self.ackerman.y + l * sin(h))
     
   def heading_degrees(self):
     return standardized_degrees(self.dynamics.heading - self.original_dynamics.heading + self.heading_adjustment)
