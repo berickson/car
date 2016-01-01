@@ -10,7 +10,7 @@ from math import *
 from geometry import *
 
 automatic = True
-desired_velocity = 0.5
+desired_velocity = 3.0
 
 def play_route(route):
   
@@ -63,11 +63,12 @@ def play_route(route):
 if __name__ == '__main__':
   route = Route()
   route.add_node(0.,0.)
-  route.add_node(3.0,0)
-  route.add_node(2.9,1.8)
-  route.add_node(1.6,2)
+  route.add_node(8.0,-2)
+  route.add_node(9,.8)
+  route.add_node(8,1)
+  route.add_node(0,0)
 
-  route = Route()
-  route.load_from_file('recordings/recording_024.csv.path')
+  #route = Route()
+  #route.load_from_file('recordings/recording_024.csv.path')
   play_route(route)
   
