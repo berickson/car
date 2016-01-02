@@ -54,6 +54,7 @@ class Car:
     self.read_configuration()
     self.online = online
     self.reset_odometry()
+    self.listener = None
     
     if self.online:
       self.quit = False
@@ -95,7 +96,19 @@ class Car:
     # todo: put these in config to get complete shape of car
     self.length = self.wheelbase_length_in_meters
     self.width = self.front_wheelbase_width_in_meters
-    
+
+  def add_listener(self, listener):
+    if self.listener is not None:
+      raise Exception("only one listener allowed")
+      
+    self.listener = listener    
+
+  def remove_listener(self, listener):
+    if self.listener is not listener:
+     raise Exception("Unknown listener")
+     
+    self.listener = None
+
 
   def __del__(self):
     self.quit = True
@@ -162,6 +175,9 @@ class Car:
       self.apply_dynamics(current, previous)
     else:
       self.original_dynamics = current
+      
+    if self.listener != None:
+      self.listener.put(current)
   
   # returns ping distance in meters
   def ping_distance(self):

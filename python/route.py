@@ -9,9 +9,10 @@ class RouteNode:
     print "x: {:.2f} y: {:.2f}".format(self.x,self.y)
   
     
-  def set(self,x,y):
+  def set(self,x,y,velocity = None):
     self.x = float(x)
     self.y = float(y)
+    self.velocity = float(velocity) if velocity is not None else None
   
   def set_from_standard_file(self, secs, x, y, heading_degrees, heading_degrees_adjustment, esc_ms, str_ms, meters_per_second):
     self.secs = secs
@@ -30,9 +31,11 @@ class Route:
     # a segment is from node[index] to node[index+1]
     self.index = 0
     
-  def add_node(self,x,y):
+    self.add_node(0,0)
+    
+  def add_node(self,x,y,velocity=None):
     node = RouteNode()
-    node.set(x=x,y=y)
+    node.set(x=x,y=y,velocity=velocity)
     self.nodes.append(node)
   
   def done(self):
@@ -71,6 +74,9 @@ class Route:
       return None
     return cte
 
+  def velocity(self):
+    return self.nodes[self.index+1].velocity
+  
   def heading_radians(self):
     p1 = self.nodes[self.index]
     p2 = self.nodes[self.index+1]
