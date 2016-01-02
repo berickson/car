@@ -9,7 +9,7 @@ import glob
 import os
 from select import select
 
-sleep_time = 0.01
+sleep_time = 0.001
 
 def log(l):
   try:
