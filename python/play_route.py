@@ -30,37 +30,12 @@ def play_route():
   last_ms = None
 
 
-#  route = Route()
-#  route.add_node(1,0,0.5)
-#  route.add_node(2,-2,1.5)
-#  route.add_node(4.,-2,2.0)
-#  route.add_node(10.,-2,2.0)
-#  route.add_node(10.,10,2.0)
-#  route.add_node(4.,10,2.0)
-#  route.add_node(4.,0,3.0)
-#  route.add_node(0.,0,0.5)
-#  route1 = route
-#  route = Route()
-#  route.add_node(1,-2,5)
-#  route.add_node(0,0,0.5)
   route = Route()
-#  route.add_node(1,0,0.5)
-#  route.add_node(10,0.0,5)
-#  route.add_node(11,1.0,.5)
-#  route.add_node(11,2.0,.5)
-#  route.add_node(11,10.0,5)
-#  route.add_node(10,2.0,5)
-#  route.add_node(9, 0,.5)
-#  route.add_node(8, 0,.5)
-#  route.add_node(2,0.,5)
-#  route.add_node(-5,0.,5)
-#  route.add_node(-4,0.,5) 
-  #route.add_node(0,0.,1.)
-  #route.add_node(-3,0.,1.)
-  #route.add_node(-3,-2.,1.)
-  #route.add_node(-1,-1.,1.)
-  #route.add_node(0,0.,.5)
-  route.load_from_file('recordings/recording_039.csv.path')
+  route.add_node(1,-.35,0.5)
+  route.add_node(2,-.35,2)
+  route.add_node(3,-.35,1)
+  route.add_node(4,-.35,0.5)
+
 
   
   car = Car()
@@ -93,7 +68,7 @@ def play_route():
       # calculate steering
       segment_heading = degrees(route.heading_radians())
       car_heading = car.heading_degrees()
-      desired_steering_angle = standardized_degrees(segment_heading - car_heading + 20. * cte)
+      desired_steering_angle = standardized_degrees(segment_heading - car_heading - 20. * cte)
       max_delta = elapsed_sec * max_steering_degrees_per_second;
       steering_delta = clamp(desired_steering_angle - last_steering_angle,-max_delta,max_delta)
       steering_angle = clamp(steering_angle + steering_delta, -max_steering_angle, max_steering_angle)
