@@ -187,7 +187,7 @@ class Car:
     self.heading_adjustment += (1. - self.gyro_adjustment_factor) * standardized_degrees(current.heading - previous.heading)
     relative_heading = self.heading_degrees()
     relative_heading_radians = radians(relative_heading)
-    outside_wheel_angle = radians(sels.angle_for_steering(previous.str))
+    outside_wheel_angle = radians(self.angle_for_steering(previous.str))
     wheel_distance = (current.odometer_ticks-previous.odometer_ticks)  * self.meters_per_odometer_tick
     self.ackerman.heading = relative_heading_radians
     self.ackerman.move_left_wheel(outside_wheel_angle, wheel_distance)
