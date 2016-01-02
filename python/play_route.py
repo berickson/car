@@ -23,18 +23,24 @@ def clamp(value, min_value, max_value):
 
 def play_route():
 
-  max_steering_degrees_per_second = 100.#250.
-  max_steering_angle = 20.
+  max_steering_degrees_per_second = 250.
+  max_steering_angle = 30.
   last_steering_angle = 0.
   steering_angle = 0.
   last_ms = None
 
 
+#  route = Route()
+#  route.add_node(1,-.35,2)
+#  route.add_node(2,-.35,10)
+#  route.add_node(3,-.35,1)
+#  route.add_node(4,-.35,0.5)
+#  route.add_node(5,-1.35,0.5)
+#  route.add_node(6,-.35,0.5)
+#  route.add_node(5,.5,0.5)
+#  route.add_node(4,-.35,0.5)
   route = Route()
-  route.add_node(1,-.35,0.5)
-  route.add_node(2,-.35,2)
-  route.add_node(3,-.35,1)
-  route.add_node(4,-.35,0.5)
+  route.load_from_file('recordings/recording_041.csv.path', velocity = 0.5)
 
 
   
