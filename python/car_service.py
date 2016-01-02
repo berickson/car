@@ -1,5 +1,6 @@
 #!/usr/bin/env python2.7
 
+import io
 import serial
 import sys
 import datetime
@@ -19,7 +20,27 @@ def log(l):
   except IOError as e:
     print 'Error writing logs: {0}'.format(str(e))
   
+
+class fast_line_reader:
+  def __init__(self, path):
+    self.leftover =  ''
+    self.f = io.open(path,buffering = 1)
+    
+  def get_lines(self):
+    lines = self.f.readlines()
+    if len(lines)>0:
+    
+      if len(self.leftover) > 0:
+        lines[0] = self.leftover+lines[0]
+        self.leftover = ''
+       
+      if not lines[-1].endswith('\n'):
+        self.leftover = lines[-1]
+        del lines[-1]
+    for line in lines:
+      yield line
   
+
 
 def get_commands(command_file):
   while True:
@@ -43,6 +64,7 @@ def run(command_file):
       for usb_path in glob.glob('/dev/ttyACM*'):
         try:
           s = serial.Serial(usb_path)
+          f = fast_line_reader(usb_path)
           log('serial connected')
           connected = True
           while True:
@@ -50,7 +72,7 @@ def run(command_file):
             for c in get_commands(command_file):
               s.write('{0}\n'.format(c))
               did_work = True
-            for o in get_output(s):
+            for o in f.get_lines():
               log(o)
               did_work = True
             if did_work == False:
