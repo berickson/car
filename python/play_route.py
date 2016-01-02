@@ -40,7 +40,7 @@ def play_route():
 #  route.add_node(5,.5,0.5)
 #  route.add_node(4,-.35,0.5)
   route = Route()
-  route.load_from_file('recordings/recording_041.csv.path', velocity = 0.5)
+  route.load_from_file('recordings/recording_041.csv.path', velocity = 1.5)
 
 
   
@@ -74,7 +74,7 @@ def play_route():
       # calculate steering
       segment_heading = degrees(route.heading_radians())
       car_heading = car.heading_degrees()
-      desired_steering_angle = standardized_degrees(segment_heading - car_heading - 20. * cte)
+      desired_steering_angle = standardized_degrees(segment_heading - car_heading - 40. * cte)
       max_delta = elapsed_sec * max_steering_degrees_per_second;
       steering_delta = clamp(desired_steering_angle - last_steering_angle,-max_delta,max_delta)
       steering_angle = clamp(steering_angle + steering_delta, -max_steering_angle, max_steering_angle)
