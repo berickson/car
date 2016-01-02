@@ -40,7 +40,7 @@ def play_route():
 #  route.add_node(5,.5,0.5)
 #  route.add_node(4,-.35,0.5)
   route = Route()
-  route.load_from_file('recordings/recording_041.csv.path', velocity = 1.5)
+  route.load_from_file('recordings/recording_041.csv.path', velocity = 0.5)
 
 
   
