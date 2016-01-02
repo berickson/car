@@ -44,9 +44,8 @@ class Route:
   
   
   # analyse cross track error at current segment
-  # returns (progress, cte), 
-  #  progress < 0, you haven't reached start
-  #  if progress > 1.0 you have passed the current goal node
+  #
+  # positive cte means you are to the left of track
   # 
   # inspired by Udacity cs373 quiz_6_6.py and quiz_6_7.py
   def cross_track_error(self,x,y):
@@ -64,7 +63,7 @@ class Route:
       progress = (drx * dx + dry * dy) / (dx * dx + dy * dy)
       
       # the cte is the estimate projected onto the normal of the path segment
-      cte = (dry * dx - drx * dy) / (dx * dx + dy * dy)
+      cte = (dry * dx - drx * dy) / sqrt(dx * dx + dy * dy)
       
       if progress > 1.0:
         self.index += 1
