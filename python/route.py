@@ -14,7 +14,7 @@ class RouteNode:
     self.y = float(y)
     self.velocity = float(velocity) if velocity is not None else None
   
-  def set_from_standard_file(self, secs, x, y, heading_degrees, heading_degrees_adjustment, esc_ms, str_ms, meters_per_second):
+  def set_from_standard_file(self, secs, x, y, heading_degrees, heading_degrees_adjustment, esc_ms, str_ms, meters_per_second, velocity = 1.0):
     self.secs = secs
     self.x = float(x)
     self.y = float(y)
@@ -23,6 +23,7 @@ class RouteNode:
     self.esc_ms = int(esc_ms)
     self.str_ms = int(str_ms)
     self.meters_per_second = float(meters_per_second)
+    self.velocity = float(velocity)
 
 class Route:
   def __init__(self):
@@ -87,7 +88,7 @@ class Route:
   def header_string(self):
     return ",".join(self.columns)
     
-  def load_from_file(self, file_path):
+  def load_from_file(self, file_path, velocity = 1.0):
     line_number = 1
     with open(file_path,'r') as infile:
       # read first line and make sure it matches expected format
@@ -103,7 +104,7 @@ class Route:
         if len(fields) != len(self.columns):
           raise Exception("wrong number of columns in data on line {}, expected {} was {}".format(line_number, len(self.columns), len(fields)));
         node = RouteNode()
-        node.set_from_standard_file(*fields)
+        node.set_from_standard_file(*fields, velocity = velocity)
         self.nodes.append(node)
     self.index = 0
         
