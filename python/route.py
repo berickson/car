@@ -5,8 +5,8 @@ class RouteNode:
     self.x = 0.
     self.y = 0.
 
-  def _repr__(self):
-    print "x: {:.2f} y: {:.2f}".format(self.x,self.y)
+  def __repr__(self):
+    return "x: {:.2f} y: {:.2f} velocity: {:2f}".format(self.x,self.y, self.velocity)
   
     
   def set(self,x,y,velocity = None):
@@ -33,6 +33,9 @@ class Route:
     self.index = 0
     
     self.add_node(0,0)
+    
+  def __repr__(self):
+    return "\n".join([str(node) for node in self.nodes])
     
   def add_node(self,x,y,velocity=None):
     node = RouteNode()
@@ -124,10 +127,53 @@ class Route:
           str(node.meters_per_second)]
           )
         f.write(line+'\n')
+
+  def optimize_velocity(self, max_velocity = 1., max_acceleration = 0.1):
+    tolerance = 0.000001
+    max_velocity = float(max_velocity)
+     
+    # start everything at max_velocity
+    for node in self.nodes:
+      node.velocity = max_velocity
+     
+    # set start and end velocities
+    self.nodes[0].velocity = 0.1
+    self.nodes[-1].velocity = 0.
+    iterations = 0
+     
+    changed = True
+    while changed:
+      changed = False
+      iterations += 1
+       
+      # make range to go up the list and back down
+      forward = range(0,len(self.nodes)-1)
+      backward = list(forward)
+      backward.reverse()
+      forward_and_back = list(forward)
+      forward_and_back.extend(backward[:])
+
+      for i in forward_and_back:
+        p0 = self.nodes[i]
+        p1 = self.nodes[i+1]
+        dv = abs(p1.velocity - p0.velocity)
+        if dv > max_acceleration + tolerance: # todo make this a real accelaration calculation
+          p0.velocity = min(p0.velocity, p1.velocity + max_acceleration)
+          p1.velocity = min(p1.velocity, p0.velocity + max_acceleration)
+          changed = True
+    print 'calculated route velocity in {} iterations'.format(iterations)
+    
  
  
 if __name__ == '__main__':
+#  route = Route()
+#  route.load_from_file('recordings/recording_016.csv.path')
+#  route.save_to_file('deleteme.path')
+  
   route = Route()
-  route.load_from_file('recordings/recording_016.csv.path')
-  route.save_to_file('deleteme.path')
+  for i in range(1,11):
+    route.add_node(i,0)
+  route.optimize_velocity()
+  print(route)
+
 
