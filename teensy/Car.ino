@@ -479,7 +479,7 @@ void loop() {
        "str, " + steering.readMicroseconds()
        + ", esc," + esc
 //       + ", aa, "+ (mpu9150.aa.x - mpu9150.a0.x) + ", " + (mpu9150.aa.y  - mpu9150.a0.y)+", "+ (mpu9150.aa.z  - mpu9150.a0.z)
-       + ", aa, "+ mpu9150.ax + ", " + mpu9150.ay+", "+ mpu9150.az
+       + ", aa, "+ ftos(mpu9150.ax) + ", " + ftos(mpu9150.ay)+", "+ ftos(mpu9150.az)
        +", heading, "+mpu9150.heading()
        +",rpm,"+ rpm_pps + "," + calculated_rpm_pps + ", " + delta_pulse + "," + motor_pulse_odometer
        +",ping,"+ping.inches()
