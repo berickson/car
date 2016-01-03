@@ -27,7 +27,8 @@ public:
 
   // orientation/motion vars
   Quaternion q;           // [w, x, y, z]         quaternion container
-  VectorInt16 aa;         // [x, y, z]            accel sensor measurements
+  VectorInt16 araw;
+  float ax,ay,az;
   VectorInt16 a0;
   VectorInt16 mag;
   VectorFloat gravity;    // [x, y, z]            gravity vector

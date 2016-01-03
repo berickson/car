@@ -79,17 +79,10 @@ void Mpu9150::log_status() {
     ",heading,"+heading() +
     ",quat,"+ftos(q.w)+"," +ftos(q.x)+"," +ftos(q.y)+"," +ftos(q.z)+
     ",gravity,"+ftos(gravity.x)+","+ftos(gravity.y)+","+ftos(gravity.z)+
-    ",aa,"+aa.x+","+aa.y+","+aa.z+
+    ",araw,"+araw.x+","+araw.y+","+araw.z+
+    ",aa,"+ftos(ax)+","+ftos(ay)+","+ftos(az)+
     ",mag,"+mag.x+","+mag.y+","+mag.z+
     ",ypr,"+ftos(rads2degrees(yaw))+","+ftos(rads2degrees(pitch))+","+ftos(rads2degrees(roll)) );
-}
-
-
-Quaternion qrotate(Quaternion q, Quaternion r) {
-  auto rc = r.getConjugate();
-  auto rq = r.getProduct(q);
-  auto rv = rq.getProduct(rc);
-  return rv;
 }
 
 void Mpu9150::execute(){
@@ -129,13 +122,20 @@ void Mpu9150::execute(){
     // original measurement was (0.674316,-0.0788574,-0.731384,0.0640259)
     // below is the conjugate which will set it to unity
     Quaternion adjust = Quaternion(0.674316,0.0788574,0.731384,-0.0640259);
+    
 
     q = q.getProduct(adjust);
 
     mpu.dmpGetGravity(&gravity, &q);
     
     mpu.dmpGetMag(&mag, fifoBuffer);
-    mpu.dmpGetAccel(&aa, fifoBuffer);
+    mpu.dmpGetAccel(&araw, fifoBuffer);
+
+    const float g =  9.80665;
+
+    ax = g*(araw.x * 0.0000144756 + araw.y * -0.0000070556+ araw.z* 0.0001214348 - 0.043 + gravity.x);
+    ay = g*(araw.x * -0.0000203849+ araw.y * -0.0001212882+ araw.z* 0.0000038742 -0.032  + gravity.y);
+    az = g*(araw.x * -0.0001197524+ araw.y *0.0000187399 + araw.z*0.0000192036 + -0.053  + gravity.z);
     
     mpu.dmpGetYawPitchRoll(yaw_pitch_roll, &q, &gravity);
     
