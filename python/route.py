@@ -5,6 +5,7 @@ class RouteNode:
     self.x = 0.
     self.y = 0.
 
+
   def __repr__(self):
     return "x: {:.2f} y: {:.2f} velocity: {:2f}".format(self.x,self.y, self.velocity)
   
@@ -31,6 +32,7 @@ class Route:
     self.nodes = []
     # a segment is from node[index] to node[index+1]
     self.index = 0
+    self.progress = 0.
     
     self.add_node(0,0)
     
@@ -46,13 +48,24 @@ class Route:
     return self.index >= len(self.nodes)-1
     
   
+  def cross_track_error(self):
+    if self.done():
+      return None
+    return self.cte
+  
+  
+  def segment_progress(self):
+    if self.done():
+      return 1.
+    return self.segment_progress
+  
   
   # analyse cross track error at current segment
   #
   # positive cte means you are to the left of track
   # 
   # inspired by Udacity cs373 quiz_6_6.py and quiz_6_7.py
-  def cross_track_error(self,x,y):
+  def set_position(self,x,y):
     cte = 0.0
     while not self.done():
       p1 = self.nodes[self.index]
@@ -73,13 +86,19 @@ class Route:
         self.index += 1
       else:
         break
-    if self.done():
-      return None
-    return cte
+    self.segment_progress = progress
+    self.cte = cte
 
   def velocity(self):
-    return self.nodes[self.index+1].velocity
-  
+    p0 = self.nodes[self.index]
+    p1 = self.nodes[self.index+1]
+    if(self.position < 0):
+      return p0.velocity
+    if(self.position > 0):
+      return p1.velocity
+      
+    return p0.velocity + (p1.velocity - p0.velocity) * self.progress
+
   def heading_radians(self):
     p1 = self.nodes[self.index]
     p2 = self.nodes[self.index+1]

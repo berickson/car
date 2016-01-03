@@ -42,7 +42,11 @@ def play_route():
 #  route.add_node(5,.5,0.5)
 #  route.add_node(4,-.35,0.5)
   route = Route()
-  route.load_from_file('recordings/recording_041.csv.path', velocity = 1.)
+#  route.load_from_file('recordings/recording_041.csv.path', velocity = 1.)
+  x = 0.1
+  while x <= 2.:
+    route.add_node(x,0.)
+  route.optimize_velocity()
 
 
   
@@ -60,9 +64,11 @@ def play_route():
       message = queue.get(block=True, timeout = 0.5)
       elapsed_sec = (message.ms - last_ms) / 1000.
       (x,y) = car.front_position()
-      cte = route.cross_track_error(x,y)
-      if cte is None:
+      route.set_position(x,y)
+      if route.done():
         break;
+        
+      cte = route.cross_track_error(x,y)
 
       # calculate speed 
       velocity = route.velocity()
