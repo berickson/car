@@ -16,8 +16,10 @@ automatic = True
 
 def clamp(value, min_value, max_value):
   if value < min_value:
+    print '*',
     return min_value
   if value > max_value:
+    print '*',
     return max_value
   return value
 
@@ -40,7 +42,7 @@ def play_route():
 #  route.add_node(5,.5,0.5)
 #  route.add_node(4,-.35,0.5)
   route = Route()
-  route.load_from_file('recordings/recording_041.csv.path', velocity = 1.0)
+  route.load_from_file('recordings/recording_041.csv.path', velocity = 1.)
 
 
   
