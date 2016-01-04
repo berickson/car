@@ -23,26 +23,13 @@ def clamp(value, min_value, max_value):
     return max_value
   return value
 
-def play_route():
 
-  max_steering_degrees_per_second = 250.
-  max_steering_angle = 30.
-  last_steering_angle = 0.
-  steering_angle = 0.
-  last_ms = None
-
-
-#  route = Route()
-#  route.add_node(1,-.35,2)
-#  route.add_node(2,-.35,10)
-#  route.add_node(3,-.35,1)
-#  route.add_node(4,-.35,0.5)
-#  route.add_node(5,-1.35,0.5)
-#  route.add_node(6,-.35,0.5)
-#  route.add_node(5,.5,0.5)
-#  route.add_node(4,-.35,0.5)
+def hall_and_back():
   route = Route()
-#  route.load_from_file('recordings/recording_041.csv.path', velocity = 1.)
+  route.load_from_file('recordings/recording_041.csv.path', velocity = 1.)
+  return route
+  
+def straight_route():
   x = 0.1
   while x <= 8.5 + 0.0001: #door is about 8.5 from end of toolbox by desk
     route.add_node(x,0.)
@@ -51,6 +38,14 @@ def play_route():
     max_acceleration = 1.0) # 1.0 - safe indoors (3 cm overshoot)
                             # 1.5 - agressive indoors (5 cm overshoot)
                             # 2.0 - very agressive indoors (10 cm overshoot)
+
+def play_route(route):
+
+  max_steering_degrees_per_second = 250.
+  max_steering_angle = 30.
+  last_steering_angle = 0.
+  steering_angle = 0.
+  last_ms = None
   
   print route 
 
@@ -130,5 +125,5 @@ def play_route():
     
   
 if __name__ == '__main__':
-  play_route()
+  play_route(hall_and_back())
   
