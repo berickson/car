@@ -41,7 +41,7 @@ def straight_route():
     x += 0.05
   route.optimize_velocity(max_velocity = 5., 
     max_acceleration = 1.0) # 1.0 - safe indoors (3 cm overshoot)
-                            # 1.5 - agressive indoors (5 cm overshoot)
+                            # 1.5 - agressive indoors (5 cm overshoot, may slide some)
                             # 2.0 - very agressive indoors (10 cm overshoot)
 
 def play_route(route):
@@ -81,7 +81,7 @@ def play_route(route):
         velocity = max_velocity
       if car.velocity < velocity:
         esc_ms = car.min_forward_speed + 3
-      elif car.velocity > velocity + .2:
+      elif car.velocity > velocity + .2 or car.velocity > 2*velocity:
         esc_ms = 1400
       else:
         esc_ms = car.min_forward_speed - 10
@@ -130,7 +130,11 @@ def play_route(route):
     
   
 if __name__ == '__main__':
-  route = around_bar()
-  route.optimize_velocity(max_velocity = 0.5, max_acceleration = 0.5)
+  route = hall_and_back()
+
+#  route = around_bar()
+  route.optimize_velocity(max_velocity = 2.0, max_acceleration = 1.0)
+  print route
+  print 'playing route now, press ctrl-c to abort'
   play_route(route)
   
