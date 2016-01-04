@@ -9,6 +9,7 @@ class RouteNode:
 
 
   def __repr__(self):
+    print self.x,self.y, self.velocity
     return "x: {:.2f} y: {:.2f} velocity: {:2f}".format(self.x,self.y, self.velocity)
   
     
@@ -18,7 +19,8 @@ class RouteNode:
     self.velocity = float(velocity) if velocity is not None else None
   
   def set_from_standard_file(self, secs, x, y, heading_degrees, heading_degrees_adjustment, esc_ms, str_ms, meters_per_second, velocity = 1.0):
-    self.secs = secs
+    print velocity
+    self.secs = float(secs)
     self.x = float(x)
     self.y = float(y)
     self.heading_degrees = float(heading_degrees)
@@ -42,7 +44,7 @@ class Route:
   def __repr__(self):
     return "\n".join([str(node) for node in self.nodes])
     
-  def add_node(self,x,y,velocity=None):
+  def add_node(self,x,y,velocity=1.0):
     node = RouteNode()
     node.set(x=x,y=y,velocity=velocity)
     self.nodes.append(node)
@@ -232,6 +234,3 @@ def test_circle():
 if __name__ == '__main__':
   test_circle()
   test_straight_line()
-  
-  
-  

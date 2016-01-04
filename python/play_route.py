@@ -23,6 +23,11 @@ def clamp(value, min_value, max_value):
     return max_value
   return value
 
+def around_bar():
+  
+  route = Route()
+  route.load_from_file('recordings/recording_044.csv.path', velocity = 1.)
+  return route
 
 def hall_and_back():
   route = Route()
@@ -125,5 +130,7 @@ def play_route(route):
     
   
 if __name__ == '__main__':
-  play_route(hall_and_back())
+  route = around_bar()
+  route.optimize_velocity(max_velocity = 0.5, max_acceleration = 0.5)
+  play_route(route)
   
