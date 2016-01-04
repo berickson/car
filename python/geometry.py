@@ -1,4 +1,5 @@
 from math import *
+import numpy as np
 
 #
 # Angular geometry
@@ -20,6 +21,13 @@ def standardized_degrees(theta):
 #returns theta2-theta1 in range of [-180,180)
 def degrees_diff(theta1, theta2):
   return standardized_degrees(theta2 - theta1)
+
+
+def dot(x1,y1,x2,y2):
+  return x1 * x2 + x2 * y2
+
+def length(x,y):
+  return sqrt(x**2+y**2)
 
 #
 # General geometry
@@ -63,3 +71,28 @@ def velocity_at_position(x, a, v0, x0 = 0):
   t = time_at_position(x=x,v0=v0,a=a)
   v = velocity_at_time(t=t,a=a,v0=v0)
   return v
+
+# below based on http://stackoverflow.com/a/13849249/383967
+
+def unit_vector(v):
+  return v / np.linalg.norm(v)
+
+def angle_between(v1, v2):
+  """ Returns the angle in radians between vectors 'v1' and 'v2'::
+
+          >>> angle_between((1, 0, 0), (0, 1, 0))
+          1.5707963267948966
+          >>> angle_between((1, 0, 0), (1, 0, 0))
+          0.0
+          >>> angle_between((1, 0, 0), (-1, 0, 0))
+          3.141592653589793
+  """
+  v1_u = unit_vector(v1)
+  v2_u = unit_vector(v2)
+  angle = np.arccos(np.dot(v1_u, v2_u))
+  if np.isnan(angle):
+      if (v1_u == v2_u).all():
+          return 0.0
+      else:
+          return np.pi
+  return angle

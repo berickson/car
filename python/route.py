@@ -1,5 +1,6 @@
 from math import *
 from geometry import *
+import numpy as np
 
 class RouteNode:
   def __init__(self):
@@ -107,9 +108,6 @@ class Route:
     p1 = self.nodes[self.index]
     p2 = self.nodes[self.index+1]
     return -atan2(p1.y-p2.y,p2.x-p1.x)
-    
-
-
   
   def header_string(self):
     return ",".join(self.columns)
@@ -163,6 +161,25 @@ class Route:
     #self.nodes[0].velocity = 1
     self.nodes[-1].velocity = 0.
     iterations = 0
+    
+    for i in range(len(self.nodes)-3):
+      print i
+      p0 = self.nodes[i]
+      p1 = self.nodes[i+1]
+      p2 = self.nodes[i+2]
+
+      s1 = np.array([p1.x-p0.x, p1.y-p0.y])
+      s2 = np.array([p2.x-p1.x, p2.y-p1.y])
+      theta = abs(angle_between(s1,s2))
+
+      # assume r = |s2| * theta (seems ok but why?) todo: find exact answer here
+      if theta > 0:
+        r = abs(length(*s2) / theta)
+        v_circle_max = sqrt(max_acceleration * r)
+        print 'i: {} theta: {} r: {} v_circle_max: {}'.format(i,theta, r,v_circle_max)
+        p1.velocity = min(p1.velocity, v_circle_max)
+      
+      
      
     changed = True
     while changed:
@@ -193,15 +210,28 @@ class Route:
     
  
  
-if __name__ == '__main__':
-#  route = Route()
-#  route.load_from_file('recordings/recording_016.csv.path')
-#  route.save_to_file('deleteme.path')
-  
+def test_straight_line():
   route = Route()
   for i in range(1,11):
     route.add_node(i,0)
   route.optimize_velocity()
   print(route)
 
-
+def test_circle():
+  route = Route()
+  steps = 30
+  r = 1
+  for i in range(1,steps):
+    theta = 2*pi * i / steps
+    x = r * sin(theta)
+    y = r - r * cos(theta)
+    route.add_node(x,y)
+  route.optimize_velocity()
+  print(route)
+ 
+if __name__ == '__main__':
+  test_circle()
+  test_straight_line()
+  
+  
+  
