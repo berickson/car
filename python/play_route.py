@@ -44,9 +44,15 @@ def play_route():
   route = Route()
 #  route.load_from_file('recordings/recording_041.csv.path', velocity = 1.)
   x = 0.1
-  while x <= 2.:
+  while x <= 8.5 + 0.0001: #door is about 8.5 from end of toolbox by desk
     route.add_node(x,0.)
-  route.optimize_velocity()
+    x += 0.05
+  route.optimize_velocity(max_velocity = 5., 
+    max_acceleration = 1.0) # 1.0 - safe indoors (3 cm overshoot)
+                            # 1.5 - agressive indoors (5 cm overshoot)
+                            # 2.0 - very agressive indoors (10 cm overshoot)
+  
+  print route 
 
 
   
@@ -58,6 +64,7 @@ def play_route():
     car.add_listener(queue)
     message = queue.get(block=True, timeout = 0.5)
     last_ms = message.ms
+    start_time = time.time()
 
     # keep going until we run out of track  
     while True:
@@ -65,10 +72,8 @@ def play_route():
       elapsed_sec = (message.ms - last_ms) / 1000.
       (x,y) = car.front_position()
       route.set_position(x,y)
-      if route.done():
-        break;
-        
-      cte = route.cross_track_error(x,y)
+       
+      cte = route.cross_track_error()
 
       # calculate speed 
       velocity = route.velocity()
@@ -76,6 +81,8 @@ def play_route():
         velocity = max_velocity
       if car.velocity < velocity:
         esc_ms = car.min_forward_speed + 3
+      elif car.velocity > velocity + .2:
+        esc_ms = 1400
       else:
         esc_ms = car.min_forward_speed - 10
         
@@ -90,17 +97,20 @@ def play_route():
       
       str_ms = car.steering_for_angle(steering_angle)
    
-      print("i: {:.2f} xg: {:.2f} gy:{:.2f} x: {:.2f} y:{:.2f} cte:{:.2f} v:{:.2f} heading:{:.2f} segment_heading: {:.2f} steering_degrees: {:.2f}".format(
+      print("t: {:.1f} i: {:.2f} xg: {:.2f} gy:{:.2f} gv: {:.2f} x: {:.2f} y:{:.2f} cte:{:.2f} v:{:.2f} heading:{:.2f} segment_heading: {:.2f} steering_degrees: {:.2f} esc:{}".format(
+         time.time() - start_time,
          route.index,
          route.nodes[route.index+1].x,
          route.nodes[route.index+1].y,         
+         velocity,
          x,
          y,
          cte,
          car.velocity,
          car_heading, 
          segment_heading,
-         steering_angle))
+         steering_angle,
+         esc_ms))
      
       
       # send to car
@@ -109,6 +119,9 @@ def play_route():
       # remember state for next loop
       last_ms = message.ms
       last_steering_angle = steering_angle
+      
+      if route.done() and car.velocity<=0:
+        break;
       
   finally:
     car.set_speed_and_steering(1500,1500)

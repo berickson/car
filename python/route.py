@@ -1,4 +1,5 @@
 from math import *
+from geometry import *
 
 class RouteNode:
   def __init__(self):
@@ -35,6 +36,7 @@ class Route:
     self.progress = 0.
     
     self.add_node(0,0)
+    self._done = False
     
   def __repr__(self):
     return "\n".join([str(node) for node in self.nodes])
@@ -45,12 +47,10 @@ class Route:
     self.nodes.append(node)
   
   def done(self):
-    return self.index >= len(self.nodes)-1
+    return self._done
     
   
   def cross_track_error(self):
-    if self.done():
-      return None
     return self.cte
   
   
@@ -67,7 +67,7 @@ class Route:
   # inspired by Udacity cs373 quiz_6_6.py and quiz_6_7.py
   def set_position(self,x,y):
     cte = 0.0
-    while not self.done():
+    while True:
       p1 = self.nodes[self.index]
       p2 = self.nodes[self.index+1]
       # some basic vector calculations
@@ -82,22 +82,26 @@ class Route:
       # the cte is the estimate projected onto the normal of the path segment
       cte = (dry * dx - drx * dy) / sqrt(dx * dx + dy * dy)
       
-      if progress > 1.0:
-        self.index += 1
-      else:
+      if progress <= 1.0 or self.done():
         break
+      if self.index >= len(self.nodes)-2.:
+        self._done = True
+        break
+      else:
+        self.index += 1
     self.segment_progress = progress
     self.cte = cte
 
   def velocity(self):
+    if self.done(): return 0.
     p0 = self.nodes[self.index]
     p1 = self.nodes[self.index+1]
-    if(self.position < 0):
+    if(self.segment_progress < 0):
       return p0.velocity
-    if(self.position > 0):
+    if(self.segment_progress > 1):
       return p1.velocity
       
-    return p0.velocity + (p1.velocity - p0.velocity) * self.progress
+    return p0.velocity + (p1.velocity - p0.velocity) * self.segment_progress
 
   def heading_radians(self):
     p1 = self.nodes[self.index]
@@ -156,7 +160,7 @@ class Route:
       node.velocity = max_velocity
      
     # set start and end velocities
-    self.nodes[0].velocity = 0.1
+    #self.nodes[0].velocity = 1
     self.nodes[-1].velocity = 0.
     iterations = 0
      
@@ -176,9 +180,14 @@ class Route:
         p0 = self.nodes[i]
         p1 = self.nodes[i+1]
         dv = abs(p1.velocity - p0.velocity)
-        if dv > max_acceleration + tolerance: # todo make this a real accelaration calculation
-          p0.velocity = min(p0.velocity, p1.velocity + max_acceleration)
-          p1.velocity = min(p1.velocity, p0.velocity + max_acceleration)
+        ds = distance(p0.x,p0.y,p1.x,p1.y)
+        
+        min_v = min(p0.velocity,p1.velocity) 
+        max_dv = velocity_at_position(x=ds, a=max_acceleration, v0=min_v) - min_v
+        
+        if dv > max_dv + tolerance: 
+          p0.velocity = min(p0.velocity, velocity_at_position(x=ds, a=max_acceleration, v0=p1.velocity))
+          p1.velocity = min(p1.velocity, velocity_at_position(x=ds, a=max_acceleration, v0=p0.velocity))
           changed = True
     print 'calculated route velocity in {} iterations'.format(iterations)
     
