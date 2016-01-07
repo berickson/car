@@ -27,7 +27,7 @@ class Dynamics:
   def __init__(self):
     self.reading_count = 0
   def set_from_log(self,fields):
-    try:
+#    try:
       self.datetime = dateutil.parser.parse(fields[0])
       self.str = int(fields[3])
       self.esc = int(fields[5])
@@ -44,8 +44,8 @@ class Dynamics:
       self.ms = int(fields[22])
       self.us = int(fields[24])
       self.reading_count = self.reading_count + 1
-    except (IndexError, ValueError) as e:
-      pass
+ #   except (IndexError, ValueError) as e:
+#      pass
 
 
 class Car:
@@ -58,6 +58,7 @@ class Car:
     
     if self.online:
       self.quit = False
+      self.write_command('') # first command normally fails, so write a blank command
       self.write_command('td+')
       self.output_thread = threading.Thread(target=self._monitor_output, args = ())
       self.output_thread.daemon = True
@@ -167,7 +168,10 @@ class Car:
     # for now, make changeover quick and don't mess
     # with existing structures, maybe by keeping a big list
     current = Dynamics()
-    current.set_from_log(fields)
+    try:
+      current.set_from_log(fields)
+    except:
+      return
     previous = self.dynamics
     self.dynamics = current
     self.reading_count += 1

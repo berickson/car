@@ -16,10 +16,8 @@ automatic = True
 
 def clamp(value, min_value, max_value):
   if value < min_value:
-    print '*',
     return min_value
   if value > max_value:
-    print '*',
     return max_value
   return value
 
@@ -27,6 +25,12 @@ def around_bar():
   
   route = Route()
   route.load_from_file('recordings/recording_044.csv.path', velocity = 1.)
+  return route
+
+def around_kitchen():
+  
+  route = Route()
+  route.load_from_file('recordings/recording_049.csv.path', velocity = 1.)
   return route
 
 def hall_and_back():
@@ -133,7 +137,8 @@ if __name__ == '__main__':
   route = hall_and_back()
 
 #  route = around_bar()
-  route.optimize_velocity(max_velocity = 2.0, max_acceleration = 1.0)
+#  route = around_kitchen()
+  route.optimize_velocity(max_velocity = 3.0, max_acceleration = 2.0)
   print route
   print 'playing route now, press ctrl-c to abort'
   play_route(route)

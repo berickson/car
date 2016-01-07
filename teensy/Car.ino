@@ -407,7 +407,7 @@ void loop() {
 
   // get common execution times
   bool every_second = every_n_ms(last_loop_time_ms, loop_time_ms, 1000);
-  bool every_20_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 20);
+  bool every_10_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 10);
 
 
   // get commands from usb
@@ -444,7 +444,7 @@ void loop() {
     }
   }
 
-  if(every_20_ms) {
+  if(every_10_ms) {
     modes.execute();
   }
 
@@ -457,7 +457,7 @@ void loop() {
     rx_speed.trace();
     Serial.println();
   }
-  if(every_20_ms && TRACE_DYNAMICS) {
+  if(every_10_ms && TRACE_DYNAMICS) {
     unsigned long pulses = motor_pulses;
     unsigned long elapsed_pulses = pulses - last_reported_motor_pulses;
     unsigned long rpm_pps = ((elapsed_pulses)* 1000) / (loop_time_ms - last_reported_motor_pulses_ms);
