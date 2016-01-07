@@ -58,7 +58,7 @@ class Car:
     
     if self.online:
       self.quit = False
-      self.write_command('') # first command normally fails, so write a blank command
+      self.write_command('td+') # first command normally fails, so write a blank command
       self.write_command('td+')
       self.output_thread = threading.Thread(target=self._monitor_output, args = ())
       self.output_thread.daemon = True
@@ -111,7 +111,7 @@ class Car:
     self.listener = None
 
 
-  def __del__(self):
+  def __exit__(self, type_unused, value_unused, traceback_unused):
     self.quit = True
     if self.online:
       self.output_thread.join()
