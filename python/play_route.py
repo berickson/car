@@ -8,6 +8,7 @@ from recording import Recording
 from route import *
 from math import *
 from geometry import *
+from filenames import *
 import Queue
 
 max_velocity = 5.
@@ -94,7 +95,16 @@ def play_route(route):
       # calculate steering
       segment_heading = degrees(route.heading_radians())
       car_heading = car.heading_degrees()
-      desired_steering_angle = standardized_degrees(segment_heading - car_heading - 40. * cte)
+
+      # fix headings by opposite steering if going reverse
+      heading_fix = segment_heading - car_heading
+      cte_fix = -40 * cte
+      if route.is_reverse():
+        heading_fix = -heading_fix
+        cte_fix = -cte_fix
+        
+      desired_steering_angle = standardized_degrees(heading_fix + cte_fix)
+      
       max_delta = elapsed_sec * max_steering_degrees_per_second;
       steering_delta = clamp(desired_steering_angle - last_steering_angle,-max_delta,max_delta)
       steering_angle = clamp(steering_angle + steering_delta, -max_steering_angle, max_steering_angle)
@@ -110,7 +120,7 @@ def play_route(route):
          velocity,
          x,
          y,
-         route.nodes[route.index].reverse,
+         route.is_reverse(),
          cte,
          car.velocity,
          car_heading, 
@@ -136,11 +146,14 @@ def play_route(route):
     
   
 if __name__ == '__main__':
+  input_path = latest_filename('recordings','recording','csv.path')
   route = Route()
-  route.load_from_file('recordings/recording_050.csv.path')
+  print 'loading route at', input_path
+  route.load_from_file(input_path)
 
 #  route = around_bar()
 #  route = around_kitchen()
+  print 'optimizing speeds along the route'
   route.optimize_velocity(max_velocity = 0.5, max_acceleration = 0.5)
   print route
   print 'playing route now, press ctrl-c to abort'

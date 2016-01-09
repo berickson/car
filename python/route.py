@@ -77,7 +77,7 @@ class Route:
       p1 = self.nodes[self.index]
       p2 = self.nodes[self.index+1]
 
-      print 'set_position velocity: {} p2.veloicity {}: '.format(velocity, p2.velocity)
+      #print 'set_position velocity: {} p2.veloicity {}: '.format(velocity, p2.velocity)
       # skip this node if we reach the required zero velocity for
       # a non-terminal node so we can get moving a again
       if abs(velocity) <0.01 and abs(p2.velocity) <0.01:
@@ -118,8 +118,12 @@ class Route:
     p0 = self.nodes[self.index]
     p1 = self.nodes[self.index+1]
     
+    # if we just turned around, take the velocity from the node in the new direction
+    if self.index > 0 and self.nodes[self.index-1].reverse != p1.reverse:
+      v = p1.velocity
+    
     # interpolate speed
-    if(self.segment_progress < 0):
+    elif(self.segment_progress < 0):
       v =  p0.velocity
     elif(self.segment_progress > 1):
       v= p1.velocity
@@ -161,6 +165,9 @@ class Route:
         node.set_from_standard_file(*fields, velocity = velocity)
         self.nodes.append(node)
     self.index = 0
+  
+  def is_reverse(self):
+    return self.nodes[self.index].reverse
         
   def save_to_file(self, file_path):
     with open(file_path,'w') as f:
