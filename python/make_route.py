@@ -20,35 +20,31 @@ def write_path_from_recording_file(inpath = None, outpath = None, min_length = 0
     current = car.dynamics
     (x,y) = car.front_position()
     
-    reversing = False
+    reverse = False
+    next_reverse = False
     
-   
+    i = 0
     while(car.step()):
-      (x_next,y_next) = car.front_position()
-      (rear_x,rear_y) = car.position()
-      
-      #todo: are we missing terminal node when we switched forward / reverse?
-      
-      # see if we are switching direction because we always want to write a node if we are
-      next_reversing = reversing
-      if next.odometer_ticks > current.odometer_ticks:
-        next_reversing = False
-      if next.odometer_ticks < current.odometer_ticks:
-        next_reversing = True
-      
-      # skip node if distance threshold hasn't been met and haven't switched direction
-      if next_reversing == reversing and distance(x_next,y_next,x,y) < min_length:
-        continue
-      current = next
-      (x,y) = (x_next,y_next)
       next = car.dynamics
-      reversing = next_reversing
-      
+      (x_next,y_next) = car.front_position()
       wheel_ticks = next.odometer_ticks - current.odometer_ticks
+      if abs(wheel_ticks)>0:
+        next_reverse = wheel_ticks < 0
+      else:
+        next_reverse = reverse
+      # skip node if distance threshold hasn't been met
+      if distance(x_next,y_next,x,y) < min_length:
+        continue
+
+      i = i + 1
+      reverse = next_reverse
+      
       d = wheel_ticks * car.meters_per_odometer_tick
       wheel_meters_per_second = d / ((next.ms - current.ms) / 1000.)
       
       seconds = (current.ms - start.ms)/1000.
+      (rear_x,rear_y) = car.rear_position()
+      current = next
 
       line =  ",".join([
          str(seconds),
@@ -56,7 +52,8 @@ def write_path_from_recording_file(inpath = None, outpath = None, min_length = 0
          str(y), 
          str(rear_x),
          str(rear_y),
-         str(reversing),
+         str(next_reverse),
+#         str(current.odometer_ticks),
  #        str(standardized_degrees(current.heading() - start_heading)),
          str(car.heading_degrees()),
          str(car.heading_adjustment),
@@ -64,9 +61,13 @@ def write_path_from_recording_file(inpath = None, outpath = None, min_length = 0
          str(current.str),
          str(wheel_meters_per_second)])
       outfile.write(line+"\n")
+      print i, line
+      
+      start = current
+      (x,y) = (x_next,y_next)
+
        
 if __name__ == '__main__':
   input_path = latest_filename('recordings','recording','csv')
   write_path_from_recording_file(input_path)
-       
-
+ 

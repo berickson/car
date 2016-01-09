@@ -75,7 +75,8 @@ def play_route(route):
       message = queue.get(block=True, timeout = 0.5)
       elapsed_sec = (message.ms - last_ms) / 1000.
       (x,y) = car.front_position()
-      route.set_position(x,y)
+      (rear_x,rear_y) = car.rear_position()
+      route.set_position(x,y,rear_x,rear_y,car.velocity)
        
       cte = route.cross_track_error()
 
@@ -101,7 +102,7 @@ def play_route(route):
       
       str_ms = car.steering_for_angle(steering_angle)
    
-      print("t: {:.1f} i: {:.2f} xg: {:.2f} gy:{:.2f} gv: {:.2f} x: {:.2f} y:{:.2f} cte:{:.2f} v:{:.2f} heading:{:.2f} segment_heading: {:.2f} steering_degrees: {:.2f} esc:{}".format(
+      print("t: {:.1f} i: {} xg: {:.2f} gy:{:.2f} gv: {:.2f} x: {:.2f} y:{:.2f} reverse: {} cte:{:.2f} v:{:.2f} heading:{:.2f} segment_heading: {:.2f} steering_degrees: {:.2f} esc:{}".format(
          time.time() - start_time,
          route.index,
          route.nodes[route.index+1].x,
@@ -109,6 +110,7 @@ def play_route(route):
          velocity,
          x,
          y,
+         route.nodes[route.index].reverse,
          cte,
          car.velocity,
          car_heading, 
@@ -134,12 +136,14 @@ def play_route(route):
     
   
 if __name__ == '__main__':
-  route = hall_and_back()
+  route = Route()
+  route.load_from_file('recordings/recording_050.csv.path')
 
 #  route = around_bar()
 #  route = around_kitchen()
-  route.optimize_velocity(max_velocity = 3.0, max_acceleration = 2.0)
+  route.optimize_velocity(max_velocity = 0.5, max_acceleration = 0.5)
   print route
   print 'playing route now, press ctrl-c to abort'
+  
   play_route(route)
   

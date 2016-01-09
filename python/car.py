@@ -199,10 +199,12 @@ class Car:
     self.velocity = wheel_distance / elapsed_time
     #print("x:{:.2f} y:{:.2f} heading:{:.2f}".format(self.ackerman.x, self.ackerman.y, relative_heading))
   
-  def position(self):
-    return (self.ackerman.x, self.ackerman.y)
   
-  # returns position of front of car (between two front wheels)
+  # returns position of rear of car (between two rear wheels), this starts at -wheelbase_length_in_meters,0
+  def rear_position(self):
+    return (self.ackerman.x - self.wheelbase_length_in_meters, self.ackerman.y)
+  
+  # returns position of front of car (between two front wheels), this starts at 0,0
   def front_position(self):
     h = radians(self.heading_degrees());
     l = self.wheelbase_length_in_meters

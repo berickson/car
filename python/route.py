@@ -6,23 +6,26 @@ class RouteNode:
   def __init__(self):
     self.x = 0.
     self.y = 0.
+    self.reverse = False
 
 
   def __repr__(self):
-    print self.x,self.y, self.velocity
-    return "x: {:.2f} y: {:.2f} velocity: {:2f}".format(self.x,self.y, self.velocity)
+    return "x: {:.2f} y: {:.2f} velocity: {:2f} reverse: {}".format(self.x,self.y, self.velocity, self.reverse)
   
     
-  def set(self,x,y,velocity = None):
+  def set(self,x,y,velocity = None, reverse = False):
     self.x = float(x)
     self.y = float(y)
+    self.reverse = reverse
     self.velocity = float(velocity) if velocity is not None else None
   
-  def set_from_standard_file(self, secs, x, y, heading_degrees, heading_degrees_adjustment, esc_ms, str_ms, meters_per_second, velocity = 1.0):
-    print velocity
+  def set_from_standard_file(self, secs, x, y, rear_x, rear_y, reverse, heading_degrees, heading_degrees_adjustment, esc_ms, str_ms, meters_per_second, velocity = 1.0):
     self.secs = float(secs)
     self.x = float(x)
     self.y = float(y)
+    self.rear_x = float(rear_x)
+    self.rear_y = float(rear_y)
+    self.reverse = (reverse == 'True')
     self.heading_degrees = float(heading_degrees)
     self.heading_degrees_adjustment = float(heading_degrees_adjustment)
     self.esc_ms = int(esc_ms)
@@ -32,21 +35,21 @@ class RouteNode:
 
 class Route:
   def __init__(self):
-    self.columns = ["secs","x","y","heading","adj","esc","str","m/s"];
+    self.columns = ["secs","x","y","rear_x", "rear_y", "reverse", "heading","adj","esc","str","m/s"];
     self.nodes = []
     # a segment is from node[index] to node[index+1]
     self.index = 0
     self.progress = 0.
     
-    self.add_node(0,0)
+#    self.add_node(0,0)
     self._done = False
     
   def __repr__(self):
-    return "\n".join([str(node) for node in self.nodes])
+    return "\n".join([ (str(i)+" " + str(self.nodes[i])) for i in range(len(self.nodes))])
     
-  def add_node(self,x,y,velocity=1.0):
+  def add_node(self,x,y,velocity=1.0, reverse=False):
     node = RouteNode()
-    node.set(x=x,y=y,velocity=velocity)
+    node.set(x=x,y=y,velocity=velocity,reverse=reverse)
     self.nodes.append(node)
   
   def done(self):
@@ -68,24 +71,39 @@ class Route:
   # positive cte means you are to the left of track
   # 
   # inspired by Udacity cs373 quiz_6_6.py and quiz_6_7.py
-  def set_position(self,x,y):
+  def set_position(self,x,y,rear_x,rear_y, velocity):
     cte = 0.0
     while True:
       p1 = self.nodes[self.index]
       p2 = self.nodes[self.index+1]
-      # some basic vector calculations
-      dx = p2.x - p1.x
-      dy = p2.y - p1.y
-      drx = x - p1.x
-      dry = y - p1.y
+
+      print 'set_position velocity: {} p2.veloicity {}: '.format(velocity, p2.velocity)
+      # skip this node if we reach the required zero velocity for
+      # a non-terminal node so we can get moving a again
+      if abs(velocity) <0.01 and abs(p2.velocity) <0.01:
+        progress = 1.0
+      else:
+
+        if p1.reverse:
+          dx = p2.rear_x - p1.rear_x
+          dy = p2.rear_y - p1.rear_y
+          drx = rear_x - p1.rear_x
+          dry = rear_y - p1.rear_y
+        else:
+          # some basic vector calculations
+          dx = p2.x - p1.x
+          dy = p2.y - p1.y
+          drx = x - p1.x
+          dry = y - p1.y
+        
+        # u is the robot estimate projected onto the path segment
+        progress = (drx * dx + dry * dy) / (dx * dx + dy * dy)
+        
+        # the cte is the estimate projected onto the normal of the path segment
+        cte = (dry * dx - drx * dy) / sqrt(dx * dx + dy * dy)
       
-      # u is the robot estimate projected onto the path segment
-      progress = (drx * dx + dry * dy) / (dx * dx + dy * dy)
       
-      # the cte is the estimate projected onto the normal of the path segment
-      cte = (dry * dx - drx * dy) / sqrt(dx * dx + dy * dy)
-      
-      if progress <= 1.0 or self.done():
+      if progress < 1.0 or self.done():
         break
       if self.index >= len(self.nodes)-2.:
         self._done = True
@@ -99,17 +117,27 @@ class Route:
     if self.done(): return 0.
     p0 = self.nodes[self.index]
     p1 = self.nodes[self.index+1]
+    
+    # interpolate speed
     if(self.segment_progress < 0):
-      return p0.velocity
-    if(self.segment_progress > 1):
-      return p1.velocity
-      
-    return p0.velocity + (p1.velocity - p0.velocity) * self.segment_progress
+      v =  p0.velocity
+    elif(self.segment_progress > 1):
+      v= p1.velocity
+    else:
+      v = p0.velocity + (p1.velocity - p0.velocity) * self.segment_progress
+    
+    # set negative speed for reverse
+    if p0.reverse:
+      v = -v
+    return v
 
   def heading_radians(self):
     p1 = self.nodes[self.index]
     p2 = self.nodes[self.index+1]
-    return -atan2(p1.y-p2.y,p2.x-p1.x)
+    h = -atan2(p1.y-p2.y,p2.x-p1.x)
+    if p1.reverse:
+      h += pi
+    return standardized_radians(h)
   
   def header_string(self):
     return ",".join(self.columns)
@@ -164,8 +192,16 @@ class Route:
     self.nodes[-1].velocity = 0.
     iterations = 0
     
+    # apply speed limit of zero for switching direction
+    for i in range(len(self.nodes)-2):
+      p0 = self.nodes[i]
+      p1 = self.nodes[i+1]
+      if p0.reverse != p1.reverse:
+        p1.velocity = 0.0
+    
+    
+    # apply speed limit for curves
     for i in range(len(self.nodes)-3):
-      print i
       p0 = self.nodes[i]
       p1 = self.nodes[i+1]
       p2 = self.nodes[i+2]
@@ -178,48 +214,46 @@ class Route:
       if theta > 0:
         r = abs(length(*s2) / theta)
         v_circle_max = sqrt(max_acceleration * r)
-        print 'i: {} theta: {} r: {} v_circle_max: {}'.format(i,theta, r,v_circle_max)
+        #print 'i: {} theta: {} r: {} v_circle_max: {}'.format(i,theta, r,v_circle_max)
         p1.velocity = min(p1.velocity, v_circle_max)
       
-      
      
-    changed = True
-    while changed:
-      changed = False
-      iterations += 1
-       
-      # make range to go up the list and back down
-      forward = range(0,len(self.nodes)-1)
-      backward = list(forward)
-      backward.reverse()
-      forward_and_back = list(forward)
-      forward_and_back.extend(backward[:])
 
-      for i in forward_and_back:
-        p0 = self.nodes[i]
-        p1 = self.nodes[i+1]
-        dv = abs(p1.velocity - p0.velocity)
-        ds = distance(p0.x,p0.y,p1.x,p1.y)
-        
-        min_v = min(p0.velocity,p1.velocity) 
-        max_dv = velocity_at_position(x=ds, a=max_acceleration, v0=min_v) - min_v
-        
-        if dv > max_dv + tolerance: 
-          p0.velocity = min(p0.velocity, velocity_at_position(x=ds, a=max_acceleration, v0=p1.velocity))
-          p1.velocity = min(p1.velocity, velocity_at_position(x=ds, a=max_acceleration, v0=p0.velocity))
-          changed = True
-    print 'calculated route velocity in {} iterations'.format(iterations)
+    for i in reversed(range(0,len(self.nodes)-1)):
+      p0 = self.nodes[i]
+      p1 = self.nodes[i+1]
+      dv = abs(p1.velocity - p0.velocity)
+      ds = distance(p0.x,p0.y,p1.x,p1.y)
+      
+      min_v = p1.velocity 
+      max_dv = velocity_at_position(x=ds, a=max_acceleration, v0=min_v) - min_v
+      
+      if dv > max_dv + tolerance: 
+        p0.velocity = min(p0.velocity, velocity_at_position(x=ds, a=max_acceleration, v0=p1.velocity))
     
  
  
 def test_straight_line():
+  print 'testing a straight line'
   route = Route()
   for i in range(1,11):
     route.add_node(i,0)
   route.optimize_velocity()
   print(route)
 
+def test_reversing():
+  print 'testing a back and forth line'
+  route = Route()
+  for i in range(1,11):
+    route.add_node(i,0)
+  for i in range(11,21):
+    route.add_node(i,0,reverse=True)
+  route.optimize_velocity()
+  print(route)
+
+
 def test_circle():
+  print 'testing a circle'
   route = Route()
   steps = 30
   r = 1
@@ -234,3 +268,4 @@ def test_circle():
 if __name__ == '__main__':
   test_circle()
   test_straight_line()
+  test_reversing()
