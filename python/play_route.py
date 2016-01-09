@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys,tty,termios
 import datetime
 import time
@@ -146,7 +147,33 @@ def play_route(route):
     
   
 if __name__ == '__main__':
-  input_path = latest_filename('recordings','recording','csv.path')
+
+  import argparse
+  parser = argparse.ArgumentParser(description = 'Route follower')
+  parser.add_argument(
+    'input_path',
+    nargs='?',
+    default='',
+    help='path file to play, defaults to latest')
+  parser.add_argument(
+    '--max_a',
+    nargs='?',
+    type=float,
+    default=1.0,
+    help='max_acceleration')
+  parser.add_argument(
+    '--max_v',
+    nargs='?',
+    type=float,
+    default='1.0',
+    help='max_velocity')
+  args = parser.parse_args()
+  max_a = args.max_a
+  max_v = args.max_v
+  
+  input_path = args.input_path
+  if input_path == "":
+    input_path = latest_filename('recordings','recording','csv.path')
   route = Route()
   print 'loading route at', input_path
   route.load_from_file(input_path)
@@ -154,7 +181,7 @@ if __name__ == '__main__':
 #  route = around_bar()
 #  route = around_kitchen()
   print 'optimizing speeds along the route'
-  route.optimize_velocity(max_velocity = 0.5, max_acceleration = 0.5)
+  route.optimize_velocity(max_velocity = max_v, max_acceleration = max_a)
   print route
   print 'playing route now, press ctrl-c to abort'
   

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from car import *
 from recording import Recording
 from ackerman import *
@@ -63,7 +65,6 @@ def write_path_from_recording_file(inpath = None, outpath = None, min_length = 0
       outfile.write(line+"\n")
       print i, line
       
-      start = current
       (x,y) = (x_next,y_next)
 
        

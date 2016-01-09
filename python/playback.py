@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys,tty,termios
 import datetime
 import time
