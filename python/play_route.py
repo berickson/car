@@ -84,14 +84,28 @@ def play_route(route):
 
       # calculate speed 
       velocity = route.velocity()
+      
+      # set limits for forward and reverse
       if velocity is None:
         velocity = max_velocity
-      if car.velocity < velocity:
-        esc_ms = car.min_forward_speed + 3
-      elif car.velocity > velocity + .2 or car.velocity > 2*velocity:
-        esc_ms = 1400
+      
+      if route.is_reverse():
+        speed_up_esc = car.min_reverse_speed - 30
+        slow_down_esc = car.min_forward_speed + 10
+        maintain_esc = car.min_reverse_speed
+        error = velocity - car.velocity
       else:
-        esc_ms = car.min_forward_speed - 10
+        speed_up_esc = car.min_forward_speed + 40
+        slow_down_esc = 1500.#car.min_reverse_speed
+        maintain_esc = car.min_forward_speed
+        error = car.velocity - velocity
+      
+      if error < 0.: # too slow
+        esc_ms = speed_up_esc
+      elif car.velocity > velocity + .2 or car.velocity > 2*velocity:
+        esc_ms = slow_down_esc
+      else:
+        esc_ms = maintain_esc
         
       # calculate steering
       segment_heading = degrees(route.heading_radians())
@@ -102,7 +116,7 @@ def play_route(route):
       cte_fix = -40 * cte
       if route.is_reverse():
         heading_fix = -heading_fix
-        cte_fix = -cte_fix
+        cte_fix = -10.*cte_fix # 10x cte fix for reverse!
         
       desired_steering_angle = standardized_degrees(heading_fix + cte_fix)
       

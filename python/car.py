@@ -136,17 +136,24 @@ class Car:
   def write_command(self, s):
     if not self.online:
       raise Exception("must be online")
-    command = open('/dev/car/command','w')
-    #print 'Sending command "{0}"'.format(s)
-    command.write("{0}\n".format(s))
+    with open('/dev/car/command','w') as command:
+      #print 'Sending command "{0}"'.format(s)
+      command.write("{0}\n".format(s))
     
   def _monitor_output(self):
     self.output = open('/var/log/car/output.log','r')
     self.output.seek(0,2) # go to end of file
-    lines_printed = 0
+    line_start = None
     while not self.quit:
       s = self.output.readline()
       if s:
+        if line_start is not None:
+          s = line_start + s
+          line_start = None
+        if not s.endswith('\n'):
+          line_start = s
+          continue
+          
         self.process_line_from_log(s)              
       else:
         time.sleep(0.001)
@@ -161,7 +168,7 @@ class Car:
     if fields[1] != 'TRACE_DYNAMICS':
       return
     if len(fields) != 29:
-      print 'invalid TRACE_DYNAMICS packet'
+      print 'invalid TRACE_DYNAMICS packet: {}'.format(s)
       return
       
     # todo, handle contention with different threads
@@ -293,11 +300,11 @@ class Car:
     if ticks > 0:
       direction = 1
       min_speed = self.min_forward_speed - 3
-      max_speed = self.min_forward_speed + 5
+      max_speed = self.min_forward_speed + 30
     else:
       direction = -1
       min_speed = self.min_reverse_speed + 1
-      max_speed = self.min_reverse_speed - 3
+      max_speed = self.min_reverse_speed - 30
     
     goal_odometer = self.dynamics.odometer_ticks + ticks
 

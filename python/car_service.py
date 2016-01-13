@@ -13,10 +13,10 @@ sleep_time = 0.001
 
 def log(l):
   try:
-    log_file = open('/var/log/car/output.log','a')
-    ts = datetime.datetime.now()
-    log_file.write("{0},{1}\n".format(ts,l.strip()))
-    log_file.flush()
+    with open('/var/log/car/output.log','a') as log_file:
+      ts = datetime.datetime.now()
+      log_file.write("{0},{1}\n".format(ts,l.strip()))
+      log_file.flush()
   except IOError as e:
     print 'Error writing logs: {0}'.format(str(e))
   

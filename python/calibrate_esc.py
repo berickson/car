@@ -1,6 +1,6 @@
 import time
 import sys
-from Car import Car
+from car import Car
 car = Car()
 
 sleep_time = 5.0
