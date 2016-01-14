@@ -63,8 +63,8 @@ def run(command_file):
     try:
       for usb_path in glob.glob('/dev/ttyACM*'):
         try:
-          s = serial.Serial(usb_path)
           f = fast_line_reader(usb_path)
+          s = serial.Serial(usb_path)
           log('serial connected')
           connected = True
           while True:
@@ -77,17 +77,21 @@ def run(command_file):
               did_work = True
             if did_work == False:
               time.sleep(sleep_time)
-        except IOError:
+        except IOError,e:
           time.sleep(sleep_time)
           if (connected):
+            log(str(e.errno))
+            log(str(e))
             log('serial disconnected')
             connected = False    
-    except OSError:
+    except OSError, e:
       if (connected):
+        log(str(e.errno))
+        log(str(e))
         log('serial disconnected')
         connected = False
       
-command_file = os.open('/dev/car/command',os.O_RDONLY | os.O_NONBLOCK)
+command_file = os.open('/dev/car/command',os.O_RDONLY)
 
 run(command_file)
 

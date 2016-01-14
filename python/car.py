@@ -5,6 +5,7 @@ import ConfigParser
 from ackerman import Ackerman
 from math import *
 from geometry import *
+import pprint
 
 
 
@@ -26,6 +27,10 @@ def interpolate(x, x1, y1, x2, y2):
 class Dynamics:
   def __init__(self):
     self.reading_count = 0
+  def __repr__(self):
+    return pprint.pformat(vars(self),depth=1)
+      
+      
   def set_from_log(self,fields):
 #    try:
       self.datetime = dateutil.parser.parse(fields[0])

@@ -69,12 +69,19 @@ def play_route(route):
     if automatic: car.set_rc_mode()
     car.add_listener(queue)
     message = queue.get(block=True, timeout = 0.5)
+    print repr(message)
     last_ms = message.ms
     start_time = time.time()
 
     # keep going until we run out of track  
     while True:
-      message = queue.get(block=True, timeout = 0.5)
+      try:
+        message = queue.get(block=True, timeout = 0.5)
+      except:
+        print 'message timed out at: '+datetime.datetime.now().strftime("%H:%M:%S.%f")
+        print 'last message received:' + repr(message)
+        print 
+        raise
       elapsed_sec = (message.ms - last_ms) / 1000.
       (x,y) = car.front_position()
       (rear_x,rear_y) = car.rear_position()
