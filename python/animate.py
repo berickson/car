@@ -4,6 +4,7 @@ import gobject
 import math
 from math import *
 from car import Dynamics, FakeCar
+import filenames
 
 import pygtk
 pygtk.require('2.0')
@@ -105,7 +106,7 @@ class Transform(Screen):
         self.world = World()
         super(Transform,self).__init__()
         self.draw_count = 0
-        self.timer = gobject.timeout_add (30, self.idle_cb)
+        self.timer = gobject.timeout_add (10, self.idle_cb)
 
 
     def idle_cb(self):
@@ -138,7 +139,15 @@ class Transform(Screen):
         cr.set_source_rgb(0,0,0)
         cr.set_font_size(11)
         cr.move_to(15,11)
-        cr.show_text(str(self.draw_count))
+        display_text ="{} frame: {} m/s: {:4.1f} esc: {:4} ax: {:4.1f}".format(
+          args.infile,
+          self.draw_count, 
+          self.world.car.get_velocity_meters_per_second(),
+          self.world.car.dynamics.esc,
+          self.world.car.dynamics.ax
+          )
+          
+        cr.show_text(display_text)
 
 
 import argparse
@@ -147,7 +156,7 @@ parser.add_argument(
   'infile',
   nargs='?',
 #  type=argparse.FileType('r'),
-  default='recording.csv',
+  default= filenames.latest_filename('recordings','recording','csv'),
   help='csv file recorded with recorder')
 args = parser.parse_args()
 

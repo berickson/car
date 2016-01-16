@@ -85,7 +85,8 @@ def play_route(route):
       elapsed_sec = (message.ms - last_ms) / 1000.
       (x,y) = car.front_position()
       (rear_x,rear_y) = car.rear_position()
-      route.set_position(x,y,rear_x,rear_y,car.velocity)
+      car_velocity = car.get_velocity_meters_per_second()
+      route.set_position(x,y,rear_x,rear_y,v)
        
       cte = route.cross_track_error()
 
@@ -95,6 +96,7 @@ def play_route(route):
       # set limits for forward and reverse
       if velocity is None:
         velocity = max_velocity
+<<<<<<< Updated upstream
       
       if route.is_reverse():
         speed_up_esc = car.min_reverse_speed - 30
@@ -111,6 +113,10 @@ def play_route(route):
         esc_ms = speed_up_esc
       elif car.velocity > velocity + .2 or car.velocity > 2*velocity:
         esc_ms = slow_down_esc
+      if car_velocity < velocity:
+        esc_ms = car.min_forward_speed + 3
+      elif car_velocity > velocity + .2 or car_velocity > 2*velocity:
+        esc_ms = 1400
       else:
         esc_ms = maintain_esc
         
@@ -144,7 +150,7 @@ def play_route(route):
          y,
          route.is_reverse(),
          cte,
-         car.velocity,
+         car_velocity,
          car_heading, 
          segment_heading,
          steering_angle,
@@ -158,7 +164,7 @@ def play_route(route):
       last_ms = message.ms
       last_steering_angle = steering_angle
       
-      if route.done() and car.velocity<=0:
+      if route.done() and car_velocity<=0:
         break;
       
   finally:

@@ -208,9 +208,18 @@ class Car:
     self.ackerman.heading = relative_heading_radians
     self.ackerman.move_left_wheel(outside_wheel_angle, wheel_distance)
     elapsed_time = ( current.ms - previous.ms ) / 1000.
+    
+    self.last_velocity = self.velocity
     self.velocity = wheel_distance / elapsed_time
     #print("x:{:.2f} y:{:.2f} heading:{:.2f}".format(self.ackerman.x, self.ackerman.y, relative_heading))
   
+  def get_velocity_meters_per_second(self):
+    if self.last_velocity is not None:
+      return (self.velocity + self.last_velocity) /2.
+    elif self.velocity is not None:
+      return self.velocity
+    else:
+      return 0.
   
   # returns position of rear of car (between two rear wheels), this starts at -wheelbase_length_in_meters,0
   def rear_position(self):
