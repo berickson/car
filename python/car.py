@@ -9,19 +9,6 @@ import pprint
 
 
 
-#returns y for given x based on x1,y1,x2,y2
-def interpolate(x, x1, y1, x2, y2):
-  x = float(x)
-  x1 = float(x1)
-  x2 = float(x2)
-  y1 = float(y1)
-  y2 = float(y2)
-  
-  #print("x:{} x1:{} y1:{} x2:{} y2:{}".format(x,x1,y1,x2,y2))
-  m = (y2 - y1)/( x2 - x1 )
-  y = y1 + m * (x-x1)
-  return y
-
 
 
 class Dynamics:
@@ -76,6 +63,7 @@ class Car:
     self.reading_count = 0
     self.dynamics = Dynamics()
     self.velocity = 0.0
+    self.last_velocity = 0.0
     self.heading_adjustment = 0.
     self.ackerman = Ackerman(
       front_wheelbase_width = self.front_wheelbase_width_in_meters, 
@@ -89,8 +77,8 @@ class Car:
     
     # esc and steering
     self.center_steering_us = int(self.get_option('calibration','center_steering_us'))
-    self.min_forward_speed = int(self.get_option('calibration','min_forward_speed'))
-    self.min_reverse_speed = int(self.get_option('calibration','min_reverse_speed'))
+    self.min_forward_esc = int(self.get_option('calibration','min_forward_esc'))
+    self.min_reverse_esc = int(self.get_option('calibration','min_reverse_esc'))
     self.reverse_center_steering_us = int(self.get_option('calibration','reverse_center_steering_us'))
     
     # car dimensions
@@ -223,7 +211,7 @@ class Car:
   
   # returns position of rear of car (between two rear wheels), this starts at -wheelbase_length_in_meters,0
   def rear_position(self):
-    return (self.ackerman.x - self.wheelbase_length_in_meters, self.ackerman.y)
+    return (self.ackerman.x, self.ackerman.y)
   
   # returns position of front of car (between two front wheels), this starts at 0,0
   def front_position(self):
@@ -244,6 +232,22 @@ class Car:
   
   def wheels_angle(self):
     return self.angle_for_steering(self.dynamics.str) 
+    
+  
+  def esc_for_velocity(self, v):
+    data = [
+      (0.0,  1500),
+      (0.1, 1645),
+      (0.34, 1659),
+      (0.85, 1679),
+      (1.2, 1699),
+      (1.71, 1719),
+      (1.88, 1739),
+      (2.22, 1759),
+      (2.6, 1779),
+      (3.0, 1799)
+      ]
+    return table_lookup(data, v)
       
   def angle_for_steering(self, str):
     data = [
@@ -298,11 +302,11 @@ class Car:
           theta, data[i][0], data[i][1], data[i+1][0], data[i+1][1])
      
     
-  def set_speed_and_steering(self, speed, steering):
+  def set_esc_and_str(self, speed, steering):
      self.write_command('pse {0},{1}'.format(int(steering), int(speed)))
 
  
-  def forward(self, meters, goal_heading = None, fixed_steering_us = None):
+  def forward(self, meters, goal_heading = None, fixed_steering_us = None, max_speed = 2.0):
     ticks = int(meters/self.meters_per_odometer_tick)
     if fixed_steering_us != None:
       steering = fixed_steering_us
@@ -313,18 +317,18 @@ class Car:
     #use a direction of 1 / -1 to help with the math for forward / reverse
     if ticks > 0:
       direction = 1
-      min_speed = self.min_forward_speed - 3
-      max_speed = self.min_forward_speed + 30
+      min_esc = self.min_forward_esc - 3
+      max_esc = self.min_forward_esc + 30
     else:
       direction = -1
-      min_speed = self.min_reverse_speed + 1
-      max_speed = self.min_reverse_speed - 30
+      min_esc = self.min_reverse_esc + 1
+      max_esc = self.min_reverse_esc - 30
     
     goal_odometer = self.dynamics.odometer_ticks + ticks
 
     self.set_rc_mode()
     while self.dynamics.odometer_ticks * direction < goal_odometer * direction:
-      speed = max_speed
+      esc = max_esc
     
       # adjust steering if fixed steering wasn't selected
       if fixed_steering_us == None:
@@ -332,12 +336,12 @@ class Car:
         steering = self.steering_for_angle(-direction * heading_error)
    
       # adjust speed
-      if abs(self.dynamics.rpm_pps) > 350:
-        speed = min_speed
+      if abs(self.get_velocity_meters_per_second()) > max_speed:
+        esc = min_esc
              
-      self.set_speed_and_steering(speed, steering)
+      self.set_esc_and_str(esc, steering)
       time.sleep(.02)
-    self.set_speed_and_steering(1500,steering)
+    self.set_esc_and_str(1500,steering)
     slowdown_start = time.time()
     while (time.time()-slowdown_start < 3):
       if fixed_steering_us == None:

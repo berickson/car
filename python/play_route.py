@@ -16,6 +16,7 @@ max_velocity = 5.
 automatic = True
 
 
+
 def clamp(value, min_value, max_value):
   if value < min_value:
     return min_value
@@ -40,15 +41,6 @@ def hall_and_back():
   route.load_from_file('recordings/recording_041.csv.path', velocity = 1.)
   return route
   
-def straight_route():
-  x = 0.1
-  while x <= 8.5 + 0.0001: #door is about 8.5 from end of toolbox by desk
-    route.add_node(x,0.)
-    x += 0.05
-  route.optimize_velocity(max_velocity = 5., 
-    max_acceleration = 1.0) # 1.0 - safe indoors (3 cm overshoot)
-                            # 1.5 - agressive indoors (5 cm overshoot, may slide some)
-                            # 2.0 - very agressive indoors (10 cm overshoot)
 
 def play_route(route):
 
@@ -86,39 +78,43 @@ def play_route(route):
       (x,y) = car.front_position()
       (rear_x,rear_y) = car.rear_position()
       car_velocity = car.get_velocity_meters_per_second()
-      route.set_position(x,y,rear_x,rear_y,v)
+      route.set_position(x,y,rear_x,rear_y,car_velocity)
        
       cte = route.cross_track_error()
 
       # calculate speed 
       velocity = route.velocity()
+      error = car_velocity - velocity
       
       # set limits for forward and reverse
       if velocity is None:
         velocity = max_velocity
-<<<<<<< Updated upstream
       
       if route.is_reverse():
-        speed_up_esc = car.min_reverse_speed - 30
-        slow_down_esc = car.min_forward_speed + 10
-        maintain_esc = car.min_reverse_speed
-        error = velocity - car.velocity
+        error = velocity - car_velocity
+        speed_up_esc = car.min_reverse_esc - 80
+        slow_down_esc = car.min_forward_esc + 10
+        maintain_esc = car.min_reverse_esc
+        
+        if error < 0.: # too slow
+          esc_ms = speed_up_esc
+        elif error > 0.2:
+          esc_ms = slow_down_esc
+        else:
+          esc_ms = maintain_esc
+
       else:
-        speed_up_esc = car.min_forward_speed + 40
-        slow_down_esc = 1500.#car.min_reverse_speed
-        maintain_esc = car.min_forward_speed
-        error = car.velocity - velocity
+        if error > 0.2:
+          esc_ms = car.min_reverse_esc # slow down esc
+        elif error > 0.:
+          esc_ms = car.esc_for_velocity(clamp(velocity- 3.*error,0.1,999.))
+        else:
+          esc_ms = car.esc_for_velocity(velocity  - error)
+
+#        speed_up_esc = car.esc_for_velocity(velocity + 1)
+#        slow_down_esc = car.min_reverse_esc
+#        maintain_esc = car.esc_for_velocity(velocity) #car.min_forward_esc
       
-      if error < 0.: # too slow
-        esc_ms = speed_up_esc
-      elif car.velocity > velocity + .2 or car.velocity > 2*velocity:
-        esc_ms = slow_down_esc
-      if car_velocity < velocity:
-        esc_ms = car.min_forward_speed + 3
-      elif car_velocity > velocity + .2 or car_velocity > 2*velocity:
-        esc_ms = 1400
-      else:
-        esc_ms = maintain_esc
         
       # calculate steering
       segment_heading = degrees(route.heading_radians())
@@ -158,17 +154,17 @@ def play_route(route):
      
       
       # send to car
-      if automatic: car.set_speed_and_steering(esc_ms, str_ms)
+      if automatic: car.set_esc_and_str(esc_ms, str_ms)
       
       # remember state for next loop
       last_ms = message.ms
       last_steering_angle = steering_angle
       
-      if route.done() and car_velocity<=0:
+      if route.done() and car_velocity == 0:
         break;
       
   finally:
-    car.set_speed_and_steering(1500,1500)
+    car.set_esc_and_str(1500,1500)
     car.set_manual_mode()
     car.remove_listener(queue)
     

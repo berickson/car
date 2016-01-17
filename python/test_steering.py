@@ -20,7 +20,7 @@ try:
       if steer_angle <= min_angle:
         step = abs(step)
       steer_ms = car.steering_for_angle(steer_angle)
-      car.set_speed_and_steering(1500, steer_ms)
+      car.set_esc_and_str(1500, steer_ms)
       time.sleep(0.02)
 finally:
   car.set_manual_mode()

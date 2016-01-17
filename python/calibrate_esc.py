@@ -19,12 +19,12 @@ move_threshold = 0.5
 
 def does_it_move(speed):
   car.set_rc_mode()
-  car.set_speed_and_steering(speed,neutral_steer)
+  car.set_esc_and_str(speed,neutral_steer)
   current_test_start_time = time.time()
   moved = False
   start_inches = car.dynamics.ping_inches;
   while time.time() - current_test_start_time < wait_seconds and not moved:
-    car.set_speed_and_steering(speed,neutral_steer)
+    car.set_esc_and_str(speed,neutral_steer)
     time.sleep(0.05)
     new_inches = car.dynamics.ping_inches
     delta = abs(new_inches - start_inches)
@@ -36,23 +36,23 @@ def does_it_move(speed):
     if delta > move_threshold:
       moved = True
       print
-  car.set_speed_and_steering(neutral_speed,neutral_steer)
+  car.set_esc_and_str(neutral_speed,neutral_steer)
   car.set_manual_mode()
   return moved
 
 
 
-def calibrate_min_forward_speed():
+def calibrate_min_forward_esc():
   speed = 1540
   moved = False
   while not moved:
     moved = does_it_move(speed)
     if not moved:
-      speed+=1
+      speed+=3
   time.sleep(3) # allow to stop completely
   return speed
   
-def calibrate_min_reverse_speed():
+def calibrate_min_reverse_esc():
   time.sleep(3)
 
   speed = 1460
@@ -60,12 +60,12 @@ def calibrate_min_reverse_speed():
   while not moved:
     moved = does_it_move(speed)
     if not moved:
-      speed-=1
+      speed-=3
   return speed
 
 
-min_forward_speed = calibrate_min_forward_speed()
-min_reverse_speed = calibrate_min_reverse_speed()
+min_forward_esc = calibrate_min_forward_esc()
+min_reverse_esc = calibrate_min_reverse_esc()
 
-print 'min_forward_speed:  {}  min_reverse_speed: {}'.format(min_forward_speed, min_reverse_speed)
+print 'min_forward_esc:  {}  min_reverse_esc: {}'.format(min_forward_esc, min_reverse_esc)
 

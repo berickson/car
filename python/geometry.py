@@ -96,3 +96,35 @@ def angle_between(v1, v2):
       else:
           return np.pi
   return angle
+
+
+# returns an interpolated value from table of k-v
+# kv must be sorted by key
+def table_lookup(kv, key):
+    last = len(kv)-1
+    if key <= kv[0][0]:
+      return kv[0][1]
+    if key >= kv[last][0]:
+      return kv[last][1]
+    for i in range(0,last):
+      if key <= kv[i+1][0]:
+        return interpolate(
+          key, kv[i][0], kv[i][1], kv[i+1][0], kv[i+1][1])
+
+
+
+#returns y for given x based on x1,y1,x2,y2
+def interpolate(x, x1, y1, x2, y2):
+  x = float(x)
+  x1 = float(x1)
+  x2 = float(x2)
+  y1 = float(y1)
+  y2 = float(y2)
+  
+  #print("x:{} x1:{} y1:{} x2:{} y2:{}".format(x,x1,y1,x2,y2))
+  m = (y2 - y1)/( x2 - x1 )
+  y = y1 + m * (x-x1)
+  return y
+
+
+

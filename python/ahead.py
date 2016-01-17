@@ -13,7 +13,7 @@ speed = 1500
 while(True):
   heading = angle_diff(original_heading, car.dynamics.heading)
   steering = car.steering_for_angle(-heading)
-  car.set_speed_and_steering(speed, steering)
+  car.set_esc_and_str(speed, steering)
   #print "Heading: {} Steering: {}".format(heading, steering)
   time.sleep(0.01)
 car.set_manual_mode()

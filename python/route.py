@@ -77,7 +77,7 @@ class Route:
       p1 = self.nodes[self.index]
       p2 = self.nodes[self.index+1]
 
-      #print 'set_position velocity: {} p2.veloicity {}: '.format(velocity, p2.velocity)
+      #print 'set_position velocity: {} p2.velocity {}: '.format(velocity, p2.velocity)
       # skip this node if we reach the required zero velocity for
       # a non-terminal node so we can get moving a again
       if abs(velocity) <0.01 and abs(p2.velocity) <0.01:
@@ -85,10 +85,21 @@ class Route:
       else:
 
         if p1.reverse:
-          dx = p2.rear_x - p1.rear_x
-          dy = p2.rear_y - p1.rear_y
-          drx = rear_x - p1.rear_x
-          dry = rear_y - p1.rear_y
+          if hasattr(p1,'rear_x'):
+            dx = p2.rear_x - p1.rear_x
+            dy = p2.rear_y - p1.rear_y
+            drx = rear_x - p1.rear_x
+            dry = rear_y - p1.rear_y
+          else:
+            h = self.heading_radians()
+            l = distance(x,y,rear_x,rear_y)
+            rear_offset_x = -l * sin(h)
+            rear_offset_y = -l * cos(h)
+            dx = p2.x-p1.x
+            dy = p2.y-p1.y
+            drx = rear_x - (p1.x + rear_offset_x)
+            dry = rear_y - (p1.y + rear_offset_y)
+            
         else:
           # some basic vector calculations
           dx = p2.x - p1.x

@@ -36,7 +36,7 @@ def playback():
     steer_angle = original_steer_angle + degrees_diff(actual_turn, expected_turn)
     str = car.steering_for_angle(steer_angle)
       
-    car.set_speed_and_steering(dyn.esc, str)
+    car.set_esc_and_str(dyn.esc, str)
 
   car.set_manual_mode() 
   print 'all done'
