@@ -1,9 +1,11 @@
+#!/usr/bin/env python
+
 from car import Car
 from play_route import play_route
 from route import Route
 #car = Car()
-meters = 2.0
-max_speed = .25
+meters = 7.0
+max_speed = 3
 
 
 def straight_route():
@@ -17,7 +19,7 @@ def straight_route():
     x -= 0.05
     
   route.optimize_velocity(max_velocity = max_speed, 
-    max_acceleration = 0.5) # 1.0 - safe indoors (3 cm overshoot)
+    max_acceleration = 1) # 1.0 - safe indoors (3 cm overshoot)
                             # 1.5 - agressive indoors (5 cm overshoot, may slide some)
                             # 2.0 - very agressive indoors (10 cm overshoot)
   return route
