@@ -75,11 +75,9 @@ Ping ping;
 Beeper beeper;
 Blinker blinker;
 CommandInterpreter interpreter;
-unsigned long motor_pulses = 0;
-unsigned long last_reported_motor_pulses = 0;
-unsigned long last_reported_motor_pulses_ms = 0;
-long calculated_rpm_pps = 0;
-long motor_pulse_odometer = 0;
+unsigned long spur_pulse_count = 0;
+unsigned long last_spur_pulse_us;
+unsigned long microseconds_between_spur_pulse_count;
 long odometer=0;
 
 
@@ -118,7 +116,10 @@ const RxEvent circle_pattern [] =
 
 
 void motor_rpm_handler() {
-  motor_pulses++;
+  unsigned long us = micros();
+  spur_pulse_count++;
+  microseconds_between_spur_pulse_count = us - last_spur_pulse_us;
+  last_spur_pulse_us = us;
 }
 
 
@@ -348,57 +349,6 @@ bool every_n_ms(unsigned long last_loop_ms, unsigned long loop_ms, unsigned long
 }
 
 
-int calculate_rpm_pps(unsigned int esc, unsigned int rpm_pps, int last_calculated_rpm_pps) {
-
-  bool reverse_esc = esc <= 1446;
-  bool forward_esc = esc >= 1544;
-  bool neutral_esc = !forward_esc && !reverse_esc;
-  bool ambiguous_pps = rpm_pps < 1000;
-  bool increasing_pps = rpm_pps > abs(last_calculated_rpm_pps);
-  
-  ///////////////////////////////////////////////////////////
-  // see if we are sitting still
-  // zero returns zero
-  if(rpm_pps == 0)
-    return 0;
-  
-  // was zero, not accelerating
-  if(last_calculated_rpm_pps == 0 && neutral_esc && ambiguous_pps)  {
-    return 0;
-  }
-  
-  ///////////////////////////////////////////////////////////
-  // see if we have changed direction from zero
-
-  // check for reverse from zero
-  if(reverse_esc && last_calculated_rpm_pps == 0) {
-    return -rpm_pps;
-  }
-  // check for forward from zero
-  if(forward_esc && last_calculated_rpm_pps == 0) {
-    return rpm_pps;
-  }
-  
-  //////////////////////////////////////////////////////
-  // see if we have changed direction from close to zero
-  if(abs(last_calculated_rpm_pps) < 200) {
-    if(increasing_pps && reverse_esc) {
-      return -rpm_pps;
-    }
-    if(increasing_pps && forward_esc) {
-      return rpm_pps;
-    }
-  }
-  
-  
-  // assume we are going in the same direction as before
-  if(last_calculated_rpm_pps < 0)
-    return -rpm_pps;
-  else
-    return rpm_pps;
-  
-}
-
 void loop() {
   // set global loop values
   loop_count++;
@@ -458,31 +408,15 @@ void loop() {
     Serial.println();
   }
   if(every_10_ms && TRACE_DYNAMICS) {
-    unsigned long pulses = motor_pulses;
-    unsigned long elapsed_pulses = pulses - last_reported_motor_pulses;
-    unsigned long rpm_pps = ((elapsed_pulses)* 1000) / (loop_time_ms - last_reported_motor_pulses_ms);
-    last_reported_motor_pulses = pulses;
-    last_reported_motor_pulses_ms = loop_time_ms;
-    unsigned long esc = speed.readMicroseconds();
-    calculated_rpm_pps = calculate_rpm_pps(esc,rpm_pps, calculated_rpm_pps);
-    long delta_pulse = elapsed_pulses;
-    if(calculated_rpm_pps < 0) {
-      delta_pulse = -delta_pulse;
-    }
-    if(calculated_rpm_pps == 0) {
-      delta_pulse = 0;
-    }
-    motor_pulse_odometer += delta_pulse;
-    
     
     log(TRACE_DYNAMICS,
        "str, " + steering.readMicroseconds()
-       + ", esc," + esc
-//       + ", aa, "+ (mpu9150.aa.x - mpu9150.a0.x) + ", " + (mpu9150.aa.y  - mpu9150.a0.y)+", "+ (mpu9150.aa.z  - mpu9150.a0.z)
+       + ", esc," + speed.readMicroseconds()
        + ", aa, "+ ftos(mpu9150.ax) + ", " + ftos(mpu9150.ay)+", "+ ftos(mpu9150.az)
        +", heading, "+ftos(mpu9150.heading())
-       +",rpm,"+ rpm_pps + "," + calculated_rpm_pps + ", " + delta_pulse + "," + motor_pulse_odometer
-       +",ping,"+ftos(ping.inches())
+       +",spur_us,"+   microseconds_between_spur_pulse_count + "," + last_spur_pulse_us
+       +",spur_odo," + spur_pulse_count
+       +",ping_mm,"+ping.millimeters()
        +",odo,"+odometer
        +",ms,"+millis()
        +",us,"+micros()

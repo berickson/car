@@ -23,4 +23,5 @@ public:
   void set_distance_from_us(unsigned long us);
   void execute();
   double inches();
+  int millimeters();
 };

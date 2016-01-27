@@ -38,6 +38,10 @@ void Ping::set_distance_from_us(unsigned long us) {
   }
 }
 
+int Ping::millimeters() {
+  return last_ping_distance_inches * 25.4;
+}
+
 void Ping::execute(){
     _new_data_ready = false;
     unsigned long ms = millis();
