@@ -9,7 +9,7 @@ extern bool TRACE_PINGS;
 extern bool TRACE_ESC;
 extern bool TRACE_MPU;
 extern bool TRACE_LOOP_SPEED;
-extern bool TRACE_DYNAMICS;
+extern bool TD;
 
 
 

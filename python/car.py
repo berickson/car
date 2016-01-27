@@ -36,6 +36,7 @@ class Dynamics:
       self.ms = int(fields[20])
       self.us = int(fields[22])
       self.yaw = float(fields[24])
+      self.heading = self.yaw
       self.pitch = float(fields[25])
       self.roll = float(fields[26])
       self.reading_count = self.reading_count + 1
@@ -161,10 +162,10 @@ class Car:
       return
     if len(fields) < 10:
       return
-    if fields[1] != 'TRACE_DYNAMICS':
+    if fields[1] != 'TD':
       return
-    if len(fields) != 29:
-      print 'invalid TRACE_DYNAMICS packet: {}'.format(s)
+    if len(fields) != 27:
+      print 'invalid TD packet: {}'.format(s)
       return
       
     # todo, handle contention with different threads

@@ -157,11 +157,11 @@ void trace_loop_speed_off() {
 
 
 void trace_dynamics_on() {
-  TRACE_DYNAMICS = true;
+  TD = true;
 }
 
 void trace_dynamics_off() {
-  TRACE_DYNAMICS = false;
+  TD = false;
 }
 
 extern Fsm modes;
@@ -315,7 +315,7 @@ void setup() {
   attachInterrupt(int_esc, rx_spd_handler, CHANGE);
 
   pinMode(PIN_MOTOR_RPM, INPUT);
-  attachInterrupt(PIN_MOTOR_RPM, motor_rpm_handler, CHANGE);
+  attachInterrupt(PIN_MOTOR_RPM, motor_rpm_handler, RISING);
 
   pinMode(PIN_ODOMOTER_SENSOR_A, INPUT);
   pinMode(PIN_ODOMOTER_SENSOR_B, INPUT);
@@ -407,19 +407,19 @@ void loop() {
     rx_speed.trace();
     Serial.println();
   }
-  if(every_10_ms && TRACE_DYNAMICS) {
+  if(every_10_ms && TD) {
     
-    log(TRACE_DYNAMICS,
-       "str, " + steering.readMicroseconds()
-       + ", esc," + speed.readMicroseconds()
-       + ", aa, "+ ftos(mpu9150.ax) + ", " + ftos(mpu9150.ay)+", "+ ftos(mpu9150.az)
+    log(TD,
+       "str," + steering.readMicroseconds()
+       + ",esc," + speed.readMicroseconds()
+       + ",aa,"+ ftos(mpu9150.ax) + "," + ftos(mpu9150.ay)+","+ ftos(mpu9150.az)
        +",spur_us,"+   microseconds_between_spur_pulse_count + "," + last_spur_pulse_us
        +",spur_odo," + spur_pulse_count
        +",ping_mm,"+ping.millimeters()
        +",odo,"+odometer
        +",ms,"+millis()
        +",us,"+micros()
-       +",ypr,"+ ftos(-mpu9150.yaw* 180. / M_PI) + ", " + ftos(-mpu9150.pitch* 180. / M_PI) + ", " + ftos(-mpu9150.roll* 180. / M_PI)
+       +",ypr,"+ ftos(-mpu9150.yaw* 180. / M_PI) + "," + ftos(-mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
        );
   }
 

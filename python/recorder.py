@@ -47,7 +47,7 @@ while not kbhit():
   if s:
     fields = s.split(',')
     if len(fields) > 1:
-      if fields[1] == 'TRACE_DYNAMICS':
+      if fields[1] == 'TD':
         recording.write(s);
   else:
     time.sleep(0.01)

@@ -8,7 +8,7 @@ bool TRACE_PINGS = false;
 bool TRACE_ESC = false;
 bool TRACE_MPU = false;
 bool TRACE_LOOP_SPEED = false;
-bool TRACE_DYNAMICS = false;
+bool TD = false;
 
 
 String ftos(float f) {
