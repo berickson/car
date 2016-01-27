@@ -122,10 +122,10 @@ def play_route(route):
 
       # fix headings by opposite steering if going reverse
       heading_fix = segment_heading - car_heading
-      cte_fix = -40 * cte
-      if route.is_reverse():
+      cte_fix = -80 * cte
+      if car_velocity < 0: #route.is_reverse():
         heading_fix = -heading_fix
-        cte_fix = -10.*cte_fix # 10x cte fix for reverse!
+        cte_fix = -2.*cte_fix # amplify fix for reverse
         
       desired_steering_angle = standardized_degrees(heading_fix + cte_fix)
       
@@ -136,17 +136,17 @@ def play_route(route):
       
       str_ms = car.steering_for_angle(steering_angle)
    
-      print("t: {:.1f} i: {} xg: {:.2f} gy:{:.2f} gv: {:.2f} x: {:.2f} y:{:.2f} reverse: {} cte:{:.2f} v:{:.2f} heading:{:.2f} segment_heading: {:.2f} steering_degrees: {:.2f} esc:{}".format(
+      print("t: {:.1f} i: {} xg: {:.2f} gy:{:.2f} gv: {:.2f}  v:{:.2f} x: {:.2f} y:{:.2f} reverse: {} cte:{:.2f} heading:{:.2f} segment_heading: {:.2f} steering_degrees: {:.2f} esc:{}".format(
          time.time() - start_time,
          route.index,
          route.nodes[route.index+1].x,
          route.nodes[route.index+1].y,         
          velocity,
+         car_velocity,
          x,
          y,
          route.is_reverse(),
          cte,
-         car_velocity,
          car_heading, 
          segment_heading,
          steering_angle,
