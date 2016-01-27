@@ -413,14 +413,13 @@ void loop() {
        "str, " + steering.readMicroseconds()
        + ", esc," + speed.readMicroseconds()
        + ", aa, "+ ftos(mpu9150.ax) + ", " + ftos(mpu9150.ay)+", "+ ftos(mpu9150.az)
-       +", heading, "+ftos(mpu9150.heading())
        +",spur_us,"+   microseconds_between_spur_pulse_count + "," + last_spur_pulse_us
        +",spur_odo," + spur_pulse_count
        +",ping_mm,"+ping.millimeters()
        +",odo,"+odometer
        +",ms,"+millis()
        +",us,"+micros()
-       +",ypr,"+ ftos(mpu9150.yaw* 180. / M_PI) + ", " + ftos(mpu9150.pitch* 180. / M_PI) + ", " + ftos(mpu9150.roll* 180. / M_PI)
+       +",ypr,"+ ftos(-mpu9150.yaw* 180. / M_PI) + ", " + ftos(-mpu9150.pitch* 180. / M_PI) + ", " + ftos(-mpu9150.roll* 180. / M_PI)
        );
   }
 
