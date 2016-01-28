@@ -52,8 +52,8 @@ class World:
         global args
         self.left = -2.
         self.right = 2.
-        self.top = -2.
-        self.bottom = 2.
+        self.top = 2.
+        self.bottom = -2.
         self.car = FakeCar(recording_file_path = args.infile)
         
     def width(self):
@@ -65,8 +65,8 @@ class World:
     def inflate_to_include(self,x,y):
       self.left = min(self.left, x)
       self.right = max(self.right, x)
-      self.top = min(self.top,y)
-      self.bottom = max(self.bottom,y)
+      self.top = max(self.top,y)
+      self.bottom = min(self.bottom,y)
 
     def move(self):
         if self.car.step() == False:
@@ -178,7 +178,7 @@ class Transform(Screen):
         # maps to middle of (20, 20) to (width - 40, height - 40)
         oldmatrix = cr.get_matrix()
         cr.translate(width*(-self.world.left / self.world.width()), 
-        -height*self.world.top / self.world.height())
+        height*self.world.top / self.world.height())
         scale = max((width - 40) / self.world.width(), (height - 40) / self.world.height())
         cr.scale(scale,-scale)
         
@@ -188,8 +188,8 @@ class Transform(Screen):
         cr.set_line_width(device_pixels(cr,0.5)) 
         cr.set_source_rgb(.75, .75, .75)
         
-        y = math.floor(self.world.top)
-        while y <= math.ceil(self.world.bottom):
+        y = math.floor(self.world.bottom)
+        while y <= math.ceil(self.world.top):
           cr.move_to(self.world.left, y)
           cr.line_to(self.world.right, y )
           cr.stroke()
@@ -211,7 +211,7 @@ class Transform(Screen):
 
 
 import argparse
-parser = argparse.ArgumentParser(description = 'RC car control playback')
+parser = argparse.ArgumentParser(description = 'RC recording animation')
 parser.add_argument(
   'infile',
   nargs='?',
