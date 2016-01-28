@@ -179,13 +179,14 @@ class Transform(Screen):
         oldmatrix = cr.get_matrix()
         cr.translate(width*(-self.world.left / self.world.width()), 
         height*self.world.top / self.world.height())
-        scale = max((width - 40) / self.world.width(), (height - 40) / self.world.height())
+        cx1,cy1,cx2,cy2 = cr.clip_extents()
+        scale = min((cx2-cx1) / self.world.width(), (cy2-cy1) / self.world.height())
         cr.scale(scale,-scale)
         
 #        cr.move_to(0,0)
         
         # draw grid
-        cr.set_line_width(device_pixels(cr,0.5)) 
+        cr.set_line_width(device_pixels(cr,1.)) 
         cr.set_source_rgb(.75, .75, .75)
         
         y = math.floor(self.world.bottom)
