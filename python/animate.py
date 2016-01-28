@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import random
+# http://cairographics.org/documentation/pycairo/3/reference/index.html
 import gobject
 import math
 from math import *
@@ -90,6 +91,8 @@ class CarView:
     cr.fill()
 
     # car velocity arrows
+    m2 = cr.get_matrix()
+    cr.translate(car.length/2,0)
     cr.set_source_rgb(0,1,0)
     cr.move_to(0,0)
     cr.set_line_width(device_pixels(cr,2))
@@ -98,6 +101,7 @@ class CarView:
     cr.move_to(0,0)
     cr.line_to(0, car.dynamics.ay)
     cr.stroke()
+    cr.set_matrix(m2)
 
     # car turn arrow
     s = cr.get_matrix()
@@ -148,9 +152,28 @@ class Transform(Screen):
         cr.fill()
 
         # draw a rectangle
+        cr.set_source_rgb(1,1,1)
+        cr.set_font_size(11)
+        cr.move_to(15,11)
+        display_text ="{} frame: {:4} x: {:5.2f} y: {:5.2f} m/s: {:4.1f} esc: {:4} ax: {:4.1f} ay: {:4.1f}".format(
+          args.infile,
+          self.draw_count, 
+          self.world.car.ackerman.x,
+          self.world.car.ackerman.y,
+          self.world.car.get_velocity_meters_per_second(),
+          self.world.car.dynamics.esc,
+          self.world.car.dynamics.ax,
+          self.world.car.dynamics.ay,
+          )
+          
+        cr.show_text(display_text)
+        #set clip rectangle for main display_text
         cr.set_source_rgb(1.0, 1.0, 1.0)
         cr.rectangle(15, 15, width - 30, height - 30)
         cr.fill()
+        cr.rectangle(15, 15, width - 30, height - 30)
+        cr.clip()
+
 
         # set up a transform so that (0,0) to (world.width,world_height)
         # maps to middle of (20, 20) to (width - 40, height - 40)
@@ -160,11 +183,11 @@ class Transform(Screen):
         scale = max((width - 40) / self.world.width(), (height - 40) / self.world.height())
         cr.scale(scale,-scale)
         
-        cr.move_to(0,0)
-        cr.set_source_rgb(.5, .5, .5)
+#        cr.move_to(0,0)
         
         # draw grid
         cr.set_line_width(device_pixels(cr,0.5)) 
+        cr.set_source_rgb(.75, .75, .75)
         
         y = math.floor(self.world.top)
         while y <= math.ceil(self.world.bottom):
@@ -186,21 +209,6 @@ class Transform(Screen):
         carView.draw(cr,self.world.car)
     
         cr.set_matrix(oldmatrix)
-        cr.set_source_rgb(1,1,1)
-        cr.set_font_size(11)
-        cr.move_to(15,11)
-        display_text ="{} frame: {:4} x: {:4.2f} y: {:4.2f} m/s: {:4.1f} esc: {:4} ax: {:4.1f} ay: {:4.1f}".format(
-          args.infile,
-          self.draw_count, 
-          self.world.car.ackerman.x,
-          self.world.car.ackerman.y,
-          self.world.car.get_velocity_meters_per_second(),
-          self.world.car.dynamics.esc,
-          self.world.car.dynamics.ax,
-          self.world.car.dynamics.ay,
-          )
-          
-        cr.show_text(display_text)
 
 
 import argparse
