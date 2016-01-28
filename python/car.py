@@ -189,7 +189,7 @@ class Car:
   
   # returns ping distance in meters
   def ping_distance(self):
-    return self.dynamics.ping_inches * 0.0254
+    return self.dynamics.ping_millimeters / 1000.
   
   def apply_dynamics(self, current, previous):
     self.heading_adjustment += (1. - self.gyro_adjustment_factor) * standardized_degrees(current.heading - previous.heading)
