@@ -51,6 +51,10 @@ class World:
         global args
         self.width = 20.
         self.height = 20.
+        self.left = -self.width/2.
+        self.right = self.width/2.
+        self.top = -self.height/2.
+        self.bottom = self.height/2.
         self.car = FakeCar(recording_file_path = args.infile)
 
     def move(self):
@@ -129,8 +133,32 @@ class Transform(Screen):
         # maps to middle of (20, 20) to (width - 40, height - 40)
         oldmatrix = cr.get_matrix()
         cr.translate(width/2, height/2)
-        cr.scale((width - 40) / self.world.width, (height - 40) / self.world.height)
-
+        scale = min((width - 40) / self.world.width, (height - 40) / self.world.height)
+        cr.scale(scale,scale)
+        
+        cr.move_to(0,0)
+        cr.set_source_rgb(.5, .5, .5)
+        
+        # draw grid
+        # get 1 pixel width
+        w,_=cr.device_to_user_distance(0.5,0.5);
+        cr.set_line_width(w) # meters
+        
+        y = self.world.top
+        while y <= self.world.bottom:
+          cr.move_to(y,self.world.left)
+          cr.line_to(y, self.world.right)
+          cr.stroke()
+          y += 1
+        x = self.world.left
+        while x <= self.world.right:
+          cr.move_to(self.world.top,x)
+          cr.line_to(self.world.bottom,x)
+          cr.stroke()
+          x += 1
+        # draw circle at origin
+        cr.arc(0.,0.,.25,0.,2*math.pi);
+        cr.stroke()
 
         carView = CarView()
         carView.draw(cr,self.world.car)
