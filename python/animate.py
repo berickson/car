@@ -1,7 +1,5 @@
 #! /usr/bin/env python
 import random
-# http://cairographics.org/documentation/pycairo/3/reference/index.html
-import gobject
 import math
 from math import *
 from car import Dynamics, FakeCar
@@ -10,6 +8,7 @@ import geometry
 
 import pygtk
 pygtk.require('2.0')
+# http://cairographics.org/documentation/pycairo/3/reference/index.html
 import gtk, gobject, cairo
 
 # Create a GTK+ widget on which we will draw using Cairo
