@@ -5,6 +5,7 @@ import math
 from math import *
 from car import Dynamics, FakeCar
 import filenames
+import geometry
 
 import pygtk
 pygtk.require('2.0')
@@ -49,17 +50,29 @@ def run(Widget):
 class World:
     def __init__(self):
         global args
-        self.width = 20.
-        self.height = 20.
-        self.left = -self.width/2.
-        self.right = self.width/2.
-        self.top = -self.height/2.
-        self.bottom = self.height/2.
+        self.left = -2.
+        self.right = 2.
+        self.top = -2.
+        self.bottom = 2.
         self.car = FakeCar(recording_file_path = args.infile)
+        
+    def width(self):
+        return abs(self.right-self.left)
+        
+    def height(self):
+        return abs(self.top-self.bottom)
+    
+    def inflate_to_include(self,x,y):
+      self.left = min(self.left, x)
+      self.right = max(self.right, x)
+      self.top = min(self.top,y)
+      self.bottom = max(self.bottom,y)
 
     def move(self):
         if self.car.step() == False:
           self.car.reset()
+        self.inflate_to_include(self.car.ackerman.x+2,self.car.ackerman.y+2)
+        self.inflate_to_include(self.car.ackerman.x-2,self.car.ackerman.y-2)
     
 
 class CarView:
@@ -71,22 +84,25 @@ class CarView:
     # car position x,y is at center of rear
 
     # car outline
-    cr.set_line_width(0.01) # meters
+    cr.set_line_width(device_pixels(cr,1)) 
     cr.set_source_rgb(0.5, 0.5, 0.5)
-    cr.rectangle(0, car.width/-2.,  car.width, car.length)
+    cr.rectangle(0, car.width/-2.,  car.length, car.width, )
     cr.fill()
 
-    # car velocity arrow
+    # car velocity arrows
     cr.set_source_rgb(0,1,0)
     cr.move_to(0,0)
-    cr.set_line_width(0.1)
-    cr.line_to(car.velocity, 0)
+    cr.set_line_width(device_pixels(cr,2))
+    cr.line_to(car.dynamics.ax, 0)
+    cr.stroke()
+    cr.move_to(0,0)
+    cr.line_to(0, car.dynamics.ay)
     cr.stroke()
 
     # car turn arrow
     s = cr.get_matrix()
     cr.set_source_rgb(0.5,0.5,1.)
-    cr.set_line_width(0.1)
+    cr.set_line_width(device_pixels(cr,1))
     cr.translate(car.length,0)
     cr.rotate(radians(car.wheels_angle()))
     cr.move_to(0,0)
@@ -94,16 +110,23 @@ class CarView:
     cr.stroke()
     cr.set_matrix(s)
 
-    # ping arrow
-    cr.set_source_rgb(1.,.5,.5)
-    cr.set_line_width(0.1)
+    # ping arc
+    cr.set_source_rgb(.5,.5,.5)
+    cr.set_line_width(device_pixels(cr,1))
     cr.translate(car.length,0)
-    cr.move_to(0,0)
-    cr.line_to(car.ping_distance(),0)
+#    cr.line_to(car.ping_distance(),0)
+    cr.new_sub_path()
+    cr.arc(car.length,0,car.ping_distance(),-0.261799, 0.261799)
+    cr.new_sub_path()
+    cr.arc(car.length,0,car.ping_distance()*0.9,-0.261799*.8, 0.261799*.8)
     cr.stroke()
 
     cr.set_matrix(oldmatrix)
 
+def device_pixels(cr, x):
+  x = float(x)
+  px,py = cr.device_to_user_distance(x,0.);
+  return geometry.length(px,py)
 
 class Transform(Screen):
     def __init__(self):
@@ -132,28 +155,27 @@ class Transform(Screen):
         # set up a transform so that (0,0) to (world.width,world_height)
         # maps to middle of (20, 20) to (width - 40, height - 40)
         oldmatrix = cr.get_matrix()
-        cr.translate(width/2, height/2)
-        scale = min((width - 40) / self.world.width, (height - 40) / self.world.height)
-        cr.scale(scale,scale)
+        cr.translate(width*(-self.world.left / self.world.width()), 
+        -height*self.world.top / self.world.height())
+        scale = max((width - 40) / self.world.width(), (height - 40) / self.world.height())
+        cr.scale(scale,-scale)
         
         cr.move_to(0,0)
         cr.set_source_rgb(.5, .5, .5)
         
         # draw grid
-        # get 1 pixel width
-        w,_=cr.device_to_user_distance(0.5,0.5);
-        cr.set_line_width(w) # meters
+        cr.set_line_width(device_pixels(cr,0.5)) 
         
-        y = self.world.top
-        while y <= self.world.bottom:
-          cr.move_to(y,self.world.left)
-          cr.line_to(y, self.world.right)
+        y = math.floor(self.world.top)
+        while y <= math.ceil(self.world.bottom):
+          cr.move_to(self.world.left, y)
+          cr.line_to(self.world.right, y )
           cr.stroke()
           y += 1
-        x = self.world.left
-        while x <= self.world.right:
-          cr.move_to(self.world.top,x)
-          cr.line_to(self.world.bottom,x)
+        x = math.floor(self.world.left)
+        while x <= math.ceil(self.world.right):
+          cr.move_to(x,self.world.top)
+          cr.line_to(x, self.world.bottom)
           cr.stroke()
           x += 1
         # draw circle at origin
@@ -164,15 +186,18 @@ class Transform(Screen):
         carView.draw(cr,self.world.car)
     
         cr.set_matrix(oldmatrix)
-        cr.set_source_rgb(0,0,0)
+        cr.set_source_rgb(1,1,1)
         cr.set_font_size(11)
         cr.move_to(15,11)
-        display_text ="{} frame: {} m/s: {:4.1f} esc: {:4} ax: {:4.1f}".format(
+        display_text ="{} frame: {:4} x: {:4.2f} y: {:4.2f} m/s: {:4.1f} esc: {:4} ax: {:4.1f} ay: {:4.1f}".format(
           args.infile,
           self.draw_count, 
+          self.world.car.ackerman.x,
+          self.world.car.ackerman.y,
           self.world.car.get_velocity_meters_per_second(),
           self.world.car.dynamics.esc,
-          self.world.car.dynamics.ax
+          self.world.car.dynamics.ax,
+          self.world.car.dynamics.ay,
           )
           
         cr.show_text(display_text)
