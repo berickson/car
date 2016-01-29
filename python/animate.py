@@ -36,25 +36,57 @@ class Screen(gtk.DrawingArea):
         cr.rectangle(0, 0, width, height)
         cr.fill()
 
-# GTK mumbo-jumbo to show the widget in a window and quit when it's closed
+
+
 def run(Widget):
     window = gtk.Window()
     window.set_default_size(1000,500)
     window.connect("delete-event", gtk.main_quit)
     widget = Widget()
+    
+    menu = gtk.Menu()
+    menu_item = gtk.MenuItem("Open...")
+    menu_item.show()
+    menu_item.connect("activate",widget.get_filename)
+    menu.append(menu_item)
+    root_menu = gtk.MenuItem("File")
+    root_menu.show()
+    root_menu.set_submenu(menu)
+    vbox = gtk.VBox(False,0)
+    window.add(vbox)
+    vbox.show()
+
+    # Create a menu-bar to hold the menus and add it to our main window
+    menu_bar = gtk.MenuBar()
+    vbox.pack_start(menu_bar, False, False, 2)
+    menu_bar.show()
+    
+    # Create a button to which to attach menu as a popup
+    button = gtk.Button("press me")
+    #button.connect_object("event", window.button_press, menu)
+    vbox.pack_end(widget, True, True, 2)
+    button.show()
+
+    # And finally we append the menu-item to the menu-bar -- this is the
+    # "root" menu-item I have been raving about =)
+    menu_bar.append (root_menu)
+            
     widget.show()
-    window.add(widget)
+#    window.add(widget)
     window.present()
     gtk.main()
 
 class World:
-    def __init__(self):
+    def __init__(self, path = None):
         global args
+        if path is None:
+          path = args.infile
+        self.recording_file_path = path
         self.left = -2.
         self.right = 2.
         self.top = 2.
         self.bottom = -2.
-        self.car = FakeCar(recording_file_path = args.infile)
+        self.car = FakeCar(recording_file_path = self.recording_file_path)
         
     def width(self):
         return abs(self.right-self.left)
@@ -131,12 +163,43 @@ def device_pixels(cr, x):
   px,py = cr.device_to_user_distance(x,0.);
   return geometry.length(px,py)
 
-class Transform(Screen):
+class App(Screen):
     def __init__(self):
         self.world = World()
-        super(Transform,self).__init__()
+        super(App,self).__init__()
         self.draw_count = 0
         self.timer = gobject.timeout_add (10, self.idle_cb)
+        
+    def get_filename(self, _):
+      # Check for new pygtk: this is new class in PyGtk 2.4
+      if gtk.pygtk_version < (2,3,90):
+         print "PyGtk 2.3.90 or later required for this example"
+         raise SystemExit
+
+      dialog = gtk.FileChooserDialog("Open..",
+                                     None,
+                                     gtk.FILE_CHOOSER_ACTION_OPEN,
+                                     (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                                      gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+      dialog.set_default_response(gtk.RESPONSE_OK)
+
+      filter = gtk.FileFilter()
+      filter.set_name("All files")
+      filter.add_pattern("*")
+      dialog.add_filter(filter)
+
+      filter = gtk.FileFilter()
+      filter.set_name("Recordings")
+      filter.add_pattern("*.csv")
+      dialog.add_filter(filter)
+
+      response = dialog.run()
+      if response == gtk.RESPONSE_OK:
+          self.world = World(dialog.get_filename())
+#          print dialog.get_filename(), 'selected'
+      elif response == gtk.RESPONSE_CANCEL:
+          print 'Closed, no files selected'
+      dialog.destroy()
 
 
     def idle_cb(self):
@@ -155,7 +218,7 @@ class Transform(Screen):
         cr.set_font_size(11)
         cr.move_to(15,11)
         display_text ="{} frame: {:4} x: {:5.2f} y: {:5.2f} m/s: {:4.1f} esc: {:4} ax: {:4.1f} ay: {:4.1f}".format(
-          args.infile,
+          self.world.recording_file_path,
           self.draw_count, 
           self.world.car.ackerman.x,
           self.world.car.ackerman.y,
@@ -174,16 +237,12 @@ class Transform(Screen):
         cr.clip()
 
 
-        # set up a transform so that (0,0) to (world.width,world_height)
-        # maps to middle of (20, 20) to (width - 40, height - 40)
         oldmatrix = cr.get_matrix()
         cr.translate(width*(-self.world.left / self.world.width()), 
         height*self.world.top / self.world.height())
         cx1,cy1,cx2,cy2 = cr.clip_extents()
         scale = min((cx2-cx1) / self.world.width(), (cy2-cy1) / self.world.height())
         cr.scale(scale,-scale)
-        
-#        cr.move_to(0,0)
         
         # draw grid
         cr.set_line_width(device_pixels(cr,1.)) 
@@ -221,4 +280,4 @@ parser.add_argument(
   help='csv file recorded with recorder')
 args = parser.parse_args()
 
-run(Transform)
+run(App)
