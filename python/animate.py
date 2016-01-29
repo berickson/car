@@ -181,18 +181,20 @@ class App(Screen):
                                      gtk.FILE_CHOOSER_ACTION_OPEN,
                                      (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                                       gtk.STOCK_OPEN, gtk.RESPONSE_OK))
-      dialog.set_file('./recordings')
+      dialog.set_current_folder('./recordings')
       dialog.set_default_response(gtk.RESPONSE_OK)
 
       filter = gtk.FileFilter()
       filter.set_name("All files")
       filter.add_pattern("*")
       dialog.add_filter(filter)
+      
 
       filter = gtk.FileFilter()
       filter.set_name("Recordings")
       filter.add_pattern("*.csv")
       dialog.add_filter(filter)
+      dialog.set_filter(filter)
 
       response = dialog.run()
       if response == gtk.RESPONSE_OK:
