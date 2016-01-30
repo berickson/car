@@ -1,26 +1,9 @@
 #!/usr/bin/env python
 
-from car import Car
+#from car import Car
 from play_route import play_route
-from route import Route
+from route import Route, straight_route
 #car = Car()
-
-
-def straight_route(distance, max_a, max_v):
-  route = Route()
-  x = 0.1
-  while x <= distance + 0.0001:
-    route.add_node(x,0.)
-    x += 0.05
-  while x > 0:
-    route.add_node(x,0.,reverse=True)
-    x -= 0.05
-    
-  route.optimize_velocity(max_velocity = max_v, 
-    max_acceleration = max_a) # 1.0 - safe indoors (3 cm overshoot)
-                            # 1.5 - agressive indoors (5 cm overshoot, may slide some)
-                            # 2.0 - very agressive indoors (10 cm overshoot)
-  return route
 
 
 import argparse
@@ -49,7 +32,7 @@ max_v = args.max_v
 distance = args.distance
 
 
-route = straight_route(distance, max_a, max_v)
+route = forward_back_route(distance, max_a, max_v)
 play_route(route)
 
 #car.forward(meters, max_speed = max_speed)

@@ -69,6 +69,7 @@ class Car:
     self.velocity = 0.0
     self.last_velocity = 0.0
     self.heading_adjustment = 0.
+    self.odometer_start = 0
     self.ackerman = Ackerman(
       front_wheelbase_width = self.front_wheelbase_width_in_meters, 
       wheelbase_length = self.wheelbase_length_in_meters)
@@ -240,6 +241,8 @@ class Car:
   
   def esc_for_velocity(self, v):
     data = [
+      (-2., 1200), # made up numbers for negative v: todo: find imperically
+      (-1., 1250),
       (0.0,  1500),
       (0.1, 1645),
       (0.34, 1659),
@@ -309,9 +312,12 @@ class Car:
     
   def set_esc_and_str(self, speed, steering):
      self.write_command('pse {0},{1}'.format(int(steering), int(speed)))
+  
+  def zero_odometer(self):
+    self.odometer_start = self.dynamics.odometer_ticks
 
   def odometer_meters(self):
-    return self.dynamics.odometer_ticks * self.meters_per_odometer_tick
+    return (self.dynamics.odometer_ticks - self.odometer_start) * self.meters_per_odometer_tick
  
   # returns where you should steer to if you wish to go to goal_heading
   def steering_for_goal_heading_degrees(self, goal_heading, reverse = False):
@@ -331,12 +337,12 @@ class Car:
     #use a direction of 1 / -1 to help with the math for forward / reverse
     if ticks > 0:
       direction = 1
-      min_esc = self.min_forward_esc - 3
-      max_esc = self.min_forward_esc + 30
+      min_esc = 1500
+      max_esc = self.esc_for_velocity(max_speed)
     else:
       direction = -1
-      min_esc = self.min_reverse_esc + 1
-      max_esc = self.min_reverse_esc - 30
+      min_esc = 1500
+      max_esc = self.esc_for_velocity(-max_speed) 
     
     goal_odometer = self.dynamics.odometer_ticks + ticks
 

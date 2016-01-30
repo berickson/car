@@ -42,7 +42,7 @@ def hall_and_back():
   return route
   
 
-def play_route(route):
+def play_route(route, car = None, print_progress = False):
 
   max_steering_degrees_per_second = 250.
   max_steering_angle = 30.
@@ -50,18 +50,18 @@ def play_route(route):
   steering_angle = 0.
   last_ms = None
   
-  print route 
+  #print route 
 
 
-  
-  car = Car()
+  if car is None:
+    car = Car()
   queue = Queue.Queue()
   
   try:
     if automatic: car.set_rc_mode()
     car.add_listener(queue)
     message = queue.get(block=True, timeout = 0.5)
-    print repr(message)
+    #print repr(message)
     last_ms = message.ms
     start_time = time.time()
 
@@ -136,21 +136,22 @@ def play_route(route):
       
       str_ms = car.steering_for_angle(steering_angle)
    
-      print("t: {:.1f} i: {} xg: {:.2f} gy:{:.2f} gv: {:.2f}  v:{:.2f} x: {:.2f} y:{:.2f} reverse: {} cte:{:.2f} heading:{:.2f} segment_heading: {:.2f} steering_degrees: {:.2f} esc:{}".format(
-         time.time() - start_time,
-         route.index,
-         route.nodes[route.index+1].x,
-         route.nodes[route.index+1].y,         
-         velocity,
-         car_velocity,
-         x,
-         y,
-         route.is_reverse(),
-         cte,
-         car_heading, 
-         segment_heading,
-         steering_angle,
-         esc_ms))
+      if print_progress:
+        print("t: {:.1f} i: {} xg: {:.2f} gy:{:.2f} gv: {:.2f}  v:{:.2f} x: {:.2f} y:{:.2f} reverse: {} cte:{:.2f} heading:{:.2f} segment_heading: {:.2f} steering_degrees: {:.2f} esc:{}".format(
+           time.time() - start_time,
+           route.index,
+           route.nodes[route.index+1].x,
+           route.nodes[route.index+1].y,         
+           velocity,
+           car_velocity,
+           x,
+           y,
+           route.is_reverse(),
+           cte,
+           car_heading, 
+           segment_heading,
+           steering_angle,
+           esc_ms))
      
       
       # send to car

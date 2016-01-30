@@ -2,6 +2,38 @@ from math import *
 from geometry import *
 import numpy as np
 
+
+def reverse_route(distance, max_a, max_v):
+  route = Route()
+  x = 0.0
+  while x > -distance:
+    route.add_node(x,0.,reverse=True)
+    x -= 0.05
+  route.add_node(-distance,0.,reverse=True)
+    
+  route.optimize_velocity(max_velocity = max_v, 
+    max_acceleration = max_a) # 1.0 - safe indoors (3 cm overshoot)
+                            # 1.5 - agressive indoors (5 cm overshoot, may slide some)
+                            # 2.0 - very agressive indoors (10 cm overshoot)
+  return route
+
+def forward_back_route(distance, max_a, max_v):
+  route = Route()
+  x = 0.1
+  while x <= distance + 0.0001:
+    route.add_node(x,0.)
+    x += 0.05
+  while x > 0:
+    route.add_node(x,0.,reverse=True)
+    x -= 0.05
+    
+  route.optimize_velocity(max_velocity = max_v, 
+    max_acceleration = max_a) # 1.0 - safe indoors (3 cm overshoot)
+                            # 1.5 - agressive indoors (5 cm overshoot, may slide some)
+                            # 2.0 - very agressive indoors (10 cm overshoot)
+  return route
+
+
 class RouteNode:
   def __init__(self):
     self.x = 0.
