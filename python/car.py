@@ -314,9 +314,11 @@ class Car:
     return self.dynamics.odometer_ticks * self.meters_per_odometer_tick
  
   # returns where you should steer to if you wish to go to goal_heading
-  def steering_for_goal_heading_degrees(self, goal_heading):
-    heading_error = degrees_diff(goal_heading, self.dynamics.heading)
+  def steering_for_goal_heading_degrees(self, goal_heading, reverse = False):
+    direction = -1 if reverse else 1
+    heading_error = degrees_diff(goal_heading, self.heading_degrees())
     steering = self.steering_for_angle(-direction * heading_error)
+    return steering
 
   def forward(self, meters, goal_heading = None, fixed_steering_us = None, max_speed = 2.0):
     ticks = int(meters/self.meters_per_odometer_tick)
