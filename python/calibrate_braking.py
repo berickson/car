@@ -87,7 +87,7 @@ def calibrate_braking(test_esc=1350,max_speed=1.,total_track_length=3.,stop_trac
 
   # do a quick analysis of data and print results
 
-  prefix = 'esc/{}_{}_{}'.format(note,int(max_speed*10),int(test_esc))
+  prefix = 'esc/{}_start_{}_esc_{}'.format(note,int(max_speed*10),int(test_esc))
   f = open(next_filename(folder = 'data', prefix = prefix, suffix = '.csv'), 'w')
   print ('seconds,meters,us,esc,odometer_ticks,ax,spur_delta_us,spur_odo',file=f)
   for p in data:
