@@ -189,7 +189,13 @@ class Car:
       self.listener.put(current)
   
   # returns ping distance in meters
+  def ping_inches(self):
+    return self.ping_meters()/0.0254
+
   def ping_distance(self):
+    return self.ping_meters()
+
+  def ping_meters(self):
     return self.dynamics.ping_millimeters / 1000.
   
   def apply_dynamics(self, current, previous):

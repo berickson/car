@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
+# coding: utf-8
+
 import sys,tty,termios
 import datetime
 import time

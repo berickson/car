@@ -1,3 +1,6 @@
+#!/usr/bin/env python2.7
+# coding: utf-8
+
 import time
 import sys
 from car import Car
@@ -22,11 +25,11 @@ def does_it_move(speed):
   car.set_esc_and_str(speed,neutral_steer)
   current_test_start_time = time.time()
   moved = False
-  start_inches = car.dynamics.ping_inches;
+  start_inches = car.ping_inches();
   while time.time() - current_test_start_time < wait_seconds and not moved:
     car.set_esc_and_str(speed,neutral_steer)
     time.sleep(0.05)
-    new_inches = car.dynamics.ping_inches
+    new_inches = car.ping_inches()
     delta = abs(new_inches - start_inches)
     sys.stdout.write("esc: {}  {:5.3} inches, delta is {:5.3} inches\r".format(
       speed,
