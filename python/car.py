@@ -200,26 +200,43 @@ class Car:
     return self.dynamics.ping_millimeters / 1000.
   
   def apply_dynamics(self, current, previous):
+    # correct heading with adjustment factor
     self.heading_adjustment += (1. - self.gyro_adjustment_factor) * standardized_degrees(current.heading - previous.heading)
-    relative_heading = self.heading_degrees()
-    relative_heading_radians = radians(relative_heading)
-    outside_wheel_angle = radians(self.angle_for_steering(previous.str))
-    wheel_distance = (current.odometer_ticks-previous.odometer_ticks)  * self.meters_per_odometer_tick
-    self.ackerman.heading = relative_heading_radians
-    self.ackerman.move_left_wheel(outside_wheel_angle, wheel_distance)
-    elapsed_time = ( current.ms - previous.ms ) / 1000.
-    
-    self.last_velocity = self.velocity
-    self.velocity = wheel_distance / elapsed_time
+   
+    # if wheels have moved, update ackerman
+    wheel_distance_meters = (current.odometer_ticks-previous.odometer_ticks)  * self.meters_per_odometer_tick
+    if abs(wheel_distance_meters) > 0.:
+      outside_wheel_angle = radians(self.angle_for_steering(previous.str))
+      self.ackerman.heading = self.heading_radians()
+      self.ackerman.move_left_wheel(outside_wheel_angle, wheel_distance_meters)
+      
+    # update velocity
+    if abs(wheel_distance_meters) > 0.:
+      elapsed_seconds = (current.odometer_last_us - previous.odometer_last_us) / 1000000.
+      self.velocity = wheel_distance_meters / elapsed_seconds
+      self.last_verified_velocity = self.velocity
+    else:
+      # no tick this time, how long has it been?
+      seconds_since_tick = ( current.us - current.odometer_last_us ) / 1000000.
+      if seconds_since_tick > 0.1:
+        # it's been a long time, let's call velocity zero
+        self.velocity = 0.0
+      else:
+        # we've had a tick recently, fastest possible speed is when a tick is about to happen
+        # let's use smaller of that and previously certain velocity
+        max_possible = self.meters_per_odometer_tick / seconds_since_tick
+        if max_possible > abs(self.last_verified_velocity):
+          self.velocity = self.last_verified_velocity
+        else:
+          if self.last_verified_velocity > 0:
+            self.velocity = max_possible
+          else:
+            self.velocity = -max_possible
+
     #print("x:{:.2f} y:{:.2f} heading:{:.2f}".format(self.ackerman.x, self.ackerman.y, relative_heading))
   
   def get_velocity_meters_per_second(self):
-    if self.last_velocity is not None:
-      return (self.velocity + self.last_velocity) /2.
-    elif self.velocity is not None:
-      return self.velocity
-    else:
-      return 0.
+    return self.velocity;
   
   # returns position of rear of car (between two rear wheels), this starts at -wheelbase_length_in_meters,0
   def rear_position(self):
@@ -234,6 +251,8 @@ class Car:
   def heading_degrees(self):
     return standardized_degrees(self.dynamics.heading - self.original_dynamics.heading + self.heading_adjustment)
     
+  def heading_radians(self):  
+    return radians(self.heading_degrees())
     
   
   def set_rc_mode(self):
