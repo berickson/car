@@ -79,7 +79,7 @@ unsigned long spur_pulse_count = 0;
 unsigned long last_spur_pulse_us;
 unsigned long microseconds_between_spur_pulse_count;
 long odometer=0;
-long last_odometer_change_us=0;
+unsigned long last_odometer_change_us=0;
 
 
 
