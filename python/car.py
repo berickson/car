@@ -33,12 +33,13 @@ class Dynamics:
 #      self.engine_odometer = int(fields[1])
       self.ping_millimeters = int(fields[16])
       self.odometer_ticks = int(fields[18])
-      self.ms = int(fields[20])
-      self.us = int(fields[22])
-      self.yaw = float(fields[24])
+      self.odometer_last_us = int(fields[20])
+      self.ms = int(fields[22])
+      self.us = int(fields[24])
+      self.yaw = float(fields[26])
       self.heading = self.yaw
-      self.pitch = float(fields[25])
-      self.roll = float(fields[26])
+      self.pitch = float(fields[27])
+      self.roll = float(fields[28])
       self.reading_count = self.reading_count + 1
  #   except (IndexError, ValueError) as e:
 #      pass
@@ -165,7 +166,7 @@ class Car:
       return
     if fields[1] != 'TD':
       return
-    if len(fields) != 27:
+    if len(fields) != 29:
       print 'invalid TD packet: {}'.format(s)
       return
       

@@ -79,6 +79,7 @@ unsigned long spur_pulse_count = 0;
 unsigned long last_spur_pulse_us;
 unsigned long microseconds_between_spur_pulse_count;
 long odometer=0;
+long last_odometer_change_us=0;
 
 
 
@@ -267,6 +268,7 @@ Fsm::Edge edges[] = {{"circle", "non-neutral", "manual"},
 Fsm modes(tasks, count_of(tasks), edges, count_of(edges));
 
 void odometer_sensor_a_changed() {
+  last_odometer_change_us=micros();
   if(digitalRead(PIN_ODOMOTER_SENSOR_A)==digitalRead(PIN_ODOMOTER_SENSOR_B)){
     --odometer;
   } else {
@@ -275,6 +277,7 @@ void odometer_sensor_a_changed() {
 }
 
 void odometer_sensor_b_changed() {
+  last_odometer_change_us=micros();
   if(digitalRead(PIN_ODOMOTER_SENSOR_A)==digitalRead(PIN_ODOMOTER_SENSOR_B)){
     ++odometer;
   } else {
@@ -417,6 +420,7 @@ void loop() {
        +",spur_odo," + spur_pulse_count
        +",ping_mm,"+ping.millimeters()
        +",odo,"+odometer
+       +",odo_us," +  last_odometer_change_us
        +",ms,"+millis()
        +",us,"+micros()
        +",ypr,"+ ftos(-mpu9150.yaw* 180. / M_PI) + "," + ftos(-mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
