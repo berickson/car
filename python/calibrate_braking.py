@@ -94,7 +94,7 @@ def calibrate_braking(test_esc=1350,max_speed=1.,total_track_length=3.,stop_trac
   for p in data:
     p.seconds = (p.us-data[0].us)/1000000.
     p.meters = (p.odometer_ticks-data[0].odometer_ticks)*car.meters_per_odometer_tick
-    fields = [p.seconds,p.meters,p.us,p.esc,p.odometer_ticks,,p.odometer_last_us,p.ax,p.spur_delta_us,p.spur_odo]
+    fields = [p.seconds,p.meters,p.us,p.esc,p.odometer_ticks,p.odometer_last_us,p.ax,p.spur_delta_us,p.spur_odo]
     print(",".join([str(field) for field in fields]), file=f)
   print('np polyfit 2 result',np.polyfit([p.seconds for p in data], [p.meters for p in data], 2))
   print('np polyfit 3 result',np.polyfit([p.seconds for p in data], [p.meters for p in data], 3))
