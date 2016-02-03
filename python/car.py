@@ -1,3 +1,6 @@
+#!/usr/bin/env python2.7
+# coding: utf-8
+
 import time
 import dateutil.parser
 import threading
@@ -52,6 +55,7 @@ class Car:
     self.online = online
     self.reset_odometry()
     self.listener = None
+    self.last_verified_velocity = 0.0
     
     if self.online:
       self.quit = False
@@ -211,7 +215,7 @@ class Car:
       self.ackerman.move_left_wheel(outside_wheel_angle, wheel_distance_meters)
       
     # update velocity
-    if abs(wheel_distance_meters) > 0.:
+    if current.odometer_last_us != previous.odometer_last_us:
       elapsed_seconds = (current.odometer_last_us - previous.odometer_last_us) / 1000000.
       self.velocity = wheel_distance_meters / elapsed_seconds
       self.last_verified_velocity = self.velocity
@@ -240,7 +244,7 @@ class Car:
   
   # returns position of rear of car (between two rear wheels), this starts at -wheelbase_length_in_meters,0
   def rear_position(self):
-    return (self.ackerman.x, self.ackerman.y)
+    return (self.ackerman.x - self.wheelbase_length_in_meters, self.ackerman.y)
   
   # returns position of front of car (between two front wheels), this starts at 0,0
   def front_position(self):
@@ -425,6 +429,11 @@ def main():
   # wait here so messages can come from thread and we can trap ctrl-c
   while True:
     time.sleep(0.01) 
+    print "v: {:5.2f} rear:({:5.2f},{:5.2f}) rear:({:5.2f},{:5.2f})".format(
+      car.get_velocity_meters_per_second(),
+      *car.rear_position()+
+      car.front_position()
+      )
   
 
 if __name__ == "__main__":

@@ -85,37 +85,38 @@ def play_route(route, car = None, print_progress = False):
       cte = route.cross_track_error()
 
       # calculate speed 
-      velocity = route.velocity()
-      error = car_velocity - velocity
+      goal_velocity = route.velocity()
+      error = car_velocity - goal_velocity
       
       # set limits for forward and reverse
-      if velocity is None:
-        velocity = max_velocity
+      if goal_velocity is None:
+        goal_velocity = max_velocity
       
       if route.is_reverse():
-        error = velocity - car_velocity
+        goal_velocity = -abs(goal_velocity)
+        error = car_velocity - goal_velocity
         speed_up_esc = car.min_reverse_esc - 80
-        slow_down_esc = car.min_forward_esc + 10
+        slow_down_esc = 1500#car.min_forward_esc + 10
         maintain_esc = car.min_reverse_esc
         
-        if error < 0.: # too slow
+        if error > 0.: # too slow
           esc_ms = speed_up_esc
-        elif error > 0.2:
+        elif error < 0.2:
           esc_ms = slow_down_esc
         else:
           esc_ms = maintain_esc
 
       else:
         if error > 0.2:
-          esc_ms = car.min_reverse_esc # slow down esc
+          esc_ms = 1500#car.min_reverse_esc # slow down esc
         elif error > 0.:
-          esc_ms = car.esc_for_velocity(clamp(velocity- 3.*error,0.1,999.))
+          esc_ms = car.esc_for_velocity(clamp(goal_velocity- 3.*error,0.1,999.))
         else:
-          esc_ms = car.esc_for_velocity(velocity  - error)
+          esc_ms = car.esc_for_velocity(goal_velocity  - error)
 
-#        speed_up_esc = car.esc_for_velocity(velocity + 1)
+#        speed_up_esc = car.esc_for_velocity(goal_velocity + 1)
 #        slow_down_esc = car.min_reverse_esc
-#        maintain_esc = car.esc_for_velocity(velocity) #car.min_forward_esc
+#        maintain_esc = car.esc_for_velocity(goal_velocity) #car.min_forward_esc
       
         
       # calculate steering
@@ -144,7 +145,7 @@ def play_route(route, car = None, print_progress = False):
            route.index,
            route.nodes[route.index+1].x,
            route.nodes[route.index+1].y,         
-           velocity,
+           goal_velocity,
            car_velocity,
            x,
            y,
@@ -213,9 +214,9 @@ if __name__ == '__main__':
 #  route = around_bar()
 #  route = around_kitchen()
   print 'optimizing speeds along the route'
-  route.optimize_velocity(max_velocity = max_v, max_acceleration = max_a, print_progress = args.trace)
+  route.optimize_velocity(max_velocity = max_v, max_acceleration = max_a)
   print route
   print 'playing route now, press ctrl-c to abort'
   
-  play_route(route)
+  play_route(route, print_progress = args.trace)
   
