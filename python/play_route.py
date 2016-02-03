@@ -187,6 +187,12 @@ if __name__ == '__main__':
     type=float,
     default=1.0,
     help='max_acceleration')
+  
+  parser.add_argument(
+    '-t', '--trace',
+    action='store_true',
+
+    help='turn on tracing')
   parser.add_argument(
     '--max_v',
     nargs='?',
@@ -207,7 +213,7 @@ if __name__ == '__main__':
 #  route = around_bar()
 #  route = around_kitchen()
   print 'optimizing speeds along the route'
-  route.optimize_velocity(max_velocity = max_v, max_acceleration = max_a)
+  route.optimize_velocity(max_velocity = max_v, max_acceleration = max_a, print_progress = args.trace)
   print route
   print 'playing route now, press ctrl-c to abort'
   
