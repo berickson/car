@@ -78,7 +78,8 @@ def calibrate_braking(test_esc=1350,max_speed=1.,total_track_length=3.,stop_trac
       v = car.get_velocity_meters_per_second()
     
   # set everything to neutral
-  print('final distance: {} meters'.format(car.odometer_meters()))
+  final_distance = car.odometer_meters()
+  print('final distance: {} meters'.format(final_distance))
   car.set_manual_mode()
 
   # save the results of braking to two files
@@ -106,7 +107,7 @@ def calibrate_braking(test_esc=1350,max_speed=1.,total_track_length=3.,stop_trac
 
   car.reset_odometry()
   time.sleep(0.01)
-  route = reverse_route(car.odometer_meters(), max_a=0.5, max_v=2.)
+  route = reverse_route(final_distance, max_a=0.5, max_v=2.)
   play_route(route, car = car)
   car.set_manual_mode()
 
