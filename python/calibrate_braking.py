@@ -30,7 +30,7 @@ def calibrate_braking(test_esc=1350,max_speed=1.,total_track_length=3.,stop_trac
       aborted = True
       abort_reason = "ran out of track"
       break;
-    esc = car.esc_for_velocity(v+1.5)
+    esc = car.esc_for_velocity(v+2.5)
     steer = car.steering_for_goal_heading_degrees(goal_heading)
     car.set_esc_and_str(esc,steer)
     time.sleep(0.02)
