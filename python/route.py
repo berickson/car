@@ -125,8 +125,8 @@ class Route:
           else:
             h = self.heading_radians()
             l = distance(x,y,rear_x,rear_y)
-            rear_offset_x = -l * sin(h)
-            rear_offset_y = -l * cos(h)
+            rear_offset_x = -l * cos(h)
+            rear_offset_y = -l * sin(h)
             dx = p2.x-p1.x
             dy = p2.y-p1.y
             drx = rear_x - (p1.x + rear_offset_x)
