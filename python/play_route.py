@@ -97,7 +97,7 @@ def play_route(route, car = None, print_progress = False):
         
       desired_steering_angle = standardized_degrees(heading_fix + cte_fix)
       
-      max_delta = elapsed_sec * max_steering_degrees_per_second;
+      max_delta = 30.#elapsed_sec * max_steering_degrees_per_second;
       steering_delta = clamp(desired_steering_angle - last_steering_angle,-max_delta,max_delta)
       steering_angle = clamp(steering_angle + steering_delta, -max_steering_angle, max_steering_angle)
       
