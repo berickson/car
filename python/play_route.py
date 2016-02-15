@@ -84,6 +84,26 @@ def play_route(route, car = None, print_progress = False):
        
       cte = route.cross_track_error()
 
+      # calculate steering
+      segment_heading = degrees(route.heading_radians())
+      car_heading = car.heading_degrees()
+
+      # fix headings by opposite steering if going reverse
+      heading_fix = segment_heading - car_heading
+      cte_fix = -80 * cte
+      if car_velocity < 0: #route.is_reverse():
+        heading_fix = -heading_fix
+        cte_fix = -2.*cte_fix # amplify fix for reverse
+        
+      desired_steering_angle = standardized_degrees(heading_fix + cte_fix)
+      
+      max_delta = elapsed_sec * max_steering_degrees_per_second;
+      steering_delta = clamp(desired_steering_angle - last_steering_angle,-max_delta,max_delta)
+      steering_angle = clamp(steering_angle + steering_delta, -max_steering_angle, max_steering_angle)
+      
+      
+      str_ms = car.steering_for_angle(steering_angle)
+   
       # calculate speed 
       goal_velocity = route.velocity()
       error = car_velocity - goal_velocity
@@ -113,32 +133,15 @@ def play_route(route, car = None, print_progress = False):
           esc_ms = car.esc_for_velocity(clamp(goal_velocity- 3.*error,0.1,999.))
         else:
           esc_ms = car.esc_for_velocity(goal_velocity  - error)
+      #special case for goal velocity of zero, always use neutral
+      if goal_velocity == 0.:
+        esc_ms = 1500
 
 #        speed_up_esc = car.esc_for_velocity(goal_velocity + 1)
 #        slow_down_esc = car.min_reverse_esc
 #        maintain_esc = car.esc_for_velocity(goal_velocity) #car.min_forward_esc
       
         
-      # calculate steering
-      segment_heading = degrees(route.heading_radians())
-      car_heading = car.heading_degrees()
-
-      # fix headings by opposite steering if going reverse
-      heading_fix = segment_heading - car_heading
-      cte_fix = -80 * cte
-      if car_velocity < 0: #route.is_reverse():
-        heading_fix = -heading_fix
-        cte_fix = -2.*cte_fix # amplify fix for reverse
-        
-      desired_steering_angle = standardized_degrees(heading_fix + cte_fix)
-      
-      max_delta = elapsed_sec * max_steering_degrees_per_second;
-      steering_delta = clamp(desired_steering_angle - last_steering_angle,-max_delta,max_delta)
-      steering_angle = clamp(steering_angle + steering_delta, -max_steering_angle, max_steering_angle)
-      
-      
-      str_ms = car.steering_for_angle(steering_angle)
-   
       if print_progress:
         print("t: {:.1f} i: {} xg: {:.2f} gy:{:.2f} gv: {:.2f}  v:{:.2f} x: {:.2f} y:{:.2f} reverse: {} cte:{:.2f} heading:{:.2f} segment_heading: {:.2f} steering_degrees: {:.2f} esc:{}".format(
            time.time() - start_time,
@@ -183,7 +186,7 @@ if __name__ == '__main__':
     default='',
     help='path file to play, defaults to latest')
   parser.add_argument(
-    '--max_a',
+    '-a','--max_a',
     nargs='?',
     type=float,
     default=1.0,
@@ -195,7 +198,7 @@ if __name__ == '__main__':
 
     help='turn on tracing')
   parser.add_argument(
-    '--max_v',
+    '-v','--max_v',
     nargs='?',
     type=float,
     default='1.0',
