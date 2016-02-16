@@ -15,8 +15,6 @@ from filenames import *
 import Queue
 
 max_velocity = 5.
-automatic = True
-
 
 
 def clamp(value, min_value, max_value):
@@ -26,86 +24,8 @@ def clamp(value, min_value, max_value):
     return max_value
   return value
 
-def around_bar():
-  
-  route = Route()
-  route.load_from_file('recordings/recording_044.csv.path', velocity = 1.)
-  return route
-
-def around_kitchen():
-  
-  route = Route()
-  route.load_from_file('recordings/recording_049.csv.path', velocity = 1.)
-  return route
-
-def hall_and_back():
-  route = Route()
-  route.load_from_file('recordings/recording_041.csv.path', velocity = 1.)
-  return route
-  
-
-def play_route(route, car = None, print_progress = False):
-
-  max_steering_degrees_per_second = 250.
-  max_steering_angle = 30.
-  last_steering_angle = 0.
-  steering_angle = 0.
-  last_ms = None
-  
-  #print route 
-
-
-  if car is None:
-    car = Car()
-  queue = Queue.Queue()
-  
-  try:
-    if automatic: car.set_rc_mode()
-    car.add_listener(queue)
-    message = queue.get(block=True, timeout = 0.5)
-    #print repr(message)
-    last_ms = message.ms
-    start_time = time.time()
-
-    # keep going until we run out of track  
-    while True:
-      try:
-        message = queue.get(block=True, timeout = 0.5)
-      except:
-        print 'message timed out at: '+datetime.datetime.now().strftime("%H:%M:%S.%f")
-        print 'last message received:' + repr(message)
-        print 
-        raise
-      elapsed_sec = (message.ms - last_ms) / 1000.
-      (x,y) = car.front_position()
-      (rear_x,rear_y) = car.rear_position()
-      car_velocity = car.get_velocity_meters_per_second()
-      route.set_position(x,y,rear_x,rear_y,car_velocity)
-       
-      cte = route.cross_track_error()
-
-      # calculate steering
-      segment_heading = degrees(route.heading_radians())
-      car_heading = car.heading_degrees()
-
-      # fix headings by opposite steering if going reverse
-      heading_fix = segment_heading - car_heading
-      cte_fix = -80 * cte
-      if car_velocity < 0: #route.is_reverse():
-        heading_fix = -heading_fix
-        cte_fix = -2.*cte_fix # amplify fix for reverse
-        
-      desired_steering_angle = standardized_degrees(heading_fix + cte_fix)
-      
-      max_delta = 30.#elapsed_sec * max_steering_degrees_per_second;
-      steering_delta = clamp(desired_steering_angle - last_steering_angle,-max_delta,max_delta)
-      steering_angle = clamp(steering_angle + steering_delta, -max_steering_angle, max_steering_angle)
-      
-      
-      str_ms = car.steering_for_angle(steering_angle)
-   
+def esc_for_velocity(goal_velocity, current_velocity):
       # calculate speed 
-      goal_velocity = route.velocity()
       error = car_velocity - goal_velocity
       
       # set limits for forward and reverse
@@ -137,9 +57,57 @@ def play_route(route, car = None, print_progress = False):
       if goal_velocity == 0.:
         esc_ms = 1500
 
-#        speed_up_esc = car.esc_for_velocity(goal_velocity + 1)
-#        slow_down_esc = car.min_reverse_esc
-#        maintain_esc = car.esc_for_velocity(goal_velocity) #car.min_forward_esc
+def play_route(route, car = None, print_progress = False):
+  last_ms = None
+  
+  #print route 
+
+
+  if car is None:
+    car = Car()
+  queue = Queue.Queue()
+  
+  try:
+    car.set_rc_mode()
+    car.add_listener(queue)
+    message = queue.get(block=True, timeout = 0.5)
+    #print repr(message)
+    last_ms = message.ms
+    start_time = time.time()
+
+    # keep going until we run out of track  
+    while True:
+      try:
+        message = queue.get(block=True, timeout = 0.5)
+      except:
+        print 'message timed out at: '+datetime.datetime.now().strftime("%H:%M:%S.%f")
+        print 'last message received:' + repr(message)
+        print 
+        raise
+      (x,y) = car.front_position()
+      (rear_x,rear_y) = car.rear_position()
+      car_velocity = car.get_velocity_meters_per_second()
+      route.set_position(x,y,rear_x,rear_y,car_velocity)
+       
+      cte = route.cross_track_error()
+
+      # calculate steering
+      segment_heading = degrees(route.heading_radians())
+      car_heading = car.heading_degrees()
+
+      # fix headings by opposite steering if going reverse
+      heading_fix = segment_heading - car_heading
+      cte_fix = -80 * cte
+      if car_velocity < 0: #route.is_reverse():
+        heading_fix = -heading_fix
+        cte_fix = -2.*cte_fix # amplify fix for reverse
+        
+      steering_angle = standardized_degrees(heading_fix + cte_fix)
+      
+      str_ms = car.steering_for_angle(steering_angle)
+   
+   
+      esc_ms = esc_for_velocity(route.velocity(), car_velocity, route.is_reverse())
       
         
       if print_progress:
@@ -161,11 +129,8 @@ def play_route(route, car = None, print_progress = False):
      
       
       # send to car
-      if automatic: car.set_esc_and_str(esc_ms, str_ms)
+      car.set_esc_and_str(esc_ms, str_ms)
       
-      # remember state for next loop
-      last_ms = message.ms
-      last_steering_angle = steering_angle
       
       if route.done() and car_velocity == 0:
         break;

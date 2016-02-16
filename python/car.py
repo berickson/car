@@ -239,6 +239,8 @@ class Car:
 
     #print("x:{:.2f} y:{:.2f} heading:{:.2f}".format(self.ackerman.x, self.ackerman.y, relative_heading))
   
+  # returns the velocity in meters/sec
+  # if the car is reversing, velocity will be negative
   def get_velocity_meters_per_second(self):
     return self.velocity;
   
