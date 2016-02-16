@@ -24,38 +24,41 @@ def clamp(value, min_value, max_value):
     return max_value
   return value
 
-def esc_for_velocity(goal_velocity, current_velocity):
-      # calculate speed 
-      error = car_velocity - goal_velocity
-      
-      # set limits for forward and reverse
-      if goal_velocity is None:
-        goal_velocity = max_velocity
-      
-      if route.is_reverse():
-        goal_velocity = -abs(goal_velocity)
-        error = car_velocity - goal_velocity
-        speed_up_esc = car.min_reverse_esc - 80
-        slow_down_esc = 1500#car.min_forward_esc + 10
-        maintain_esc = car.min_reverse_esc
-        
-        if error > 0.: # too slow
-          esc_ms = speed_up_esc
-        elif error < 0.2:
-          esc_ms = slow_down_esc
-        else:
-          esc_ms = maintain_esc
+def esc_for_velocity(goal_velocity, car, is_reverse):
+  # calculate speed 
+  car_velocity = car.get_velocity_meters_per_second()
+  error = car_velocity - goal_velocity
+  
+  # set limits for forward and reverse
+  if goal_velocity is None:
+    goal_velocity = max_velocity
+  
+  if is_reverse:
+    goal_velocity = -abs(goal_velocity)
+    error = car_velocity - goal_velocity
+    speed_up_esc = car.min_reverse_esc - 80
+    slow_down_esc = 1500#car.min_forward_esc + 10
+    maintain_esc = car.min_reverse_esc
+    
+    if error > 0.: # too slow
+      esc_ms = speed_up_esc
+    elif error < 0.2:
+      esc_ms = slow_down_esc
+    else:
+      esc_ms = maintain_esc
 
-      else:
-        if error > 0.2:
-          esc_ms = 1500#car.min_reverse_esc # slow down esc
-        elif error > 0.:
-          esc_ms = car.esc_for_velocity(clamp(goal_velocity- 3.*error,0.1,999.))
-        else:
-          esc_ms = car.esc_for_velocity(goal_velocity  - error)
-      #special case for goal velocity of zero, always use neutral
-      if goal_velocity == 0.:
-        esc_ms = 1500
+  else:
+    if error > 0.2:
+      esc_ms = 1500#car.min_reverse_esc # slow down esc
+    elif error > 0.:
+      esc_ms = car.esc_for_velocity(clamp(goal_velocity- 3.*error,0.1,999.))
+    else:
+      esc_ms = car.esc_for_velocity(goal_velocity  - error)
+  #special case for goal velocity of zero, always use neutral
+  if goal_velocity == 0.:
+    esc_ms = 1500
+  return esc_ms
+      
 
 def play_route(route, car = None, print_progress = False):
   last_ms = None
@@ -107,7 +110,7 @@ def play_route(route, car = None, print_progress = False):
       str_ms = car.steering_for_angle(steering_angle)
    
    
-      esc_ms = esc_for_velocity(route.velocity(), car_velocity, route.is_reverse())
+      esc_ms = esc_for_velocity(route.velocity(), car, route.is_reverse())
       
         
       if print_progress:
