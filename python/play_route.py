@@ -60,6 +60,37 @@ def esc_for_velocity(goal_velocity, car, is_reverse):
   return esc_ms
       
 
+
+def drift():
+  # Start with a highly curved  route
+  route = Route()
+  
+  circles = 3.
+  r = .5 # 1 meter circle
+  theta = 0.
+  while theta < circles*2*pi:
+    route.add_node(r-r*cos(theta),r*sin(theta)
+    
+  play_route(route)
+  
+  
+
+  # Have outside front wheel following the desired route (alternatively use front center of car)
+  #Apply 100% speed
+  #Detect drift with these conditions:
+  #Heading change no longer follows Ackerman model
+  #Rear wheels  spinning
+  #While drifting:
+  #Update position as a function of steering angle, heading from imu, delta heading and delta wheel clicks (or velocity) of front wheel.
+  #Using the new car heading, calculate how outside front wheel will need to point to stay on track. Turn to that angle.
+  #If rear wheel is going at unsafe speed, decrease throttle
+  #If the front outside wheel can't turn to the outside enough to stay on the route, decrease throttle to decrease slip. This happens because the rear of the car slipped too far forward compared to the front.
+  #Try to maintain a car angle so that the front wheel still is about 10-20 degrees from its maximum steering angle.
+  #If front wheel can't turn to the outside enough, because it reached maximum steering angle, decrease throttle to create less slip so the rear of the car can swing back.
+  #If car angle is getting too close to path angle, increase throttle.
+  #If getting close to goal, stop drifting
+
+
 def play_route(route, car = None, print_progress = False):
   last_ms = None
   
@@ -159,7 +190,11 @@ if __name__ == '__main__':
     type=float,
     default=1.0,
     help='max_acceleration')
-  
+  parser.add_argument(
+    '-d','--drift',
+    action='store_true',
+    help='drift mode, may override other variables')
+    
   parser.add_argument(
     '-t', '--trace',
     action='store_true',
@@ -175,19 +210,22 @@ if __name__ == '__main__':
   max_a = args.max_a
   max_v = args.max_v
   
-  input_path = args.input_path
-  if input_path == "":
-    input_path = latest_filename('recordings','recording','csv.path')
-  route = Route()
-  print 'loading route at', input_path
-  route.load_from_file(input_path)
+  if args.drift:
+    drift(car)
+  else:
+    input_path = args.input_path
+    if input_path == "":
+      input_path = latest_filename('recordings','recording','csv.path')
+    route = Route()
+    print 'loading route at', input_path
+    route.load_from_file(input_path)
 
 #  route = around_bar()
 #  route = around_kitchen()
-  print 'optimizing speeds along the route'
-  route.optimize_velocity(max_velocity = max_v, max_acceleration = max_a)
-  print route
-  print 'playing route now, press ctrl-c to abort'
+    print 'optimizing speeds along the route'
+    route.optimize_velocity(max_velocity = max_v, max_acceleration = max_a)
+    print route
+    print 'playing route now, press ctrl-c to abort'
   
-  play_route(route, print_progress = args.trace)
+    play_route(route, print_progress = args.trace)
   
