@@ -58,7 +58,7 @@ def esc_for_velocity(goal_velocity, current_velocity):
         esc_ms = 1500
 
 
-def drift(car):
+def drift():
   # Start with a highly curved  route
   route = Route()
   
@@ -68,7 +68,7 @@ def drift(car):
   while theta < circles*2*pi:
     route.add_node(r-r*cos(theta),r*sin(theta)
     
-  play_route(route,car)
+  play_route(route)
   
   
 
@@ -187,7 +187,11 @@ if __name__ == '__main__':
     type=float,
     default=1.0,
     help='max_acceleration')
-  
+  parser.add_argument(
+    '-d','--drift',
+    action='store_true',
+    help='drift mode, may override other variables')
+    
   parser.add_argument(
     '-t', '--trace',
     action='store_true',
@@ -203,19 +207,22 @@ if __name__ == '__main__':
   max_a = args.max_a
   max_v = args.max_v
   
-  input_path = args.input_path
-  if input_path == "":
-    input_path = latest_filename('recordings','recording','csv.path')
-  route = Route()
-  print 'loading route at', input_path
-  route.load_from_file(input_path)
+  if args.drift:
+    drift(car)
+  else:
+    input_path = args.input_path
+    if input_path == "":
+      input_path = latest_filename('recordings','recording','csv.path')
+    route = Route()
+    print 'loading route at', input_path
+    route.load_from_file(input_path)
 
 #  route = around_bar()
 #  route = around_kitchen()
-  print 'optimizing speeds along the route'
-  route.optimize_velocity(max_velocity = max_v, max_acceleration = max_a)
-  print route
-  print 'playing route now, press ctrl-c to abort'
+    print 'optimizing speeds along the route'
+    route.optimize_velocity(max_velocity = max_v, max_acceleration = max_a)
+    print route
+    print 'playing route now, press ctrl-c to abort'
   
-  play_route(route, print_progress = args.trace)
+    play_route(route, print_progress = args.trace)
   
