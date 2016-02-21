@@ -211,8 +211,7 @@ class Car:
     wheel_distance_meters = (current.odometer_ticks-previous.odometer_ticks)  * self.meters_per_odometer_tick
     if abs(wheel_distance_meters) > 0.:
       outside_wheel_angle = radians(self.angle_for_steering(previous.str))
-      self.ackerman.heading = self.heading_radians()
-      self.ackerman.move_left_wheel(outside_wheel_angle, wheel_distance_meters)
+      self.ackerman.move_left_wheel(outside_wheel_angle, wheel_distance_meters, self.heading_radians())
       
     # update velocity
     if current.odometer_last_us != previous.odometer_last_us:
@@ -357,6 +356,9 @@ class Car:
     heading_error = degrees_diff(goal_heading, self.heading_degrees())
     steering = self.steering_for_angle(-direction * heading_error)
     return steering
+  
+  def is_drifting(self):
+    return self.ackerman.is_drifting()
 
   def forward(self, meters, goal_heading = None, fixed_steering_us = None, max_speed = 2.0):
     ticks = int(meters/self.meters_per_odometer_tick)
@@ -431,7 +433,13 @@ def main():
   # wait here so messages can come from thread and we can trap ctrl-c
   while True:
     time.sleep(0.01) 
-    print "v: {:5.2f} rear:({:5.2f},{:5.2f}) rear:({:5.2f},{:5.2f})".format(
+#    if car.is_drifting():
+#      print '*'
+#    else:
+#      print '.'
+    print "drifting: {} heading: {:5.2f} v: {:5.2f}  rear:({:5.2f},{:5.2f}) front:({:5.2f},{:5.2f}) ".format(
+      car.is_drifting(),
+      car.heading_degrees(),
       car.get_velocity_meters_per_second(),
       *car.rear_position()+
       car.front_position()

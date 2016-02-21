@@ -11,14 +11,18 @@ class Ackerman :
     self.x = x
     self.y = y
     self.heading = heading_radians
+    self.drifting = False
     
   def __repr__(self):
     return 'Ackerman x: {:.5} y: {:.5} heading: {:.5}°'.format(
       self.x,
       self.y,
       degrees(self.heading))
+      
+  def is_drifting(self):
+    return self.drifting
 
-  def move_left_wheel(self, outside_wheel_angle, wheel_distance, debug = False):
+  def move_left_wheel(self, outside_wheel_angle, wheel_distance, new_heading = None, debug = False):
   
     # avoid errors for very small angles
     if abs(outside_wheel_angle) < 0.00001:
@@ -61,7 +65,17 @@ class Ackerman :
     self.y += sin(self.heading)*forward
     self.x += sin(self.heading)*left
     self.y += cos(self.heading)*left
-    self.heading = standardized_radians(self.heading + turn_angle)
+    
+    computed_new_heading = standardized_radians(self.heading + turn_angle)
+    if new_heading is None:
+      self.heading = computed_new_heading
+    else:
+      delta_heading_error = radians_diff(new_heading,computed_new_heading)
+      if delta_heading_error > 0.005:
+        self.drifting = True
+      else:
+        self.drifting = False
+      self.heading = new_heading
     
     if debug: print str(self)
 

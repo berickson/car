@@ -61,19 +61,110 @@ def esc_for_velocity(goal_velocity, car, is_reverse):
       
 
 
-def drift():
+def drift(print_progress = True,car=None):
   # Start with a highly curved  route
   route = Route()
   
-  circles = 3.
-  r = .5 # 1 meter circle
+  circles = 0.25
+  r = 1. # meters for circle
   theta = 0.
+  steps = 360.
   while theta < circles*2*pi:
-    route.add_node(r-r*cos(theta),r*sin(theta)
-    
-  play_route(route)
+    route.add_node(r*sin(theta),r-r*cos(theta))
+    theta += (2*pi)/steps
   
+  route.optimize_velocity(max_velocity = 99., max_acceleration = 99.)
+  print repr(route) 
   
+ 
+  
+  last_ms = None
+  
+  #print route 
+
+  
+  if car is None:
+    car = Car()
+  queue = Queue.Queue()
+  
+  try:
+    car.set_rc_mode()
+    car.add_listener(queue)
+    message = queue.get(block=True, timeout = 0.5)
+    #print repr(message)
+    last_ms = message.ms
+    start_time = time.time()
+
+    # keep going until we run out of track  
+    while True:
+      try:
+        message = queue.get(block=True, timeout = 0.5)
+      except:
+        print 'message timed out at: '+datetime.datetime.now().strftime("%H:%M:%S.%f")
+        print 'last message received:' + repr(message)
+        print 
+        raise
+      (x,y) = car.front_position()
+      (rear_x,rear_y) = car.rear_position()
+      car_velocity = car.get_velocity_meters_per_second()
+      route.set_position(x,y,rear_x,rear_y,car_velocity)
+       
+      cte = route.cross_track_error()
+
+      # calculate steering
+      segment_heading = degrees(route.heading_radians())
+      car_heading = car.heading_degrees()
+
+      # fix headings by opposite steering if going reverse
+      heading_fix = segment_heading - car_heading
+      cte_fix = -80 * cte
+      if car_velocity < 0: #route.is_reverse():
+        heading_fix = -heading_fix
+        cte_fix = -2.*cte_fix # amplify fix for reverse
+        
+      steering_angle = standardized_degrees(heading_fix + cte_fix)
+      
+      str_ms = car.steering_for_angle(steering_angle)
+   
+      drift_angle_degrees = standardized_degrees(segment_heading-car.heading_degrees())
+      if drift_angle_degrees > 30.:
+        esc_ms = esc_for_velocity(1.,car,False)
+      else:
+        esc_ms = esc_for_velocity(99.,car,False)
+      #esc_ms = esc_for_velocity(route.velocity(), car, route.is_reverse())
+      print 'heading',car.heading_degrees(),'seg',segment_heading,'drift angle',drift_angle_degrees
+      if route.done():
+        esc_ms = esc_for_velocity(0.,car,False)
+        
+      if print_progress and False:
+        print("t: {:.1f} i: {} xg: {:.2f} gy:{:.2f} gv: {:.2f}  v:{:.2f} x: {:.2f} y:{:.2f} reverse: {} cte:{:.2f} heading:{:.2f} segment_heading: {:.2f} steering_degrees: {:.2f} esc:{}".format(
+           time.time() - start_time,
+           route.index,
+           route.nodes[route.index+1].x,
+           route.nodes[route.index+1].y,         
+           route.velocity(),
+           car_velocity,
+           x,
+           y,
+           route.is_reverse(),
+           cte,
+           car_heading, 
+           segment_heading,
+           steering_angle,
+           esc_ms))
+     
+      
+      # send to car
+      car.set_esc_and_str(esc_ms, str_ms)
+      
+      
+      if route.done() and car_velocity == 0:
+        break;
+      
+  finally:
+    car.set_esc_and_str(1500,1500)
+    car.set_manual_mode()
+    car.remove_listener(queue)  
 
   # Have outside front wheel following the desired route (alternatively use front center of car)
   #Apply 100% speed
@@ -150,7 +241,7 @@ def play_route(route, car = None, print_progress = False):
            route.index,
            route.nodes[route.index+1].x,
            route.nodes[route.index+1].y,         
-           goal_velocity,
+           route.velocity(),
            car_velocity,
            x,
            y,
@@ -211,7 +302,7 @@ if __name__ == '__main__':
   max_v = args.max_v
   
   if args.drift:
-    drift(car)
+    drift()
   else:
     input_path = args.input_path
     if input_path == "":
