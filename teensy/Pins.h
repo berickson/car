@@ -15,7 +15,7 @@
 
 #define PIN_MOTOR_RPM 29
 
-#define PIN_SPEAKER   A14
+#define PIN_SPEAKER   30
 #define PIN_LED 13
 
 
