@@ -313,6 +313,8 @@ void setup() {
 
   int int_str = PIN_RX_STEER;
   int int_esc = PIN_RX_SPEED;
+  pinMode(PIN_RX_STEER, INPUT);
+  pinMode(PIN_RX_SPEED, INPUT);
 
   attachInterrupt(int_str, rx_str_handler, CHANGE);
   attachInterrupt(int_esc, rx_spd_handler, CHANGE);
