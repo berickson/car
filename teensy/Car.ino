@@ -339,10 +339,10 @@ void setup() {
   last_report_ms = millis();
 
   log(LOG_INFO, "car_control begun");
-  //mpu9150.setup();
+  mpu9150.setup();
   delay(1000);
-  //mpu9150.zero();
-  //circle_mode.init(&mpu9150);
+  mpu9150.zero();
+  circle_mode.init(&mpu9150);
   beeper.beep_nbc();
   modes.begin();
 }
@@ -370,7 +370,7 @@ void loop() {
 
 
   ping.execute();
-  //mpu9150.execute();
+  mpu9150.execute();
   blinker.execute();
   beeper.execute();
 

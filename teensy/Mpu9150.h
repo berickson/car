@@ -7,8 +7,8 @@
 //#include "vector_math.h"
 #include "Logger.h"
 
-#define INTERRUPT_PIN 12
-#define INTERRUPT_NUMBER 12
+#define INTERRUPT_PIN 33
+#define INTERRUPT_NUMBER 33
 
 
 class Mpu9150 {
