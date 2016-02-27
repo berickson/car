@@ -265,8 +265,9 @@ def play_route(route, car = None, print_progress = False):
     car.set_manual_mode()
     car.remove_listener(queue)
     
-  
-if __name__ == '__main__':
+
+
+def play_route_main():  
 
   import argparse
   parser = argparse.ArgumentParser(description = 'Route follower')
@@ -320,3 +321,5 @@ if __name__ == '__main__':
   
     play_route(route, print_progress = args.trace)
   
+if __name__ == '__main__':
+  play_route()

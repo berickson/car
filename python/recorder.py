@@ -7,6 +7,8 @@ import dateutil.parser
 import filenames
 from select import select
 
+from car import Car
+import Adafruit_CharLCD as LCD
 
 folder = 'recordings'
 prefix = 'recording'
@@ -32,27 +34,35 @@ def kbhit():
   dr,dw,de = select([sys.stdin],[],[],0)
   return dr <> []
 
-output = open('/var/log/car/output.log','r')
-output.seek(0,2) # go to end of file
+def make_recording(car = None):
+  output = open('/var/log/car/output.log','r')
+  output.seek(0,2) # go to end of file
 
-write_command_to_car('td+\n')
-
-
-recording = open(recording_file_path,'w')
+  write_command_to_car('td+\n')
 
 
-print('recording, press any key to stop')
-while not kbhit():
-  s = output.readline()
-  if s:
-    fields = s.split(',')
-    if len(fields) > 1:
-      if fields[1] == 'TD':
-        recording.write(s);
-  else:
-    time.sleep(0.01)
+  recording = open(recording_file_path,'w')
 
-recording.close()
 
-print 'all done'
+  print('recording, press any key to stop')
+  car.display_text("recording\n-> stop")
+  if car is None:
+    car = Car()
+  while not kbhit():
+    if car.lcd.is_pressed(LCD.RIGHT):
+      break
+    s = output.readline()
+    if s:
+      fields = s.split(',')
+      if len(fields) > 1:
+        if fields[1] == 'TD':
+          recording.write(s);
+    else:
+      time.sleep(0.01)
 
+  recording.close()
+
+  print 'all done'
+
+if __name__=="__main__":
+  make_recording()

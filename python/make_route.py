@@ -6,6 +6,9 @@ from ackerman import *
 from filenames import *
 
 def write_path_from_recording_file(inpath = None, outpath = None, min_length = 0.03):
+  if inpath == None:
+   inpath = latest_filename('recordings','recording','csv')
+
   car = FakeCar(recording_file_path = inpath)
   if outpath == None:
     outpath = inpath + '.path'
@@ -63,12 +66,11 @@ def write_path_from_recording_file(inpath = None, outpath = None, min_length = 0
          str(current.str),
          str(wheel_meters_per_second)])
       outfile.write(line+"\n")
-      print i, line
+ #     print i, line
       
       (x,y) = (x_next,y_next)
 
        
 if __name__ == '__main__':
-  input_path = latest_filename('recordings','recording','csv')
-  write_path_from_recording_file(input_path)
+  write_path_from_recording_file()
  
