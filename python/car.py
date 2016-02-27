@@ -9,8 +9,7 @@ from ackerman import Ackerman
 from math import *
 from geometry import *
 import pprint
-
-
+import Adafruit_CharLCD as LCD
 
 
 
@@ -56,6 +55,8 @@ class Car:
     self.reset_odometry()
     self.listener = None
     self.last_verified_velocity = 0.0
+    self.lcd = LCD.Adafruit_CharLCDPlate()
+    self.last_lcd_message = ""
     
     if self.online:
       self.quit = False
@@ -66,6 +67,17 @@ class Car:
       self.output_thread.start()
       while self.dynamics.reading_count == 0:
         time.sleep(0.01) 
+
+  def display_text(self, s):
+    try:
+      if self.last_lcd_message != s:
+        self.lcd.set_color(0.0, 1.0, 1.0)
+        self.lcd.clear()
+        self.lcd.message(s)
+        self.last_lcd_message = s
+    except IOError:
+      lcd = LCD.Adafruit_CharLCDPlate()
+
 
 
   def reset_odometry(self):
@@ -428,22 +440,27 @@ class FakeCar(Car):
 
 
 def main():
+  count = 0
   print 'testing car'
   car = Car()
   # wait here so messages can come from thread and we can trap ctrl-c
   while True:
+    count = count + 1
     time.sleep(0.01) 
 #    if car.is_drifting():
 #      print '*'
 #    else:
 #      print '.'
-    print "drifting: {} heading: {:5.2f} v: {:5.2f}  rear:({:5.2f},{:5.2f}) front:({:5.2f},{:5.2f}) ".format(
+
+    s = "drifting: {} heading: {:5.2f} v: {:5.2f}  rear:({:5.2f},{:5.2f}) front:({:5.2f},{:5.2f}) ".format(
       car.is_drifting(),
       car.heading_degrees(),
       car.get_velocity_meters_per_second(),
       *car.rear_position()+
       car.front_position()
       )
+    if count%20 == 0:
+      car.display_text("h:{:.1f}\nf:{:5.2f},{:5.2f}".format(car.heading_degrees(),*car.front_position()))
   
 
 if __name__ == "__main__":
