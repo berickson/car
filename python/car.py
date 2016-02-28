@@ -42,6 +42,7 @@ class Dynamics:
       self.heading = self.yaw
       self.pitch = float(fields[27])
       self.roll = float(fields[28])
+      self.battery_voltage = float(fields[30])
       self.reading_count = self.reading_count + 1
  #   except (IndexError, ValueError) as e:
 #      pass
@@ -125,7 +126,6 @@ class Car:
      
     self.listener = None
 
-
   def __exit__(self, type_unused, value_unused, traceback_unused):
     self.quit = True
     if self.online:
@@ -182,7 +182,7 @@ class Car:
       return
     if fields[1] != 'TD':
       return
-    if len(fields) != 29:
+    if len(fields) != 31:
       print 'invalid TD packet: {}'.format(s)
       return
       
@@ -214,6 +214,10 @@ class Car:
 
   def ping_meters(self):
     return self.dynamics.ping_millimeters / 1000.
+  
+  
+  def battery_voltage(self):
+    return self.dynamics.battery_voltage
   
   def apply_dynamics(self, current, previous):
     # correct heading with adjustment factor

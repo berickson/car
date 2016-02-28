@@ -18,6 +18,8 @@
 #define PIN_SPEAKER   30
 #define PIN_LED 13
 
+#define PIN_BATTERY_VOLTAGE_DIVIDER 14
+
 
 #else
 #define PIN_RX_SPEED 1

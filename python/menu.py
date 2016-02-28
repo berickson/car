@@ -16,7 +16,7 @@ def main():
               (lcd.DOWN,   'Down'  , (0,1,0)),
               (lcd.RIGHT,  'Right' , (1,0,1)) )
   while True:
-    car.display_text("(sel) record\n(->) playback")
+    car.display_text("{:4.1f}v\n(s)rec  (>) play".format(car.battery_voltage()))
     for button in buttons:
       if lcd.buttonPressed(car.lcd.SELECT):
         car.display_text("recording route\n-> stop");

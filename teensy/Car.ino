@@ -413,6 +413,8 @@ void loop() {
     Serial.println();
   }
   if(every_10_ms && TD) {
+    // constants below based on 220k and 1M resistor, 1023 steps and 3.3 reference voltage
+    float battery_voltage = analogRead(PIN_BATTERY_VOLTAGE_DIVIDER) * ((3.3/1023.) / 220.)*(220.+1000.);
     
     log(TD,
        "str," + steering.readMicroseconds()
@@ -426,6 +428,7 @@ void loop() {
        +",ms,"+millis()
        +",us,"+micros()
        +",ypr,"+ ftos(-mpu9150.yaw* 180. / M_PI) + "," + ftos(-mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
+       +",vbat,"+ftos(battery_voltage)
        );
   }
 
