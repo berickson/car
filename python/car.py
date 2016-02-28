@@ -9,7 +9,7 @@ from ackerman import Ackerman
 from math import *
 from geometry import *
 import pprint
-import Adafruit_CharLCDPlate as LCD
+import Adafruit_CharLCD as LCD
 
 
 
