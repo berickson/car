@@ -61,7 +61,7 @@ def run(command_file):
   connected = False
   while True:
     try:
-      for usb_path in glob.glob('/dev/ttyACM*'):
+      for usb_path in glob.glob('/dev/ttyA*'):
         try:
           f = fast_line_reader(usb_path)
           s = serial.Serial(usb_path)

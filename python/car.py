@@ -9,7 +9,7 @@ from ackerman import Ackerman
 from math import *
 from geometry import *
 import pprint
-import Adafruit_CharLCD as LCD
+import Adafruit_CharLCDPlate as LCD
 
 
 
@@ -71,7 +71,7 @@ class Car:
   def display_text(self, s):
     try:
       if self.last_lcd_message != s:
-        self.lcd.set_color(0.0, 1.0, 1.0)
+        #self.lcd.backlight((0.0, 1.0, 1.0))
         self.lcd.clear()
         self.lcd.message(s)
         self.last_lcd_message = s
