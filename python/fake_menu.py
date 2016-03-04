@@ -4,14 +4,29 @@
 import time
 import curses
 
+
+class MenuItem:
+  _text = ''
+  childMenu = None
+  action = None
+  
+  def __init__(self,text, childMenu = None, action = None):
+    self._text = text
+    self.childMenu = childMenu
+    self.action = action
+  def __str__(self):
+    if hasattr(self._text, '__call__'):
+      return self._text()
+    else:
+      return str(self._text)
+  
+sub1 = [MenuItem('sub1'),MenuItem('sub2'),MenuItem(lambda:time.strftime('%H:%M:%S'))];
 class Menu:
   stack = []
-  items = ['3.2v ok menu>','192.168.1.6','item2','item3','item4']
+  items = [MenuItem('3.2v ok menu',childMenu = sub1),MenuItem('192.168.1.6'),MenuItem('item2'),MenuItem('item3'),MenuItem('item4')]
   position = 0
   w = 16
   _quit = False
-  line1 = 'menu line 1'
-  line2 = 'menu line 2'
   def process_key(self,k):
     if c == ord('q'):
       self._quit = True
@@ -22,15 +37,18 @@ class Menu:
       self.position = self.position + 1
       self.position = min(self.position,len(self.items)-1)
     if c == curses.KEY_RIGHT:
-      self.stack.append(self.position)
+      if self.get_item(self.position).childMenu is None:
+        return
+      self.stack.append((self.items,self.position))
+      self.items = self.get_item(self.position).childMenu
       self.position = 0
     if c == curses.KEY_LEFT:
       if len(self.stack) > 0:
-        self.position = self.stack.pop()
+        self.items,self.position = self.stack.pop()
 
   def get_item(self, p):
     if p < 0 or p > len(self.items)-1:
-      return ''
+      return MenuItem('')
     else:
       return self.items[p]
     
@@ -38,10 +56,10 @@ class Menu:
     return s[:self.w].ljust(self.w)
 
   def text1(self):
-    return self.clip(self.get_item(self.position))
+    return self.clip(str(self.get_item(self.position)))
 
   def text2(self):
-    return self.clip(self.get_item(self.position+1))
+    return self.clip(str(self.get_item(self.position+1)))
 
   def quit(self):
     return self._quit
