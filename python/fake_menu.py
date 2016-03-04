@@ -3,7 +3,13 @@
 
 import time
 import curses
+import numpy as np
 
+class Config:
+  pass
+config = Config()
+config.max_a = 1.0
+config.max_v = 2.0
 
 class MenuItem:
   _text = ''
@@ -20,10 +26,21 @@ class MenuItem:
     else:
       return str(self._text)
   
-sub1 = [MenuItem('sub1'),MenuItem('sub2'),MenuItem(lambda:time.strftime('%H:%M:%S'))];
+sub1 = [MenuItem(lambda:time.strftime('%H:%M:%S'))];
+acceleration_menu = [MenuItem(a) for a in np.arange(0.1,3,0.1)]
+velocity_menu = [MenuItem(v) for v in np.arange(1,30,1)]
+
 class Menu:
   stack = []
-  items = [MenuItem('3.2v ok menu',childMenu = sub1),MenuItem('192.168.1.6'),MenuItem('item2'),MenuItem('item3'),MenuItem('item4')]
+  items = [
+    MenuItem('3.2v ok menu',childMenu = sub1),
+    MenuItem('Record'),
+    MenuItem('Route'),
+    MenuItem('192.168.1.6'),
+    MenuItem(lambda:'max_a[{}]'.format(config.max_a),childMenu = acceleration_menu ),
+    MenuItem(lambda:'max_v[{}]'.format(config.max_v),childMenu = velocity_menu)]
+
+    
   position = 0
   w = 16
   _quit = False
@@ -54,12 +71,19 @@ class Menu:
     
   def clip(self,s):
     return s[:self.w].ljust(self.w)
+    
+  def text_at(self,p):
+    menuItem = self.get_item(p)
+    s = str(self.get_item(p))
+    if menuItem.childMenu is not None and p == self.position:
+      s = s + ' >'
+    return self.clip(s)
 
   def text1(self):
-    return self.clip(str(self.get_item(self.position)))
+    return self.text_at(self.position)
 
   def text2(self):
-    return self.clip(str(self.get_item(self.position+1)))
+    return self.text_at(self.position+1)
 
   def quit(self):
     return self._quit
@@ -81,12 +105,15 @@ try:
   stdscr.refresh()
   win.refresh()
   menu = Menu()
+  stdscr.nodelay(1)
   while not menu.quit():
     win.addstr(1,1,menu.text1())
     win.addstr(2,1,menu.text2())
     win.refresh()
     c = stdscr.getch()
-    menu.process_key(c)
+    if c!=-1:
+      menu.process_key(c)
+    time.sleep(0.01)
       
 finally:
   curses.nocbreak()
