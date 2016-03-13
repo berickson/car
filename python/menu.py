@@ -34,6 +34,7 @@ def main():
     except KeyboardInterrupt:
       break
   car.display_text("goodbye")
+  print('goodbye')
   time.sleep(1)
   lcd.set_backlight(0)
 

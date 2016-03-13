@@ -29,12 +29,14 @@ class MenuItem:
 sub1 = [MenuItem(lambda:time.strftime('%H:%M:%S'))];
 acceleration_menu = [MenuItem(a) for a in np.arange(0.1,3,0.1)]
 velocity_menu = [MenuItem(v) for v in np.arange(1,30,1)]
+monitor_menu = [MenuItem('esc')]
 
 class Menu:
   stack = []
   items = [
     MenuItem('3.2v ok menu',childMenu = sub1),
     MenuItem('Record'),
+    MenuItem('Monitor',childMenu = monitor_menu),
     MenuItem('Route'),
     MenuItem('192.168.1.6'),
     MenuItem(lambda:'max_a[{}]'.format(config.max_a),childMenu = acceleration_menu ),
