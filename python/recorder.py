@@ -16,7 +16,7 @@ suffix = '.csv'
 recording_file_path = filenames.next_filename(folder=folder,prefix=prefix,suffix=suffix)
 
 def write_command_to_car(s):
-  command = open('/dev/car/command','w')
+  command = open('/dev/car','w')
   command.write(s)
 
 def getch():

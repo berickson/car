@@ -151,7 +151,7 @@ class Car:
   def write_command(self, s):
     if not self.online:
       raise Exception("must be online")
-    with open('/dev/car/command','w') as command:
+    with open('/dev/car','w') as command:
       #print 'Sending command "{0}"'.format(s)
       command.write("{0}\n".format(s))
     
