@@ -90,8 +90,10 @@ def run(command_file):
         log(str(e))
         log('serial disconnected')
         connected = False
-      
-command_file = os.open('/dev/car/command',os.O_RDONLY)
+
+os.system("mkfifo /dev/car")
+os.system("chmod o+w /dev/car")      
+command_file = os.open('/dev/car',os.O_RDONLY)
 
 run(command_file)
 
