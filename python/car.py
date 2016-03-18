@@ -156,7 +156,7 @@ class Car:
       command.write("{0}\n".format(s))
     
   def _monitor_output(self):
-    self.output = open('/var/log/car/output.log','r')
+    self.output = open('/var/log/car','r')
     self.output.seek(0,2) # go to end of file
     line_start = None
     while not self.quit:

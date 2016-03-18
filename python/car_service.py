@@ -9,16 +9,18 @@ import glob
 import os
 from select import select
 
-sleep_time = 0.001
+sleep_time = 0.005
 
 def log(l):
+  print 'logging '+l
   try:
-    with open('/var/log/car/output.log','a') as log_file:
+    with open('/var/log/car','a') as log_file:
       ts = datetime.datetime.now()
       log_file.write("{0},{1}\n".format(ts,l.strip()))
       log_file.flush()
   except IOError as e:
     print 'Error writing logs: {0}'.format(str(e))
+  print 'done logging '+l
   
 
 class fast_line_reader:
@@ -45,6 +47,7 @@ class fast_line_reader:
 def get_commands(command_file):
   while True:
     buffer = os.read(command_file,1000).strip()
+    
     if(buffer != ''):
       for l in buffer.split('\n'):
         log('COMMAND,{0}'.format(l))
@@ -58,6 +61,7 @@ def get_output(s):
 
       
 def run(command_file):
+  log("car service started")
   connected = False
   while True:
     try:
@@ -91,9 +95,16 @@ def run(command_file):
         log('serial disconnected')
         connected = False
 
-os.system("mkfifo /dev/car")
-os.system("chmod o+w /dev/car")      
-command_file = os.open('/dev/car',os.O_RDONLY)
-
+fifo_path = '/dev/car'
+try:
+  os.system("sudo rm -f "+fifo_path)
+  os.system("sudo mkfifo "+fifo_path)
+except:
+  pass
+os.system("sudo chmod o+w "+fifo_path)      
+os.system("touch /var/log/car")
+os.system("sudo chmod a+rw /var/log/car")
+command_file = os.open(fifo_path,os.O_RDONLY|os.O_NONBLOCK)
+print 'entering run'
 run(command_file)
 

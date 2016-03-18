@@ -35,7 +35,7 @@ def kbhit():
   return dr <> []
 
 def make_recording(car = None):
-  output = open('/var/log/car/output.log','r')
+  output = open('/var/log/car','r')
   output.seek(0,2) # go to end of file
 
   write_command_to_car('td+\n')
