@@ -9,10 +9,9 @@ import glob
 import os
 from select import select
 
-sleep_time = 0.005
+sleep_time = 0.001
 
 def log(l):
-  print 'logging '+l
   try:
     with open('/var/log/car','a') as log_file:
       ts = datetime.datetime.now()
@@ -20,13 +19,13 @@ def log(l):
       log_file.flush()
   except IOError as e:
     print 'Error writing logs: {0}'.format(str(e))
-  print 'done logging '+l
   
 
 class fast_line_reader:
   def __init__(self, path):
+    self.path = path
     self.leftover =  ''
-    self.f = io.open(path,buffering = 1)
+    self.f = io.open(path,'r',buffering = 1)
     
   def get_lines(self):
     lines = self.f.readlines()
@@ -65,13 +64,15 @@ def run(command_file):
   connected = False
   while True:
     try:
-      for usb_path in glob.glob('/dev/ttyA*'):
+      for usb_path in glob.glob('/dev/ttyAC*'):
         try:
           f = fast_line_reader(usb_path)
           s = serial.Serial(usb_path)
-          log('serial connected')
+          log('serial connected to {}'.format(usb_path))
           connected = True
           while True:
+            if not os.path.exists(usb_path):
+              raise IOError("usb {} no longer exists".format(usb_path))
             did_work = False
             for c in get_commands(command_file):
               s.write('{0}\n'.format(c))
@@ -105,6 +106,5 @@ os.system("sudo chmod o+w "+fifo_path)
 os.system("touch /var/log/car")
 os.system("sudo chmod a+rw /var/log/car")
 command_file = os.open(fifo_path,os.O_RDONLY|os.O_NONBLOCK)
-print 'entering run'
 run(command_file)
 
