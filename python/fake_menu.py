@@ -5,30 +5,62 @@ import time
 import curses
 import numpy as np
 
+
+
 class Config:
   pass
 config = Config()
 config.max_a = 1.0
 config.max_v = 2.0
 
+
 class MenuItem:
   _text = ''
   childMenu = None
   action = None
+  selected = None
   
-  def __init__(self,text, childMenu = None, action = None):
+  def __init__(self,text, childMenu = None, action = None, selected = None):
     self._text = text
     self.childMenu = childMenu
     self.action = action
+    self.selected = selected
   def __str__(self):
+    s = ''
     if hasattr(self._text, '__call__'):
-      return self._text()
+      s = self._text()
     else:
-      return str(self._text)
+      s= str(self._text)
+    if self.selected is not None:
+      if self.selected == False:
+        s += "()"
+      else:
+        s += "(*)"
+    return s
+
+def selection_text(option,current):
+  s=str(option)
+  if option == current:
+    s += "(*)"
+  else:
+    s += "( )"
+  return s
+
+# getter / setter methods to help as actions in menus
+def max_a(a = None):
+  if a is not None:
+    config.max_a = a
+  return config.max_a
+
+def max_v(v = None):
+  if v is not None:
+    config.max_v = v
+  return config.max_v
   
 sub1 = [MenuItem(lambda:time.strftime('%H:%M:%S'))];
-acceleration_menu = [MenuItem(a) for a in np.arange(0.1,3,0.1)]
-velocity_menu = [MenuItem(v) for v in np.arange(1,30,1)]
+acceleration_menu = map(lambda a: MenuItem(lambda: selection_text(a,max_a()),action=lambda:max_a(a)),np.arange(0.1,3,0.1))
+velocity_menu = map(lambda v: MenuItem(lambda: selection_text(v,max_v()),action=lambda:max_v(v)),np.arange(1,30,1))
+#velocity_menu = [MenuItem(v) for v in np.arange(1,30,1)]
 
 class Menu:
   stack = []
@@ -47,6 +79,10 @@ class Menu:
   def process_key(self,k):
     if c == ord('q'):
       self._quit = True
+    if c == ord(' '):
+      item =  self.current_item()
+      if item.action is not None:
+        item.action()
     if c == curses.KEY_UP:
       self.position = self.position - 1
       self.position = max(self.position,0)
@@ -54,7 +90,8 @@ class Menu:
       self.position = self.position + 1
       self.position = min(self.position,len(self.items)-1)
     if c == curses.KEY_RIGHT:
-      if self.get_item(self.position).childMenu is None:
+      item =  self.current_item()
+      if item.childMenu is None:
         return
       self.stack.append((self.items,self.position))
       self.items = self.get_item(self.position).childMenu
@@ -62,6 +99,9 @@ class Menu:
     if c == curses.KEY_LEFT:
       if len(self.stack) > 0:
         self.items,self.position = self.stack.pop()
+        
+  def current_item(self):
+    return self.get_item(self.position)
 
   def get_item(self, p):
     if p < 0 or p > len(self.items)-1:
