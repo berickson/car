@@ -16,7 +16,7 @@ suffix = '.csv'
 recording_file_path = filenames.next_filename(folder=folder,prefix=prefix,suffix=suffix)
 
 def write_command_to_car(s):
-  command = open('/dev/car/command','w')
+  command = open('/dev/car','w')
   command.write(s)
 
 def getch():
@@ -35,7 +35,7 @@ def kbhit():
   return dr <> []
 
 def make_recording(car = None):
-  output = open('/var/log/car/output.log','r')
+  output = open('/var/log/car','r')
   output.seek(0,2) # go to end of file
 
   write_command_to_car('td+\n')

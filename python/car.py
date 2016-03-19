@@ -151,12 +151,12 @@ class Car:
   def write_command(self, s):
     if not self.online:
       raise Exception("must be online")
-    with open('/dev/car/command','w') as command:
+    with open('/dev/car','w') as command:
       #print 'Sending command "{0}"'.format(s)
       command.write("{0}\n".format(s))
     
   def _monitor_output(self):
-    self.output = open('/var/log/car/output.log','r')
+    self.output = open('/var/log/car','r')
     self.output.seek(0,2) # go to end of file
     line_start = None
     while not self.quit:

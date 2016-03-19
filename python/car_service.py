@@ -13,7 +13,7 @@ sleep_time = 0.001
 
 def log(l):
   try:
-    with open('/var/log/car/output.log','a') as log_file:
+    with open('/var/log/car','a') as log_file:
       ts = datetime.datetime.now()
       log_file.write("{0},{1}\n".format(ts,l.strip()))
       log_file.flush()
@@ -23,8 +23,9 @@ def log(l):
 
 class fast_line_reader:
   def __init__(self, path):
+    self.path = path
     self.leftover =  ''
-    self.f = io.open(path,buffering = 1)
+    self.f = io.open(path,'r',buffering = 1)
     
   def get_lines(self):
     lines = self.f.readlines()
@@ -45,6 +46,7 @@ class fast_line_reader:
 def get_commands(command_file):
   while True:
     buffer = os.read(command_file,1000).strip()
+    
     if(buffer != ''):
       for l in buffer.split('\n'):
         log('COMMAND,{0}'.format(l))
@@ -58,16 +60,19 @@ def get_output(s):
 
       
 def run(command_file):
+  log("car service started")
   connected = False
   while True:
     try:
-      for usb_path in glob.glob('/dev/ttyA*'):
+      for usb_path in glob.glob('/dev/ttyAC*'):
         try:
           f = fast_line_reader(usb_path)
           s = serial.Serial(usb_path)
-          log('serial connected')
+          log('serial connected to {}'.format(usb_path))
           connected = True
           while True:
+            if not os.path.exists(usb_path):
+              raise IOError("usb {} no longer exists".format(usb_path))
             did_work = False
             for c in get_commands(command_file):
               s.write('{0}\n'.format(c))
@@ -90,8 +95,16 @@ def run(command_file):
         log(str(e))
         log('serial disconnected')
         connected = False
-      
-command_file = os.open('/dev/car/command',os.O_RDONLY)
 
+fifo_path = '/dev/car'
+try:
+  os.system("sudo rm -f "+fifo_path)
+  os.system("sudo mkfifo "+fifo_path)
+except:
+  pass
+os.system("sudo chmod o+w "+fifo_path)      
+os.system("touch /var/log/car")
+os.system("sudo chmod a+rw /var/log/car")
+command_file = os.open(fifo_path,os.O_RDONLY|os.O_NONBLOCK)
 run(command_file)
 
