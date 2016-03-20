@@ -17,7 +17,9 @@ def main():
               (LCD.RIGHT,  'Right' , (1,0,1)) )
   while True:
     try:
-      car.display_text("{:4.1f}v\n(s)rec  (>) play".format(car.battery_voltage()))
+      x,y=car.front_position()
+      v = car.battery_voltage()
+      car.display_text("{:5.2f},{:5.2f}\n{:3.1f}v s rec >go".format(x,y,v))
       if lcd.is_pressed(LCD.SELECT):
         print('pressed select')
         car.display_text("recording route\n-> stop")
@@ -33,6 +35,7 @@ def main():
       continue
     except KeyboardInterrupt:
       break
+    time.sleep(0.1)
   car.display_text("goodbye")
   print('goodbye')
   time.sleep(1)
