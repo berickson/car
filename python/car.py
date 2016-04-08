@@ -58,6 +58,7 @@ class Car:
     self.last_verified_velocity = 0.0
     self.lcd = LCD.Adafruit_CharLCDPlate()
     self.last_lcd_message = ""
+    self._display_text = [' '*16, ' '*16]
     
     if self.online:
       self.quit = False
@@ -68,14 +69,23 @@ class Car:
       self.output_thread.start()
       while self.dynamics.reading_count == 0:
         time.sleep(0.01) 
-
   def display_text(self, s):
+    line_count = 2
+    column_count = 16
+    # make input into two lines
+    # of 16 characters each
+    lines = s.split('\n')
+    while len(lines)<line_count:
+      lines.append("")
+    for i in range(line_count):
+      lines[i] = lines[i].ljust(column_count)[:column_count] # force exact width
     try:
-      if self.last_lcd_message != s:
-        #self.lcd.backlight((0.0, 1.0, 1.0))
-        self.lcd.clear()
-        self.lcd.message(s)
-        self.last_lcd_message = s
+      for r in range(line_count):
+        for c in range(column_count):
+          if self._display_text[r][c] <> lines[r][c]:
+            self.lcd.set_cursor(c,r)
+            self.lcd.write8(ord(lines[r][c]), True)
+      self._display_text = lines
     except IOError:
       lcd = LCD.Adafruit_CharLCDPlate()
 
