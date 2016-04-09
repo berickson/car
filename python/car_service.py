@@ -7,6 +7,9 @@ import datetime
 import time
 import glob
 import os
+import menu
+from threading import Thread
+
 from select import select
 
 sleep_time = 0.001
@@ -61,6 +64,12 @@ def get_output(s):
       
 def run(command_file):
   log("car service started")
+  # start menu in a separate thread
+  menu_thread = Thread(target = menu.main)
+  menu_thread.start()
+  log("started menu")
+  
+  # run main loop
   connected = False
   while True:
     try:
@@ -95,6 +104,7 @@ def run(command_file):
         log(str(e))
         log('serial disconnected')
         connected = False
+  menu_thread.join()
 
 fifo_path = '/dev/car'
 try:
