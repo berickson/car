@@ -23,7 +23,7 @@ def main():
       if lcd.is_pressed(LCD.SELECT):
         print('pressed select')
         car.display_text("recording route\n-> stop")
-        make_recording(car = car)
+        ring(car = car)
         car.display_text("recording\ncomplete")
         time.sleep(1);
       if lcd.is_pressed(LCD.RIGHT):
