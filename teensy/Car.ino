@@ -269,7 +269,7 @@ Fsm modes(tasks, count_of(tasks), edges, count_of(edges));
 
 void odometer_sensor_a_changed() {
   last_odometer_change_us=micros();
-  if(digitalRead(PIN_ODOMOTER_SENSOR_A)==digitalRead(PIN_ODOMOTER_SENSOR_B)){
+  if(digitalRead(PIN_ODOMETER_FRONT_RIGHT_SENSOR_A)==digitalRead(PIN_ODOMETER_FRONT_RIGHT_SENSOR_B)){
     --odometer;
   } else {
     ++odometer;
@@ -278,7 +278,7 @@ void odometer_sensor_a_changed() {
 
 void odometer_sensor_b_changed() {
   last_odometer_change_us=micros();
-  if(digitalRead(PIN_ODOMOTER_SENSOR_A)==digitalRead(PIN_ODOMOTER_SENSOR_B)){
+  if(digitalRead(PIN_ODOMETER_FRONT_RIGHT_SENSOR_A)==digitalRead(PIN_ODOMETER_FRONT_RIGHT_SENSOR_B)){
     ++odometer;
   } else {
     --odometer;
@@ -322,10 +322,10 @@ void setup() {
   pinMode(PIN_MOTOR_RPM, INPUT);
   attachInterrupt(PIN_MOTOR_RPM, motor_rpm_handler, RISING);
 
-  pinMode(PIN_ODOMOTER_SENSOR_A, INPUT);
-  pinMode(PIN_ODOMOTER_SENSOR_B, INPUT);
-  attachInterrupt(PIN_ODOMOTER_SENSOR_A, odometer_sensor_a_changed, CHANGE);
-  attachInterrupt(PIN_ODOMOTER_SENSOR_B, odometer_sensor_b_changed, CHANGE);
+  pinMode(PIN_ODOMETER_FRONT_RIGHT_SENSOR_A, INPUT);
+  pinMode(PIN_ODOMETER_FRONT_RIGHT_SENSOR_B, INPUT);
+  attachInterrupt(PIN_ODOMETER_FRONT_RIGHT_SENSOR_A, odometer_sensor_a_changed, CHANGE);
+  attachInterrupt(PIN_ODOMETER_FRONT_RIGHT_SENSOR_B, odometer_sensor_b_changed, CHANGE);
 
   pinMode(PIN_PING_TRIG, OUTPUT);
   pinMode(PIN_PING_ECHO, INPUT);
