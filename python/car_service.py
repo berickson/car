@@ -71,7 +71,8 @@ def run(command_file):
   
   # run main loop
   connected = False
-  while True:
+  while True:#menu_thread.is_alive():
+    print 'test'
     try:
       for usb_path in glob.glob('/dev/ttyAC*'):
         try:
@@ -104,7 +105,7 @@ def run(command_file):
         log(str(e))
         log('serial disconnected')
         connected = False
-  menu_thread.join()
+#  menu_thread.join()
 
 fifo_path = '/dev/car'
 try:

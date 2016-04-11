@@ -8,6 +8,7 @@ from play_route import play_route_main
 import Adafruit_CharLCD as LCD
 
 def main():
+  print 'making a car'
   car = Car()
   lcd = car.lcd
   buttons = ( (LCD.SELECT, 'Select', (1,1,1)),
@@ -21,9 +22,8 @@ def main():
       v = car.battery_voltage()
       car.display_text("{:5.2f},{:5.2f}\n{:3.1f}v s rec >go".format(x,y,v))
       if lcd.is_pressed(LCD.SELECT):
-        print('pressed select')
         car.display_text("recording route\n-> stop")
-        ring(car = car)
+        make_recording(car = car)
         car.display_text("recording\ncomplete")
         time.sleep(1);
       if lcd.is_pressed(LCD.RIGHT):

@@ -441,8 +441,10 @@ void loop() {
        +",spur_us,"+   microseconds_between_spur_pulse_count + "," + last_spur_pulse_us
        +",spur_odo," + spur_pulse_count
        +",ping_mm,"+ping.millimeters()
-       +",odo,"+odometer_front_left.odometer
-       +",odo_us," +  odometer_front_left.last_odometer_change_us
+       +",odo_fl,"+odometer_front_left.odometer +"," +  odometer_front_left.last_odometer_change_us 
+       +",odo_fr,"+0 +"," +  0
+       +",odo_bl,"+odometer_back_left.odometer +"," +  odometer_back_left.last_odometer_change_us
+       +",odo_br,"+odometer_back_right.odometer+"," +  odometer_back_right.last_odometer_change_us
        +",ms,"+millis()
        +",us,"+micros()
        +",ypr,"+ ftos(-mpu9150.yaw* 180. / M_PI) + "," + ftos(-mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
