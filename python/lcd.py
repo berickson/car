@@ -11,6 +11,10 @@ class Lcd(LCD.Adafruit_CharLCDPlate):
 
     self.buttons = {LCD.SELECT, LCD.RIGHT, LCD.DOWN, LCD.UP, LCD.LEFT}
     self.buttons_pressed = self.read_buttons()
+    
+  def __del__(self):
+    self.clear()
+    self.set_backlight(0)
   
   def read_buttons(self):
     old_presses = presses = {}
