@@ -458,8 +458,8 @@ def main():
       *car.rear_position()+
       car.front_position()
       )
-    if count%20 == 0:
-      car.display_text("h:{:.1f}\nf:{:5.2f},{:5.2f}".format(car.heading_degrees(),*car.front_position()))
+    #if count%20 == 0:
+    #  car.display_text("h:{:.1f}\nf:{:5.2f},{:5.2f}".format(car.heading_degrees(),*car.front_position()))
   
 
 if __name__ == "__main__":
