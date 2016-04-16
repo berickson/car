@@ -8,6 +8,7 @@ import time
 import glob
 import os
 import menu
+import car_menu
 import signal
 from threading import Thread
 
@@ -72,9 +73,10 @@ def get_output(s):
 
 
 def run(command_file):
+  global shutdown_flag
   log("car service started")
   # start menu in a separate thread
-  menu_thread = Thread(target = menu.main)
+  menu_thread = Thread(target = car_menu.main)
   menu_thread.start()
   log("started menu")
   
@@ -109,6 +111,8 @@ def run(command_file):
             log(str(e))
             log('serial disconnected')
             connected = False    
+        except KeyboardInterrupt:
+          shutdown_flag = True
     except OSError, e:
       if (connected):
         log(str(e.errno))
@@ -116,6 +120,7 @@ def run(command_file):
         log('serial disconnected')
         connected = False
   print 'main thread shutting down'
+  car_menu.shutdown_flag = True
   menu.shutdown_flag = True
 
 fifo_path = '/dev/car'

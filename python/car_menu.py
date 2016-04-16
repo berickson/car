@@ -5,8 +5,19 @@ import time
 import curses
 import numpy as np
 import pdb
+import os
 from lcd import LCD, Lcd
-#from car import Car
+from car import Car
+shutdown_flag = False
+
+
+# stackoverflow answer from http://stackoverflow.com/a/1267524/383967
+def ip_address():
+  import socket
+  try:
+    return [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
+  except:
+    return "not connected"
 
 class FakeLcd:
   def __init__(self,h=2,w=16,x=10,y=10):
@@ -103,6 +114,11 @@ def max_v(v = None):
 sub1 = [MenuItem(lambda:time.strftime('%H:%M:%S'))];
 
 
+# returns a float string fixed to n characters
+def fixed_float_string(f,n):
+  return "{:<.4f}".format(f).replace("0.",".")[:n]
+
+
 def selection_menu(value_function, values):
   return  map(
     lambda a: MenuItem(
@@ -113,14 +129,21 @@ def selection_menu(value_function, values):
 acceleration_menu = selection_menu(max_a, np.arange(0.1,3,0.1))
 velocity_menu = selection_menu(max_v,np.arange(1,30,1))
 monitor_menu = [MenuItem('esc')]
+pi_menu = [
+  MenuItem('reboot',action=lambda:os.system('sudo reboot')),
+  MenuItem('shutdown',action=lambda:os.system('sudo shutdown'))
+  ]
 
 
 main_menu = [
-    MenuItem('3.2v ok menu',sub_menu = sub1),
-    MenuItem('Record'),
+    MenuItem(lambda:'{0:3.1f}v{1},{2}'.format(
+      car.battery_voltage(),
+      fixed_float_string(car.front_position()[0],4),
+      fixed_float_string(car.front_position()[1],4)
+      ),sub_menu = sub1),
+    MenuItem(lambda:ip_address()),
     MenuItem('Monitor',sub_menu = monitor_menu),
-    MenuItem('Route'),
-    MenuItem('192.168.1.6'),
+    MenuItem('pi',sub_menu = pi_menu),
     MenuItem(lambda:'max_a[{}]'.format(config.max_a),sub_menu = acceleration_menu ),
     MenuItem(lambda:'max_v[{}]'.format(config.max_v),sub_menu = velocity_menu)]
 
@@ -179,7 +202,7 @@ class Menu:
     menuItem = self.get_item(p)
     s = str(self.get_item(p))
     if menuItem.sub_menu is not None and p == self.position:
-      s = s + ' >'
+      s = s + '>'
     return self.clip(s)
 
   def text1(self):
@@ -189,25 +212,36 @@ class Menu:
     return self.text_at(self.position+1)
 
   def quit(self):
-    return self._quit
+    return self._quit or shutdown_flag
     
   def show_in_terminal(self):
     try:
-      fake_lcd = FakeLcd()
-      lcd = Lcd()
-      while not False:# self.quit():
+#      fake_lcd = FakeLcd()
+      lcd = car.lcd
+      while not self.quit():
         t = self.text1()+"\n"+self.text2()
-        fake_lcd.display_text(t)
+#        fake_lcd.display_text(t)
         lcd.display_text(t)
         c = lcd.getch()
-        if c is None:
-          c = fake_lcd.getch()
+#        if c is None:
+#          c = fake_lcd.getch()
         if c is not None:
           self.process_key(c)
         time.sleep(0.03)
     finally:
-      del lcd
+      car.display_text("goodbye")
+    print('goodbye')
+    time.sleep(1)
+    lcd.set_backlight(0)
+    del lcd
 
-menu = Menu(main_menu)
-menu.show_in_terminal()
+def main():
+  global car
+  car = Car()
+  menu = Menu(main_menu)
+  menu.show_in_terminal()
+  del car
+
+if __name__ == "__main__":
+  main()
 
