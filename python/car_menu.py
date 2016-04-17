@@ -117,7 +117,7 @@ def go():
     play_route(rte, car)
 
 acceleration_menu = selection_menu(max_a, np.arange(0.1,3,0.1))
-velocity_menu = selection_menu(max_v,np.arange(1,30,1))
+velocity_menu = selection_menu(max_v,np.arange(0.5,20,0.5))
 
   
 route_menu = [
