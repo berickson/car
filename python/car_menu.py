@@ -2,7 +2,6 @@
 # coding: utf-8
 
 import time
-import curses
 import numpy as np
 import pdb
 import os
@@ -25,55 +24,6 @@ def ip_address():
     return [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
   except:
     return "not connected"
-
-class FakeLcd:
-  def __init__(self,h=2,w=16,x=10,y=10):
-    self.h=h
-    self.w=w
-    self.x=10
-    self.y=10
-    
-    self.stdscr = curses.initscr()
-    curses.noecho()
-    curses.cbreak() # read keys instantly
-    self.win = curses.newwin(self.h+2,self.w+2,self.y,self.x)
-    self.stdscr.keypad(1)
-    curses.curs_set(0)
-    self.win.addstr(0,0,"hello")
-    self.win.box()
-    self.stdscr.refresh()
-    self.win.refresh()
-    self.stdscr.nodelay(1)
-    
-  # returns a curses key press as an LCD.* constant.  
-  # Returns None if no key pressed.
-  def getch(self):
-    c = self.stdscr.getch()
-    if c == curses.KEY_UP:
-      return LCD.UP
-    if c == curses.KEY_DOWN:
-      return LCD.DOWN
-    if c == curses.KEY_RIGHT:
-      return LCD.RIGHT
-    if c == curses.KEY_LEFT:
-      return LCD.LEFT
-    if c ==  ord(' '):
-      return LCD.SELECT
-    return None
-
-  def __del__(self):
-    curses.nocbreak()
-    self.stdscr.keypad(0)
-    curses.echo()
-    curses.endwin()
-    curses.curs_set(1)
-  
-  def display_text(self,s):
-    lines = s.split('\n')
-    for i in range(self.h):
-      if len(lines)<i : break
-      self.win.addstr(i+1,1, lines[i])
-    self.win.refresh()
 
 class Config:
   pass
@@ -204,8 +154,6 @@ class Menu:
     self.items = items
     
   def process_key(self,c):
-#    if c == ord('q'):
-#      self._quit = True
     if c == LCD.SELECT:
       pass # todo: home / display off
 #      item =  self.current_item()
@@ -258,17 +206,13 @@ class Menu:
   def quit(self):
     return self._quit or shutdown_flag
     
-  def show_in_terminal(self):
+  def run(self):
     try:
-#      fake_lcd = FakeLcd()
       lcd = car.lcd
       while not self.quit():
         t = self.text1()+"\n"+self.text2()
-#        fake_lcd.display_text(t)
         lcd.display_text(t)
         c = lcd.getch()
-#        if c is None:
-#          c = fake_lcd.getch()
         if c is not None:
           self.process_key(c)
         time.sleep(0.03)
@@ -283,7 +227,7 @@ def main():
   global car
   car = Car()
   menu = Menu(main_menu)
-  menu.show_in_terminal()
+  menu.run()
   del car
 
 if __name__ == "__main__":
