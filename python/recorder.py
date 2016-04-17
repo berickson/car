@@ -48,9 +48,7 @@ def make_recording(car = None):
   car.display_text("recording\n-> stop")
   if car is None:
     car = Car()
-  while not car.lcd.is_pressed(LCD.RIGHT):#kbhit():
-    if car.lcd.is_pressed(LCD.RIGHT):
-      break
+  while car.lcd.getch() is None:
     s = output.readline()
     if s:
       fields = s.split(',')

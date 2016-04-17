@@ -60,9 +60,10 @@ class Car:
     self.reset_odometry()
     self.listener = None
     self.last_verified_velocity = 0.0
-    self.lcd = Lcd()
+    self.lcd = None
     
     if self.online:
+      self.lcd = Lcd()
       self.quit = False
       self.write_command('td+') # first command normally fails, so write a blank command
       self.write_command('td+')
@@ -73,8 +74,8 @@ class Car:
         time.sleep(0.01) 
 
   def display_text(self, s):
-    self.lcd.display_text(s)
-    return
+    if self.lcd is not None:
+      self.lcd.display_text(s)
 
   def reset_odometry(self):
     self.reading_count = 0

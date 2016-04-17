@@ -6,8 +6,15 @@ import curses
 import numpy as np
 import pdb
 import os
+import route
+from subprocess import Popen
 from lcd import LCD, Lcd
 from car import Car
+from recorder import make_recording
+from make_route import write_path_from_recording_file
+from play_route import play_route
+from filenames import *
+
 shutdown_flag = False
 
 
@@ -71,8 +78,8 @@ class FakeLcd:
 class Config:
   pass
 config = Config()
-config.max_a = 1.0
-config.max_v = 2.0
+config.max_a = 0.1
+config.max_v = 1.0
 
 
 class MenuItem:
@@ -110,6 +117,20 @@ def max_v(v = None):
   if v is not None:
     config.max_v = v
   return config.max_v
+
+# reboot the computer
+def reboot():
+  #p = Popen(['sudo shutdown -r now /r']) # async
+  car.display_text("rebooting")
+  time.sleep(0.25)
+  car.lcd.set_backlight(0)
+  os.system('sudo shutdown -r now /r')
+
+def shutdown():
+  car.display_text("shutting down")
+  time.sleep(0.25)
+  car.lcd.set_backlight(0)
+  os.system('sudo shutdown now /r')
   
 sub1 = [MenuItem(lambda:time.strftime('%H:%M:%S'))];
 
@@ -126,14 +147,36 @@ def selection_menu(value_function, values):
       action=lambda:value_function(a)),
     values)
 
-acceleration_menu = selection_menu(max_a, np.arange(0.1,3,0.1))
-velocity_menu = selection_menu(max_v,np.arange(1,30,1))
-monitor_menu = [MenuItem('esc')]
 pi_menu = [
-  MenuItem('reboot',action=lambda:os.system('sudo reboot')),
-  MenuItem('shutdown',action=lambda:os.system('sudo shutdown'))
+  MenuItem('reboot',action=reboot),
+  MenuItem('shutdown',action=shutdown)
   ]
 
+
+def make_path():
+  car.lcd.display_text("making path")
+  write_path_from_recording_file()
+
+def go():
+    input_path = latest_filename('recordings','recording','csv.path')
+    rte = route.Route()
+    car.display_text('loading route')
+    rte.load_from_file(input_path)
+    rte.optimize_velocity(max_velocity = config.max_v, max_acceleration = config.max_a)
+    car.display_text('playing route')
+    play_route(rte, car)
+
+acceleration_menu = selection_menu(max_a, np.arange(0.1,3,0.1))
+velocity_menu = selection_menu(max_v,np.arange(1,30,1))
+
+  
+route_menu = [
+  MenuItem('go',action=go),
+  MenuItem('make path',action=make_path),
+  MenuItem('record',action=lambda:make_recording(car = car)),
+  MenuItem(lambda:'max_a[{}]'.format(config.max_a),sub_menu = acceleration_menu ),
+  MenuItem(lambda:'max_v[{}]'.format(config.max_v),sub_menu = velocity_menu)
+  ]
 
 main_menu = [
     MenuItem(lambda:'{0:3.1f}v{1},{2}'.format(
@@ -142,10 +185,8 @@ main_menu = [
       fixed_float_string(car.front_position()[1],4)
       ),sub_menu = sub1),
     MenuItem(lambda:ip_address()),
-    MenuItem('Monitor',sub_menu = monitor_menu),
-    MenuItem('pi',sub_menu = pi_menu),
-    MenuItem(lambda:'max_a[{}]'.format(config.max_a),sub_menu = acceleration_menu ),
-    MenuItem(lambda:'max_v[{}]'.format(config.max_v),sub_menu = velocity_menu)]
+    MenuItem('route',sub_menu=route_menu),
+    MenuItem('pi',sub_menu = pi_menu)]
 
 
 class Menu:
@@ -166,9 +207,9 @@ class Menu:
 #    if c == ord('q'):
 #      self._quit = True
     if c == LCD.SELECT:
-      item =  self.current_item()
-      if item.action is not None:
-        item.action()
+      pass # todo: home / display off
+#      item =  self.current_item()
+
     if c == LCD.UP:
       self.position = self.position - 1
       self.position = max(self.position,0)
@@ -177,11 +218,12 @@ class Menu:
       self.position = min(self.position,len(self.items)-1)
     if c == LCD.RIGHT:
       item =  self.current_item()
-      if item.sub_menu is None:
-        return
-      self.stack.append((self.items,self.position))
-      self.items = self.get_item(self.position).sub_menu
-      self.position = 0
+      if item.sub_menu is not None:
+        self.stack.append((self.items,self.position))
+        self.items = self.get_item(self.position).sub_menu
+        self.position = 0
+      if item.action is not None:
+        item.action()      
     if c == LCD.LEFT:
       if len(self.stack) > 0:
         self.items,self.position = self.stack.pop()
@@ -203,6 +245,8 @@ class Menu:
     s = str(self.get_item(p))
     if menuItem.sub_menu is not None and p == self.position:
       s = s + '>'
+    if menuItem.action is not None and p == self.position:
+      s = s + '*'
     return self.clip(s)
 
   def text1(self):
@@ -230,10 +274,10 @@ class Menu:
         time.sleep(0.03)
     finally:
       car.display_text("goodbye")
-    print('goodbye')
-    time.sleep(1)
-    lcd.set_backlight(0)
-    del lcd
+      print('goodbye')
+      time.sleep(0.25)
+      lcd.set_backlight(0)
+      del lcd
 
 def main():
   global car

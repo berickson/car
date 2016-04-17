@@ -7,7 +7,7 @@ import datetime
 import time
 import glob
 import os
-import menu
+#import menu
 import car_menu
 import signal
 from threading import Thread
@@ -83,7 +83,6 @@ def run(command_file):
   # run main loop
   connected = False
   while not shutdown_flag:#menu_thread.is_alive():
-    print 'test'
     try:
       for usb_path in glob.glob('/dev/ttyAC*'):
         try:

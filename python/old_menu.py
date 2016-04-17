@@ -2,7 +2,7 @@
 # coding: utf-8
 import time
 from car import Car
-from recorder import make_recording
+from recorder import recording
 from make_route import write_path_from_recording_file
 from play_route import play_route_main
 import Adafruit_CharLCD as LCD

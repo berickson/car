@@ -201,7 +201,8 @@ def play_route(route, car = None, print_progress = False):
     start_time = time.time()
 
     # keep going until we run out of track  
-    while True:
+    car.lcd.display_text('press any key\nto abort')
+    while car.lcd.getch() is None:
       try:
         message = queue.get(block=True, timeout = 0.5)
       except:
