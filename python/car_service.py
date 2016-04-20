@@ -7,9 +7,22 @@ import datetime
 import time
 import glob
 import os
+#import menu
+import car_menu
+import signal
+from threading import Thread
+
 from select import select
 
 sleep_time = 0.001
+
+# shutdown handler will be called and global shutdown_flag will be set to true
+# if we get a shutdown event signalled
+shutdown_flag = False
+def shutdown_handler(signum, frame):
+  global shutdown_flag
+  print 'got signal',signum
+  shutdown_flag = True
 
 def log(l):
   try:
@@ -44,7 +57,7 @@ class fast_line_reader:
 
 
 def get_commands(command_file):
-  while True:
+  while not shutdown_flag:
     buffer = os.read(command_file,1000).strip()
     
     if(buffer != ''):
@@ -58,11 +71,18 @@ def get_output(s):
   while(s.inWaiting() > 0):
     yield s.readline()
 
-      
+
 def run(command_file):
+  global shutdown_flag
   log("car service started")
+  # start menu in a separate thread
+  menu_thread = Thread(target = car_menu.main)
+  menu_thread.start()
+  log("started menu")
+  
+  # run main loop
   connected = False
-  while True:
+  while not shutdown_flag:#menu_thread.is_alive():
     try:
       for usb_path in glob.glob('/dev/ttyAC*'):
         try:
@@ -70,7 +90,7 @@ def run(command_file):
           s = serial.Serial(usb_path)
           log('serial connected to {}'.format(usb_path))
           connected = True
-          while True:
+          while not shutdown_flag:
             if not os.path.exists(usb_path):
               raise IOError("usb {} no longer exists".format(usb_path))
             did_work = False
@@ -82,6 +102,7 @@ def run(command_file):
               did_work = True
             if did_work == False:
               time.sleep(sleep_time)
+          print 'shutdown main loop'
         except IOError,e:
           time.sleep(sleep_time)
           if (connected):
@@ -89,12 +110,17 @@ def run(command_file):
             log(str(e))
             log('serial disconnected')
             connected = False    
+        except KeyboardInterrupt:
+          shutdown_flag = True
     except OSError, e:
       if (connected):
         log(str(e.errno))
         log(str(e))
         log('serial disconnected')
         connected = False
+  print 'main thread shutting down'
+  car_menu.shutdown_flag = True
+  menu.shutdown_flag = True
 
 fifo_path = '/dev/car'
 try:
@@ -106,5 +132,6 @@ os.system("sudo chmod o+w "+fifo_path)
 os.system("touch /var/log/car")
 os.system("sudo chmod a+rw /var/log/car")
 command_file = os.open(fifo_path,os.O_RDONLY|os.O_NONBLOCK)
+signal.signal(signal.SIGTERM, shutdown_handler)
 run(command_file)
 

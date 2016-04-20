@@ -2,12 +2,15 @@
 # coding: utf-8
 import time
 from car import Car
-from recorder import make_recording
+from recorder import recording
 from make_route import write_path_from_recording_file
 from play_route import play_route_main
 import Adafruit_CharLCD as LCD
 
+shutdown_flag = False
+
 def main():
+  print 'making a car'
   car = Car()
   lcd = car.lcd
   buttons = ( (LCD.SELECT, 'Select', (1,1,1)),
@@ -15,11 +18,12 @@ def main():
               (LCD.UP,     'Up'    , (0,0,1)),
               (LCD.DOWN,   'Down'  , (0,1,0)),
               (LCD.RIGHT,  'Right' , (1,0,1)) )
-  while True:
+  while not shutdown_flag:
     try:
-      car.display_text("{:4.1f}v\n(s)rec  (>) play".format(car.battery_voltage()))
+      x,y=car.front_position()
+      v = car.battery_voltage()
+      car.display_text("{:5.2f},{:5.2f}\n{:3.1f}v s rec >go".format(x,y,v))
       if lcd.is_pressed(LCD.SELECT):
-        print('pressed select')
         car.display_text("recording route\n-> stop")
         make_recording(car = car)
         car.display_text("recording\ncomplete")
@@ -33,7 +37,9 @@ def main():
       continue
     except KeyboardInterrupt:
       break
+    time.sleep(0.1)
   car.display_text("goodbye")
+  del car
   print('goodbye')
   time.sleep(1)
   lcd.set_backlight(0)

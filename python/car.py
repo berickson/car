@@ -9,7 +9,8 @@ from ackerman import Ackerman
 from math import *
 from geometry import *
 import pprint
-import Adafruit_CharLCD as LCD
+from lcd import Lcd
+
 
 
 
@@ -21,31 +22,34 @@ class Dynamics:
       
       
   def set_from_log(self,fields):
-#    try:
-      self.datetime = dateutil.parser.parse(fields[0])
-      self.str = int(fields[3])
-      self.esc = int(fields[5])
-      self.ax = float(fields[7])
-      self.ay = float(fields[8])
-      self.az = float(fields[9])
-#      self.heading = float(fields[11])
-      self.spur_delta_us = int(fields[11])
-      self.spur_last_us = int(fields[12])
-      self.spur_odo = int(fields[14])
-#      self.engine_odometer = int(fields[1])
-      self.ping_millimeters = int(fields[16])
-      self.odometer_ticks = int(fields[18])
-      self.odometer_last_us = int(fields[20])
-      self.ms = int(fields[22])
-      self.us = int(fields[24])
-      self.yaw = float(fields[26])
-      self.heading = self.yaw
-      self.pitch = float(fields[27])
-      self.roll = float(fields[28])
-      self.battery_voltage = float(fields[30])
-      self.reading_count = self.reading_count + 1
- #   except (IndexError, ValueError) as e:
-#      pass
+    self.datetime = dateutil.parser.parse(fields[0])
+    self.str = int(fields[3])
+    self.esc = int(fields[5])
+    self.ax = float(fields[7])
+    self.ay = float(fields[8])
+    self.az = float(fields[9])
+    self.spur_delta_us = int(fields[11])
+    self.spur_last_us = int(fields[12])
+    self.spur_odo = int(fields[14])
+    self.ping_millimeters = int(fields[16])
+    self.odometer_front_left =  int(fields[18])
+    self.odometer_ticks = self.odometer_front_left
+    self.odometer_front_left_last_us =  int(fields[19])
+    self.odometer_last_us = self.odometer_front_left_last_us
+    self.odometer_front_right = int(fields[21])
+    self.odometer_front_right_last_us = int(fields[22])
+    self.odometer_back_left = int(fields[24])
+    self.odometer_back_left_last_us = int(fields[25])
+    self.odometer_back_right = int(fields[27])
+    self.odometer_back_right_last_us = int(fields[28])
+    self.ms = int(fields[30])
+    self.us = int(fields[32])
+    self.yaw = float(fields[34])
+    self.heading = self.yaw
+    self.pitch = float(fields[35])
+    self.roll = float(fields[36])
+    self.battery_voltage = float(fields[38])
+    self.reading_count = self.reading_count + 1
 
 
 class Car:
@@ -56,10 +60,10 @@ class Car:
     self.reset_odometry()
     self.listener = None
     self.last_verified_velocity = 0.0
-    self.lcd = LCD.Adafruit_CharLCDPlate()
-    self.last_lcd_message = ""
+    self.lcd = None
     
     if self.online:
+      self.lcd = Lcd()
       self.quit = False
       self.write_command('td+') # first command normally fails, so write a blank command
       self.write_command('td+')
@@ -70,16 +74,8 @@ class Car:
         time.sleep(0.01) 
 
   def display_text(self, s):
-    try:
-      if self.last_lcd_message != s:
-        #self.lcd.backlight((0.0, 1.0, 1.0))
-        self.lcd.clear()
-        self.lcd.message(s)
-        self.last_lcd_message = s
-    except IOError:
-      lcd = LCD.Adafruit_CharLCDPlate()
-
-
+    if self.lcd is not None:
+      self.lcd.display_text(s)
 
   def reset_odometry(self):
     self.reading_count = 0
@@ -182,8 +178,8 @@ class Car:
       return
     if fields[1] != 'TD':
       return
-    if len(fields) != 31:
-      print 'invalid TD packet: {}'.format(s)
+    if len(fields) != 39:
+      print 'invalid TD packet with {} fields: {}'.format(len(fields),s)
       return
       
     # todo, handle contention with different threads
@@ -463,8 +459,8 @@ def main():
       *car.rear_position()+
       car.front_position()
       )
-    if count%20 == 0:
-      car.display_text("h:{:.1f}\nf:{:5.2f},{:5.2f}".format(car.heading_degrees(),*car.front_position()))
+    #if count%20 == 0:
+    #  car.display_text("h:{:.1f}\nf:{:5.2f},{:5.2f}".format(car.heading_degrees(),*car.front_position()))
   
 
 if __name__ == "__main__":

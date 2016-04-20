@@ -1,6 +1,7 @@
 #include <I2Cdev.h>
 #include <Servo.h>
 #include "Pins.h"
+#include "QuadratureEncoder.h"
 #include "Logger.h"
 #include "Blinker.h"
 #include "Mpu9150.h"
@@ -78,8 +79,11 @@ CommandInterpreter interpreter;
 unsigned long spur_pulse_count = 0;
 unsigned long last_spur_pulse_us;
 unsigned long microseconds_between_spur_pulse_count;
-long odometer=0;
-unsigned long last_odometer_change_us=0;
+
+
+QuadratureEncoder odometer_front_left(PIN_ODOMETER_FRONT_LEFT_SENSOR_A, PIN_ODOMETER_FRONT_LEFT_SENSOR_B);
+QuadratureEncoder odometer_back_left(PIN_ODOMETER_BACK_LEFT_SENSOR_A, PIN_ODOMETER_BACK_LEFT_SENSOR_B);
+QuadratureEncoder odometer_back_right(PIN_ODOMETER_BACK_RIGHT_SENSOR_A, PIN_ODOMETER_BACK_RIGHT_SENSOR_B);
 
 
 
@@ -267,22 +271,28 @@ Fsm::Edge edges[] = {{"circle", "non-neutral", "manual"},
 
 Fsm modes(tasks, count_of(tasks), edges, count_of(edges));
 
-void odometer_sensor_a_changed() {
-  last_odometer_change_us=micros();
-  if(digitalRead(PIN_ODOMOTER_SENSOR_A)==digitalRead(PIN_ODOMOTER_SENSOR_B)){
-    --odometer;
-  } else {
-    ++odometer;
-  }
+void odometer_front_left_sensor_a_changed() {
+  odometer_front_left.sensor_a_changed();
 }
 
-void odometer_sensor_b_changed() {
-  last_odometer_change_us=micros();
-  if(digitalRead(PIN_ODOMOTER_SENSOR_A)==digitalRead(PIN_ODOMOTER_SENSOR_B)){
-    ++odometer;
-  } else {
-    --odometer;
-  }
+void odometer_front_left_sensor_b_changed() {
+  odometer_front_left.sensor_b_changed();
+}
+
+void odometer_back_left_sensor_a_changed() {
+  odometer_back_left.sensor_a_changed();
+}
+
+void odometer_back_left_sensor_b_changed() {
+  odometer_back_left.sensor_b_changed();
+}
+
+void odometer_back_right_sensor_a_changed() {
+  odometer_back_right.sensor_a_changed();
+}
+
+void odometer_back_right_sensor_b_changed() {
+  odometer_back_right.sensor_b_changed();
 }
 
 
@@ -322,10 +332,18 @@ void setup() {
   pinMode(PIN_MOTOR_RPM, INPUT);
   attachInterrupt(PIN_MOTOR_RPM, motor_rpm_handler, RISING);
 
-  pinMode(PIN_ODOMOTER_SENSOR_A, INPUT);
-  pinMode(PIN_ODOMOTER_SENSOR_B, INPUT);
-  attachInterrupt(PIN_ODOMOTER_SENSOR_A, odometer_sensor_a_changed, CHANGE);
-  attachInterrupt(PIN_ODOMOTER_SENSOR_B, odometer_sensor_b_changed, CHANGE);
+  pinMode(PIN_ODOMETER_FRONT_LEFT_SENSOR_A, INPUT);
+  pinMode(PIN_ODOMETER_FRONT_LEFT_SENSOR_B, INPUT);
+  pinMode(PIN_ODOMETER_BACK_LEFT_SENSOR_A, INPUT_PULLUP);
+  pinMode(PIN_ODOMETER_BACK_LEFT_SENSOR_B, INPUT_PULLUP);
+  pinMode(PIN_ODOMETER_BACK_RIGHT_SENSOR_A, INPUT_PULLUP);
+  pinMode(PIN_ODOMETER_BACK_RIGHT_SENSOR_B, INPUT_PULLUP);
+  attachInterrupt(PIN_ODOMETER_FRONT_LEFT_SENSOR_A, odometer_front_left_sensor_a_changed, CHANGE);
+  attachInterrupt(PIN_ODOMETER_FRONT_LEFT_SENSOR_B, odometer_front_left_sensor_b_changed, CHANGE);
+  attachInterrupt(PIN_ODOMETER_BACK_LEFT_SENSOR_A, odometer_back_left_sensor_a_changed, CHANGE);
+  attachInterrupt(PIN_ODOMETER_BACK_LEFT_SENSOR_B, odometer_back_left_sensor_b_changed, CHANGE);
+  attachInterrupt(PIN_ODOMETER_BACK_RIGHT_SENSOR_A, odometer_back_right_sensor_a_changed, CHANGE);
+  attachInterrupt(PIN_ODOMETER_BACK_RIGHT_SENSOR_B, odometer_back_right_sensor_b_changed, CHANGE);
 
   pinMode(PIN_PING_TRIG, OUTPUT);
   pinMode(PIN_PING_ECHO, INPUT);
@@ -423,8 +441,10 @@ void loop() {
        +",spur_us,"+   microseconds_between_spur_pulse_count + "," + last_spur_pulse_us
        +",spur_odo," + spur_pulse_count
        +",ping_mm,"+ping.millimeters()
-       +",odo,"+odometer
-       +",odo_us," +  last_odometer_change_us
+       +",odo_fl,"+odometer_front_left.odometer +"," +  odometer_front_left.last_odometer_change_us 
+       +",odo_fr,"+0 +"," +  0
+       +",odo_bl,"+odometer_back_left.odometer +"," +  odometer_back_left.last_odometer_change_us
+       +",odo_br,"+odometer_back_right.odometer+"," +  odometer_back_right.last_odometer_change_us
        +",ms,"+millis()
        +",us,"+micros()
        +",ypr,"+ ftos(-mpu9150.yaw* 180. / M_PI) + "," + ftos(-mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
