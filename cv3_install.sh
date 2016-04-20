@@ -1,5 +1,15 @@
 # install instructions based on 
 #    http://docs.opencv.org/3.1.0/d7/d9f/tutorial_linux_install.html#gsc.tab=0
+
+# I originally ran this as root and it doesn't work, force not to run as root
+if [ "$USER" = "root" ]
+then 
+  echo "don't run this as root"
+  exit
+else
+  echo "running as $USER"
+fi
+
 sudo apt-get install build-essential
 sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
 sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
