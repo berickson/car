@@ -3,23 +3,18 @@ import numpy as np
 import cv2
 
 seconds = 30
-fps = 30.0
-width = 320
-height = 240
+fps = 60.0
+width = 640
+height = 480
 size = (width, height)
+cam_nums = [0]
+caps = [cv2.VideoCapture(n) for n in cam_nums]
 
-
-cap1 = cv2.VideoCapture(0)
-cap2 = cv2.VideoCapture(1)
-caps = [cap1,cap2]
 for cap in caps:
   cap.set(cv2.CAP_PROP_FRAME_WIDTH,width)
   cap.set(cv2.CAP_PROP_FRAME_HEIGHT,height)
   cap.set(cv2.CAP_PROP_FPS,fps)
 
-
-
-print 1
 # Define the codec and create VideoWriter object
 #fourcc = cv2.cv.CV_FOURCC('M','P','4','V'); # doesn't work on pi
 #fourcc = cv2.cv.CV_FOURCC('X','V','I','D'); # doesn't work on pi
@@ -31,30 +26,30 @@ print 1
 # x264    32.451s
 # MJPG    24.222s
 # XVID    24.026s   23.926s
-#fourcc = cv2.VideoWriter_fourcc(*'x264')# 32.451s 100 frames 640x480 
-#fourcc = cv2.VideoWriter_fourcc(*'MJPG')# 24.222s
-fourcc = cv2.VideoWriter_fourcc(*'XVID')# 24.026s
 
 
+codec = 'x264' # 32.451s 100 frames 640x480 
+#codec = 'MJPG' # 24.222s
+#codec = 'XVID' # 24.026s
 
+fourcc = cv2.VideoWriter_fourcc(*codec)
 
-out1 = cv2.VideoWriter('out1.avi',fourcc, fps, size)
-out2 = cv2.VideoWriter('out2.avi',fourcc, fps, size)
-outs = [out1,out2]
-print 2
+outs = [cv2.VideoWriter('out'+str(n)+'.avi',fourcc,fps,size) for n in cam_nums]
 
 frames_grabbed = 0
-ret, buffer1 = cap1.read()
-ret, buffer2 = cap1.read()
-while(cap.isOpened() and frames_grabbed < seconds * fps):
+buffers = [cap.read()[1] for cap in caps]
+#ret, buffer1 = cap1.read()
+#ret, buffer2 = cap1.read()
+frames_to_grab = 200
+while(caps[0].isOpened() and frames_grabbed < frames_to_grab):
     for cap in caps: cap.grab()
-    ret, frame = cap1.retrieve(buffer1)
-    ret, frame = cap2.retrieve(buffer2)
+    frames = list()
+    for n in cam_nums:
+      ret,frame = caps[n].retrieve(buffers[n]) 
+      if ret==False:
+          break
+      outs[n].write(buffers[n])
     frames_grabbed += 1
-    if ret==False:
-        break
-    out1.write(buffer1)
-    out2.write(buffer2)
 
 # Release everything if job is finished
 
