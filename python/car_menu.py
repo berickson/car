@@ -16,7 +16,6 @@ from filenames import *
 
 shutdown_flag = False
 
-
 # stackoverflow answer from http://stackoverflow.com/a/1267524/383967
 def ip_address():
   import socket
@@ -103,11 +102,16 @@ pi_menu = [
   ]
 
 
+def record():
+  car.reset_odometry()
+  make_recording(car = car)
+
 def make_path():
   car.lcd.display_text("making path")
   write_path_from_recording_file()
 
 def go():
+    car.reset_odometry()
     input_path = latest_filename('recordings','recording','csv.path')
     rte = route.Route()
     car.display_text('loading route')
@@ -116,16 +120,25 @@ def go():
     car.display_text('playing route')
     play_route(rte, car)
 
-acceleration_menu = selection_menu(max_a, np.arange(0.1,3,0.1))
-velocity_menu = selection_menu(max_v,np.arange(0.5,20,0.5))
+acceleration_menu = selection_menu(max_a, np.arange(0.25,10.1,0.25))
+velocity_menu = selection_menu(max_v,np.arange(0.5,20.1,0.5))
 
   
 route_menu = [
   MenuItem('go',action=go),
   MenuItem('make path',action=make_path),
-  MenuItem('record',action=lambda:make_recording(car = car)),
+  MenuItem('record',action=record),
   MenuItem(lambda:'max_a[{}]'.format(config.max_a),sub_menu = acceleration_menu ),
   MenuItem(lambda:'max_v[{}]'.format(config.max_v),sub_menu = velocity_menu)
+  ]
+
+
+vars_menu = [
+  MenuItem(lambda:'frnt:{0},{1}'.format(fixed_float_string(car.front_position()[0],4),
+      fixed_float_string(car.front_position()[1],4))),
+  MenuItem(lambda:'rear:{0},{1}'.format(fixed_float_string(car.rear_position()[0],4),
+      fixed_float_string(car.rear_position()[1],4))),
+  MenuItem(lambda:'head: {0}'.format(fixed_float_string(car.heading_degrees(),4)))
   ]
 
 main_menu = [
@@ -136,7 +149,9 @@ main_menu = [
       ),sub_menu = sub1),
     MenuItem(lambda:ip_address()),
     MenuItem('route',sub_menu=route_menu),
-    MenuItem('pi',sub_menu = pi_menu)]
+    MenuItem('pi',sub_menu = pi_menu),
+    MenuItem('vars',sub_menu = vars_menu)
+    ]
 
 
 class Menu:
