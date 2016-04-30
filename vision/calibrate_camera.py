@@ -34,6 +34,7 @@ class FrameGrabber:
   def __init__(self,camera):
     self._quit = False
     self.camera = camera
+    self.img = None
     
   def _grab_thread(self):
     while self._quit == False:
@@ -55,7 +56,11 @@ class FrameGrabber:
   def read(self):
     FrameGrabber.lock.acquire()
     try:
-      retval,img = self.camera.retrieve()
+      if self.img is None:
+        retval,img = self.camera.retrieve()
+      else:
+        retval,img = self.camera.retrieve(self.img)
+      if retval: self.img = img
     finally:
       FrameGrabber.lock.release()
     return (retval,img)
@@ -68,7 +73,6 @@ def grab_images():
       camera.set(cv2.CAP_PROP_FRAME_WIDTH,320)
       camera.set(cv2.CAP_PROP_FRAME_HEIGHT,240)
       camera.set(cv2.CAP_PROP_FPS,60)
-#      camera.set(cv2.CAP_PROP_BUFFERSIZE, 3)# internal buffer will now store only 3 frames
       grabber = FrameGrabber(camera)
       grabbers.append(grabber)
       grabber.go()
@@ -77,7 +81,13 @@ def grab_images():
       
   print 'found',str(len(grabbers)),'cameras'
   
-  while cv2.waitKey(1)==-1:
+  while True:
+    c = cv2.waitKey(1)
+    if c <> -1:
+      print 'pressed: '+str(c)
+    c = c & 255
+    if c == ord('q'):
+      break
     images = []
     for grabber in grabbers:
       retval,img = grabber.read()
@@ -85,6 +95,10 @@ def grab_images():
         
     for i in range(len(images)):
       cv2.imshow(str(i),images[i])
+    if c == ord(' '):
+      print 'saving images'
+      for i in range(len(images)):
+        cv2.imwrite('img_'+str(i)+'.png',images[i])
    
   for grabber in grabbers:
     grabber.quit()
