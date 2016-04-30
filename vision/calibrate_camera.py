@@ -1,3 +1,5 @@
+#!/usr/bin/env python2.7
+
 # calibrate camera based on input images
 # based on example from
 # http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_calib3d/py_calibration/py_calibration.html#
@@ -5,15 +7,92 @@
 import numpy as np
 import cv2
 import glob
+import threading
+import time
 
 import os
 
-show_images = False
+show_images = True
 
 def filename_from_path(path):
     basename = os.path.basename(path)
     filename = basename.split('.')[0]
     return filename
+
+def get_yes_no(s):
+    while True:
+      x = raw_input(str(s)+str(' (y/n)'))
+      if x == 'y':
+          return True
+      if x == 'n':
+          return False
+      print 'please enter y/n'
+
+
+class FrameGrabber:
+  lock = threading.Lock()
+  def __init__(self,camera):
+    self._quit = False
+    self.camera = camera
+    
+  def _grab_thread(self):
+    while self._quit == False:
+      FrameGrabber.lock.acquire()
+      try:
+        self.camera.grab()
+      finally:
+        FrameGrabber.lock.release()
+      time.sleep(0.001)
+    
+  def go(self):
+    self._thread = threading.Thread(target = self._grab_thread)
+    self._thread.start()
+  
+  def quit(self):
+    self._quit = True
+    self._thread.join()
+    
+  def read(self):
+    FrameGrabber.lock.acquire()
+    try:
+      retval,img = self.camera.retrieve()
+    finally:
+      FrameGrabber.lock.release()
+    return (retval,img)
+
+def grab_images():
+  grabbers = []
+  for i in range(2):
+    try:
+      camera = cv2.VideoCapture(i)
+      camera.set(cv2.CAP_PROP_FRAME_WIDTH,320)
+      camera.set(cv2.CAP_PROP_FRAME_HEIGHT,240)
+      camera.set(cv2.CAP_PROP_FPS,60)
+#      camera.set(cv2.CAP_PROP_BUFFERSIZE, 3)# internal buffer will now store only 3 frames
+      grabber = FrameGrabber(camera)
+      grabbers.append(grabber)
+      grabber.go()
+    except:
+      raise
+      
+  print 'found',str(len(grabbers)),'cameras'
+  
+  while cv2.waitKey(1)==-1:
+    images = []
+    for grabber in grabbers:
+      retval,img = grabber.read()
+      if retval: images.append(img)
+        
+    for i in range(len(images)):
+      cv2.imshow(str(i),images[i])
+   
+  for grabber in grabbers:
+    grabber.quit()
+    
+
+if get_yes_no('do you want to grab images?'):
+    grab_images()
+    exit()
 
 
 # termination criteria
