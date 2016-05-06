@@ -9,6 +9,7 @@ import cv2
 import glob
 import threading
 import time
+from frame_grabber import FrameGrabber, RuntimeStats, Interval
 
 import os
 
@@ -29,41 +30,6 @@ def get_yes_no(s):
       print 'please enter y/n'
 
 
-class FrameGrabber:
-  lock = threading.Lock()
-  def __init__(self,camera):
-    self._quit = False
-    self.camera = camera
-    self.img = None
-    
-  def _grab_thread(self):
-    while self._quit == False:
-      FrameGrabber.lock.acquire()
-      try:
-        self.camera.grab()
-      finally:
-        FrameGrabber.lock.release()
-      time.sleep(0.001)
-    
-  def go(self):
-    self._thread = threading.Thread(target = self._grab_thread)
-    self._thread.start()
-  
-  def quit(self):
-    self._quit = True
-    self._thread.join()
-    
-  def read(self):
-    FrameGrabber.lock.acquire()
-    try:
-      if self.img is None:
-        retval,img = self.camera.retrieve()
-      else:
-        retval,img = self.camera.retrieve(self.img)
-      if retval: self.img = img
-    finally:
-      FrameGrabber.lock.release()
-    return (retval,img)
 
 def grab_images():
   grabbers = []
@@ -81,6 +47,7 @@ def grab_images():
       
   print 'found',str(len(grabbers)),'cameras'
   
+  interval = Interval(10.)
   while True:
     c = cv2.waitKey(1)
     if c <> -1:
@@ -92,6 +59,8 @@ def grab_images():
     for grabber in grabbers:
       retval,img = grabber.read()
       if retval: images.append(img)
+      if interval.occurred():
+        print grabber.stats()
         
     for i in range(len(images)):
       cv2.imshow(str(i),images[i])
