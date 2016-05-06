@@ -284,7 +284,7 @@ class Car:
   
   def esc_for_velocity(self, v):
     data = [
-      (-2., 1200), # made up numbers for negative v: todo: find imperically
+      (-2., 1200), # made up numbers for negative v: todo: find empirically
       (-1., 1250),
       (0.0,  1500),
       (0.1, 1645),
