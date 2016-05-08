@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+fl#!/usr/bin/env python2.7
 # coding: utf-8
 
 import sys,tty,termios
@@ -76,6 +76,18 @@ def steering_angle_by_cte(car, route):
   steering_angle = standardized_degrees(heading_fix + cte_fix)
   return steering_angle
 
+# steer to point t seconds + d meters ahead, use cte for reverse
+def steering_angle_by_look_ahead(car,route,d=0.05,t=0.1):
+  v = car.get_velocity_meters_per_second()
+  if v < 0:
+    return steering_angle_by_cte(car,route)
+  (x,y) = route.get_position_ahead(d+v*t)
+  car_x,car_y = car.front_position()
+  heading_radians = car.heading_radians()
+  desired_radians = math.atan2(y-car_Y,x-car_x)
+  return degrees(desire_radians-heading_radians)
+
+
 def drift(print_progress = True,car=None):
   # Start with a highly curved  route
   route = Route()
@@ -123,7 +135,8 @@ def drift(print_progress = True,car=None):
       (rear_x,rear_y) = car.rear_position()
       route.set_position(x,y,rear_x,rear_y,car_velocity)
        
-      steering_angle = steering_angle_by_cte(car,route)
+      #steering_angle = steering_angle_by_cte(car,route)
+      steering_angle = steering_angle_by_look_ahead(car,route)
       
       str_ms = car.steering_for_angle(steering_angle)
    
