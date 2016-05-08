@@ -80,6 +80,12 @@ class Route:
     return "\n".join([ (str(i)+" " + str(self.nodes[i])) for i in range(len(self.nodes))])
     
   def add_node(self,x,y,velocity=1.0, reverse=False):
+    # reject if it is a duplicate
+    if len(self.nodes) > 0:
+      last = self.nodes[-1]
+      if x == last_x and y == last_y:
+        return
+      
     node = RouteNode()
     node.set(x=x,y=y,velocity=velocity,reverse=reverse)
     self.nodes.append(node)
