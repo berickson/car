@@ -120,7 +120,7 @@ def run(command_file):
         connected = False
   print 'main thread shutting down'
   car_menu.shutdown_flag = True
-  menu.shutdown_flag = True
+  car_menu.shutdown_flag = True
 
 fifo_path = '/dev/car'
 try:

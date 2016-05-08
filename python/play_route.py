@@ -84,8 +84,8 @@ def steering_angle_by_look_ahead(car,route,d=0.05,t=0.5):
   (x,y) = route.get_position_ahead(d+v*t)
   car_x,car_y = car.front_position()
   heading_radians = car.heading_radians()
-  desired_radians = math.atan2(y-car_y,x-car_x)
-  return degrees(desire_radians-heading_radians)
+  desired_radians = atan2(y-car_y,x-car_x)
+  return standardized_degrees(degrees(desired_radians-heading_radians))
 
 
 def play_route(route, car = None, print_progress = False):
@@ -121,20 +121,7 @@ def play_route(route, car = None, print_progress = False):
       car_velocity = car.get_velocity_meters_per_second()
       route.set_position(x,y,rear_x,rear_y,car_velocity)
        
-      cte = route.cross_track_error()
-
-      # calculate steering
-      segment_heading = degrees(route.heading_radians())
-      car_heading = car.heading_degrees()
-
-      # fix headings by opposite steering if going reverse
-      heading_fix = segment_heading - car_heading
-      cte_fix = -80 * cte
-      if car_velocity < 0: #route.is_reverse():
-        heading_fix = -heading_fix
-        cte_fix = -2.*cte_fix # amplify fix for reverse
-        
-      steering_angle = standardized_degrees(heading_fix + cte_fix)
+      steering_angle = steering_angle_by_look_ahead(car,route)
       
       str_ms = car.steering_for_angle(steering_angle)
    
