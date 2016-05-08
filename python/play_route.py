@@ -58,8 +58,23 @@ def esc_for_velocity(goal_velocity, car, is_reverse):
   if goal_velocity == 0.:
     esc_ms = 1500
   return esc_ms
-      
 
+def steering_angle_by_cte(car, route):  
+  cte = route.cross_track_error()
+
+  # calculate steering
+  segment_heading = degrees(route.heading_radians())
+  car_heading = car.heading_degrees()
+
+  # fix headings by opposite steering if going reverse
+  heading_fix = segment_heading - car_heading
+  cte_fix = -80 * cte
+  if car.get_velocity_meters_per_second() < 0: #route.is_reverse():
+    heading_fix = -heading_fix
+    cte_fix = -2.*cte_fix # amplify fix for reverse
+    
+  steering_angle = standardized_degrees(heading_fix + cte_fix)
+  return steering_angle
 
 def drift(print_progress = True,car=None):
   # Start with a highly curved  route
@@ -106,23 +121,9 @@ def drift(print_progress = True,car=None):
         raise
       (x,y) = car.front_position()
       (rear_x,rear_y) = car.rear_position()
-      car_velocity = car.get_velocity_meters_per_second()
       route.set_position(x,y,rear_x,rear_y,car_velocity)
        
-      cte = route.cross_track_error()
-
-      # calculate steering
-      segment_heading = degrees(route.heading_radians())
-      car_heading = car.heading_degrees()
-
-      # fix headings by opposite steering if going reverse
-      heading_fix = segment_heading - car_heading
-      cte_fix = -80 * cte
-      if car_velocity < 0: #route.is_reverse():
-        heading_fix = -heading_fix
-        cte_fix = -2.*cte_fix # amplify fix for reverse
-        
-      steering_angle = standardized_degrees(heading_fix + cte_fix)
+      steering_angle = steering_angle_by_cte(car,route)
       
       str_ms = car.steering_for_angle(steering_angle)
    
@@ -143,7 +144,7 @@ def drift(print_progress = True,car=None):
            route.nodes[route.index+1].x,
            route.nodes[route.index+1].y,         
            route.velocity(),
-           car_velocity,
+           car.get_velocity_meters_per_second(),
            x,
            y,
            route.is_reverse(),
