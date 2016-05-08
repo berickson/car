@@ -179,7 +179,7 @@ class Car:
     if fields[1] != 'TD':
       return
     if len(fields) != 39:
-      print 'invalid TD packet with {} fields: {}'.format(len(fields),s)
+      #print 'invalid TD packet with {} fields: {}'.format(len(fields),s)
       return
       
     # todo, handle contention with different threads

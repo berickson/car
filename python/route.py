@@ -145,11 +145,15 @@ class Route:
           drx = x - p1.x
           dry = y - p1.y
         
-        # u is the robot estimate projected onto the path segment
-        progress = (drx * dx + dry * dy) / (dx * dx + dy * dy)
-        
-        # the cte is the estimate projected onto the normal of the path segment
-        cte = (dry * dx - drx * dy) / sqrt(dx * dx + dy * dy)
+        l =  sqrt(dx * dx + dy * dy)
+        if l < 0.000001:
+          progress = 1.1
+        else:
+          # u is the robot estimate projected onto the path segment
+          progress = (drx * dx + dry * dy) / (dx * dx + dy * dy)
+          
+          # the cte is the estimate projected onto the normal of the path segment
+          cte = (dry * dx - drx * dy) / l
       
       
       if progress < 1.0 or self.done():

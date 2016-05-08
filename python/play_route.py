@@ -1,4 +1,4 @@
-fl#!/usr/bin/env python2.7
+#!/usr/bin/env python2.7
 # coding: utf-8
 
 import sys,tty,termios
@@ -77,123 +77,15 @@ def steering_angle_by_cte(car, route):
   return steering_angle
 
 # steer to point t seconds + d meters ahead, use cte for reverse
-def steering_angle_by_look_ahead(car,route,d=0.05,t=0.1):
+def steering_angle_by_look_ahead(car,route,d=0.05,t=0.5):
   v = car.get_velocity_meters_per_second()
   if v < 0:
     return steering_angle_by_cte(car,route)
   (x,y) = route.get_position_ahead(d+v*t)
   car_x,car_y = car.front_position()
   heading_radians = car.heading_radians()
-  desired_radians = math.atan2(y-car_Y,x-car_x)
+  desired_radians = math.atan2(y-car_y,x-car_x)
   return degrees(desire_radians-heading_radians)
-
-
-def drift(print_progress = True,car=None):
-  # Start with a highly curved  route
-  route = Route()
-  
-  circles = 0.25
-  r = 1. # meters for circle
-  theta = 0.
-  steps = 360.
-  while theta < circles*2*pi:
-    route.add_node(r*sin(theta),r-r*cos(theta))
-    theta += (2*pi)/steps
-  
-  route.optimize_velocity(max_velocity = 99., max_acceleration = 99.)
-  print repr(route) 
-  
- 
-  
-  last_ms = None
-  
-  #print route 
-
-  
-  if car is None:
-    car = Car()
-  queue = Queue.Queue()
-  
-  try:
-    car.set_rc_mode()
-    car.add_listener(queue)
-    message = queue.get(block=True, timeout = 0.5)
-    #print repr(message)
-    last_ms = message.ms
-    start_time = time.time()
-
-    # keep going until we run out of track  
-    while True:
-      try:
-        message = queue.get(block=True, timeout = 0.5)
-      except:
-        print 'message timed out at: '+datetime.datetime.now().strftime("%H:%M:%S.%f")
-        print 'last message received:' + repr(message)
-        print 
-        raise
-      (x,y) = car.front_position()
-      (rear_x,rear_y) = car.rear_position()
-      route.set_position(x,y,rear_x,rear_y,car_velocity)
-       
-      #steering_angle = steering_angle_by_cte(car,route)
-      steering_angle = steering_angle_by_look_ahead(car,route)
-      
-      str_ms = car.steering_for_angle(steering_angle)
-   
-      drift_angle_degrees = standardized_degrees(segment_heading-car.heading_degrees())
-      if drift_angle_degrees > 30.:
-        esc_ms = esc_for_velocity(1.,car,False)
-      else:
-        esc_ms = esc_for_velocity(99.,car,False)
-      #esc_ms = esc_for_velocity(route.velocity(), car, route.is_reverse())
-      print 'heading',car.heading_degrees(),'seg',segment_heading,'drift angle',drift_angle_degrees
-      if route.done():
-        esc_ms = esc_for_velocity(0.,car,False)
-        
-      if print_progress and False:
-        print("t: {:.1f} i: {} xg: {:.2f} gy:{:.2f} gv: {:.2f}  v:{:.2f} x: {:.2f} y:{:.2f} reverse: {} cte:{:.2f} heading:{:.2f} segment_heading: {:.2f} steering_degrees: {:.2f} esc:{}".format(
-           time.time() - start_time,
-           route.index,
-           route.nodes[route.index+1].x,
-           route.nodes[route.index+1].y,         
-           route.velocity(),
-           car.get_velocity_meters_per_second(),
-           x,
-           y,
-           route.is_reverse(),
-           cte,
-           car_heading, 
-           segment_heading,
-           steering_angle,
-           esc_ms))
-     
-      
-      # send to car
-      car.set_esc_and_str(esc_ms, str_ms)
-      
-      
-      if route.done() and car_velocity == 0:
-        break;
-      
-  finally:
-    car.set_esc_and_str(1500,1500)
-    car.set_manual_mode()
-    car.remove_listener(queue)  
-
-  # Have outside front wheel following the desired route (alternatively use front center of car)
-  #Apply 100% speed
-  #Detect drift with these conditions:
-  #Heading change no longer follows Ackerman model
-  #Rear wheels  spinning
-  #While drifting:
-  #Update position as a function of steering angle, heading from imu, delta heading and delta wheel clicks (or velocity) of front wheel.
-  #Using the new car heading, calculate how outside front wheel will need to point to stay on track. Turn to that angle.
-  #If rear wheel is going at unsafe speed, decrease throttle
-  #If the front outside wheel can't turn to the outside enough to stay on the route, decrease throttle to decrease slip. This happens because the rear of the car slipped too far forward compared to the front.
-  #Try to maintain a car angle so that the front wheel still is about 10-20 degrees from its maximum steering angle.
-  #If front wheel can't turn to the outside enough, because it reached maximum steering angle, decrease throttle to create less slip so the rear of the car can swing back.
-  #If car angle is getting too close to path angle, increase throttle.
-  #If getting close to goal, stop drifting
 
 
 def play_route(route, car = None, print_progress = False):
@@ -318,7 +210,8 @@ def play_route_main():
   max_v = args.max_v
   
   if args.drift:
-    drift()
+    pass
+    #drift()
   else:
     input_path = args.input_path
     if input_path == "":
