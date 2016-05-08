@@ -71,9 +71,9 @@ class Route:
     self.nodes = []
     # a segment is from node[index] to node[index+1]
     self.index = 0
-    self.progress = 0.
+    self.segment_progress = 0.
     
-#    self.add_node(0,0)
+    self.add_node(0.,0.)
     self._done = False
     
   def __repr__(self):
@@ -92,10 +92,10 @@ class Route:
     return self.cte
   
   
-  def segment_progress(self):
-    if self.done():
-      return 1.
-    return self.segment_progress
+#  def segment_progress(self):
+#    if self.done():
+#      return 1.
+#    return self.segment_progress
   
   
   # analyse cross track error at current segment
@@ -155,6 +155,37 @@ class Route:
         self.index += 1
     self.segment_progress = progress
     self.cte = cte
+  
+  # returns (x,y) position of the point at distance d ahead of the current position
+  def get_position_ahead(self, d):
+    d = float(d)
+    i = self.index
+    done = False
+    segment_progress = self.segment_progress
+    while not done:
+      p1 = self.nodes[i]
+      p2 = self.nodes[i+1]
+      dx = p2.x-p1.x
+      dy = p2.y-p1.y
+      l = sqrt(dx*dx+dy*dy)
+      progress_d = l * segment_progress
+      remaining_d = l - progress_d
+      # go to next node 
+      # if we are past the end of this node 
+      # and there are nodes left
+      if d > remaining_d and i < len(self.nodes)-2:
+        i+=1
+        d -= remaining_d
+        segment_progress = 0.
+        continue
+      unit_x = dx/l
+      unit_y = dy/l
+      x = p1.x + segment_progress * dx
+      y = p1.y + segment_progress * dy
+      ahead_x = x+unit_x * d
+      ahead_y = y+unit_y * d
+      done = True
+    return (ahead_x,ahead_y)
 
   def velocity(self):
     if self.done(): return 0.
@@ -301,9 +332,7 @@ def test_reversing():
   route.optimize_velocity()
   print(route)
 
-
-def test_circle():
-  print 'testing a circle'
+def get_circle_route():
   route = Route()
   steps = 30
   r = 1
@@ -312,10 +341,26 @@ def test_circle():
     x = r * sin(theta)
     y = r - r * cos(theta)
     route.add_node(x,y)
+  return route
+
+def test_circle():
+  print 'testing a circle'
+  route = get_circle_route()
   route.optimize_velocity()
   print(route)
+
+def test_position_ahead():
+  print 'testing position_ahead with a circle'
+  route = get_circle_route()
+  print 'd,x,y'
+  for d in np.arange(0,10,0.1):
+    x,y = route.get_position_ahead(d)
+    print d,x,y
+  
  
 if __name__ == '__main__':
+  test_position_ahead()
   test_circle()
   test_straight_line()
   test_reversing()
+
