@@ -80,6 +80,12 @@ def shutdown():
   time.sleep(0.25)
   car.lcd.set_backlight(0)
   os.system('sudo shutdown now /r')
+
+def restart():
+  car.display_text("restart svc")
+  time.sleep(0.25)
+  car.lcd.set_backlight(0)
+  os.system('sudo service car restart')
   
 sub1 = [MenuItem(lambda:time.strftime('%H:%M:%S'))];
 
@@ -98,7 +104,8 @@ def selection_menu(value_function, values):
 
 pi_menu = [
   MenuItem('reboot',action=reboot),
-  MenuItem('shutdown',action=shutdown)
+  MenuItem('shutdown',action=shutdown),
+  MenuItem('restart svc',action=restart)
   ]
 
 
@@ -134,6 +141,7 @@ route_menu = [
 
 
 vars_menu = [
+  MenuItem(lambda:'usb_errors: {0}'.format(car.get_usb_error_count())),
   MenuItem(lambda:'frnt:{0},{1}'.format(fixed_float_string(car.front_position()[0],4),
       fixed_float_string(car.front_position()[1],4))),
   MenuItem(lambda:'rear:{0},{1}'.format(fixed_float_string(car.rear_position()[0],4),
@@ -151,7 +159,6 @@ main_menu = [
       fixed_float_string(car.front_position()[0],4),
       fixed_float_string(car.front_position()[1],4)
       ),sub_menu = sub1),
-    MenuItem(lambda:'usb_errors: {0}'.format(car.get_usb_error_count())),
     MenuItem(lambda:ip_address()),
     MenuItem('route',sub_menu=route_menu),
     MenuItem('pi',sub_menu = pi_menu),
