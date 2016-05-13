@@ -61,6 +61,7 @@ class Car:
     self.listener = None
     self.last_verified_velocity = 0.0
     self.lcd = None
+    self.usb_error_count = 0
     
     if self.online:
       self.lcd = Lcd()
@@ -179,6 +180,7 @@ class Car:
     if fields[1] != 'TD':
       return
     if len(fields) != 39:
+      self.usb_error_count = self.usb_error_count + 1
       #print 'invalid TD packet with {} fields: {}'.format(len(fields),s)
       return
       
@@ -201,6 +203,9 @@ class Car:
     if self.listener != None:
       self.listener.put(current)
   
+  def get_usb_error_count(self):
+    return self.usb_error_count
+    
   # returns ping distance in meters
   def ping_inches(self):
     return self.ping_meters()/0.0254
@@ -361,6 +366,15 @@ class Car:
 
   def odometer_meters(self):
     return (self.dynamics.odometer_ticks - self.odometer_start) * self.meters_per_odometer_tick
+  
+  def odometer_front_left(self):
+    return self.dynamics.odometer_front_left
+  def odometer_front_right(self):
+    return self.dynamics.odometer_front_right
+  def odometer_back_left(self):
+    return self.dynamics.odometer_back_left
+  def odometer_back_right(self):
+    return self.dynamics.odometer_back_right
  
   # returns where you should steer to if you wish to go to goal_heading
   def steering_for_goal_heading_degrees(self, goal_heading, reverse = False):

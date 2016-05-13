@@ -138,7 +138,11 @@ vars_menu = [
       fixed_float_string(car.front_position()[1],4))),
   MenuItem(lambda:'rear:{0},{1}'.format(fixed_float_string(car.rear_position()[0],4),
       fixed_float_string(car.rear_position()[1],4))),
-  MenuItem(lambda:'head: {0}'.format(fixed_float_string(car.heading_degrees(),4)))
+  MenuItem(lambda:'head: {0}'.format(fixed_float_string(car.heading_degrees(),4))),
+  MenuItem(lambda:'odo_fl: {0}'.format(car.odometer_front_left())),
+  MenuItem(lambda:'odo_fr: {0}'.format(car.odometer_front_right())),
+  MenuItem(lambda:'odo_bl: {0}'.format(car.odometer_back_left())),
+  MenuItem(lambda:'odo_br: {0}'.format(car.odometer_back_right()))
   ]
 
 main_menu = [
@@ -147,6 +151,7 @@ main_menu = [
       fixed_float_string(car.front_position()[0],4),
       fixed_float_string(car.front_position()[1],4)
       ),sub_menu = sub1),
+    MenuItem(lambda:'usb_errors: {0}'.format(car.get_usb_error_count())),
     MenuItem(lambda:ip_address()),
     MenuItem('route',sub_menu=route_menu),
     MenuItem('pi',sub_menu = pi_menu),
