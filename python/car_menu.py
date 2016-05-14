@@ -141,30 +141,31 @@ route_menu = [
   ]
 
 
-vars_menu = [
-  MenuItem(lambda:'usb_errors: {0}'.format(car.get_usb_error_count())),
-  MenuItem(lambda:'frnt:{0},{1}'.format(fixed_float_string(car.front_position()[0],4),
-      fixed_float_string(car.front_position()[1],4))),
-  MenuItem(lambda:'rear:{0},{1}'.format(fixed_float_string(car.rear_position()[0],4),
-      fixed_float_string(car.rear_position()[1],4))),
-  MenuItem(lambda:'head: {0}'.format(fixed_float_string(car.heading_degrees(),4))),
-  MenuItem(lambda:'odo_fl: {0}'.format(car.odometer_front_left())),
-  MenuItem(lambda:'odo_fr: {0}'.format(car.odometer_front_right())),
-  MenuItem(lambda:'odo_bl: {0}'.format(car.odometer_back_left())),
-  MenuItem(lambda:'odo_br: {0}'.format(car.odometer_back_right()))
-  ]
-
 main_menu = [
+    MenuItem('route',sub_menu=route_menu),
+    MenuItem('pi',sub_menu = pi_menu),
+##    MenuItem('vars',sub_menu = vars_menu)
+    ]
+
+
+vars_menu = [
     MenuItem(lambda:'{0:3.1f}v{1},{2}'.format(
       car.battery_voltage(),
       fixed_float_string(car.front_position()[0],4),
       fixed_float_string(car.front_position()[1],4)
-      ),sub_menu = sub1),
-    MenuItem(lambda:ip_address()),
-    MenuItem('route',sub_menu=route_menu),
-    MenuItem('pi',sub_menu = pi_menu),
-    MenuItem('vars',sub_menu = vars_menu)
-    ]
+      ),sub_menu = main_menu),
+    MenuItem(lambda:ip_address(),sub_menu = main_menu),
+  MenuItem(lambda:'usb_errors: {0}'.format(car.get_usb_error_count()),sub_menu = main_menu),
+  MenuItem(lambda:'frnt:{0},{1}'.format(fixed_float_string(car.front_position()[0],4),
+      fixed_float_string(car.front_position()[1],4)),sub_menu = main_menu),
+  MenuItem(lambda:'rear:{0},{1}'.format(fixed_float_string(car.rear_position()[0],4),
+      fixed_float_string(car.rear_position()[1],4)),sub_menu = main_menu),
+  MenuItem(lambda:'head: {0}'.format(fixed_float_string(car.heading_degrees(),4)),sub_menu = main_menu),
+  MenuItem(lambda:'odo_fl: {0}'.format(car.odometer_front_left()),sub_menu = main_menu),
+  MenuItem(lambda:'odo_fr: {0}'.format(car.odometer_front_right()),sub_menu = main_menu),
+  MenuItem(lambda:'odo_bl: {0}'.format(car.odometer_back_left()),sub_menu = main_menu),
+  MenuItem(lambda:'odo_br: {0}'.format(car.odometer_back_right()),sub_menu = main_menu)
+  ]
 
 
 class Menu:
@@ -254,7 +255,7 @@ class Menu:
 def main():
   global car
   car = Car()
-  menu = Menu(main_menu)
+  menu = Menu(vars_menu)
   menu.run()
   del car
 
