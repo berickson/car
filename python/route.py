@@ -65,6 +65,25 @@ class RouteNode:
     self.meters_per_second = float(meters_per_second)
     self.velocity = float(velocity)
 
+
+def smooth(path, weight_data = 0.5, weight_smooth = 0.1, tolerance = 0.0001):
+  newpath = [[0 for row in range(len(path[0]))] for col in range(len(path))]
+  for i in range(len(path)):
+    for j in range(len(path[0])):
+      newpath[i][j] = path[i][j]
+  change = tolerance
+  while change >= tolerance:
+    change = 0.0
+    for i in range(1,len(path)-1):
+      for j in range(len(path[0])):
+        aux = newpath[i][j]
+        newpath[i][j] += weight_data * (path[i][j] - newpath[i][j])
+        newpath[i][j] += weight_smooth * (newpath[i-1][j] + newpath[i+1][j] - (2.0*newpath[i][j]))
+        change += abs(aux-newpath[i][j])
+  return newpath
+        
+
+
 class Route:
   def __init__(self):
     self.columns = ["secs","x","y","rear_x", "rear_y", "reverse", "heading","adj","esc","str","m/s"];
@@ -75,6 +94,20 @@ class Route:
     
     self.add_node(0.,0.)
     self._done = False
+    
+  def get_coordinates(self):
+    return [(node.x,node.y) for node in self.nodes]
+
+  def max_velocity(self):  
+    return max([n.velocity for n in self.nodes])
+  
+  def smooth(self):
+    a = self.get_coordinates()
+    b = smooth(a,weight_smooth = 0.4)
+    for i in range(len(a)):
+      self.nodes[i].x = b[i][0]
+      self.nodes[i].y = b[i][1]
+
     
   def __repr__(self):
     return "\n".join([ (str(i)+" " + str(self.nodes[i])) for i in range(len(self.nodes))])
@@ -366,9 +399,24 @@ def test_position_ahead():
   for d in np.arange(0,10,0.1):
     x,y = route.get_position_ahead(d)
     print d,x,y
-  
- 
+
+def test_smooth():
+    rte = Route()
+    rte.load_from_file('recordings/recording_179.csv.path')
+    rte.optimize_velocity(max_velocity = 10., max_acceleration = 10.)
+    
+    print rte
+    print rte.max_velocity()
+    rte.smooth()
+    rte.optimize_velocity(max_velocity = 10., max_acceleration = 10.)
+    print rte
+    print rte.max_velocity()
+
+    
 if __name__ == '__main__':
+  test_smooth()
+  #print smooth(((0,0),(0,1),(1,1)))
+  exit()
   test_position_ahead()
   test_circle()
   test_straight_line()

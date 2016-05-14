@@ -123,6 +123,7 @@ def go():
     rte = route.Route()
     car.display_text('loading route')
     rte.load_from_file(input_path)
+    rte.smooth()
     rte.optimize_velocity(max_velocity = config.max_v, max_acceleration = config.max_a)
     car.display_text('playing route')
     play_route(rte, car)
