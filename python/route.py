@@ -101,9 +101,9 @@ class Route:
   def max_velocity(self):  
     return max([n.velocity for n in self.nodes])
   
-  def smooth(self):
+  def smooth(self, k_smooth = 0.4):
     a = self.get_coordinates()
-    b = smooth(a,weight_smooth = 0.4)
+    b = smooth(a,weight_smooth = k_smooth)
     for i in range(len(a)):
       self.nodes[i].x = b[i][0]
       self.nodes[i].y = b[i][1]

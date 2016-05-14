@@ -77,18 +77,18 @@ def steering_angle_by_cte(car, route):
   return steering_angle
 
 # steer to point t seconds + d meters ahead, use cte for reverse
-def steering_angle_by_look_ahead(car,route,d=0.05,t=0.2):
+def steering_angle_by_look_ahead(car,route,d_ahead=0.05,t_ahead=0.2):
   v = car.get_velocity_meters_per_second()
   if v < 0:
     return steering_angle_by_cte(car,route)
-  (x,y) = route.get_position_ahead(d+v*t)
+  (x,y) = route.get_position_ahead(d_ahead+v*t_ahead)
   car_x,car_y = car.front_position()
   heading_radians = car.heading_radians()
   desired_radians = atan2(y-car_y,x-car_x)
   return standardized_degrees(degrees(desired_radians-heading_radians))
 
 
-def play_route(route, car = None, print_progress = False):
+def play_route(route, car = None, print_progress = False, k_smooth = 0.4, d_ahead = 0.05, t_ahead = 0.2):
   last_ms = None
   
   #print route 
@@ -121,7 +121,7 @@ def play_route(route, car = None, print_progress = False):
       car_velocity = car.get_velocity_meters_per_second()
       route.set_position(x,y,rear_x,rear_y,car_velocity)
        
-      steering_angle = steering_angle_by_look_ahead(car,route)
+      steering_angle = steering_angle_by_look_ahead(car,route,d_ahead,t_ahead)
       
       str_ms = car.steering_for_angle(steering_angle)
    
@@ -214,7 +214,7 @@ def play_route_main():
     print route
     print 'playing route now, press ctrl-c to abort'
   
-    play_route(route, print_progress = args.trace)
+    play_route(route, print_progress = args.trace, k_smooth = config.k_smooth, d_ahead = config.d_head, t_ahead = config.t_ahead)
   
 if __name__ == '__main__':
   play_route()
