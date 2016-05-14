@@ -150,8 +150,8 @@ def go():
 
 acceleration_menu = selection_menu(max_a, np.arange(0.25,10.1,0.25))
 velocity_menu = selection_menu(max_v,np.arange(0.5,20.1,0.5))
-k_smooth_menu = selection_menu(k_smooth,np.arange(0.,1.1,0.5))
-t_ahead_menu = selection_menu(t_ahead,np.arange(0.,1.1,0.5))
+k_smooth_menu = selection_menu(k_smooth,np.arange(0.,1.1,0.1))
+t_ahead_menu = selection_menu(t_ahead,np.arange(0.,1.1,0.1))
 d_ahead_menu = selection_menu(d_ahead,np.arange(0.,1.001,0.01))
 
   
