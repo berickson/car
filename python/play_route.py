@@ -77,7 +77,7 @@ def steering_angle_by_cte(car, route):
   return steering_angle
 
 # steer to point t seconds + d meters ahead, use cte for reverse
-def steering_angle_by_look_ahead(car,route,d=0.05,t=0.5):
+def steering_angle_by_look_ahead(car,route,d=0.05,t=0.2):
   v = car.get_velocity_meters_per_second()
   if v < 0:
     return steering_angle_by_cte(car,route)
