@@ -29,6 +29,9 @@ class Config:
 config = Config()
 config.max_a = 0.1
 config.max_v = 1.0
+config.t_ahead = 0.2
+config.d_ahead = 0.05
+config.k_smooth = 0.4
 
 
 class MenuItem:
@@ -66,6 +69,22 @@ def max_v(v = None):
   if v is not None:
     config.max_v = v
   return config.max_v
+
+def t_ahead(t = None):
+  if t is not None:
+    config.t_ahead = t
+  return config.t_ahead
+
+def d_ahead(d = None):
+  if d is not None:
+    config.d_ahead = d
+  return config.d_ahead
+
+def k_smooth(k = None):
+  if k is not None:
+    config.k_smooth = k
+  return config.k_smooth
+
 
 # reboot the computer
 def reboot():
@@ -123,13 +142,17 @@ def go():
     rte = route.Route()
     car.display_text('loading route')
     rte.load_from_file(input_path)
-    rte.smooth()
+    rte.smooth(k_smooth=config.k_smooth)
     rte.optimize_velocity(max_velocity = config.max_v, max_acceleration = config.max_a)
     car.display_text('playing route')
-    play_route(rte, car)
+    # todo: pass around config object instead
+    play_route(rte, car, k_smooth = config.k_smooth, d_ahead = config.d_ahead, t_ahead = config.t_ahead)
 
 acceleration_menu = selection_menu(max_a, np.arange(0.25,10.1,0.25))
 velocity_menu = selection_menu(max_v,np.arange(0.5,20.1,0.5))
+k_smooth_menu = selection_menu(k_smooth,np.arange(0.,1.1,0.5))
+t_ahead_menu = selection_menu(t_ahead,np.arange(0.,1.1,0.5))
+d_ahead_menu = selection_menu(d_ahead,np.arange(0.,1.001,0.01))
 
   
 route_menu = [
@@ -137,7 +160,10 @@ route_menu = [
   MenuItem('make path',action=make_path),
   MenuItem('record',action=record),
   MenuItem(lambda:'max_a[{}]'.format(config.max_a),sub_menu = acceleration_menu ),
-  MenuItem(lambda:'max_v[{}]'.format(config.max_v),sub_menu = velocity_menu)
+  MenuItem(lambda:'max_v[{}]'.format(config.max_v),sub_menu = velocity_menu),
+  MenuItem(lambda:'k_smooth[{}]'.format(config.k_smooth),sub_menu = k_smooth_menu),
+  MenuItem(lambda:'t_ahead[{}]'.format(config.t_ahead),sub_menu = t_ahead_menu),
+  MenuItem(lambda:'d_ahead[{}]'.format(config.d_ahead),sub_menu = d_ahead_menu)
   ]
 
 
