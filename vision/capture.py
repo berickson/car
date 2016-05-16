@@ -2,7 +2,7 @@
 import numpy as np
 import cv2
 
-seconds = 30
+seconds = 10
 fps = 30.0
 width = 320
 height = 240
@@ -28,8 +28,11 @@ for cap in caps:
 # XVID    24.026s   23.926s
 
 
-codec = 'x264' # 32.451s 100 frames 640x480 
-#codec = 'MJPG' # 24.222s
+#codec = 'x264' # 300% cpu 
+
+#codec = 'theo' # 1 min 30s for 30s of 320x240x30fps
+codec = 'MJPG' # 90% cpu
+codec = 'MPEG'
 #codec = 'XVID' # 24.026s
 
 fourcc = cv2.VideoWriter_fourcc(*codec)
