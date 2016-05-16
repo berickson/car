@@ -48,6 +48,7 @@ def grab_images():
   print 'found',str(len(grabbers)),'cameras'
   
   interval = Interval(10.)
+  grab_number = 0
   while True:
     c = cv2.waitKey(1)
     if c <> -1:
@@ -62,41 +63,61 @@ def grab_images():
       if interval.occurred():
         print grabber.stats()
         
-    for i in range(len(images)):
-      cv2.imshow(str(i),images[i])
     if c == ord(' '):
+      grab_number += 1
       print 'saving images'
       for i in range(len(images)):
-        cv2.imwrite('img_'+str(i)+'.png',images[i])
+        cv2.imwrite('img_'+str(grab_number)+'_'+str(i)+'.png',images[i])
+    for i in range(len(images)):
+      add_chessboard_corners(images[i])
+      cv2.imshow(str(i),images[i])
    
   for grabber in grabbers:
     grabber.quit()
+
+chessboard_rows = 8
+chessboard_cols = 6
+
+
+def add_chessboard_corners(img,rows=8,cols=6):
+  gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+  ret, corners = cv2.findChessboardCorners(gray, (rows,cols),None)
+
+  # If found, add object points, image points (after refining them)
+  if ret == True:
+      criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+      cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
+      # Draw and display the corners
+      cv2.drawChessboardCorners(img, (rows,cols), corners,ret)
+
     
 
 if get_yes_no('do you want to grab images?'):
     grab_images()
     exit()
 
+folder = 'm1_cal'
+
 
 # termination criteria
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
 # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
-objp = np.zeros((6*7,3), np.float32)
-objp[:,:2] = np.mgrid[0:7,0:6].T.reshape(-1,2)
+objp = np.zeros((chessboard_rows*chessboard_cols,3), np.float32)
+objp[:,:2] = np.mgrid[0:chessboard_rows,0:chessboard_cols].T.reshape(-1,2)
 
 # Arrays to store object points and image points from all the images.
 objpoints = [] # 3d point in real world space
 imgpoints = [] # 2d points in image plane.
 
-images = glob.glob('data/*.jpg')
+images = glob.glob(folder+'/*0.png')
 
 for fname in images:
     img = cv2.imread(fname)
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
     # Find the chess board corners
-    ret, corners = cv2.findChessboardCorners(gray, (7,6),None)
+    ret, corners = cv2.findChessboardCorners(gray, (chessboard_rows,chessboard_cols),None)
 
     # If found, add object points, image points (after refining them)
     if ret == True:
@@ -106,7 +127,7 @@ for fname in images:
         imgpoints.append(corners)
         if show_images:
             # Draw and display the corners
-            cv2.drawChessboardCorners(img, (7,6), corners,ret)
+            cv2.drawChessboardCorners(img, (chessboard_rows,chessboard_cols), corners,ret)
             cv2.imshow('img',img)
             cv2.waitKey(500)
 
@@ -119,7 +140,7 @@ cv2.destroyAllWindows()
 ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(
     objpoints, imgpoints, gray.shape[::-1],None,None)
 
-img = cv2.imread('data/left12.jpg')
+img = cv2.imread(images[0])
 h,  w = img.shape[:2]
 newcameramtx, roi=cv2.getOptimalNewCameraMatrix(mtx,dist,(w,h),1,(w,h))
 
@@ -152,7 +173,7 @@ for fname in images:
     outfile = 'output/undistor-{0}.jpg'.format(filename_from_path(fname))
     cv2.imwrite(outfile,dst)
 
-print "remaping images"
+print "remapping images"
 ###################################
 # Medhod 2 - remap
 for fname in images:

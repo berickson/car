@@ -3,11 +3,11 @@ import numpy as np
 import cv2
 
 seconds = 30
-fps = 60.0
-width = 640
-height = 480
+fps = 30.0
+width = 320
+height = 240
 size = (width, height)
-cam_nums = [0]
+cam_nums = [0,1]
 caps = [cv2.VideoCapture(n) for n in cam_nums]
 
 for cap in caps:
@@ -35,12 +35,16 @@ codec = 'x264' # 32.451s 100 frames 640x480
 fourcc = cv2.VideoWriter_fourcc(*codec)
 
 outs = [cv2.VideoWriter('out'+str(n)+'.avi',fourcc,fps,size) for n in cam_nums]
+for o in outs:
+  o.set(cv2.CAP_PROP_FRAME_WIDTH,width)
+  o.set(cv2.CAP_PROP_FRAME_HEIGHT,height)
+  o.set(cv2.CAP_PROP_FPS,fps)
 
 frames_grabbed = 0
 buffers = [cap.read()[1] for cap in caps]
 #ret, buffer1 = cap1.read()
 #ret, buffer2 = cap1.read()
-frames_to_grab = 200
+frames_to_grab = seconds * fps
 while(caps[0].isOpened() and frames_grabbed < frames_to_grab):
     for cap in caps: cap.grab()
     frames = list()
