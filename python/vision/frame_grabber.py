@@ -83,13 +83,13 @@ class FrameGrabber:
     self._quit = True
     self._thread.join()
     
-  def read(self):
+  def read(self, buffer = None):
     FrameGrabber.lock.acquire()
     try:
-      if self.img is None:
-        retval,img = self.camera.retrieve()
-      else:
+      if buffer == None:
         retval,img = self.camera.retrieve(self.img)
+      else:
+        retval,img = self.camera.retrieve(buffer)
       if retval: 
         self.img = img
         self.read_stats.increment()
