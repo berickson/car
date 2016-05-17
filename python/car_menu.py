@@ -14,6 +14,8 @@ from make_route import write_path_from_recording_file
 from play_route import play_route
 from filenames import *
 
+import vision.capture
+
 shutdown_flag = False
 
 # stackoverflow answer from http://stackoverflow.com/a/1267524/383967
@@ -146,7 +148,10 @@ def go():
     rte.optimize_velocity(max_velocity = config.max_v, max_acceleration = config.max_a)
     car.display_text('playing route')
     # todo: pass around config object instead
+    capture = vision.capture.Capture()
+    capture.begin()
     play_route(rte, car, k_smooth = config.k_smooth, d_ahead = config.d_ahead, t_ahead = config.t_ahead)
+    capture.end()
 
 acceleration_menu = selection_menu(max_a, np.arange(0.25,10.1,0.25))
 velocity_menu = selection_menu(max_v,np.arange(0.5,20.1,0.5))
