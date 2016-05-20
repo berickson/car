@@ -8,7 +8,8 @@ import frame_grabber
 
 
 class Capture:
-  def __init__(self):
+  def __init__(self, base_file_path = ""):
+    self.base_file_path = base_file_path
     pass
     
   def begin(self):
@@ -47,7 +48,7 @@ class Capture:
     codec = 'MPEG'
     fourcc = cv2.VideoWriter_fourcc(*codec)
 
-    outs = [cv2.VideoWriter('out'+str(n)+'.avi',fourcc,fps,size) for n in cam_nums]
+    outs = [cv2.VideoWriter(self.base_file_path+str(n)+'.avi',fourcc,fps,size) for n in cam_nums]
     for o in outs:
       o.set(cv2.CAP_PROP_FRAME_WIDTH,width)
       o.set(cv2.CAP_PROP_FRAME_HEIGHT,height)
@@ -58,6 +59,7 @@ class Capture:
     frames_to_grab = seconds * fps
     while(not self.done):
         for n in range(len(self.grabbers)):
+          time.sleep(0.01)
           grabber = self.grabbers[i]
           ret,frame = grabber.read(buffers[n]) 
           if ret==False:

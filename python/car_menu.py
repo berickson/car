@@ -141,15 +141,16 @@ def make_path():
 def go():
     car.reset_odometry()
     input_path = latest_filename('recordings','recording','csv.path')
+    capture_base_path = input_path
+    capture = vision.capture.Capture(base_file_path = capture_base_path)
+    capture.begin()
+
     rte = route.Route()
     car.display_text('loading route')
     rte.load_from_file(input_path)
     rte.smooth(k_smooth=config.k_smooth)
     rte.optimize_velocity(max_velocity = config.max_v, max_acceleration = config.max_a)
     car.display_text('playing route')
-    # todo: pass around config object instead
-    capture = vision.capture.Capture()
-    capture.begin()
     play_route(rte, car, k_smooth = config.k_smooth, d_ahead = config.d_ahead, t_ahead = config.t_ahead)
     capture.end()
 
