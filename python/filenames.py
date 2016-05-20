@@ -1,3 +1,6 @@
+#!/usr/bin/env python2.7
+# coding: utf-8
+
 import os.path
 import re
 
@@ -19,13 +22,53 @@ def next_filename(folder = '.', prefix = 'file', suffix = ''):
     latest_number = int(m.group(1)) if m != None else 0
   return os.path.join(folder, prefix +"_{:03}".format(latest_number + 1) + suffix)
 
+
+class FileNames:
+  def __init__(self, tracks_folder = '../tracks'):
+    self.tracks_folder = os.path.abspath(tracks_folder)
+  
+  def get_track_folder(self,track_name):
+    return os.path.join(self.tracks_folder, track_name)
+    
+  def get_track_names(self):
+    return [p for p in os.listdir(self.tracks_folder) if os.path.isdir(self.get_track_folder(p))]
+    
+  def get_routes_folder(self,track_name):
+    return os.path.join(self.get_track_folder(track_name),'routes')
+
+  def get_route_folder(self,track_name, route_name):
+    return os.path.join(self.get_routes_folder(track_name),route_name)
+    
+  def get_route_names(self,tracK_name):
+    return [p for p in os.listdir(self.tracks_folder) if os.path.isdir(self.get_track_folder(p))]
+  
+  def get_runs_folder(self, track_name, route_name):
+    return os.path.join(self.get_route_folder(track_name,route_name),'runs')
+  
+  def next_route(self,track_name):
+    i = 1
+    while i < 100:
+      route_name = str(i)
+      if not os.path.exists(self.get_route_folder(track_name, route_name)):
+        return route_name
+      i += 1
+    raise 'could not find empty route'
+        
+
 if __name__ == '__main__':
+  f = FileNames()
+  print 'track names',f.get_track_names()
+  tracks = f.get_track_names()
+  track_name = f.get_track_names()[0]
+  print 'routes folder for {0}'.format(track_name),f.get_routes_folder(track_name)
+  print 'next route for {0}'.format(track_name),f.next_route(track_name)
+  route_name = f.get_route_names(track_name)[0]
+  print 'runs folder for {0},{1}'.format(track_name,route_name), f.get_runs_folder(track_name, route_name)
+  exit()
   print latest_filename('.','recording','.csv')
   print next_filename('.','recording','.csv')
   print latest_filename('.','other','.csv')
   print next_filename('.','other','.csv')
   print next_filename()
   print next_filename(folder='recordings',prefix='recording',suffix='.csv')
-
-
 
