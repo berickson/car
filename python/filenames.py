@@ -3,6 +3,7 @@
 
 import os.path
 import re
+import string
 
 import glob
 
@@ -31,7 +32,9 @@ class FileNames:
     return os.path.join(self.tracks_folder, track_name)
     
   def get_track_names(self):
-    return [p for p in os.listdir(self.tracks_folder) if os.path.isdir(self.get_track_folder(p))]
+    track_names =  [p for p in os.listdir(self.tracks_folder) if os.path.isdir(self.get_track_folder(p))]
+    track_names.sort()
+    return track_names
     
   def get_routes_folder(self,track_name):
     return os.path.join(self.get_track_folder(track_name),'routes')
@@ -39,18 +42,41 @@ class FileNames:
   def get_route_folder(self,track_name, route_name):
     return os.path.join(self.get_routes_folder(track_name),route_name)
     
-  def get_route_names(self,tracK_name):
-    return [p for p in os.listdir(self.tracks_folder) if os.path.isdir(self.get_track_folder(p))]
+  def get_route_names(self,track_name):
+    route_names = [p for p in os.listdir(self.get_routes_folder(track_name)) if os.path.isdir(self.get_route_folder(track_name,p))]
+    route_names.sort()
+    return route_names
   
   def get_runs_folder(self, track_name, route_name):
     return os.path.join(self.get_route_folder(track_name,route_name),'runs')
   
-  def next_route(self,track_name):
-    i = 1
-    while i < 100:
-      route_name = str(i)
+  def get_run_folder(self, track_name, route_name, run_name):
+    return os.path.join(self.get_runs_folder(track_name,route_name),run_name)
+
+  def next_route_name(self,track_name):
+    for route_name in list(string.ascii_uppercase):
       if not os.path.exists(self.get_route_folder(track_name, route_name)):
         return route_name
+    raise 'could not find empty route'
+  
+  def recording_file_path(self,track_name, route_name):
+    return os.path.join(self.get_route_folder(track_name,route_name),'recording.csv')
+    
+  def stereo_video_file_paths(self,track_name, route_name, run_name):
+    folder = self.get_run_folder(track_name, route_name, run_name)
+    return [os.path.join(folder,'video_left.avi'),os.path.join(folder,'video_right.avi')]
+  
+
+    return os.path.join(self.get_route_folder(track_name,route_name),'recording.csv')
+    
+  def path_file_path(self,track_name, route_name):
+    return os.path.join(self.get_route_folder(track_name,route_name),'path.csv')
+
+  def next_run_name(self,track_name,route_name):
+    for i in range(99):
+      run_name = str(i+1)
+      if not os.path.exists(self.get_run_folder(track_name, route_name, run_name)):
+        return run_name
       i += 1
     raise 'could not find empty route'
         
@@ -61,9 +87,11 @@ if __name__ == '__main__':
   tracks = f.get_track_names()
   track_name = f.get_track_names()[0]
   print 'routes folder for {0}'.format(track_name),f.get_routes_folder(track_name)
-  print 'next route for {0}'.format(track_name),f.next_route(track_name)
+  print 'routes for {0}'.format(track_name),f.get_route_names(track_name)
+  print 'next route name for {0}'.format(track_name),f.next_route_name(track_name)
   route_name = f.get_route_names(track_name)[0]
-  print 'runs folder for {0},{1}'.format(track_name,route_name), f.get_runs_folder(track_name, route_name)
+  print 'runs folder for {0}, {1}'.format(track_name,route_name), f.get_runs_folder(track_name, route_name)
+  print 'next run name for {0}, {1}'.format(track_name,route_name), f.next_run_name(track_name, route_name)
   exit()
   print latest_filename('.','recording','.csv')
   print next_filename('.','recording','.csv')

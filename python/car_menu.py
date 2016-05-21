@@ -29,6 +29,8 @@ def ip_address():
 class Config:
   pass
 config = Config()
+config.track_name = 'desk'
+config.route_name = FileNames().get_route_names(config.track_name)[0]
 config.max_a = 0.1
 config.max_v = 1.0
 config.t_ahead = 0.2
@@ -86,6 +88,16 @@ def k_smooth(k = None):
   if k is not None:
     config.k_smooth = k
   return config.k_smooth
+  
+def track_name(n = None):
+  if n is not None:
+    config.track_name = n
+  return config.track_name
+
+def route_name(n = None):
+  if n is not None:
+    config.route_name = n
+  return config.route_name
 
 
 # reboot the computer
@@ -132,17 +144,29 @@ pi_menu = [
 
 def record():
   car.reset_odometry()
-  make_recording(car = car)
-
-def make_path():
+  f = FileNames()
+  track_name = config.track_name
+  route_name = f.next_route_name(track_name)
+  os.makedirs(f.get_route_folder(track_name, route_name))
+  
+  recording_file_path = f.recording_file_path(track_name, route_name)
+  make_recording(car = car, recording_file_path = recording_file_path )
   car.lcd.display_text("making path")
-  write_path_from_recording_file()
+  path_file_path = f.path_file_path(track_name, route_name)
+  write_path_from_recording_file(inpath=recording_file_path,outpath=path_file_path)
+  config.route_name = route_name
+  update_route_menu()
 
 def go():
+    f = FileNames()
+    config.run_name = f.next_run_name(config.track_name, config.route_name)
+    run_folder = f.get_run_folder(config.track_name, config.route_name, config.run_name)
+    os.makedirs(run_folder)
+    
     car.reset_odometry()
-    input_path = latest_filename('recordings','recording','csv.path')
-    capture_base_path = input_path
-    capture = vision.capture.Capture(base_file_path = capture_base_path)
+    input_path = f.path_file_path(config.track_name,config.route_name)
+    stereo_video_paths = f.stereo_video_file_paths(config.track_name,config.route_name,config.run_name)
+    capture = vision.capture.Capture(stereo_video_paths=stereo_video_paths)
     capture.begin()
 
     rte = route.Route()
@@ -159,19 +183,23 @@ velocity_menu = selection_menu(max_v,np.arange(0.5,20.1,0.5))
 k_smooth_menu = selection_menu(k_smooth,np.arange(0.,1.1,0.1))
 t_ahead_menu = selection_menu(t_ahead,np.arange(0.,1.1,0.1))
 d_ahead_menu = selection_menu(d_ahead,np.arange(0.,1.001,0.01))
+track_selection_menu = selection_menu(track_name, FileNames().get_track_names())
+route_selection_menu = selection_menu(route_name, FileNames().get_route_names(config.track_name))
 
-  
-route_menu = [
-  MenuItem('go',action=go),
-  MenuItem('make path',action=make_path),
-  MenuItem('record',action=record),
-  MenuItem(lambda:'max_a[{}]'.format(config.max_a),sub_menu = acceleration_menu ),
-  MenuItem(lambda:'max_v[{}]'.format(config.max_v),sub_menu = velocity_menu),
-  MenuItem(lambda:'k_smooth[{}]'.format(config.k_smooth),sub_menu = k_smooth_menu),
-  MenuItem(lambda:'t_ahead[{}]'.format(config.t_ahead),sub_menu = t_ahead_menu),
-  MenuItem(lambda:'d_ahead[{}]'.format(config.d_ahead),sub_menu = d_ahead_menu)
-  ]
-
+def update_route_menu():  
+  global route_menu
+  route_menu = [
+    MenuItem(lambda:'track[{}]'.format(config.track_name),sub_menu=track_selection_menu),
+    MenuItem(lambda:'route[{}]'.format(config.route_name),sub_menu=route_selection_menu),
+    MenuItem('go',action=go),
+    MenuItem('record',action=record),
+    MenuItem(lambda:'max_a[{}]'.format(config.max_a),sub_menu = acceleration_menu ),
+    MenuItem(lambda:'max_v[{}]'.format(config.max_v),sub_menu = velocity_menu),
+    MenuItem(lambda:'k_smooth[{}]'.format(config.k_smooth),sub_menu = k_smooth_menu),
+    MenuItem(lambda:'t_ahead[{}]'.format(config.t_ahead),sub_menu = t_ahead_menu),
+    MenuItem(lambda:'d_ahead[{}]'.format(config.d_ahead),sub_menu = d_ahead_menu)
+    ]
+update_route_menu()
 
 main_menu = [
     MenuItem('route',sub_menu=route_menu),

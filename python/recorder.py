@@ -34,7 +34,7 @@ def kbhit():
   dr,dw,de = select([sys.stdin],[],[],0)
   return dr <> []
 
-def make_recording(car = None):
+def make_recording(car = None, recording_file_path = None):
   output = open('/var/log/car','r')
   output.seek(0,2) # go to end of file
 
