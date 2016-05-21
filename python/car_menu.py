@@ -92,11 +92,14 @@ def k_smooth(k = None):
 def track_name(n = None):
   if n is not None:
     config.track_name = n
+    config.route_name = ""
+    update_route_menu()
   return config.track_name
 
 def route_name(n = None):
   if n is not None:
     config.route_name = n
+    update_route_menu()
   return config.route_name
 
 
@@ -184,13 +187,14 @@ k_smooth_menu = selection_menu(k_smooth,np.arange(0.,1.1,0.1))
 t_ahead_menu = selection_menu(t_ahead,np.arange(0.,1.1,0.1))
 d_ahead_menu = selection_menu(d_ahead,np.arange(0.,1.001,0.01))
 track_selection_menu = selection_menu(track_name, FileNames().get_track_names())
-route_selection_menu = selection_menu(route_name, FileNames().get_route_names(config.track_name))
+def route_selection_menu():
+  return selection_menu(route_name, FileNames().get_route_names(config.track_name))
 
 def update_route_menu():  
   global route_menu
   route_menu = [
     MenuItem(lambda:'track[{}]'.format(config.track_name),sub_menu=track_selection_menu),
-    MenuItem(lambda:'route[{}]'.format(config.route_name),sub_menu=route_selection_menu),
+    MenuItem(lambda:'route[{}]'.format(config.route_name),sub_menu=route_selection_menu()),
     MenuItem('go',action=go),
     MenuItem('record',action=record),
     MenuItem(lambda:'max_a[{}]'.format(config.max_a),sub_menu = acceleration_menu ),
