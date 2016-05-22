@@ -97,12 +97,13 @@ def steering_angle_by_look_ahead_curve(car,route,d_ahead=0.05,t_ahead=0.2):
   d = distance(x,y,car_x,car_y)
   heading_radians = car.heading_radians()
   desired_radians = atan2(y-car_y,x-car_x)
-  delta_radians = desired_radiance - heading_radians
+  delta_radians = desired_radians - heading_radians
   
   ahead = d * cos(delta_radians)
-  left = d * sin(delta_radins)
-  (steer_radians,arc_radians,r,arc_len) =  car.ackerman.arc_to_relative_location(x,y)
-  return standardized_degrees(degrees(steer_radians))
+  left = d * sin(delta_radians)
+  (steer_radians,arc_radians,r,arc_len) =  car.ackerman.arc_to_relative_location(ahead,left)
+  str_degrees = standardized_degrees(degrees(steer_radians))
+  return str_degrees
 
 
 def play_route(route, car = None, print_progress = False, k_smooth = 0.4, d_ahead = 0.05, t_ahead = 0.2):
@@ -138,7 +139,8 @@ def play_route(route, car = None, print_progress = False, k_smooth = 0.4, d_ahea
       car_velocity = car.get_velocity_meters_per_second()
       route.set_position(x,y,rear_x,rear_y,car_velocity)
        
-      steering_angle = steering_angle_by_look_ahead(car,route,d_ahead,t_ahead)
+      steering_angle = steering_angle_by_look_ahead_curve(car,route,d_ahead,t_ahead)
+      #steering_angle = steering_angle_by_look_ahead(car,route,d_ahead,t_ahead)
       
       str_ms = car.steering_for_angle(steering_angle)
    

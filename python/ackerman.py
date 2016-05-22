@@ -23,18 +23,27 @@ class Ackerman :
     return self.drifting
   
   
-  # x is ahead, l is to left
+  # x is ahead, l is to left, x must be positive
   def arc_to_relative_location(self,x,y):
     x = float(x)
     y = float(y)
     l = self.l
-    if abs(y) > 0.000001:
-      z=sqrt((l+x/2)**2+(x/y*(l+x/2))**2)
-      c=sqrt(x**2+y**2)
-      r=sqrt(z**2+(c**2)/2)
-      steer_radians = asin(l/r)
-      arc_radians = 2*asin((c/2)/z)
-      arc_len = r * arc_radians
+    if abs(y) > 0.000001 and x > 0:
+      try:
+        z=sqrt((l+x/2)**2+(x/y*(l+x/2))**2)
+        c=sqrt(x**2+y**2)
+        r=sqrt(z**2+(c**2)/2)
+        steer_radians = asin(l/r)
+        arc_radians = 2*asin((c/2)/z)
+        arc_len = r * arc_radians
+      except:
+        print 'error in arc',l,x,y
+        steer_radians = 0.0
+        arc_radians = 0.0
+        r = 1.0E100
+        arc_len = x
+        
+      
     else:
       steer_radians = 0.0
       arc_radians = 0.0
@@ -115,6 +124,9 @@ def test_arc_to_relative_location(l,x,y):
   
 
 def arc_to_relative_location_tests():
+  test_arc_to_relative_location(l= 0.33655,x= -0.534768912905,y= -0.138360394072)
+  return
+
   test_arc_to_relative_location(l=20,x=20,y=20)
   test_arc_to_relative_location(l=20,x=40,y=20)
   test_arc_to_relative_location(l=20,x=20,y=0.01)

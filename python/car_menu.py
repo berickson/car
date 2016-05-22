@@ -169,8 +169,8 @@ def go():
     car.reset_odometry()
     input_path = f.path_file_path(config.track_name,config.route_name)
     stereo_video_paths = f.stereo_video_file_paths(config.track_name,config.route_name,config.run_name)
-    capture = vision.capture.Capture(stereo_video_paths=stereo_video_paths)
-    capture.begin()
+#    capture = vision.capture.Capture(stereo_video_paths=stereo_video_paths)
+#    capture.begin()
 
     rte = route.Route()
     car.display_text('loading route')
@@ -179,7 +179,7 @@ def go():
     rte.optimize_velocity(max_velocity = config.max_v, max_acceleration = config.max_a)
     car.display_text('playing route')
     play_route(rte, car, k_smooth = config.k_smooth, d_ahead = config.d_ahead, t_ahead = config.t_ahead)
-    capture.end()
+#    capture.end()
 
 acceleration_menu = selection_menu(max_a, np.arange(0.25,10.1,0.25))
 velocity_menu = selection_menu(max_v,np.arange(0.5,20.1,0.5))
