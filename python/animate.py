@@ -40,11 +40,11 @@ class Screen(gtk.DrawingArea):
 
 
 
-def run(Widget):
+def run():
     window = gtk.Window()
     window.set_default_size(1000,500)
     window.connect("delete-event", gtk.main_quit)
-    widget = Widget()
+    widget = App()
     
     menu = gtk.Menu()
     menu_item = gtk.MenuItem("Open...")
@@ -63,10 +63,26 @@ def run(Widget):
     vbox.pack_start(menu_bar, False, False, 2)
     menu_bar.show()
     
+    # get a list of path files and display them
+    import glob
+    path_store = gtk.ListStore(str)
+    for f in glob.glob('*.py'):
+      path_store.append([f])
+    cell = gtk.CellRendererText()
+    col = gtk.TreeViewColumn('file', cell, text='hello')
+    path_listbox = gtk.TreeView(model=path_store)
+    path_listbox.append_column(col)
+    path_listbox.set_size_request(20,20)
+    path_listbox.show()
+    
+    
     # Create a button to which to attach menu as a popup
     button = gtk.Button("press me")
+    button.set_size_request(50,50)
     #button.connect_object("event", window.button_press, menu)
-    vbox.pack_end(widget, True, True, 2)
+    vbox.pack_end(widget, expand=True, fill=True, padding=2)
+    #vbox.pack_start(button, expand=False, fill=False, padding=2)
+    vbox.pack_start(path_listbox, expand=False, fill=False, padding=2)
     button.show()
 
     # And finally we append the menu-item to the menu-bar -- this is the
@@ -285,4 +301,4 @@ parser.add_argument(
   help='csv file recorded with recorder')
 args = parser.parse_args()
 
-run(App)
+run()

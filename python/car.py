@@ -9,7 +9,6 @@ from ackerman import Ackerman
 from math import *
 from geometry import *
 import pprint
-from lcd import Lcd
 
 
 
@@ -64,6 +63,8 @@ class Car:
     self.usb_error_count = 0
     
     if self.online:
+      from lcd import Lcd
+    
       self.lcd = Lcd()
       self.quit = False
       self.write_command('td+') # first command normally fails, so write a blank command
