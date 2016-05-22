@@ -163,7 +163,7 @@ def record():
   path_file_path = f.path_file_path(track_name, route_name)
   write_path_from_recording_file(inpath=recording_file_path,outpath=path_file_path)
   config.route_name = route_name
-  update_route_menu()
+  update_route_selection_menu()
 
 def go():
     f = FileNames()

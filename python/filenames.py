@@ -43,6 +43,8 @@ class FileNames:
     return os.path.join(self.get_routes_folder(track_name),route_name)
     
   def get_route_names(self,track_name):
+    if not os.path.exists(self.get_routes_folder(track_name)):
+      return []
     route_names = [p for p in os.listdir(self.get_routes_folder(track_name)) if os.path.isdir(self.get_route_folder(track_name,p))]
     route_names.sort()
     return route_names
