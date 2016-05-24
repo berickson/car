@@ -22,14 +22,13 @@ def main():
   except:
     exc_type, exc_value, tb = sys.exc_info()
     print str(tb.tb_lineno), 'exception:',exc_type,exc_value 
-    if tb is not None:
-      curr = tb.tb_next
-      while curr is not None:
-        frame = curr.tb_frame
-        print "%s:%s %s()" % (frame.f_code.co_filename, frame.f_lineno, frame.f_code.co_name)
-        print '  ',frame.f_locals
-        curr = curr.tb_next
-      del tb # required to keep from getting a memory leak
+    curr = tb
+    while curr is not None:
+      frame = curr.tb_frame
+      print "%s:%s %s()" % (frame.f_code.co_filename, frame.f_lineno, frame.f_code.co_name)
+      print '  ',frame.f_locals
+      curr = curr.tb_next
+    del tb # required to keep from getting a memory leak
 
 
 
