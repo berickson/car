@@ -17,12 +17,6 @@ import Queue
 max_velocity = 5.
 
 
-def clamp(value, min_value, max_value):
-  if value < min_value:
-    return min_value
-  if value > max_value:
-    return max_value
-  return value
 
 def esc_for_velocity(goal_velocity, car, is_reverse):
   # calculate speed 
