@@ -75,8 +75,12 @@ class FileNames:
 
     return os.path.join(self.get_route_folder(track_name,route_name),'recording.csv')
     
-  def path_file_path(self,track_name, route_name):
-    return os.path.join(self.get_route_folder(track_name,route_name),'path.csv')
+  def path_file_path(self,track_name, route_name, run_name = None):
+    if run_name is None:
+      folder = self.get_route_folder(track_name,route_name)
+    else:
+      folder = self.get_run_folder(track_name,route_name,run_name)
+    return os.path.join(folder, 'path.csv')
 
   def next_run_name(self,track_name,route_name):
     for i in range(99):
