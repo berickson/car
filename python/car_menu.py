@@ -1,5 +1,6 @@
 #!/usr/bin/env python2.7
 # coding: utf-8
+route_selection_menu = []
 
 import time
 import numpy as np
@@ -31,9 +32,9 @@ class Config:
 config = Config()
 config.track_name = 'desk'
 config.route_name = FileNames().get_route_names(config.track_name)[0]
-config.max_a = 0.1
+config.max_a = 0.25
 config.max_v = 1.0
-config.t_ahead = 0.2
+config.t_ahead = 0.3
 config.d_ahead = 0.05
 config.k_smooth = 0.4
 
@@ -92,8 +93,12 @@ def k_smooth(k = None):
 def track_name(n = None):
   if n is not None:
     config.track_name = n
-    config.route_name = ""
-    update_route_menu()
+    route_names = FileNames().get_route_names(config.track_name)
+    if len(route_names) > 0:
+      config.route_name = route_names[0]
+    else:
+      config.route_name = ""
+    update_route_selection_menu()
   return config.track_name
 
 def route_name(n = None):
@@ -158,7 +163,7 @@ def record():
   path_file_path = f.path_file_path(track_name, route_name)
   write_path_from_recording_file(inpath=recording_file_path,outpath=path_file_path)
   config.route_name = route_name
-  update_route_menu()
+  update_route_selection_menu()
 
 def go():
     f = FileNames()
@@ -169,8 +174,8 @@ def go():
     car.reset_odometry()
     input_path = f.path_file_path(config.track_name,config.route_name)
     stereo_video_paths = f.stereo_video_file_paths(config.track_name,config.route_name,config.run_name)
-    capture = vision.capture.Capture(stereo_video_paths=stereo_video_paths)
-    capture.begin()
+#    capture = vision.capture.Capture(stereo_video_paths=stereo_video_paths)
+#    capture.begin()
 
     rte = route.Route()
     car.display_text('loading route')
@@ -178,8 +183,17 @@ def go():
     rte.smooth(k_smooth=config.k_smooth)
     rte.optimize_velocity(max_velocity = config.max_v, max_acceleration = config.max_a)
     car.display_text('playing route')
-    play_route(rte, car, k_smooth = config.k_smooth, d_ahead = config.d_ahead, t_ahead = config.t_ahead)
-    capture.end()
+    recording_file_path = FileNames().recording_file_path(config.track_name,config.route_name,config.run_name)
+    car.begin_recording_input(recording_file_path)
+    try:
+      play_route(rte, car, k_smooth = config.k_smooth, d_ahead = config.d_ahead, t_ahead = config.t_ahead)
+    finally:
+      car.end_recording_input()
+    car.lcd.display_text("making path")
+    path_file_path = f.path_file_path(config.track_name,config.route_name,config.run_name)
+    write_path_from_recording_file(inpath=recording_file_path,outpath=path_file_path)
+
+#    capture.end()
 
 acceleration_menu = selection_menu(max_a, np.arange(0.25,10.1,0.25))
 velocity_menu = selection_menu(max_v,np.arange(0.5,20.1,0.5))
@@ -187,14 +201,18 @@ k_smooth_menu = selection_menu(k_smooth,np.arange(0.,1.1,0.1))
 t_ahead_menu = selection_menu(t_ahead,np.arange(0.,1.1,0.1))
 d_ahead_menu = selection_menu(d_ahead,np.arange(0.,1.001,0.01))
 track_selection_menu = selection_menu(track_name, FileNames().get_track_names())
-def route_selection_menu():
-  return selection_menu(route_name, FileNames().get_route_names(config.track_name))
+
+def update_route_selection_menu():
+  del route_selection_menu[:]
+  route_selection_menu.extend( selection_menu(route_name, FileNames().get_route_names(config.track_name)))
+  
+update_route_selection_menu()
 
 def update_route_menu():  
   global route_menu
   route_menu = [
     MenuItem(lambda:'track[{}]'.format(config.track_name),sub_menu=track_selection_menu),
-    MenuItem(lambda:'route[{}]'.format(config.route_name),sub_menu=route_selection_menu()),
+    MenuItem(lambda:'route[{}]'.format(config.route_name),sub_menu=route_selection_menu),
     MenuItem('go',action=go),
     MenuItem('record',action=record),
     MenuItem(lambda:'max_a[{}]'.format(config.max_a),sub_menu = acceleration_menu ),
@@ -203,6 +221,7 @@ def update_route_menu():
     MenuItem(lambda:'t_ahead[{}]'.format(config.t_ahead),sub_menu = t_ahead_menu),
     MenuItem(lambda:'d_ahead[{}]'.format(config.d_ahead),sub_menu = d_ahead_menu)
     ]
+    
 update_route_menu()
 
 main_menu = [

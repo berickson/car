@@ -43,6 +43,8 @@ class FileNames:
     return os.path.join(self.get_routes_folder(track_name),route_name)
     
   def get_route_names(self,track_name):
+    if not os.path.exists(self.get_routes_folder(track_name)):
+      return []
     route_names = [p for p in os.listdir(self.get_routes_folder(track_name)) if os.path.isdir(self.get_route_folder(track_name,p))]
     route_names.sort()
     return route_names
@@ -59,8 +61,12 @@ class FileNames:
         return route_name
     raise 'could not find empty route'
   
-  def recording_file_path(self,track_name, route_name):
-    return os.path.join(self.get_route_folder(track_name,route_name),'recording.csv')
+  def recording_file_path(self,track_name, route_name, run_name = None):
+    if run_name is None:
+      folder = self.get_route_folder(track_name,route_name)
+    else:
+      folder = self.get_run_folder(track_name,route_name,run_name)
+    return os.path.join(folder,'recording.csv')
     
   def stereo_video_file_paths(self,track_name, route_name, run_name):
     folder = self.get_run_folder(track_name, route_name, run_name)
@@ -69,8 +75,12 @@ class FileNames:
 
     return os.path.join(self.get_route_folder(track_name,route_name),'recording.csv')
     
-  def path_file_path(self,track_name, route_name):
-    return os.path.join(self.get_route_folder(track_name,route_name),'path.csv')
+  def path_file_path(self,track_name, route_name, run_name = None):
+    if run_name is None:
+      folder = self.get_route_folder(track_name,route_name)
+    else:
+      folder = self.get_run_folder(track_name,route_name,run_name)
+    return os.path.join(folder, 'path.csv')
 
   def next_run_name(self,track_name,route_name):
     for i in range(99):
