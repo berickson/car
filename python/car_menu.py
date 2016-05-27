@@ -183,7 +183,11 @@ def go():
     rte.smooth(k_smooth=config.k_smooth)
     rte.optimize_velocity(max_velocity = config.max_v, max_acceleration = config.max_a)
     car.display_text('playing route')
-    play_route(rte, car, k_smooth = config.k_smooth, d_ahead = config.d_ahead, t_ahead = config.t_ahead)
+    car.begin_recording_input(FileNames().recording_file_path(config.track_name,config.route_name,config.run_name))
+    try:
+      play_route(rte, car, k_smooth = config.k_smooth, d_ahead = config.d_ahead, t_ahead = config.t_ahead)
+    finally:
+      car.end_recording_input()
 #    capture.end()
 
 acceleration_menu = selection_menu(max_a, np.arange(0.25,10.1,0.25))

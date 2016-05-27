@@ -61,6 +61,7 @@ class Car:
     self.last_verified_velocity = 0.0
     self.lcd = None
     self.usb_error_count = 0
+    self.input_recording_file = None
     
     if self.online:
       from lcd import Lcd
@@ -78,6 +79,19 @@ class Car:
   def display_text(self, s):
     if self.lcd is not None:
       self.lcd.display_text(s)
+  
+  # records all input from the pi
+  def begin_recording_input(self, recording_file_path):
+    if self.input_recording_file is not None:
+      self.end_recording_input()
+    self.input_recording_file = open(recording_file_path,'w')
+  
+  def end_recording_input(self):
+    if self.input_recording_file is not None:
+      self.input_recording_file.close()
+      self.input_recording_file = None
+    
+    
 
   def reset_odometry(self):
     self.reading_count = 0
@@ -184,6 +198,9 @@ class Car:
       self.usb_error_count = self.usb_error_count + 1
       #print 'invalid TD packet with {} fields: {}'.format(len(fields),s)
       return
+    
+    if self.input_recording_file is not None:
+      self.input_recording_file.write(s)
       
     # todo, handle contention with different threads
     # for now, make changeover quick and don't mess

@@ -61,8 +61,12 @@ class FileNames:
         return route_name
     raise 'could not find empty route'
   
-  def recording_file_path(self,track_name, route_name):
-    return os.path.join(self.get_route_folder(track_name,route_name),'recording.csv')
+  def recording_file_path(self,track_name, route_name, run_name = None):
+    if run_name is None:
+      folder = self.get_route_folder(track_name,route_name)
+    else:
+      folder = self.get_run_folder(track_name,route_name,run_name)
+    return os.path.join(folder,'recording.csv')
     
   def stereo_video_file_paths(self,track_name, route_name, run_name):
     folder = self.get_run_folder(track_name, route_name, run_name)
