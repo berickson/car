@@ -122,6 +122,15 @@ def shutdown():
   car.lcd.set_backlight(0)
   os.system('sudo shutdown now /r')
 
+
+def dump_config(path):
+  import json
+  with open(path,'w') as f:
+    f.write(json.dumps(config, 
+                 default=lambda obj: vars(obj),
+                 indent=1))
+  
+
 def restart():
   car.display_text("restart svc")
   time.sleep(0.25)
@@ -170,6 +179,7 @@ def go():
     config.run_name = f.next_run_name(config.track_name, config.route_name)
     run_folder = f.get_run_folder(config.track_name, config.route_name, config.run_name)
     os.makedirs(run_folder)
+    dump_config(f.config_file_path(config.track_name, config.route_name, config.run_name))
     
     car.reset_odometry()
     input_path = f.path_file_path(config.track_name,config.route_name)
@@ -213,7 +223,7 @@ def update_route_menu():
   route_menu = [
     MenuItem(lambda:'track[{}]'.format(config.track_name),sub_menu=track_selection_menu),
     MenuItem(lambda:'route[{}]'.format(config.route_name),sub_menu=route_selection_menu),
-    MenuItem('go',action=go),
+    MenuItem(lambda:'{0:3.1f} go'.format(car.battery_voltage()),action=go),
     MenuItem('record',action=record),
     MenuItem(lambda:'max_a[{}]'.format(config.max_a),sub_menu = acceleration_menu ),
     MenuItem(lambda:'max_v[{}]'.format(config.max_v),sub_menu = velocity_menu),

@@ -33,7 +33,7 @@ def main():
   start_time = time.time()
 
   try:
-    while abs(error) > 10 or d_error > 100:
+    while abs(error) > 10 or abs(d_error) > 100:
 #      f = car.odometer_front_left()
       f = 1500
       b = car.odometer_back_left()

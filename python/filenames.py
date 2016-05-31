@@ -74,6 +74,10 @@ class FileNames:
   
 
     return os.path.join(self.get_route_folder(track_name,route_name),'recording.csv')
+  
+  def config_file_path(self,track_name, route_name, run_name = None):
+   folder = self.get_run_folder(track_name,route_name,run_name)
+   return os.path.join(folder,'config.json')
     
   def path_file_path(self,track_name, route_name, run_name = None):
     if run_name is None:
