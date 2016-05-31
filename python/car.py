@@ -62,6 +62,7 @@ class Car:
     self.lcd = None
     self.usb_error_count = 0
     self.input_recording_file = None
+    self.commands_recording_file = None
     
     if self.online:
       from lcd import Lcd
@@ -90,6 +91,17 @@ class Car:
     if self.input_recording_file is not None:
       self.input_recording_file.close()
       self.input_recording_file = None
+    
+  # records all commands to the pi
+  def begin_recording_commands(self, commands_recording_file_path):
+    if self.commands_recording_file is not None:
+      self.end_recording_commands()
+    self.commands_recording_file = open(commands_recording_file_path,'w')
+  
+  def end_recording_commands(self):
+    if self.commands_recording_file is not None:
+      self.commands_recording_file.close()
+      self.commands_recording_file = None
     
     
 
@@ -167,9 +179,12 @@ class Car:
   def write_command(self, s):
     if not self.online:
       raise Exception("must be online")
+    
+    l = "{0}\n".format(s)
     with open('/dev/car','w') as command:
-      #print 'Sending command "{0}"'.format(s)
-      command.write("{0}\n".format(s))
+      command.write(l)
+    if self.commands_recording_file is not None:
+      self.commands_recording_file.write(l)
     
   def _monitor_output(self):
     self.output = open('/var/log/car','r')

@@ -195,10 +195,12 @@ def go():
     car.display_text('playing route')
     recording_file_path = FileNames().recording_file_path(config.track_name,config.route_name,config.run_name)
     car.begin_recording_input(recording_file_path)
+    car.begin_recording_commands(FileNames().commands_recording_file_path(config.track_name,config.route_name,config.run_name))
     try:
       play_route(rte, car, k_smooth = config.k_smooth, d_ahead = config.d_ahead, t_ahead = config.t_ahead)
     finally:
       car.end_recording_input()
+      car.end_recording_commands()
     car.lcd.display_text("making path")
     path_file_path = f.path_file_path(config.track_name,config.route_name,config.run_name)
     write_path_from_recording_file(inpath=recording_file_path,outpath=path_file_path)
