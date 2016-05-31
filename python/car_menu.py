@@ -37,6 +37,7 @@ config.max_v = 1.0
 config.t_ahead = 0.3
 config.d_ahead = 0.05
 config.k_smooth = 0.4
+config.capture_video = True
 
 
 class MenuItem:
@@ -89,6 +90,11 @@ def k_smooth(k = None):
   if k is not None:
     config.k_smooth = k
   return config.k_smooth
+
+def capture_video(v = None):
+  if v is not None:
+    config.capture_video = v
+  return config.capture_video
   
 def track_name(n = None):
   if n is not None:
@@ -184,8 +190,9 @@ def go():
     car.reset_odometry()
     input_path = f.path_file_path(config.track_name,config.route_name)
     stereo_video_paths = f.stereo_video_file_paths(config.track_name,config.route_name,config.run_name)
-#    capture = vision.capture.Capture(stereo_video_paths=stereo_video_paths)
-#    capture.begin()
+    if config.capture_video:
+      capture = vision.capture.Capture(stereo_video_paths=stereo_video_paths)
+      capture.begin()
 
     rte = route.Route()
     car.display_text('loading route')
@@ -201,14 +208,16 @@ def go():
     finally:
       car.end_recording_input()
       car.end_recording_commands()
+      if config.capture_video:
+        capture.end()
     car.lcd.display_text("making path")
     path_file_path = f.path_file_path(config.track_name,config.route_name,config.run_name)
     write_path_from_recording_file(inpath=recording_file_path,outpath=path_file_path)
 
-#    capture.end()
-
 acceleration_menu = selection_menu(max_a, np.arange(0.25,10.1,0.25))
 velocity_menu = selection_menu(max_v,np.arange(0.5,20.1,0.5))
+capture_video_menu = selection_menu(capture_video,[True,False])
+
 k_smooth_menu = selection_menu(k_smooth,np.arange(0.,1.1,0.1))
 t_ahead_menu = selection_menu(t_ahead,np.arange(0.,1.1,0.1))
 d_ahead_menu = selection_menu(d_ahead,np.arange(0.,1.001,0.01))
@@ -231,7 +240,8 @@ def update_route_menu():
     MenuItem(lambda:'max_v[{}]'.format(config.max_v),sub_menu = velocity_menu),
     MenuItem(lambda:'k_smooth[{}]'.format(config.k_smooth),sub_menu = k_smooth_menu),
     MenuItem(lambda:'t_ahead[{}]'.format(config.t_ahead),sub_menu = t_ahead_menu),
-    MenuItem(lambda:'d_ahead[{}]'.format(config.d_ahead),sub_menu = d_ahead_menu)
+    MenuItem(lambda:'d_ahead[{}]'.format(config.d_ahead),sub_menu = d_ahead_menu),
+    MenuItem(lambda:'cap video[{}]'.format(config.capture_video),sub_menu = capture_video_menu)
     ]
     
 update_route_menu()
