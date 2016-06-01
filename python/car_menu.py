@@ -14,6 +14,7 @@ from recorder import make_recording
 from make_route import write_path_from_recording_file
 from play_route import play_route
 from filenames import *
+import exception
 
 import vision.capture
 
@@ -37,7 +38,7 @@ config.max_v = 1.0
 config.t_ahead = 0.3
 config.d_ahead = 0.05
 config.k_smooth = 0.4
-config.capture_video = True
+config.capture_video = False
 
 
 class MenuItem:
@@ -205,6 +206,10 @@ def go():
     car.begin_recording_commands(FileNames().commands_recording_file_path(config.track_name,config.route_name,config.run_name))
     try:
       play_route(rte, car, k_smooth = config.k_smooth, d_ahead = config.d_ahead, t_ahead = config.t_ahead)
+    except:
+      path = f.exception_file_path(config.track_name,config.route_name,config.run_name)
+      with open(path,'w') as log:
+        log.write(exception.exception_text())
     finally:
       car.end_recording_input()
       car.end_recording_commands()
