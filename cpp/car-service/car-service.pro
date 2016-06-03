@@ -4,5 +4,10 @@ CONFIG -= app_bundle
 CONFIG -= qt
 CONFIG += c++14
 CONFIG += thread
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    ackerman.cpp
+
+HEADERS += \
+    geometry.h \
+    ackerman.h
 

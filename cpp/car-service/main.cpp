@@ -5,6 +5,8 @@
 #include <thread>
 #include <unistd.h> // for usleep, etc
 
+#include "ackerman.h"
+
 using namespace std;
 
 
@@ -32,6 +34,8 @@ public:
 
 int main(int, char *[])
 {
+    arc_to_relative_location_tests();
+
     string s = "TD,939.27,-32,Heading String,5";
     cout << "splitting string " << s << endl;
     for(auto i: split(s)){
