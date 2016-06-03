@@ -2,6 +2,20 @@
 #define GEOMETRY_H
 
 #include "math.h"
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+struct Point {
+  double x;
+  double y;
+  string to_string() {
+    stringstream ss;
+    ss << "(" << x << "," << y << ")";
+    return ss.str();
+  }
+};
 
 /*
 

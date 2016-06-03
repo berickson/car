@@ -34,7 +34,9 @@ public:
 
 int main(int, char *[])
 {
+    move_left_wheel_tests();
     arc_to_relative_location_tests();
+    return 0;
 
     string s = "TD,939.27,-32,Heading String,5";
     cout << "splitting string " << s << endl;

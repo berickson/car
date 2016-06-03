@@ -88,10 +88,9 @@ class Ackerman :
       if debug: print 'r_car: {:.4} r_left: {:.4}'.format(r_car, r_left)
       
       # calculate angle travelled
-      turn_angle = wheel_distance / (2.*r_left)
-      arc_distance = r_car * turn_angle * 2.
-      forward = r_car * sin(turn_angle) * 2.
-      left = r_car * (1.-cos(turn_angle)) * 2.
+      turn_angle = wheel_distance / r_left
+      forward = r_car * sin(turn_angle)
+      left = r_car * (1.-cos(turn_angle))
 
     if debug: print 'turn_angle: {:.4} arc_distance: {:.4} forward: {:.4} left: {:.4}'.format(turn_angle, arc_distance, forward, left)
     
@@ -151,6 +150,10 @@ def test_other():
     car.move_left_wheel(-outside_angle, 10., debug = True)
 
 if __name__ == '__main__':
-  arc_to_relative_location_tests()
+  car = Ackerman(front_wheelbase_width = 0, wheelbase_length = 1000)
+  car.move_left_wheel(pi/4,1)
+  print car.x,car.l * sin(car.heading)
+  #test_other()
+  #arc_to_relative_location_tests()
 
 

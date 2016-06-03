@@ -77,26 +77,29 @@ void Ackerman::move_left_wheel(double outside_wheel_angle, double wheel_distance
     }
 
     // calculate angle travelled
-    turn_angle = wheel_distance / (2.*r_left);
-    forward = r_car * sin(turn_angle) * 2.;
-    left = r_car * (1.-cos(turn_angle)) * 2.;
-
-    // finally, move the car based on left and forward
-    _x += cos(_heading)*forward;
-    _y += sin(_heading)*forward;
-    _x += sin(_heading)*left;
-    _y += cos(_heading)*left;
-
-    _heading = isnan(new_heading) ? standardized_radians(_heading + turn_angle) : new_heading;
+    turn_angle = wheel_distance / r_left;
+    forward = r_car * sin(turn_angle);
+    left = r_car * (1.-cos(turn_angle));
   }
+
+  // finally, move the car based on left and forward
+  _x += cos(_heading)*forward;
+  _y += sin(_heading)*forward;
+  _x += sin(_heading)*left;
+  _y += cos(_heading)*left;
+
+  _heading = isnan(new_heading) ? standardized_radians(_heading + turn_angle) : new_heading;
 }
 
 
 // calculates an arc where the front wheel will travel to
 // point x ahead and point y t left
 void test_arc_to_relative_location(double l, double x, double y){
-  auto car = Ackerman(10, l);
+  auto car = Ackerman(0, l, -l, 0, 0); // zero width makes like a bicycle, -l puts front wheel at (0,0)
+  cout << "beginning car fl position:" << car.front_left_position().to_string();
+
   auto arc = car.arc_to_relative_location(x,y);
+  car.move_left_wheel(arc.steer_radians, arc.arc_len);
   cout << " l: " << l
        << " x: " << x
        << " y: " << y
@@ -104,7 +107,29 @@ void test_arc_to_relative_location(double l, double x, double y){
        << " arc degrees: " << degrees(arc.arc_radians)
        << " turn radius: " << arc.r
        << " arc length: " << arc.arc_len
+       << " car fl:: " << car.front_left_position().to_string()
        << endl;
+}
+
+
+
+void test_move_left_wheel(double l, double outside_wheel_angle, double distance) {
+  auto car = Ackerman(0, l, -l, 0, 0); // zero width makes like a bicycle, -l puts front wheel at (0,0)
+  cout << "start fl:" << car.front_left_position().to_string()
+    << " l: " << l
+    << " outside_wheel_angle: " << outside_wheel_angle
+    << " distance: " << distance;
+
+  car.move_left_wheel(outside_wheel_angle,distance);
+
+  cout << " final fl:" << car.front_left_position().to_string()
+       << endl;
+
+}
+
+void move_left_wheel_tests() {
+  test_move_left_wheel(100000,M_PI/4,1);
+
 }
 
 
