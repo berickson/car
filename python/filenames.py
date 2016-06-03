@@ -67,13 +67,24 @@ class FileNames:
     else:
       folder = self.get_run_folder(track_name,route_name,run_name)
     return os.path.join(folder,'recording.csv')
-    
+  def commands_recording_file_path(self,track_name, route_name, run_name = None):
+    if run_name is None:
+      folder = self.get_route_folder(track_name,route_name)
+    else:
+      folder = self.get_run_folder(track_name,route_name,run_name)
+    return os.path.join(folder,'commands.csv')    
+
   def stereo_video_file_paths(self,track_name, route_name, run_name):
     folder = self.get_run_folder(track_name, route_name, run_name)
     return [os.path.join(folder,'video_left.avi'),os.path.join(folder,'video_right.avi')]
-  
 
-    return os.path.join(self.get_route_folder(track_name,route_name),'recording.csv')
+  def exception_file_path(self,track_name, route_name, run_name):
+    folder = self.get_run_folder(track_name, route_name, run_name)
+    return os.path.join(folder,'exceptions.log')
+  
+  def config_file_path(self,track_name, route_name, run_name = None):
+   folder = self.get_run_folder(track_name,route_name,run_name)
+   return os.path.join(folder,'config.json')
     
   def path_file_path(self,track_name, route_name, run_name = None):
     if run_name is None:

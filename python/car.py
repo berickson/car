@@ -62,6 +62,7 @@ class Car:
     self.lcd = None
     self.usb_error_count = 0
     self.input_recording_file = None
+    self.commands_recording_file = None
     
     if self.online:
       from lcd import Lcd
@@ -91,6 +92,17 @@ class Car:
       self.input_recording_file.close()
       self.input_recording_file = None
     
+  # records all commands to the pi
+  def begin_recording_commands(self, commands_recording_file_path):
+    if self.commands_recording_file is not None:
+      self.end_recording_commands()
+    self.commands_recording_file = open(commands_recording_file_path,'w')
+  
+  def end_recording_commands(self):
+    if self.commands_recording_file is not None:
+      self.commands_recording_file.close()
+      self.commands_recording_file = None
+    
     
 
   def reset_odometry(self):
@@ -100,6 +112,10 @@ class Car:
     self.last_velocity = 0.0
     self.heading_adjustment = 0.
     self.odometer_start = 0
+    self.odometer_front_left_start = 0
+    self.odometer_front_right_start = 0
+    self.odometer_back_left_start = 0
+    self.odometer_back_right_start = 0
     self.ackerman = Ackerman(
       front_wheelbase_width = self.front_wheelbase_width_in_meters, 
       wheelbase_length = self.wheelbase_length_in_meters)
@@ -163,9 +179,12 @@ class Car:
   def write_command(self, s):
     if not self.online:
       raise Exception("must be online")
+    
+    l = "{0}\n".format(s)
     with open('/dev/car','w') as command:
-      #print 'Sending command "{0}"'.format(s)
-      command.write("{0}\n".format(s))
+      command.write(l)
+    if self.commands_recording_file is not None:
+      self.commands_recording_file.write(l)
     
   def _monitor_output(self):
     self.output = open('/var/log/car','r')
@@ -381,18 +400,23 @@ class Car:
   
   def zero_odometer(self):
     self.odometer_start = self.dynamics.odometer_ticks
+    self.odometer_front_left_start = self.dynamics.odometer_front_left
+    self.odometer_front_right_start = self.dynamics.odometer_front_right
+    self.odometer_back_left_start = self.dynamics.odometer_back_left
+    self.odometer_back_right_start = self.dynamics.odometer_back_right
+    
 
   def odometer_meters(self):
     return (self.dynamics.odometer_ticks - self.odometer_start) * self.meters_per_odometer_tick
   
   def odometer_front_left(self):
-    return self.dynamics.odometer_front_left
+    return self.dynamics.odometer_front_left - self.odometer_front_left_start
   def odometer_front_right(self):
-    return self.dynamics.odometer_front_right
+    return self.dynamics.odometer_front_right - self.odometer_front_right_start
   def odometer_back_left(self):
-    return self.dynamics.odometer_back_left
+    return self.dynamics.odometer_back_left - self.odometer_back_left_start
   def odometer_back_right(self):
-    return self.dynamics.odometer_back_right
+    return self.dynamics.odometer_back_right - self.odometer_back_right_start
  
   # returns where you should steer to if you wish to go to goal_heading
   def steering_for_goal_heading_degrees(self, goal_heading, reverse = False):
