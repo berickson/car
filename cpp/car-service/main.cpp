@@ -7,21 +7,14 @@
 
 #include "ackerman.h"
 #include "usb.h"
+#include "work_queue.h"
+#include "dynamics.h"
+
+#include "split.h"
 
 using namespace std;
 
 
-vector<string> split(string str, char delimiter=',') {
-  vector<string> internal;
-  stringstream ss(str); // Turn the string into a stream.
-  string tok;
-
-  while(getline(ss, tok, delimiter)) {
-    internal.push_back(tok);
-  }
-
-  return internal;
-}
 
 
 
@@ -35,6 +28,12 @@ public:
 
 int main(int, char *[])
 {
+  test_dynamics();
+  return 0;
+
+  test_work_queue();
+  return 0;
+
   Usb usb;
   usb.run();
   return 0;

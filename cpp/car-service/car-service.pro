@@ -6,10 +6,14 @@ CONFIG += c++14
 CONFIG += thread
 SOURCES += main.cpp \
     ackerman.cpp \
-    usb.cpp
+    usb.cpp \
+    dynamics.cpp
 
 HEADERS += \
     geometry.h \
     ackerman.h \
-    usb.h
+    usb.h \
+    work_queue.h \
+    dynamics.h \
+    split.h
 

@@ -50,10 +50,12 @@ OBJECTS_DIR   = ./
 
 SOURCES       = ../../cpp/car-service/main.cpp \
 		../../cpp/car-service/ackerman.cpp \
-		../../cpp/car-service/usb.cpp 
+		../../cpp/car-service/usb.cpp \
+		../../cpp/car-service/dynamics.cpp 
 OBJECTS       = main.o \
 		ackerman.o \
-		usb.o
+		usb.o \
+		dynamics.o
 DIST          = ../../../Qt2.0.3/5.6/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../Qt2.0.3/5.6/gcc_64/mkspecs/common/unix.conf \
 		../../../Qt2.0.3/5.6/gcc_64/mkspecs/common/linux.conf \
@@ -184,9 +186,13 @@ DIST          = ../../../Qt2.0.3/5.6/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../Qt2.0.3/5.6/gcc_64/mkspecs/features/lex.prf \
 		../../cpp/car-service/car-service.pro geometry.h \
 		ackerman.h \
-		usb.h ../../cpp/car-service/main.cpp \
+		usb.h \
+		work_queue.h \
+		dynamics.h \
+		split.h ../../cpp/car-service/main.cpp \
 		../../cpp/car-service/ackerman.cpp \
-		../../cpp/car-service/usb.cpp
+		../../cpp/car-service/usb.cpp \
+		../../cpp/car-service/dynamics.cpp
 QMAKE_TARGET  = car-service
 DESTDIR       = 
 TARGET        = car-service
@@ -499,15 +505,22 @@ compiler_clean:
 
 main.o: ../../cpp/car-service/main.cpp ../../cpp/car-service/ackerman.h \
 		../../cpp/car-service/geometry.h \
-		../../cpp/car-service/usb.h
+		../../cpp/car-service/usb.h \
+		../../cpp/car-service/work_queue.h \
+		../../cpp/car-service/dynamics.h \
+		../../cpp/car-service/split.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../cpp/car-service/main.cpp
 
 ackerman.o: ../../cpp/car-service/ackerman.cpp ../../cpp/car-service/ackerman.h \
 		../../cpp/car-service/geometry.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ackerman.o ../../cpp/car-service/ackerman.cpp
 
-usb.o: ../../cpp/car-service/usb.cpp 
+usb.o: ../../cpp/car-service/usb.cpp ../../cpp/car-service/usb.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o usb.o ../../cpp/car-service/usb.cpp
+
+dynamics.o: ../../cpp/car-service/dynamics.cpp ../../cpp/car-service/dynamics.h \
+		../../cpp/car-service/split.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o dynamics.o ../../cpp/car-service/dynamics.cpp
 
 ####### Install
 
