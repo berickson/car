@@ -5,9 +5,11 @@ CONFIG -= qt
 CONFIG += c++14
 CONFIG += thread
 SOURCES += main.cpp \
-    ackerman.cpp
+    ackerman.cpp \
+    usb.cpp
 
 HEADERS += \
     geometry.h \
-    ackerman.h
+    ackerman.h \
+    usb.h
 

@@ -49,9 +49,11 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = ../../cpp/car-service/main.cpp \
-		../../cpp/car-service/ackerman.cpp 
+		../../cpp/car-service/ackerman.cpp \
+		../../cpp/car-service/usb.cpp 
 OBJECTS       = main.o \
-		ackerman.o
+		ackerman.o \
+		usb.o
 DIST          = ../../../Qt2.0.3/5.6/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../Qt2.0.3/5.6/gcc_64/mkspecs/common/unix.conf \
 		../../../Qt2.0.3/5.6/gcc_64/mkspecs/common/linux.conf \
@@ -181,8 +183,10 @@ DIST          = ../../../Qt2.0.3/5.6/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../Qt2.0.3/5.6/gcc_64/mkspecs/features/yacc.prf \
 		../../../Qt2.0.3/5.6/gcc_64/mkspecs/features/lex.prf \
 		../../cpp/car-service/car-service.pro geometry.h \
-		ackerman.h ../../cpp/car-service/main.cpp \
-		../../cpp/car-service/ackerman.cpp
+		ackerman.h \
+		usb.h ../../cpp/car-service/main.cpp \
+		../../cpp/car-service/ackerman.cpp \
+		../../cpp/car-service/usb.cpp
 QMAKE_TARGET  = car-service
 DESTDIR       = 
 TARGET        = car-service
@@ -494,12 +498,16 @@ compiler_clean:
 ####### Compile
 
 main.o: ../../cpp/car-service/main.cpp ../../cpp/car-service/ackerman.h \
-		../../cpp/car-service/geometry.h
+		../../cpp/car-service/geometry.h \
+		../../cpp/car-service/usb.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../cpp/car-service/main.cpp
 
 ackerman.o: ../../cpp/car-service/ackerman.cpp ../../cpp/car-service/ackerman.h \
 		../../cpp/car-service/geometry.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ackerman.o ../../cpp/car-service/ackerman.cpp
+
+usb.o: ../../cpp/car-service/usb.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o usb.o ../../cpp/car-service/usb.cpp
 
 ####### Install
 
