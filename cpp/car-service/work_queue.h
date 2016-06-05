@@ -9,26 +9,28 @@
 using namespace std;
 template <class T>
 class WorkQueue {
-  std::mutex qMutex;
+  std::mutex q_mutex;
   std::queue<T> q;
-  std::condition_variable populatedNotifier;
+  std::condition_variable cv;
 
 public:
   void push(T&& s) {
     {
-      std::lock_guard<std::mutex> lock(qMutex);
+      std::lock_guard<std::mutex> lock(q_mutex);
       q.push(std::move(s));
     }
 
-    populatedNotifier.notify_one();
+    cv.notify_one();
   }
 
-  bool try_pop(T& s, std::chrono::milliseconds timeout) {
-    std::unique_lock<std::mutex> lock(qMutex);
+  bool try_pop(T& s, int milliseconds) {
+    std::unique_lock<std::mutex> lock(q_mutex);
 
-    if(!populatedNotifier.wait_for(lock, timeout, [this] { return !q.empty(); }))
-      return false;
-
+    while(q.empty()) {
+      chrono::milliseconds timeout(milliseconds);
+      if (cv.wait_for(lock, timeout) == std::cv_status::timeout )
+        return false;
+    }
     s = std::move(q.front());
     q.pop();
 
@@ -36,7 +38,7 @@ public:
   }
 };
 
-using namespace std::chrono_literals;
+
 void test_work_queue();
 
 

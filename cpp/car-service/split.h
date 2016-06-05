@@ -2,6 +2,7 @@
 #define SPLIT_H
 #include <vector>
 #include <string>
+#include <iostream>
 #include <sstream>
 
 using namespace std;
@@ -19,5 +20,13 @@ inline vector<string> split(string str, char delimiter=',') {
 }
 
 
+inline void test_split() {
+  string s = "a,b,c";
+  auto a = split(s,',');
+  cout << "splitting \"" << s << "\" produced: " <<  endl;
+  for(auto t:a) {
+    cout << "\"" << t << "\"" << endl;
+  }
+}
 
 #endif // SPLIT_H

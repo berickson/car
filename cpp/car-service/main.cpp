@@ -30,6 +30,12 @@ public:
 
 int main(int, char *[])
 {
+  test_usb();
+  return 0;
+
+  test_split();
+  return 0;
+
   test_car();
   return 0;
 

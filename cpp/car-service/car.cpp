@@ -10,6 +10,14 @@ Car::Car(bool online) {
   reset_odometry();
 }
 
+void Car::add_listener(WorkQueue<Dynamics>* listener) {
+  listeners.push_back(listener);
+}
+
+void Car::remove_listener(WorkQueue<Dynamics>*listener) {
+  listeners.remove(listener);
+}
+
 void Car::read_configuration(string path){
   Config config;
   config.load_from_file(path);

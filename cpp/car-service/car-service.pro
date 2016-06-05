@@ -21,5 +21,7 @@ HEADERS += \
     split.h \
     car.h \
     config.h \
-    trim.h
+    trim.h \
+    glob_util.h \
+    ends_with.h
 

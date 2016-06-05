@@ -199,7 +199,9 @@ DIST          = ../../../Qt2.0.3/5.6/gcc_64/mkspecs/features/spec_pre.prf \
 		split.h \
 		car.h \
 		config.h \
-		trim.h ../../cpp/car-service/main.cpp \
+		trim.h \
+		glob_util.h \
+		ends_with.h ../../cpp/car-service/main.cpp \
 		../../cpp/car-service/ackerman.cpp \
 		../../cpp/car-service/usb.cpp \
 		../../cpp/car-service/dynamics.cpp \
@@ -532,7 +534,9 @@ ackerman.o: ../../cpp/car-service/ackerman.cpp ../../cpp/car-service/ackerman.h 
 		../../cpp/car-service/geometry.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ackerman.o ../../cpp/car-service/ackerman.cpp
 
-usb.o: ../../cpp/car-service/usb.cpp ../../cpp/car-service/usb.h
+usb.o: ../../cpp/car-service/usb.cpp ../../cpp/car-service/usb.h \
+		../../cpp/car-service/work_queue.h \
+		../../cpp/car-service/glob_util.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o usb.o ../../cpp/car-service/usb.cpp
 
 dynamics.o: ../../cpp/car-service/dynamics.cpp ../../cpp/car-service/dynamics.h \
@@ -552,7 +556,7 @@ config.o: ../../cpp/car-service/config.cpp ../../cpp/car-service/config.h \
 		../../cpp/car-service/trim.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o config.o ../../cpp/car-service/config.cpp
 
-work_queue.o: ../../cpp/car-service/work_queue.cpp 
+work_queue.o: ../../cpp/car-service/work_queue.cpp ../../cpp/car-service/work_queue.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o work_queue.o ../../cpp/car-service/work_queue.cpp
 
 ####### Install

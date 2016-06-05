@@ -1,6 +1,7 @@
 #ifndef CAR_H
 #define CAR_H
 
+#include <list>
 #include <string>
 #include "ackerman.h"
 #include "dynamics.h"
@@ -14,9 +15,10 @@ public:
   Car(bool online = true);
   void reset_odometry();
 
-  string config_path = "/home/brian/car/python/car.ini";
+  void add_listener(WorkQueue<Dynamics>*);
+  void remove_listener(WorkQueue<Dynamics>*);
 
-  WorkQueue<Dynamics> work_queue;
+  string config_path = "/home/brian/car/python/car.ini";
 
   bool online = false;
 
@@ -50,6 +52,7 @@ public:
 
 private:
   void read_configuration(string path);
+  list<WorkQueue<Dynamics>*> listeners;
 };
 
 
