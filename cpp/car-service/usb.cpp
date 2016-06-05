@@ -55,6 +55,8 @@ void Usb::monitor_incoming_data() {
   const int error = -1; // error constant for file operations
   const int buf_size = 2000;
   char buf[buf_size];
+  const int poll_us = 1000;    // one millisecond
+  const int max_wait_us = 1E6; // one second
 
   while(!quit) {
     int fd = error;
@@ -62,16 +64,16 @@ void Usb::monitor_incoming_data() {
     for(string usb_path : glob("/dev/ttyACM*")) {
       fd = open(usb_path.c_str(), O_RDONLY | O_NONBLOCK);
       if(fd != error) {
-        cout << "connected to port" << usb_path << endl;
+        //cout << "connected to port" << usb_path << endl;
         break;
       }
     }
 
-    if(fd == error)
-      cout << "couldn't find a port" << endl;
+    //if(fd == error)
+    //  cout << "couldn't find a port" << endl;
 
     // read until we hit an error a a quit
-    int wait_time = 0;
+    int us_waited = 0;
     while(fd != error && ! quit) {
       bool did_work = false;
       auto count = read(fd, buf, buf_size-1); // read(2)
@@ -82,23 +84,23 @@ void Usb::monitor_incoming_data() {
       buf[count]=0;
       if(count > 0) {
         did_work = true;
-        wait_time = 0;
+        us_waited = 0;
         process_data(buf);
       }
       if(!did_work) {
-        usleep(1000); // wait 1 ms for more data
-        wait_time += 1000;
-        if(wait_time > 1000000) // one second
+        if(us_waited > max_wait_us) // one second
           break;
+        usleep(poll_us); // wait 1 ms for more data
+        us_waited += poll_us;
       }
     }
 
     if(fd != error) {
-      cout << "closing usb" << endl;
+      //cout << "closing usb" << endl;
       close(fd);
     }
     if(!quit){
-      usleep(1000); // wait 0.1 second to list ports
+      usleep(poll_us*10);
     }
   }
 }
