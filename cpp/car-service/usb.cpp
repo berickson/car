@@ -69,7 +69,7 @@ void Usb::monitor_incoming_data() {
     for(string usb_path : glob("/dev/ttyACM*")) {
       fd = open(usb_path.c_str(), O_RDWR | O_NONBLOCK | O_SYNC | O_APPEND);
       if(fd != fd_error) {
-        cout << "connected to port" << usb_path << endl;
+        //cout << "connected to port" << usb_path << endl;
         break;
       }
     }
@@ -80,10 +80,10 @@ void Usb::monitor_incoming_data() {
     // read until we hit an error a a quit
     int us_waited = 0;
     while(fd != fd_error && ! quit) {
-      if(pending_write.length()>0) {
+      if(! pending_write.empty()) {
         if(write(fd,pending_write.c_str(),pending_write.size()) != fd_error) {
-          pending_write = "";
         }
+        pending_write.clear();
       }
       bool did_work = false;
       auto count = read(fd, buf, buf_size-1); // read(2)
@@ -137,20 +137,14 @@ void test_usb() {
 
   auto t_start = high_resolution_clock::now();
 
+  usb.write_line("td+");
+  usb.write_line("td+");
   while(q.try_pop(s, 15000)) {
     auto d = high_resolution_clock::now()-t_start;
     duration<double> secs = duration_cast<duration<double>>(d);
     cout << secs.count() << "got item " << s << endl;
     cout << flush;
     i++;
-    if(i%10==0) {
-      usb.write_line((string)"x"+to_string(secs.count()));
-    }
-
-  }
-  cout << "timed out once" << endl;
-  if(q.try_pop(s, 15000)) {
-    cout << s << endl;
   }
   usb.stop();
   cout << "timed out waiting for data" << endl;
