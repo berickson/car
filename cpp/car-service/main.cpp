@@ -9,6 +9,8 @@
 #include "usb.h"
 #include "work_queue.h"
 #include "dynamics.h"
+#include "config.h"
+#include "car.h"
 
 #include "split.h"
 
@@ -28,6 +30,12 @@ public:
 
 int main(int, char *[])
 {
+  test_car();
+  return 0;
+
+  test_config();
+  return 0;
+
   test_dynamics();
   return 0;
 

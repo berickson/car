@@ -51,11 +51,15 @@ OBJECTS_DIR   = ./
 SOURCES       = ../../cpp/car-service/main.cpp \
 		../../cpp/car-service/ackerman.cpp \
 		../../cpp/car-service/usb.cpp \
-		../../cpp/car-service/dynamics.cpp 
+		../../cpp/car-service/dynamics.cpp \
+		../../cpp/car-service/car.cpp \
+		../../cpp/car-service/config.cpp 
 OBJECTS       = main.o \
 		ackerman.o \
 		usb.o \
-		dynamics.o
+		dynamics.o \
+		car.o \
+		config.o
 DIST          = ../../../Qt2.0.3/5.6/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../Qt2.0.3/5.6/gcc_64/mkspecs/common/unix.conf \
 		../../../Qt2.0.3/5.6/gcc_64/mkspecs/common/linux.conf \
@@ -189,10 +193,15 @@ DIST          = ../../../Qt2.0.3/5.6/gcc_64/mkspecs/features/spec_pre.prf \
 		usb.h \
 		work_queue.h \
 		dynamics.h \
-		split.h ../../cpp/car-service/main.cpp \
+		split.h \
+		car.h \
+		config.h \
+		trim.h ../../cpp/car-service/main.cpp \
 		../../cpp/car-service/ackerman.cpp \
 		../../cpp/car-service/usb.cpp \
-		../../cpp/car-service/dynamics.cpp
+		../../cpp/car-service/dynamics.cpp \
+		../../cpp/car-service/car.cpp \
+		../../cpp/car-service/config.cpp
 QMAKE_TARGET  = car-service
 DESTDIR       = 
 TARGET        = car-service
@@ -508,6 +517,7 @@ main.o: ../../cpp/car-service/main.cpp ../../cpp/car-service/ackerman.h \
 		../../cpp/car-service/usb.h \
 		../../cpp/car-service/work_queue.h \
 		../../cpp/car-service/dynamics.h \
+		../../cpp/car-service/config.h \
 		../../cpp/car-service/split.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../cpp/car-service/main.cpp
 
@@ -521,6 +531,14 @@ usb.o: ../../cpp/car-service/usb.cpp ../../cpp/car-service/usb.h
 dynamics.o: ../../cpp/car-service/dynamics.cpp ../../cpp/car-service/dynamics.h \
 		../../cpp/car-service/split.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o dynamics.o ../../cpp/car-service/dynamics.cpp
+
+car.o: ../../cpp/car-service/car.cpp ../../cpp/car-service/car.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o car.o ../../cpp/car-service/car.cpp
+
+config.o: ../../cpp/car-service/config.cpp ../../cpp/car-service/config.h \
+		../../cpp/car-service/split.h \
+		../../cpp/car-service/trim.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o config.o ../../cpp/car-service/config.cpp
 
 ####### Install
 

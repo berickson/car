@@ -28,7 +28,7 @@ public:
   double _y;
   double _heading;
 
-  Ackerman(double front_wheelbase_width, double wheelbase_length, double x=0., double y = 0, double radians = 0);
+  Ackerman(double front_wheelbase_width = 1.0, double wheelbase_length = 1.0, double x=0., double y = 0, double radians = 0);
 
   inline Point front_left_position() {
     Point p;

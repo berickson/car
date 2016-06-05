@@ -7,7 +7,10 @@ CONFIG += thread
 SOURCES += main.cpp \
     ackerman.cpp \
     usb.cpp \
-    dynamics.cpp
+    dynamics.cpp \
+    car.cpp \
+    config.cpp \
+    work_queue.cpp
 
 HEADERS += \
     geometry.h \
@@ -15,5 +18,8 @@ HEADERS += \
     usb.h \
     work_queue.h \
     dynamics.h \
-    split.h
+    split.h \
+    car.h \
+    config.h \
+    trim.h
 

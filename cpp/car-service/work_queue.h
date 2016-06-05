@@ -7,14 +7,14 @@
 #include <condition_variable>
 
 using namespace std;
-
+template <class T>
 class WorkQueue {
   std::mutex qMutex;
-  std::queue<string> q;
+  std::queue<T> q;
   std::condition_variable populatedNotifier;
 
 public:
-  void push(std::string&& s) {
+  void push(T&& s) {
     {
       std::lock_guard<std::mutex> lock(qMutex);
       q.push(std::move(s));
@@ -23,7 +23,7 @@ public:
     populatedNotifier.notify_one();
   }
 
-  bool try_pop(std::string& s, std::chrono::milliseconds timeout) {
+  bool try_pop(T& s, std::chrono::milliseconds timeout) {
     std::unique_lock<std::mutex> lock(qMutex);
 
     if(!populatedNotifier.wait_for(lock, timeout, [this] { return !q.empty(); }))
@@ -37,17 +37,7 @@ public:
 };
 
 using namespace std::chrono_literals;
-void test_work_queue() {
-  WorkQueue q;
-  q.push("hello");
-  string s;
-  chrono::milliseconds time_out(500);
-  if(q.try_pop(s, time_out)){
-    cout << "got " << s << " from queue" << endl;
-  }
-  bool timed_out = q.try_pop(s,time_out);
-  cout << "executed queue success of 0, was " << timed_out << endl;
-}
+void test_work_queue();
 
 
 #endif // WORK_QUEUE_H
