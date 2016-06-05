@@ -5,7 +5,7 @@
 #include "split.h"
 #include <string>
 
-#include <trim.h>
+#include "trim.h"
 
 using namespace std;
 

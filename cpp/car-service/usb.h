@@ -2,7 +2,7 @@
 #define USB_H
 
 #include <list>
-#include <work_queue.h>
+#include "work_queue.h"
 #include <thread>
 #include <mutex>
 
