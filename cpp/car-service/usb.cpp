@@ -9,6 +9,7 @@
 #include "split.h"
 
 using namespace std;
+using namespace std::chrono;
 
 void Usb::add_line_listener(WorkQueue<string>*listener){
   line_listeners.push_back(listener);
@@ -51,20 +52,24 @@ void Usb::process_data(string data) {
   }
 }
 
+void Usb::write_line(string text) {
+  std::unique_lock<std::mutex> l(usb_mutex);
+  pending_write += text + "\n";
+}
+
 void Usb::monitor_incoming_data() {
-  const int error = -1; // error constant for file operations
   const int buf_size = 2000;
   char buf[buf_size];
   const int poll_us = 1000;    // one millisecond
-  const int max_wait_us = 1E6; // one second
+  const int max_wait_us = 2E6; // two second
 
   while(!quit) {
-    int fd = error;
+    fd = fd_error;
     // find and open usb
     for(string usb_path : glob("/dev/ttyACM*")) {
-      fd = open(usb_path.c_str(), O_RDONLY | O_NONBLOCK);
-      if(fd != error) {
-        //cout << "connected to port" << usb_path << endl;
+      fd = open(usb_path.c_str(), O_RDWR | O_NONBLOCK | O_SYNC | O_APPEND);
+      if(fd != fd_error) {
+        cout << "connected to port" << usb_path << endl;
         break;
       }
     }
@@ -74,11 +79,16 @@ void Usb::monitor_incoming_data() {
 
     // read until we hit an error a a quit
     int us_waited = 0;
-    while(fd != error && ! quit) {
+    while(fd != fd_error && ! quit) {
+      if(pending_write.length()>0) {
+        if(write(fd,pending_write.c_str(),pending_write.size()) != fd_error) {
+          pending_write = "";
+        }
+      }
       bool did_work = false;
       auto count = read(fd, buf, buf_size-1); // read(2)
 
-      if(count == error ) {
+      if(count == fd_error ) {
         break;
       }
       buf[count]=0;
@@ -95,7 +105,7 @@ void Usb::monitor_incoming_data() {
       }
     }
 
-    if(fd != error) {
+    if(fd != fd_error) {
       //cout << "closing usb" << endl;
       close(fd);
     }
@@ -123,8 +133,20 @@ void test_usb() {
   usb.add_line_listener(&q);
   usb.run();
   string s;
+  int i = 0;
+
+  auto t_start = high_resolution_clock::now();
+
   while(q.try_pop(s, 15000)) {
-    cout << "got item " << s << endl;
+    auto d = high_resolution_clock::now()-t_start;
+    duration<double> secs = duration_cast<duration<double>>(d);
+    cout << secs.count() << "got item " << s << endl;
+    cout << flush;
+    i++;
+    if(i%10==0) {
+      usb.write_line((string)"x"+to_string(secs.count()));
+    }
+
   }
   cout << "timed out once" << endl;
   if(q.try_pop(s, 15000)) {

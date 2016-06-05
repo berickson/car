@@ -7,6 +7,7 @@
 #include <condition_variable>
 
 using namespace std;
+using namespace std::chrono;
 template <class T>
 class WorkQueue {
   std::mutex q_mutex;
@@ -25,7 +26,6 @@ public:
 
   bool try_pop(T& s, int milliseconds) {
     std::unique_lock<std::mutex> lock(q_mutex);
-
     while(q.empty()) {
       chrono::milliseconds timeout(milliseconds);
       if (cv.wait_for(lock, timeout) == std::cv_status::timeout )

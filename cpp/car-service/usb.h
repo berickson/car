@@ -10,10 +10,14 @@ class Usb {
 public:
   void run();
   void stop();
+  void write_line(string text);
   void add_line_listener(WorkQueue<string>*);
   void remove_line_listener(WorkQueue<string>*);
 private:
-  std::mutex lock;
+  string pending_write;
+  const int fd_error = -1; // error constant for file operations
+  int fd = fd_error;
+  std::mutex usb_mutex;
   bool running = false;
   bool quit = false;
   void monitor_incoming_data();
