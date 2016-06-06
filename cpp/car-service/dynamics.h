@@ -12,7 +12,7 @@ using namespace std::chrono;
 struct Dynamics {
 public:
   Dynamics();
-  static Dynamics from_log_string(string &s);
+  static bool from_log_string(Dynamics &d, string &s);
   string to_string();
 
   system_clock::time_point datetime;

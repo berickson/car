@@ -11,6 +11,10 @@
 using namespace std;
 using namespace std::chrono;
 
+Usb::~Usb() {
+  stop();
+}
+
 void Usb::add_line_listener(WorkQueue<string>*listener){
   line_listeners.push_back(listener);
 }
@@ -20,8 +24,9 @@ void Usb::remove_line_listener(WorkQueue<string>*listener){
 }
 
 void Usb::send_to_listeners(string s) {
+  string stamped = "0,"+s;
   for(WorkQueue<string>* listener : line_listeners) {
-    listener->push(s.c_str());
+    listener->push(stamped.c_str());
   }
 }
 

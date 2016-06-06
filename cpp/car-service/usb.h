@@ -8,6 +8,7 @@
 
 class Usb {
 public:
+  ~Usb();
   void run();
   void stop();
   void write_line(string text);
