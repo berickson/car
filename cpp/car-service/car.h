@@ -6,6 +6,7 @@
 #include "ackerman.h"
 #include "dynamics.h"
 #include "work_queue.h"
+#include "usb.h"
 
 using namespace std;
 
@@ -13,6 +14,7 @@ class Car
 {
 public:
   Car(bool online = true);
+  ~Car();
   void reset_odometry();
 
   void add_listener(WorkQueue<Dynamics>*);
@@ -21,6 +23,8 @@ public:
   string config_path = "/home/brian/car/python/car.ini";
 
   bool online = false;
+  bool quit = false;
+  bool usb_error_count = 0;
 
   Ackerman ackerman;
 
@@ -51,6 +55,12 @@ public:
   double width;
 
 private:
+  Usb usb;
+  void usb_thread_start();
+  WorkQueue<string> usb_queue;
+  thread usb_thread;
+  void connect_usb();
+
   void read_configuration(string path);
   list<WorkQueue<Dynamics>*> listeners;
 };

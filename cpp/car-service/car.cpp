@@ -8,6 +8,42 @@ Car::Car(bool online) {
   read_configuration(config_path);
   this->online = online;
   reset_odometry();
+  if(online) {
+    connect_usb();
+  }
+}
+
+Car::~Car() {
+  quit=true;
+  usb_thread.join();
+}
+
+void Car::connect_usb() {
+  usb_thread = thread(&Car::usb_thread_start, this);
+}
+
+void Car::usb_thread_start() {
+  usb.add_line_listener(&usb_queue);
+  usb.run();
+  usb.write_line("td+"); // twice on purpose
+  usb.write_line("td+");
+  while(!quit) {
+    string line;
+    if(usb_queue.try_pop(line,1)) {
+      Dynamics d;
+      bool ok = Dynamics::from_log_string(d,line);
+      if(ok) {
+        for(auto listener:listeners) {
+          listener->push(std::move(d));
+        }
+      }
+      else {
+        cout << "dynamics not ok for " << line << endl;
+      }
+
+    }
+  }
+
 }
 
 void Car::add_listener(WorkQueue<Dynamics>* listener) {
@@ -61,4 +97,16 @@ void Car::reset_odometry() {
 void test_car() {
   Car car;
   cout << "front_wheelbase_width_in_meters: " << car.front_wheelbase_width_in_meters << endl;
+
+  WorkQueue<Dynamics> listener;
+  car.add_listener(&listener);
+  for(int i=0;i<10;i++) {
+    Dynamics d;
+    if(listener.try_pop(d,100)) {
+      cout << d.to_string() << endl;
+    } else {
+      cout << "timed out waiting for dynamics" << endl;
+    }
+  }
+  car.remove_listener(&listener);
 }
