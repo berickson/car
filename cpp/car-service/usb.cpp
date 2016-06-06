@@ -60,7 +60,7 @@ void Usb::write_line(string text) {
 void Usb::monitor_incoming_data() {
   const int buf_size = 2000;
   char buf[buf_size];
-  const int poll_us = 1000;    // one millisecond
+  const int poll_us = 1000;    
   const int max_wait_us = 2E6; // two second
 
   while(!quit) {
@@ -100,7 +100,7 @@ void Usb::monitor_incoming_data() {
       if(!did_work) {
         if(us_waited > max_wait_us) // one second
           break;
-        usleep(poll_us); // wait 1 ms for more data
+        usleep(poll_us);
         us_waited += poll_us;
       }
     }
