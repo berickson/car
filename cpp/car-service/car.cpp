@@ -100,10 +100,11 @@ void test_car() {
 
   WorkQueue<Dynamics> listener;
   car.add_listener(&listener);
-  for(int i=0;i<10;i++) {
+  int message_count = 10000;
+  for(int i=0;i<message_count;i++) {
     Dynamics d;
     if(listener.try_pop(d,100)) {
-      cout << d.to_string() << endl;
+      cout << "." << flush;//cout << d.to_string() << endl;
     } else {
       cout << "timed out waiting for dynamics" << endl;
     }
