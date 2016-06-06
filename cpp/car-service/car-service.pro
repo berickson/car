@@ -10,7 +10,8 @@ SOURCES += main.cpp \
     dynamics.cpp \
     car.cpp \
     config.cpp \
-    work_queue.cpp
+    work_queue.cpp \
+    fake_car.cpp
 
 HEADERS += \
     geometry.h \
@@ -23,5 +24,6 @@ HEADERS += \
     config.h \
     trim.h \
     glob_util.h \
-    ends_with.h
+    ends_with.h \
+    fake_car.h
 

@@ -30,6 +30,11 @@ inline double degrees(double radians) {
   return radians * 180 / M_PI;
 }
 
+inline double radians(double degrees) {
+  return degrees* M_PI / 180;
+}
+
+
 //#returns theta in range of [-pi,pi)
 inline double standardized_radians(double theta) {
   return fmod(theta + M_PI , 2.*M_PI) - M_PI;
@@ -147,21 +152,16 @@ def table_lookup(kv, key):
           key, kv[i][0], kv[i][1], kv[i+1][0], kv[i+1][1])
 
 
-
-#returns y for given x based on x1,y1,x2,y2
-def interpolate(x, x1, y1, x2, y2):
-  x = float(x)
-  x1 = float(x1)
-  x2 = float(x2)
-  y1 = float(y1)
-  y2 = float(y2)
-
-  #print("x:{} x1:{} y1:{} x2:{} y2:{}".format(x,x1,y1,x2,y2))
-  m = (y2 - y1)/( x2 - x1 )
-  y = y1 + m * (x-x1)
-  return y
-
 */
+
+// returns y for given x based on x1,y1,x2,y2
+inline double interpolate(double x, double x1, double y1, double x2, double y2){
+  double m = (y2 - y1)/( x2 - x1 );
+  return y1 + m * (x-x1);
+}
+
+
+
 inline double clamp(double value, double min_value, double max_value) {
   if(value < min_value)
     return min_value;

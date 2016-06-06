@@ -4,6 +4,7 @@
 #include <list>
 #include <string>
 #include "ackerman.h"
+#include "geometry.h"
 #include "dynamics.h"
 #include "work_queue.h"
 #include "usb.h"
@@ -29,9 +30,13 @@ public:
   Ackerman ackerman;
 
   // state variables
-  Dynamics dynamics;
+  Dynamics current_dynamics;
+  Dynamics previous_dynamics;
+  Dynamics original_dynamics;
+  int reading_count = 0;
 
   double velocity;
+  double last_verified_velocity;
   double last_velocity;
   double heading_adjustment;
   int odometer_start;
@@ -54,6 +59,15 @@ public:
   double length;
   double width;
 
+  // accessors
+  double heading_degrees();
+  double heading_radians();
+
+  double angle_for_steering(int str);
+
+  // infrastructure
+  void process_line_from_log(string s);
+  void apply_dynamics(Dynamics & d);
 private:
   Usb usb;
   void usb_thread_start();

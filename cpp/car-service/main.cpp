@@ -11,6 +11,7 @@
 #include "dynamics.h"
 #include "config.h"
 #include "car.h"
+#include "fake_car.h"
 
 #include "split.h"
 
@@ -20,8 +21,9 @@ using namespace std;
 
 
 int main(int, char *[]) {
+  test_fake_car();
   //test_dynamics();
-  test_car();
+  //test_car();
   //test_usb();
   //test_split();
   //test_config();
