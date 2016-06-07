@@ -10,17 +10,17 @@
 
 using namespace std;
 
-Ackerman::Ackerman(double front_wheelbase_width, double wheelbase_length, double x, double y, double radians) {
-  _w = front_wheelbase_width;
-  _l = wheelbase_length;
-  _x = x;
-  _y = y;
-  _heading = radians;
+Ackerman::Ackerman(double front_wheelbase_width, double wheelbase_length, double x_, double y_, double radians) {
+  w = front_wheelbase_width;
+  l = wheelbase_length;
+  x = x_;
+  y = y_;
+  heading = radians;
 }
 
 string Ackerman::to_string() {
   stringstream ss;
-  ss <<  "Ackerman x:" << _x << " y:" << _y << " heading: " << _heading;
+  ss <<  "Ackerman x:" << x << " y:" << y << " heading: " << heading;
   return ss.str() ;
 }
 
@@ -28,11 +28,11 @@ string Ackerman::to_string() {
 Ackerman::Arc Ackerman::arc_to_relative_location(double x,double y) {
   Arc arc;
   if(fabs(y) > 0.000001) {
-    double z=length(_l+x/2,x/y*(_l+x/2));
+    double z=length(l+x/2,x/y*(l+x/2));
     double c=length(x,y)/2;
 
     arc.r = length(z,c);
-    arc.steer_radians = asin(clamp(_l/arc.r,-.99,0.99));
+    arc.steer_radians = asin(clamp(l/arc.r,-.99,0.99));
     arc.arc_radians = 2*asin(c/arc.r);
     arc.arc_len = arc.r * arc.arc_radians;
 
@@ -64,13 +64,13 @@ void Ackerman::move_left_wheel(double outside_wheel_angle, double wheel_distance
     left = 0.;
   } else {
     // calculate front wheel horizontal offset from center of rear wheels to left wheel
-    double offset = outside_wheel_angle < 0. ? -_w/2. : _w/2.;
+    double offset = outside_wheel_angle < 0. ? -w/2. : w/2.;
 
     // calculate turn radius of center rear of car
-    double r_car = _l / tan(outside_wheel_angle) - offset;
+    double r_car = l / tan(outside_wheel_angle) - offset;
 
     // calculate turn radius of left wheel
-    double r_left = length(r_car + offset,_l);
+    double r_left = length(r_car + offset,l);
     // make radius negative for right turns
     if (outside_wheel_angle < 0) {
       r_left = -r_left;
@@ -83,12 +83,12 @@ void Ackerman::move_left_wheel(double outside_wheel_angle, double wheel_distance
   }
 
   // finally, move the car based on left and forward
-  _x += cos(_heading)*forward;
-  _y += sin(_heading)*forward;
-  _x += sin(_heading)*left;
-  _y += cos(_heading)*left;
+  x += cos(heading)*forward;
+  y += sin(heading)*forward;
+  x += sin(heading)*left;
+  y += cos(heading)*left;
 
-  _heading = isnan(new_heading) ? standardized_radians(_heading + turn_angle) : new_heading;
+  heading = isnan(new_heading) ? standardized_radians(heading + turn_angle) : new_heading;
 }
 
 
