@@ -18,6 +18,8 @@ void FakeCar::reset() {
   if(dynamics_file.is_open()) {
     reset_odometry();
     step();
+  } else {
+    throw (string) "could not open " + recording_file_path;
   }
 }
 
@@ -34,8 +36,9 @@ bool FakeCar::step() {
 
 
 void test_fake_car() {
+  string recording_path = "/home/brian/car/tracks/desk/routes/A/runs/47/recording.csv";
 
-  FakeCar car("/home/brian/car/tracks/desk/routes/A/runs/47/recording.csv");
+  FakeCar car(recording_path);
   cout << "processing" << endl;
   int steps = 0;
   while(car.step()) {

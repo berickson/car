@@ -21,11 +21,16 @@ using namespace std;
 
 
 int main(int, char *[]) {
-  test_fake_car();
-  //test_dynamics();
-  //test_car();
-  //test_usb();
-  //test_split();
-  //test_config();
-  //test_work_queue();
+  try {
+    test_fake_car();
+    
+    //test_dynamics();
+    //test_car();
+    //test_usb();
+    //test_split();
+    //test_config();
+    //test_work_queue();
+  } catch (string & s) {
+    cout << "caught: " << s << endl;
+  }
 }
