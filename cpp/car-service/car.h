@@ -39,7 +39,7 @@ public:
   double last_verified_velocity;
   double last_velocity;
   double heading_adjustment;
-  int odometer_start;
+
   int odometer_front_left_start;
   int odometer_front_right_start;
   int odometer_back_left_start;

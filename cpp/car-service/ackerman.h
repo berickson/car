@@ -22,18 +22,18 @@ public:
     double arc_len;
   };
 
-  double _w;
-  double _l;
-  double _x;
-  double _y;
-  double _heading;
+  double w;
+  double l;
+  double x;
+  double y;
+  double heading;
 
   Ackerman(double front_wheelbase_width = 1.0, double wheelbase_length = 1.0, double x=0., double y = 0, double radians = 0);
 
   inline Point front_left_position() {
     Point p;
-    p.x = _x + _l * cos(_heading) - sin(_heading) * _w/2;
-    p.y = _y + _l * sin(_heading) - cos(_heading) * _w/2;
+    p.x = x + l * cos(heading) - sin(heading) * w/2;
+    p.y = y + l * sin(heading) - cos(heading) * w/2;
     return p;
   }
 

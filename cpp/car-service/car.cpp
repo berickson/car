@@ -144,7 +144,6 @@ void Car::reset_odometry() {
   velocity = 0.0;
   last_velocity = 0.0;
   heading_adjustment = 0.;
-  odometer_start = 0;
   odometer_front_left_start = 0;
   odometer_front_right_start = 0;
   odometer_back_left_start = 0;
@@ -153,25 +152,6 @@ void Car::reset_odometry() {
     front_wheelbase_width_in_meters,
     wheelbase_length_in_meters);
 }
-
-void test_car() {
-  Car car;
-  cout << "front_wheelbase_width_in_meters: " << car.front_wheelbase_width_in_meters << endl;
-
-  WorkQueue<Dynamics> listener;
-  car.add_listener(&listener);
-  int message_count = 10000;
-  for(int i=0;i<message_count;i++) {
-    Dynamics d;
-    if(listener.try_pop(d,100)) {
-      cout << "." << flush;//cout << d.to_string() << endl;
-    } else {
-      cout << "timed out waiting for dynamics" << endl;
-    }
-  }
-  car.remove_listener(&listener);
-}
-
 
 double Car::heading_degrees() {
   return standardized_degrees(
@@ -216,4 +196,22 @@ double Car::angle_for_steering(int str) {
   }
 
   return NAN;
+}
+
+void test_car() {
+  Car car;
+  cout << "front_wheelbase_width_in_meters: " << car.front_wheelbase_width_in_meters << endl;
+
+  WorkQueue<Dynamics> listener;
+  car.add_listener(&listener);
+  int message_count = 10000;
+  for(int i=0;i<message_count;i++) {
+    Dynamics d;
+    if(listener.try_pop(d,100)) {
+      cout << "." << flush;//cout << d.to_string() << endl;
+    } else {
+      cout << "timed out waiting for dynamics" << endl;
+    }
+  }
+  car.remove_listener(&listener);
 }

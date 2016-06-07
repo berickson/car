@@ -35,11 +35,11 @@ bool FakeCar::step() {
 
 void test_fake_car() {
 
-  FakeCar car("/home/brian/car/tracks/desk/routes/A/runs/70/recording.csv");
+  FakeCar car("/home/brian/car/tracks/desk/routes/A/runs/47/recording.csv");
   cout << "processing" << endl;
   int steps = 0;
   while(car.step()) {
     steps++;
   }
-  cout << "processed " << steps << " steps to arrive at x:" << car.ackerman._x << " y: " << car.ackerman._y << endl;
+  cout << "processed " << steps << " steps to arrive at x:" << car.ackerman.x << " y: " << car.ackerman.y << endl;
 }
