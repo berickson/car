@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
 
                 [&]() {
                    view.rotate(2);
+
                 });
 
 

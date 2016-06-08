@@ -11,7 +11,8 @@ SOURCES += main.cpp \
     car.cpp \
     config.cpp \
     work_queue.cpp \
-    fake_car.cpp
+    fake_car.cpp \
+    menu.cpp
 
 HEADERS += \
     geometry.h \
@@ -25,5 +26,6 @@ HEADERS += \
     trim.h \
     glob_util.h \
     ends_with.h \
-    fake_car.h
+    fake_car.h \
+    menu.h
 

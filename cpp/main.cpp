@@ -14,6 +14,7 @@
 #include "fake_car.h"
 
 #include "split.h"
+#include "menu.h"
 
 using namespace std;
 
@@ -22,7 +23,9 @@ using namespace std;
 
 int main(int, char *[]) {
   try {
-    test_fake_car();
+    test_menu();
+    //test_menu();
+    //test_fake_car();
     
     //test_dynamics();
     //test_car();
