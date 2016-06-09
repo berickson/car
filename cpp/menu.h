@@ -2,7 +2,7 @@
 #define MENU_H
 
 #include <string>
-#include <list>
+#include <vector>
 #include <functional>
 
 using namespace std;
@@ -18,14 +18,16 @@ struct MenuItem {
 
 };
 
-typedef list<MenuItem> SubMenu;
+typedef vector<MenuItem> SubMenu;
 
 
 
 class Menu
 {
 public:
-  SubMenu * current;
+  SubMenu * current_submenu;
+  unsigned int current_index = 0;
+
   Menu(SubMenu * top);
 
   void up();
@@ -33,8 +35,10 @@ public:
   void enter();
   void escape();
 
-  void run();
+  virtual void run();
+  virtual void display(){}
 };
+
 
 void test_menu();
 

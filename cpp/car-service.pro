@@ -12,7 +12,10 @@ SOURCES += main.cpp \
     config.cpp \
     work_queue.cpp \
     fake_car.cpp \
-    menu.cpp
+    menu.cpp \
+    system.cpp \
+    car_menu.cpp \
+    console_menu.cpp
 
 HEADERS += \
     geometry.h \
@@ -27,5 +30,10 @@ HEADERS += \
     glob_util.h \
     ends_with.h \
     fake_car.h \
-    menu.h
+    menu.h \
+    system.h \
+    car_menu.h \
+    console_menu.h
 
+
+unix|win32: LIBS += -lncurses
