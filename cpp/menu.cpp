@@ -23,10 +23,17 @@ void Menu::enter() {
   if(current_submenu->items[current_submenu->current_index].action) {
     current_submenu->items[current_submenu->current_index].action();
   }
+  if(current_submenu->items[current_submenu->current_index].sub_menu) {
+    parents.push_back(current_submenu);
+    current_submenu = current_submenu->items[current_submenu->current_index].sub_menu;
+  }
 }
 
 void Menu::escape() {
-
+  if(parents.size()){
+    current_submenu = parents.back();
+    parents.pop_back();
+  }
 }
 
 void Menu::run() {

@@ -56,9 +56,7 @@ void ConsoleMenu::display() {
     auto menu_item = items[i];
     string s = menu_item.display_text();
 
-    if(menu_item.action)
-      s = s + "*";
-    else
+    if(menu_item.sub_menu)
       s = s + ">";
 
     bool selected = (i==current_submenu->current_index);
@@ -103,12 +101,19 @@ string time_string() {
 void test_console_menu() {
   int x = 1;
 
-  SubMenu m2 = {
+  SubMenu child = {
+    {[&]()->string {return "line 1";}},
+    {[&]()->string {return "line 2";}},
+    {[&]()->string {return "line 3";}},
+  };
+
+  SubMenu top = {
     {[&]()->string {return "x: " + to_string(x);}},
     {[&]()->string {return "increment x";},[&](){x++;}},
     {[&]()->string {return "2*x: " + to_string(x*2);}},
+    {[&]()->string {return "child";},&child},
     {[&]()->string {return time_string();}}
   };
-  ConsoleMenu m2menu(&m2);
+  ConsoleMenu m2menu(&top);
   m2menu.run();
 }

@@ -4,8 +4,12 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <list>
 
 using namespace std;
+
+
+class SubMenu;
 
 struct MenuItem {
   MenuItem( function<string()>display_text, function<void()> action = nullptr) {
@@ -13,8 +17,14 @@ struct MenuItem {
     this->action= action;
   }
 
+  MenuItem( function<string()>display_text, SubMenu * sub_menu) {
+    this->display_text = display_text;
+    this->sub_menu = sub_menu;
+  }
+
   function<string()> display_text;
   function<void()> action;
+  SubMenu * sub_menu = nullptr;
 
 };
 
@@ -42,6 +52,7 @@ public:
 
   virtual void run();
   virtual void display(){}
+  list<SubMenu*> parents;
 };
 
 
