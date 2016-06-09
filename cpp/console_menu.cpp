@@ -50,21 +50,26 @@ void ConsoleMenu::run() {
 
 void ConsoleMenu::display() {
   clear(); // always start by clearing the whole screan
-  for(unsigned int i=0;i<current_submenu->size();++i) {
+  auto items = current_submenu->items;
+  for(unsigned int i=0;i<items.size();++i) {
     move(i,0);
-    auto menu_item = (*current_submenu)[i];
+    auto menu_item = items[i];
     string s = menu_item.display_text();
 
     if(menu_item.action)
       s = s + "*";
     else
       s = s + ">";
-    if(i==current_index) {
+
+    bool selected = (i==current_submenu->current_index);
+    if(selected) {
       s = "["+s+"]";
     } else {
       s = " "+s+" ";
     }
+    if(selected) attron(A_BOLD);
     printw(s.c_str());
+    if(selected) attroff(A_BOLD);
   }
   refresh();
 }

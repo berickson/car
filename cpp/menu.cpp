@@ -8,20 +8,20 @@ Menu::Menu(SubMenu * top) {
   current_submenu = top;
 }
 void Menu::up() {
-  if(current_index > 0) {
-    --current_index;
+  if(current_submenu->current_index > 0) {
+    --current_submenu->current_index;
   }
 }
 
 void Menu::down() {
-  if(current_index+1 < current_submenu->size()){
-    ++current_index;
+  if(current_submenu->current_index+1 < current_submenu->items.size()){
+    ++current_submenu->current_index;
   }
 }
 
 void Menu::enter() {
-  if((*current_submenu)[current_index].action) {
-    (*current_submenu)[current_index].action();
+  if(current_submenu->items[current_submenu->current_index].action) {
+    current_submenu->items[current_submenu->current_index].action();
   }
 }
 
@@ -30,7 +30,7 @@ void Menu::escape() {
 }
 
 void Menu::run() {
-  for(auto item:*current_submenu) {
+  for(auto item:current_submenu->items) {
     cout << item.display_text() << endl;
   }
 }

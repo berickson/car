@@ -18,7 +18,13 @@ struct MenuItem {
 
 };
 
-typedef vector<MenuItem> SubMenu;
+class SubMenu {
+public:
+  SubMenu(std::initializer_list<MenuItem> l): items(l){;}
+  vector<MenuItem> items;
+  unsigned int current_index = 0;
+
+};
 
 
 
@@ -26,7 +32,6 @@ class Menu
 {
 public:
   SubMenu * current_submenu;
-  unsigned int current_index = 0;
 
   Menu(SubMenu * top);
 
