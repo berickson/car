@@ -1,1 +1,1 @@
-g++ -std=c++11 -pthread -o car-service ../../cpp/car-service/*.cpp
+g++ -std=c++11 -pthread -lncurses -o car-service ../../cpp/*.cpp
