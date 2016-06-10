@@ -57,9 +57,24 @@ void ConsoleMenu::run() {
 
 void ConsoleMenu::display() {
   clear(); // always start by clearing the whole screan
+
+  // see if current item fits on screen, adjust offset if necessary
+  while( ((int)current_submenu->current_index - (int)current_submenu->display_offset) > (h-1) ) {
+    ++(current_submenu->display_offset);
+  }
+  // move up if it is off the top
+  while(current_submenu->current_index < current_submenu->display_offset) {
+    --(current_submenu->display_offset);
+  }
+
+
+
   auto items = current_submenu->items;
-  for(unsigned int i=0;i<items.size();++i) {
-    move(i,0);
+  for(unsigned int i=current_submenu->display_offset;i<items.size();++i) {
+    int line = i-current_submenu->display_offset;
+    if(line >= h) break;
+
+    move(line,0);
     auto menu_item = items[i];
     string s = menu_item.display_text();
 

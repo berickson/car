@@ -58,16 +58,34 @@ void update_route_selection_menu() {
   selection_menu<string>(route_selection_menu, route_names, get_route_name, set_route_name);
 }
 
-
 string get_track_name() {
   return car_settings.track_name;
 }
+
 void set_track_name(string s) {
   car_settings.track_name = s;
   update_route_selection_menu();
 }
 
 
+// getters / setters for config
+void set_max_a(double v){car_settings.max_a = v;}
+double get_max_a(){return car_settings.max_a;}
+
+void set_max_v(double v){car_settings.max_v = v;}
+double get_max_v(){return car_settings.max_v;}
+
+void set_t_ahead(double v){car_settings.t_ahead = v;}
+double get_t_ahead(){return car_settings.t_ahead;}
+
+void set_d_ahead(double v){car_settings.d_ahead = v;}
+double get_d_ahead(){return car_settings.d_ahead;}
+
+void set_k_smooth(double v){car_settings.k_smooth = v;}
+double get_k_smooth(){return car_settings.k_smooth;}
+
+void set_capture_video(double v){car_settings.capture_video = v;}
+double get_capture_video(){return car_settings.capture_video;}
 
 
 
@@ -77,6 +95,16 @@ SubMenu pi_menu {
   {"restart",restart}
 };
 
+vector<double> linspace(double from, double to, double step) {
+  vector<double> v;
+  for(double d = from; d <= to; d+= step) {
+    v.push_back(d);
+  }
+  return v;
+}
+
+SubMenu acceleration_menu{};
+
 
 
 CarMenu::CarMenu() {
@@ -85,6 +113,7 @@ CarMenu::CarMenu() {
 void run_car_menu() {
   FakeCar car;
 
+  selection_menu<double>(acceleration_menu, linspace(0.25,10,0.25), get_max_a, set_max_a );
 
 
   SubMenu track_selection_menu{};
@@ -95,7 +124,8 @@ void run_car_menu() {
 
   SubMenu route_menu {
     {[](){return (string)"track ["+car_settings.track_name+"]";},&track_selection_menu},
-    {[](){return (string)"route ["+car_settings.route_name+"]";},&route_selection_menu}
+    {[](){return (string)"route ["+car_settings.route_name+"]";},&route_selection_menu},
+    {[](){return (string)"max_a ["+to_string(car_settings.max_a)+"]";},&acceleration_menu}
 
   };
 

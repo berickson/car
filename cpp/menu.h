@@ -44,6 +44,7 @@ public:
   SubMenu(std::initializer_list<MenuItem> l): items(l){;}
   vector<MenuItem> items;
   unsigned int current_index = 0;
+  unsigned int display_offset = 0;
 
 };
 
@@ -93,7 +94,7 @@ template <class T> void selection_menu(
 {
   for(T value:values) {
     MenuItem m(
-      [value,getter](){return selection_text(value,getter());},
+      [value,getter](){return selection_text<T>(value,getter());},
       [value,setter](){setter(value);});
     s.items.push_back(std::move(m));
   }
