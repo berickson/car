@@ -26,7 +26,8 @@ using namespace std;
 
 int main(int, char *[]) {
   try {
-    test_console_menu();
+    test_car_menu();
+    //test_console_menu();
     // test_car_menu();
     //test_system();
     //test_menu();

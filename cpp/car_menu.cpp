@@ -1,21 +1,45 @@
 #include "car_menu.h"
 #include "menu.h"
 #include "system.h"
+#include "console_menu.h"
+
+
+
+
+void shutdown(){
+  system("sudo shutdown now");
+}
+void reboot(){
+  system("sudo shutdown -r now");
+
+}
+void restart(){
+  system("sudo service car restart");
+}
+
+
+
+
+SubMenu pi_menu {
+  {"shutdown",shutdown},
+  {"reboot",reboot},
+  {"restart",restart}
+};
+
+SubMenu car_menu {
+  {"pi",&pi_menu}
+};
+
 
 
 CarMenu::CarMenu() {
+}
+
+void run_car_menu() {
 
 }
 
 void test_car_menu() {
-  int x = 3;
-
-  SubMenu m2 = {
-
-    {[&]()->string {return "ip: " + get_first_ip_address();}},
-    {[&]()->string {return "2*x: " + to_string(x*2);}}
-  };
-  Menu m2menu(&m2);
-  m2menu.run();
-
+  ConsoleMenu menu(&car_menu);
+  menu.run();
 }

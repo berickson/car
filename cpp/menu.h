@@ -12,6 +12,16 @@ using namespace std;
 class SubMenu;
 
 struct MenuItem {
+  MenuItem(const char *s, function<void()> action = nullptr) {
+    this->display_text = [s](){return s;};
+    this->action = action;
+  }
+
+  MenuItem( const char *s, SubMenu * sub_menu) {
+    this->display_text = [s](){return s;};;
+    this->sub_menu = sub_menu;
+  }
+
   MenuItem( function<string()>display_text, function<void()> action = nullptr) {
     this->display_text = display_text;
     this->action= action;

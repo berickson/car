@@ -6,6 +6,7 @@ class CarMenu
 {
 public:
     CarMenu();
+    void run();
 };
 
 void test_car_menu();
