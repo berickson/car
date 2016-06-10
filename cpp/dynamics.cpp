@@ -39,9 +39,9 @@ string Dynamics::to_string() {
      << "ms:" << ms << endl
      << "us:" << us << endl
 
-     << "yaw:" << yaw << endl
-     << "pitch:" << pitch << endl
-     << "roll:" << roll << endl
+     << "yaw:" << yaw.to_string() << endl
+     << "pitch:" << pitch.to_string() << endl
+     << "roll:" << roll.to_string() << endl
 
      << "battery_voltage:" << battery_voltage << endl;
   return ss.str();

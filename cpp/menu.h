@@ -1,6 +1,7 @@
 #ifndef MENU_H
 #define MENU_H
 
+#include <sstream>
 #include <string>
 #include <vector>
 #include <functional>
@@ -64,6 +65,40 @@ public:
   virtual void display(){}
   list<SubMenu*> parents;
 };
+
+
+
+template<class T> string selection_text(T option, T current) {
+  stringstream ss;
+  ss << option;
+
+  if (option == current)
+    ss << "(*)";
+  else
+    ss << "( )";
+  return ss.str();
+}
+
+template <class T> string to_string2(T v){
+  stringstream ss;
+  ss << v;
+  return ss.str();
+}
+
+template <class T> void selection_menu(
+    SubMenu& s,
+    const vector<T>& values,
+    function<T()>getter,
+    function<void(T)>setter)
+{
+  for(T value:values) {
+    MenuItem m(
+      [value,getter](){return selection_text(value,getter());},
+      [value,setter](){setter(value);});
+    s.items.push_back(std::move(m));
+  }
+}
+
 
 
 void test_menu();

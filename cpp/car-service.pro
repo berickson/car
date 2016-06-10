@@ -34,7 +34,8 @@ HEADERS += \
     menu.h \
     system.h \
     car_menu.h \
-    console_menu.h
+    console_menu.h \
+    filenames.h
 
 
 unix|win32: LIBS += -lncurses

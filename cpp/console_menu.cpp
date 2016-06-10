@@ -42,37 +42,17 @@ void ConsoleMenu::run() {
 
     }
   }
+  catch(string &e) {
+    endwin();
+    cout << "cought error string: " << e << endl;
+    throw(e);
+  }
   catch(...) {
     endwin();
     cout << "error caught in menu::run" << endl;
     throw;
   }
   endwin();
-}
-
-template<class T> string selection_text(T option, T current) {
-  stringstream ss;
-  ss << option;
-
-  if (option == current)
-    ss << "(*)";
-  else
-    ss << "( )";
-  return ss.str();
-}
-
-template <class T> void selection_menu(
-    SubMenu& s,
-    const list<T>& values,
-    function<T()>getter,
-    function<void(T)>setter)
-{
-  for(T value:values) {
-    MenuItem m(
-      [value,&getter](){return selection_text(value,getter());},
-      [value,&setter](){setter(value);});
-    s.items.push_back(m);
-  }
 }
 
 void ConsoleMenu::display() {
@@ -147,9 +127,9 @@ void test_console_menu() {
   int x = 1;
 
   SubMenu letters({});
-  selection_menu<string>(letters, list<string>({"a","b","c"}),get_letter,set_letter);
+  selection_menu<string>(letters, vector<string>({"a","b","c"}),get_letter,set_letter);
   SubMenu numbers({});
-  selection_menu<double>(numbers, list<double>({3,4,5.5}),get_number,set_number);
+  selection_menu<double>(numbers, vector<double>({3,4,5.5}),get_number,set_number);
 
   SubMenu child = {
     {[&]()->string {return "line 1";}},

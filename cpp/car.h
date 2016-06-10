@@ -63,8 +63,22 @@ public:
   double width;
 
   // accessors
+  Angle get_heading();
   double get_heading_degrees();
   double get_heading_radians();
+
+  int get_odometer_front_left() {
+    return current_dynamics.odometer_front_left;
+  }
+  int get_odometer_front_right() {
+    return current_dynamics.odometer_front_right;
+  }
+  int get_odometer_back_left() {
+    return current_dynamics.odometer_back_left;
+  }
+  int get_odometer_back_right() {
+    return current_dynamics.odometer_back_right;
+  }
 
   inline double get_voltage(){
     return voltage;

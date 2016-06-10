@@ -2,6 +2,7 @@
 #include <list>
 #include <string>
 #include <iostream>
+#include <algorithm>
 
 
 #include <stdio.h>
@@ -10,6 +11,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <dirent.h>
 
 using namespace std;
 
@@ -63,6 +65,45 @@ string get_first_ip_address() {
     return addresses.front();
   return "not connected";
 }
+
+
+
+// returns sorted list of child folders
+std::vector<std::string> child_folders (string folder) {
+  vector<string> rv;
+  DIR *dir = opendir(folder.c_str());
+  if(!dir) throw string("could not open folder" + folder);
+  struct dirent *entry = readdir(dir);
+
+  while (entry != NULL) {
+    if (entry->d_type == DT_DIR && entry->d_name[0] != '.'){
+      string s = string(entry->d_name);
+      rv.push_back(s);
+    }
+    entry = readdir(dir);
+  }
+
+  closedir(dir);
+  std::sort(rv.begin(),rv.end());
+  return rv;
+}
+
+bool file_exists(string path) {
+  ifstream f(path.c_str());
+  return f.good();
+
+}
+
+string path_join(string x, string y) {
+  if(x[x.length()-1]=='/') {
+    return x+y;
+  } else {
+    return x+"/"+y;
+  }
+}
+
+
+
 
 void test_system() {
     test_get_ip_addresses();

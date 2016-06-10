@@ -3,6 +3,8 @@
 
 #include <string>
 #include <list>
+#include <vector>
+#include <fstream>
 
 
 using namespace std;
@@ -12,6 +14,13 @@ class System
 public:
     System();
 };
+
+string path_join(string x, string y);
+
+// returns true if file at path exists
+bool file_exists(string path);
+
+vector<string> child_folders(string folder);
 
 
 list<string> get_ip_addresses();

@@ -217,7 +217,8 @@ DIST          = ../../../../Qt2.0.3/5.6/gcc_64/mkspecs/features/spec_pre.prf \
 		menu.h \
 		system.h \
 		car_menu.h \
-		console_menu.h ../../cpp/main.cpp \
+		console_menu.h \
+		filenames.h ../../cpp/main.cpp \
 		../../cpp/ackerman.cpp \
 		../../cpp/usb.cpp \
 		../../cpp/dynamics.cpp \
@@ -567,6 +568,7 @@ usb.o: ../../cpp/usb.cpp ../../cpp/usb.h \
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o usb.o ../../cpp/usb.cpp
 
 dynamics.o: ../../cpp/dynamics.cpp ../../cpp/dynamics.h \
+		../../cpp/geometry.h \
 		../../cpp/split.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o dynamics.o ../../cpp/dynamics.cpp
 

@@ -155,17 +155,22 @@ void Car::reset_odometry() {
     wheelbase_length_in_meters);
 }
 
-double Car::get_heading_degrees() {
+
+Angle Car::get_heading() {
   Angle a = (
         current_dynamics.yaw
         - original_dynamics.yaw
         + heading_adjustment);
   a.standardize();
-  return a.degrees();
+  return a;
+}
+
+double Car::get_heading_degrees() {
+  return get_heading().degrees();
 }
 
 double Car::get_heading_radians() {
-  return radians(get_heading_degrees());
+  return get_heading().radians();
 }
 
 double Car::angle_for_steering(int str) {
