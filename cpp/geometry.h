@@ -5,16 +5,98 @@
 #include <string>
 #include <sstream>
 
+
 using namespace std;
 
 struct Point {
   double x;
   double y;
-  string to_string() {
+  inline string to_string() const {
     stringstream ss;
     ss << "(" << x << "," << y << ")";
     return ss.str();
   }
+};
+
+inline string to_string(const Point &p) {
+  return p.to_string();
+}
+
+struct Angle {
+  static Angle degrees(double d) {
+    Angle a;
+    a.set_degrees(d);
+    return a;
+  }
+
+  static Angle radians(double rad) {
+    Angle a;
+    a.theta = rad;
+    return a;
+  }
+
+  inline double radians() const {
+    return theta;
+  }
+  inline double degrees() const  {
+    return theta * 180. / M_PI;
+  }
+  inline void set_degrees(double d) {
+    theta = d * M_PI/180.;
+  }
+
+
+  inline void standardize() {
+   theta = fmod(theta + M_PI , 2.*M_PI) - M_PI;
+  }
+
+  const inline string to_string() {
+    return std::to_string(degrees())+"°";
+  }
+
+  inline Angle & operator /= (double d)   {
+    theta /= d;
+    return *this;
+  }
+
+
+  inline Angle operator / (double d) const  {
+    Angle rv;
+    rv.theta = this->theta / d;
+    return rv;
+  }
+
+
+  inline Angle operator * (double d) const  {
+    Angle rv;
+    rv.theta = this->theta * d;
+    return rv;
+  }
+
+  inline Angle operator + (const Angle & rhs) const  {
+    Angle rv;
+    rv.theta = this->theta + rhs.theta;
+    return rv;
+  }
+
+  inline Angle & operator += (const Angle & rhs) {
+    theta += rhs.theta;
+    return *this;
+  }
+
+  inline Angle operator - (const Angle & rhs) const  {
+    Angle rv;
+    rv.theta = this->theta - rhs.theta;
+    rv.standardize();
+    return rv;
+  }
+
+private:
+  //inline operator double & () {
+  //  return theta;
+ // }
+
+  double theta; //radians
 };
 
 /*
@@ -170,6 +252,8 @@ inline double clamp(double value, double min_value, double max_value) {
   return value;
 }
 
+
+void test_geometry();
 
 
 

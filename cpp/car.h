@@ -23,6 +23,7 @@ public:
 
   string config_path = "/home/brian/car/python/car.ini";
 
+
   bool online = false;
   bool quit = false;
   bool usb_error_count = 0;
@@ -38,12 +39,14 @@ public:
   double velocity;
   double last_verified_velocity;
   double last_velocity;
-  double heading_adjustment;
+  Angle heading_adjustment;
 
   int odometer_front_left_start;
   int odometer_front_right_start;
   int odometer_back_left_start;
   int odometer_back_right_start;
+
+  double voltage = NAN;
 
   // calibrated measurements
   double meters_per_odometer_tick;
@@ -60,8 +63,24 @@ public:
   double width;
 
   // accessors
-  double heading_degrees();
-  double heading_radians();
+  double get_heading_degrees();
+  double get_heading_radians();
+
+  inline double get_voltage(){
+    return voltage;
+  };
+
+  inline Point get_front_position(){
+    return ackerman.front_position();
+  };
+
+  inline Point get_rear_position(){
+    return ackerman.rear_position();
+  };
+
+  inline int get_usb_error_count() {
+    return usb_error_count;
+  }
 
   double angle_for_steering(int str);
 

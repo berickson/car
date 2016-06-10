@@ -22,9 +22,9 @@ public:
     double arc_len;
   };
 
-  double w;
+  double w; // width of front wheelbase
   double l;
-  double x;
+  double x; // x and y are at center of rear wheels
   double y;
   double heading;
 
@@ -36,6 +36,21 @@ public:
     p.y = y + l * sin(heading) - cos(heading) * w/2;
     return p;
   }
+
+  inline Point front_position() {
+    Point p;
+    p.x = x + l * cos(heading) - sin(heading);
+    p.y = y + l * sin(heading) - cos(heading);
+    return p;
+  }
+
+  inline Point rear_position() {
+    Point p;
+    p.x = x;
+    p.y = y;
+    return p;
+  }
+
 
   void move_left_wheel(double outside_wheel_angle, double wheel_distance, double new_heading = NAN);
   Arc arc_to_relative_location(double x,double y);

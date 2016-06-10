@@ -4,6 +4,8 @@
 #include <chrono>
 #include <string>
 #include <sstream>
+#include "geometry.h"
+
 
 
 using namespace std;
@@ -43,9 +45,9 @@ public:
   int odometer_back_right_last_us;
   int ms;
   int us;
-  double yaw;
-  double pitch;
-  double roll;
+  Angle yaw;
+  Angle pitch;
+  Angle roll;
   double battery_voltage;
 };
 

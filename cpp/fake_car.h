@@ -8,7 +8,7 @@ using namespace std;
 
 class FakeCar : public Car{
 public:
-  FakeCar(string recording_path);
+  FakeCar(string recording_path = "/home/brian/car/tracks/desk/routes/A/runs/47/recording.csv");
   void reset();
   bool step();
 

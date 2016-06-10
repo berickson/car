@@ -67,14 +67,16 @@ void Car::apply_dynamics(Dynamics & d) {
 
 
   // correct heading with adjustment factor
-  heading_adjustment += (1. - gyro_adjustment_factor) * standardized_degrees(current.yaw - previous.yaw);
+  auto temp = (current.yaw - previous.yaw);
+  Angle adjustment = temp * (1. - gyro_adjustment_factor) ;
+  heading_adjustment += adjustment;
 
   // if wheels have moved, update ackerman
   double wheel_distance_meters = (current.odometer_front_left-previous.odometer_front_left)  * meters_per_odometer_tick;
 
   if (fabs(wheel_distance_meters) > 0.) {
     double outside_wheel_angle = radians(angle_for_steering(previous.str));
-    ackerman.move_left_wheel(outside_wheel_angle, wheel_distance_meters, heading_radians());
+    ackerman.move_left_wheel(outside_wheel_angle, wheel_distance_meters, get_heading_radians());
   }
 
   // update velocity
@@ -143,7 +145,7 @@ void Car::reset_odometry() {
 
   velocity = 0.0;
   last_velocity = 0.0;
-  heading_adjustment = 0.;
+  heading_adjustment = Angle::degrees(0.);
   odometer_front_left_start = 0;
   odometer_front_right_start = 0;
   odometer_back_left_start = 0;
@@ -153,15 +155,17 @@ void Car::reset_odometry() {
     wheelbase_length_in_meters);
 }
 
-double Car::heading_degrees() {
-  return standardized_degrees(
+double Car::get_heading_degrees() {
+  Angle a = (
         current_dynamics.yaw
         - original_dynamics.yaw
         + heading_adjustment);
+  a.standardize();
+  return a.degrees();
 }
 
-double Car::heading_radians() {
-  return radians(heading_degrees());
+double Car::get_heading_radians() {
+  return radians(get_heading_degrees());
 }
 
 double Car::angle_for_steering(int str) {

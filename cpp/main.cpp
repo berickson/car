@@ -18,6 +18,7 @@
 #include "system.h"
 #include "car_menu.h"
 #include "console_menu.h"
+#include "geometry.h"
 
 using namespace std;
 
@@ -26,13 +27,13 @@ using namespace std;
 
 int main(int, char *[]) {
   try {
-    test_car_menu();
+    test_geometry();
+    //test_car_menu();
     //test_console_menu();
-    // test_car_menu();
     //test_system();
     //test_menu();
     //test_menu();
-    //test_fake_car();
+    test_fake_car();
     
     //test_dynamics();
     //test_car();

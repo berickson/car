@@ -15,7 +15,8 @@ SOURCES += main.cpp \
     menu.cpp \
     system.cpp \
     car_menu.cpp \
-    console_menu.cpp
+    console_menu.cpp \
+    geometry.cpp
 
 HEADERS += \
     geometry.h \

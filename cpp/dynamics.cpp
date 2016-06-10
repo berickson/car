@@ -79,9 +79,9 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
     d.odometer_back_right_last_us = stoi(fields[28]);
     d.ms = stoi(fields[30]);
     d.us = stoi(fields[32]);
-    d.yaw = stod(fields[34]);
-    d.pitch = stod(fields[35]);
-    d.roll = stod(fields[36]);
+    d.yaw = Angle::degrees(stod(fields[34]));
+    d.pitch = Angle::degrees(stod(fields[35]));
+    d.roll = Angle::degrees(stod(fields[36]));
     d.battery_voltage = stod(fields[38]);
   } catch (...)
   {
