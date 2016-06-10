@@ -37,6 +37,15 @@ void set_track_name(string s) {
   track_name = s;
 }
 
+string route_name = "";
+string get_route_name() {
+  return route_name;
+}
+void set_route_name(string s) {
+  route_name = s;
+}
+
+
 
 CarMenu::CarMenu() {
 }
@@ -55,9 +64,15 @@ void run_car_menu() {
   vector<string> track_names = FileNames().get_track_names();
   selection_menu<string>(track_selection_menu, track_names, get_track_name, set_track_name);
 
+  SubMenu route_selection_menu{};
+  vector<string> route_names = FileNames().get_route_names(track_name);
+  selection_menu<string>(route_selection_menu, route_names, get_route_name, set_route_name);
+
+
 
   SubMenu route_menu {
-    {"track:",&track_selection_menu}
+    {[](){return (string)"track ["+track_name+"]";},&track_selection_menu},
+    {[](){return (string)"route ["+route_name+"]";},&route_selection_menu}
 
   };
 
