@@ -1,10 +1,21 @@
 #ifndef PI_BUTTONS_H
 #define PI_BUTTONS_H
 
-class PiButtons() {
+#include <string>
+#include <vector>
+
+using namespace std;
+class PiButtons {
 public:
-  string getch();
-}
+  PiButtons();
+  char getch();
+
+  vector<bool> pressed = {false,false,false,false,false}; // 0-4, but we only use 1..4
+
+  bool wiring_ok = false;
+private:
+  bool check_press(int button);
+};
 
 
 void test_pi_buttons();
