@@ -16,7 +16,8 @@ SOURCES += main.cpp \
     system.cpp \
     car_menu.cpp \
     console_menu.cpp \
-    geometry.cpp
+    geometry.cpp \
+    pi_buttons.cpp
 
 HEADERS += \
     geometry.h \
@@ -35,7 +36,8 @@ HEADERS += \
     system.h \
     car_menu.h \
     console_menu.h \
-    filenames.h
+    filenames.h \
+    pi_buttons.h
 
 
-unix|win32: LIBS += -lncurses
+unix|win32: LIBS += -lncurses -lwiringPi
