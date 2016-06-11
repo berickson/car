@@ -78,7 +78,7 @@ public:
     return current_dynamics.odometer_back_right;
   }
 
-  inline double get_voltage(){
+  double get_voltage(){
     return current_dynamics.battery_voltage;
   };
 
