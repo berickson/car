@@ -7,8 +7,6 @@ FakeCar::FakeCar(string recording_file_path):
   Car(online=false) {
   this->recording_file_path = recording_file_path;
 
-  // fake values
-  voltage = 8.25;
   reset();
   step();
 }

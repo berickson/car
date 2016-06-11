@@ -65,7 +65,6 @@ void Car::apply_dynamics(Dynamics & d) {
   Dynamics & current = current_dynamics;
   Dynamics & previous = previous_dynamics;
 
-
   // correct heading with adjustment factor
   auto temp = (current.yaw - previous.yaw);
   Angle adjustment = temp * (1. - gyro_adjustment_factor) ;
@@ -78,6 +77,7 @@ void Car::apply_dynamics(Dynamics & d) {
     double outside_wheel_angle = radians(angle_for_steering(previous.str));
     ackerman.move_left_wheel(outside_wheel_angle, wheel_distance_meters, get_heading_radians());
   }
+
 
   // update velocity
   if (current.odometer_front_left_last_us != previous.odometer_front_left_last_us) {

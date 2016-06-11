@@ -46,8 +46,6 @@ public:
   int odometer_back_left_start;
   int odometer_back_right_start;
 
-  double voltage = NAN;
-
   // calibrated measurements
   double meters_per_odometer_tick;
   double gyro_adjustment_factor;
@@ -81,7 +79,7 @@ public:
   }
 
   inline double get_voltage(){
-    return voltage;
+    return current_dynamics.battery_voltage;
   };
 
   inline Point get_front_position(){
