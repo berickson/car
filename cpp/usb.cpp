@@ -148,7 +148,7 @@ void test_usb() {
   while(q.try_pop(s, 15000)) {
     auto d = high_resolution_clock::now()-t_start;
     duration<double> secs = duration_cast<duration<double>>(d);
-    //cout << secs.count() << "got item " << s << endl;
+    cout << secs.count() << "got item " << s << endl;
     cout << flush;
     i++;
   }
