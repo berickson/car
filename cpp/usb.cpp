@@ -76,6 +76,7 @@ void Usb::monitor_incoming_data() {
       if(fd != fd_error) {
         //cout << "connected to port" << usb_path << endl;
         write_line("td+"); // car specific.  Todo: make more general.
+        write_line("td+"); // car specific.  Todo: make more general.
         break;
       }
     }
