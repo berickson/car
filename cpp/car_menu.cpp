@@ -111,7 +111,11 @@ CarMenu::CarMenu() {
 }
 
 void run_car_menu() {
+#ifdef RASBERRY_PI
+  Car car;
+#else
   FakeCar car;
+#endif
 
   selection_menu<double>(acceleration_menu, linspace(0.25,10,0.25), get_max_a, set_max_a );
 
