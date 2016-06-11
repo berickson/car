@@ -20,14 +20,17 @@ void ConsoleMenu::run() {
     while(true) {
       display();
       timeout(100);
-      int c=getch();
-      if(c==0) {
-        c=buttons.get_press();
-        if(c=='2') up();
-        if(c=='3') down();
-        if(c=='4') enter();
-        if(c=='1') escape();
+
+      {
+        char p = buttons.get_press();
+        if(p=='2') up();
+        if(p=='3') down();
+        if(p=='4') enter();
+        if(p=='1') escape();
+
       }
+
+      int c=getch();
 
       // many types of enter key
       if(c == KEY_ENTER || c == 10 || c == 13) {
