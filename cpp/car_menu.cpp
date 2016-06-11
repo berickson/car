@@ -111,7 +111,7 @@ CarMenu::CarMenu() {
 }
 
 void run_car_menu() {
-#ifdef RASBERRY_PI
+#ifdef RASPBERRY_PI
   Car car;
 #else
   FakeCar car;
