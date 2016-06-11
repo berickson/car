@@ -9,13 +9,13 @@ using namespace std;
 void test_pi_buttons() {
   wiringPiSetup();
   pinMode(1,INPUT);
-  digitalWrite(1,HIGH);
+  pullUpDnControl(1,PUD_UP);
   pinMode(2,INPUT);
-  digitalWrite(2,HIGH);
+  pullUpDnControl(2,PUD_UP);
   pinMode(3,INPUT);
-  digitalWrite(3,HIGH);
+  pullUpDnControl(3,PUD_UP);
   pinMode(4,INPUT);
-  digitalWrite(4,HIGH);
+  pullUpDnControl(4,PUD_UP);
   while(true) {
     cout << digitalRead(1) << digitalRead(2) << digitalRead(3) << digitalRead(4) << endl;
     usleep(1E5); // 0.1 second
