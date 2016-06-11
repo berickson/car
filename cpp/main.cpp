@@ -27,11 +27,10 @@ using namespace std;
 
 
 int main(int, char *[]) {
-  cout << "inside main" << endl;
   try {
-    test_pi_buttons();
+    //test_pi_buttons();
     //test_geometry();
-    //test_car_menu();
+    test_car_menu();
     //test_console_menu();
     //test_system();
     //test_menu();

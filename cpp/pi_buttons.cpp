@@ -9,7 +9,6 @@ using namespace std;
 PiButtons::PiButtons() {
 #ifdef RASPBERRY_PI
   try {
-    cout << "checking piBoardRev" << endl;
     if(piBoardRev()==-1) {
       cout << "not a pi" << endl;
       return;
@@ -29,7 +28,7 @@ PiButtons::PiButtons() {
   } catch (...) {
     wiring_ok = false;
   }
-#endif RASPBERRY_PI
+#endif
 
 }
 
@@ -41,7 +40,7 @@ bool PiButtons::check_press(int i) {
   return just_pressed;
 }
 
-char PiButtons::getch() {
+char PiButtons::get_press() {
   if(!wiring_ok)
     return 0;
 
@@ -54,11 +53,12 @@ char PiButtons::getch() {
 
 
 void test_pi_buttons() {
+  cout << "testing pi buttons" << endl;
   PiButtons buttons;
   while(true) {
-    char c = buttons.getch();
+    char c = buttons.get_press();
     if(c)
       cout << c << endl;
-    usleep(1000); // 0.1 second
+    usleep(5000); // 0.1 second
   }
 }

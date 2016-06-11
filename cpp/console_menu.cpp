@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <functional>
+#include "pi_buttons.h"
 
 #include <ncurses.h> // sudo apt-get install libncurses5-dev
 
@@ -14,11 +15,15 @@ void ConsoleMenu::run() {
   noecho(); // don't display characters
   raw();    // read keys immediately
   getmaxyx(stdscr,h,w); // get screen size y,x
+  PiButtons buttons;
   try {
     while(true) {
       display();
       timeout(100);
       int c=getch();
+      if(c==0) {
+        c=buttons.get_press();
+      }
 
       // many types of enter key
       if(c == KEY_ENTER || c == 10 || c == 13) {
@@ -34,10 +39,10 @@ void ConsoleMenu::run() {
         getch(); // eat '['
         c=getch();
 
-        if(c=='A') up();
-        if(c=='B') down();
-        if(c=='C') enter();
-        if(c=='D') escape();
+        if(c=='A' || c=='2') up();
+        if(c=='B' || c=='3') down();
+        if(c=='C' || c=='4') enter();
+        if(c=='D' || c=='1') escape();
       }
 
     }

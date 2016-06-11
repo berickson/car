@@ -8,7 +8,7 @@ using namespace std;
 class PiButtons {
 public:
   PiButtons();
-  char getch();
+  char get_press();
 
   vector<bool> pressed = {false,false,false,false,false}; // 0-4, but we only use 1..4
 
