@@ -63,7 +63,7 @@ void Usb::write_line(string text) {
 }
 
 void Usb::monitor_incoming_data() {
-  const int buf_size = 2000;
+  const int buf_size = 20000;
   char buf[buf_size];
   const int poll_us = 1000;    // one millisecond
   const int max_wait_us = 2E6; // two second
@@ -93,8 +93,9 @@ void Usb::monitor_incoming_data() {
       bool did_work = false;
       auto count = read(fd, buf, buf_size-1); // read(2)
 
-      if(count == fd_error ) {
-        break;
+      if(count == fd_error && errno == 11 ) {
+        count = 0;
+//        cout << "error: " << errno << endl;
       }
       buf[count]=0;
       if(count > 0) {
@@ -111,7 +112,7 @@ void Usb::monitor_incoming_data() {
     }
 
     if(fd != fd_error) {
-      //cout << "closing usb" << endl;
+      cout << "closing usb" << endl;
       close(fd);
     }
     if(!quit){
@@ -147,7 +148,7 @@ void test_usb() {
   while(q.try_pop(s, 15000)) {
     auto d = high_resolution_clock::now()-t_start;
     duration<double> secs = duration_cast<duration<double>>(d);
-    cout << secs.count() << "got item " << s << endl;
+    //cout << secs.count() << "got item " << s << endl;
     cout << flush;
     i++;
   }
