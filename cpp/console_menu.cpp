@@ -23,6 +23,10 @@ void ConsoleMenu::run() {
       int c=getch();
       if(c==0) {
         c=buttons.get_press();
+        if(c=='2') up();
+        if(c=='3') down();
+        if(c=='4') enter();
+        if(c=='1') escape();
       }
 
       // many types of enter key
@@ -39,10 +43,10 @@ void ConsoleMenu::run() {
         getch(); // eat '['
         c=getch();
 
-        if(c=='A' || c=='2') up();
-        if(c=='B' || c=='3') down();
-        if(c=='C' || c=='4') enter();
-        if(c=='D' || c=='1') escape();
+        if(c=='A') up();
+        if(c=='B') down();
+        if(c=='C') enter();
+        if(c=='D') escape();
       }
 
     }
