@@ -65,7 +65,7 @@ void Usb::write_line(string text) {
 void Usb::monitor_incoming_data() {
   const int buf_size = 20000;
   char buf[buf_size];
-  const int poll_us = 1000;    // one millisecond
+  const int poll_us = 3000;
   const int max_wait_us = 2E6; // two second
 
   while(!quit) {
@@ -75,6 +75,8 @@ void Usb::monitor_incoming_data() {
       fd = open(usb_path.c_str(), O_RDWR | O_NONBLOCK | O_SYNC | O_APPEND);
       if(fd != fd_error) {
         //cout << "connected to port" << usb_path << endl;
+        write_line("td+"); // car specific.  Todo: make more general.
+        write_line("td+"); // car specific.  Todo: make more general.
         break;
       }
     }
@@ -87,8 +89,8 @@ void Usb::monitor_incoming_data() {
     while(fd != fd_error && ! quit) {
       if(! pending_write.empty()) {
         if(write(fd,pending_write.c_str(),pending_write.size()) != fd_error) {
+          pending_write.clear();
         }
-        pending_write.clear();
       }
       bool did_work = false;
       auto count = read(fd, buf, buf_size-1); // read(2)
@@ -106,9 +108,9 @@ void Usb::monitor_incoming_data() {
       if(!did_work) {
         if(us_waited > max_wait_us) // one second
           break;
-        usleep(poll_us); // wait 1 ms for more data
         us_waited += poll_us;
       }
+      usleep(poll_us);
     }
 
     if(fd != fd_error) {
