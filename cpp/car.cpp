@@ -46,7 +46,8 @@ void Car::process_line_from_log(string line) {
     }
   }
   else {
-    cout << "dynamics not ok for " << line << endl;
+    ++usb_error_count;
+    cerr << "dynamics not ok for " << line << endl;
   }
 }
 
