@@ -9,12 +9,8 @@ using namespace std;
 PiButtons::PiButtons() {
 #ifdef RASPBERRY_PI
   try {
-    if(piBoardRev()==-1) {
-      cout << "not a pi" << endl;
-      return;
-    }
-    if(wiringPiSetup()!=0)
-       return;
+
+    wiringPiSetup();
     pinMode(1,INPUT);
     pullUpDnControl(1,PUD_UP);
     pinMode(2,INPUT);
@@ -23,7 +19,6 @@ PiButtons::PiButtons() {
     pullUpDnControl(3,PUD_UP);
     pinMode(4,INPUT);
     pullUpDnControl(4,PUD_UP);
-
     wiring_ok = true;
   } catch (...) {
     wiring_ok = false;
