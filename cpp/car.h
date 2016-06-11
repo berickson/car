@@ -77,6 +77,9 @@ public:
   int get_odometer_back_right() {
     return current_dynamics.odometer_back_right;
   }
+  int get_reading_count() {
+    return reading_count;
+  }
 
   double get_voltage(){
     return current_dynamics.battery_voltage;

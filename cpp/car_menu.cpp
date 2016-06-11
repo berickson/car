@@ -142,6 +142,7 @@ void run_car_menu() {
     {[&car](){return get_first_ip_address();}, &mid_menu},
     {[&car](){return "v: " + to_string(car.get_voltage());}},
     {[&car](){return "front: " + to_string(car.get_front_position());}},
+    {[&car](){return "usb readings: " + to_string(car.get_reading_count());}},
     {[&car](){return "usb errors: " + to_string(car .get_usb_error_count());}},
     {[&car](){return "heading: " + to_string(car.get_heading_degrees());}},
     {[&car](){return "rear: " + to_string(car.get_rear_position());}},
