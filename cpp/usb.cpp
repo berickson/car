@@ -30,6 +30,22 @@ void Usb::send_to_listeners(string s) {
   }
 }
 
+bool data_available(int fd) {
+  struct timeval timeout;
+  /* Initialize the file descriptor set. */
+  fd_set read_fds, write_fds, except_fds;
+  FD_ZERO(&read_fds);
+  FD_ZERO(&write_fds);
+  FD_ZERO(&except_fds);
+  FD_SET(fd, &read_fds);
+
+  /* Initialize the timeout data structure. */
+  timeout.tv_sec = 0;
+  timeout.tv_usec = 0;
+  return select(fd,&read_fds,NULL,NULL,&timeout) > 0;
+
+}
+
 
 void Usb::process_data(string data) {
   // this can be called with any amount of data, so we might have leftover data,
@@ -93,7 +109,11 @@ void Usb::monitor_incoming_data() {
         }
       }
       bool did_work = false;
-      auto count = read(fd, buf, buf_size-1); // read(2)
+      ssize_t count = 0;
+
+      if(data_available(fd)) {
+         count = read(fd, buf, buf_size-1); // read(2)
+      }
 
       if(count == fd_error && errno == 11 ) {
         count = 0;
