@@ -1,7 +1,8 @@
 #include "usb.h"
-#include <fcntl.h> // for open,close
+//#include <fcntl.h> // for open,close
 #include <unistd.h> // for file operations, usleep
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <thread>
 #include "glob_util.h"
@@ -28,22 +29,6 @@ void Usb::send_to_listeners(string s) {
   for(WorkQueue<string>* listener : line_listeners) {
     listener->push(stamped.c_str());
   }
-}
-
-bool data_available(int fd) {
-  struct timeval timeout;
-  /* Initialize the file descriptor set. */
-  fd_set read_fds, write_fds, except_fds;
-  FD_ZERO(&read_fds);
-  FD_ZERO(&write_fds);
-  FD_ZERO(&except_fds);
-  FD_SET(fd, &read_fds);
-
-  /* Initialize the timeout data structure. */
-  timeout.tv_sec = 0;
-  timeout.tv_usec = 0;
-  return select(fd,&read_fds,NULL,NULL,&timeout) > 0;
-
 }
 
 
@@ -84,42 +69,27 @@ void Usb::monitor_incoming_data() {
   const int poll_us = 3000;
   const int max_wait_us = 2E6; // two second
 
+  fstream usb;
   while(!quit) {
-    fd = fd_error;
     // find and open usb
     for(string usb_path : glob("/dev/ttyACM*")) {
-      fd = open(usb_path.c_str(), O_RDWR | O_NONBLOCK | O_SYNC | O_APPEND);
-      if(fd != fd_error) {
-        //cout << "connected to port" << usb_path << endl;
-        write_line("td+"); // car specific.  Todo: make more general.
-        write_line("td+"); // car specific.  Todo: make more general.
+      usb.open(usb_path,std::fstream::in|std::fstream::out );
+      if(usb.is_open())
         break;
-      }
     }
-
-    //if(fd == error)
-    //  cout << "couldn't find a port" << endl;
 
     // read until we hit an error a a quit
     int us_waited = 0;
-    while(fd != fd_error && ! quit) {
-      if(! pending_write.empty()) {
-        if(write(fd,pending_write.c_str(),pending_write.size()) != fd_error) {
-          pending_write.clear();
-        }
+    while(usb.is_open() && ! quit) {
+
+      if(usb.is_open() && !quit) {
+        usb<<pending_write<<flush;
+        pending_write.clear();
       }
+
       bool did_work = false;
-      ssize_t count = 0;
+      auto count = usb.readsome(buf,sizeof(buf)-1);
 
-      if(data_available(fd)) {
-         count = read(fd, buf, buf_size-1); // read(2)
-      }
-
-      if(count == fd_error && errno == 11 ) {
-        count = 0;
-//        cout << "error: " << errno << endl;
-      }
-      buf[count]=0;
       if(count > 0) {
         did_work = true;
         us_waited = 0;
@@ -133,9 +103,9 @@ void Usb::monitor_incoming_data() {
       usleep(poll_us);
     }
 
-    if(fd != fd_error) {
+    if(usb.is_open()) {
       cout << "closing usb" << endl;
-      close(fd);
+      usb.close();
     }
     if(!quit){
       usleep(poll_us*10);
@@ -170,7 +140,7 @@ void test_usb() {
   while(q.try_pop(s, 15000)) {
     auto d = high_resolution_clock::now()-t_start;
     duration<double> secs = duration_cast<duration<double>>(d);
-    //cout << secs.count() << "got item " << s << endl;
+    cout << secs.count() << "got item " << s << endl;
     cout << flush;
     i++;
   }
