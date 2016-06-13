@@ -22,17 +22,19 @@
 #include "Ping.h"
 
 
-class CommandInterpreter{
+class CommandInterpreterx{
 public:
   String buffer;
-  const Command * commands;
+  Command * commands;
   int command_count;
   String command_args;
 
-  void init(const Command * _commands, int _command_count)
+  void init2(Command * _commands, int _command_count)
   {
+/*
     commands = _commands;
     command_count = _command_count;
+*/
   }
 
   void execute() {
@@ -75,7 +77,7 @@ RxEvents rx_events;
 Ping ping;
 Beeper beeper;
 Blinker blinker;
-CommandInterpreter interpreter;
+CommandInterpreterx interpreter;
 unsigned long spur_pulse_count = 0;
 unsigned long last_spur_pulse_us;
 unsigned long microseconds_between_spur_pulse_count;
@@ -300,7 +302,7 @@ void odometer_back_right_sensor_b_changed() {
 void setup() {
   Serial.begin(9600);
 
-  interpreter.init(commands,count_of(commands));
+  interpreter.init2(commands,count_of(commands));
   log(LOG_INFO, "setup begun");
 
   circle_mode.name = "circle";

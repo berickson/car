@@ -16,8 +16,6 @@ public:
   void remove_line_listener(WorkQueue<string>*);
 private:
   string pending_write;
-  const int fd_error = -1; // error constant for file operations
-  int fd = fd_error;
   std::mutex usb_mutex;
   bool running = false;
   bool quit = false;
