@@ -1,3 +1,4 @@
-sudo setsid sudo ./car-service <> /dev/tty1 >&0 2>&1 &
+sudo killall car-service
+sudo setsid sudo ./car-service <> /dev/tty1 >&0 2>error.txt &
 
 

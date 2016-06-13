@@ -16,7 +16,7 @@ public:
   void remove_line_listener(WorkQueue<string>*);
   void write_on_connect(string s);
 private:
-  string _write_on_connect;
+  string _write_on_connect = "\ntd+\n";
   string pending_write;
   std::mutex usb_mutex;
   bool running = false;

@@ -113,7 +113,6 @@ void Usb::monitor_incoming_data() {
     }
 
     if(usb.is_open()) {
-      cout << "closing usb" << endl;
       usb.close();
     }
     if(!quit){
