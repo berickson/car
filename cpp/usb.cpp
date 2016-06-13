@@ -16,6 +16,10 @@ Usb::~Usb() {
   stop();
 }
 
+void Usb::write_on_connect(string s) {
+  _write_on_connect = s;
+}
+
 void Usb::add_line_listener(WorkQueue<string>*listener){
   line_listeners.push_back(listener);
 }
@@ -78,6 +82,10 @@ void Usb::monitor_incoming_data() {
         break;
     }
 
+    if(usb.is_open()){
+      write_line(_write_on_connect);
+    }
+
     // read until we hit an error a a quit
     int us_waited = 0;
     while(usb.is_open() && ! quit) {
@@ -127,6 +135,7 @@ void Usb::stop(){
 
 void test_usb() {
   Usb usb;
+  usb.write_on_connect("\ntd+\n");
   WorkQueue<string> q;
   usb.add_line_listener(&q);
   usb.run();
