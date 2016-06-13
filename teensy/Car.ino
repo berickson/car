@@ -22,46 +22,49 @@
 #include "Ping.h"
 
 
-class CommandInterpreterx{
+class CommandInterpreter{
 public:
   String buffer;
-  Command * commands;
+  const Command * commands;
   int command_count;
   String command_args;
 
-  void init2(Command * _commands, int _command_count)
-  {
-/*
-    commands = _commands;
-    command_count = _command_count;
-*/
-  }
+  void init(const Command * _commands, int _command_count);
 
-  void execute() {
-    while(Serial.available()>0) {
-      char c = Serial.read();
-      if( c == '\n') {
-        process_command(buffer);
-        buffer = "";
-      } else {
-        buffer += c;
-      }
-    }
-  }
+  void execute();
 
-  void process_command(String s) {
-    for(int i = 0; i < command_count; i++) {
-      String name = commands[i].name;
-      if(s.startsWith(name)) {
-        command_args = s.substring(name.length());
-        log(LOG_INFO, "Executing command " + name + " with args (" + command_args + ")");
-        commands[i].f();
-        return;
-      }
-    }
-    log(LOG_ERROR, "Unknown command: ");
-  }
+  void process_command(String s);
 };
+
+void CommandInterpreter::init(const Command * _commands, int _command_count) {
+  commands = _commands;
+  command_count = _command_count;
+}
+
+void CommandInterpreter::execute() {
+  while(Serial.available()>0) {
+    char c = Serial.read();
+    if( c == '\n') {
+      process_command(buffer);
+      buffer = "";
+    } else {
+      buffer += c;
+    }
+  }
+}
+
+void CommandInterpreter::process_command(String s) {
+  for(int i = 0; i < command_count; i++) {
+    String name = commands[i].name;
+    if(s.startsWith(name)) {
+      command_args = s.substring(name.length());
+      log(LOG_INFO, "Executing command " + name + " with args (" + command_args + ")");
+      commands[i].f();
+      return;
+    }
+  }
+  log(LOG_ERROR, "Unknown command: ");
+}
 
 
 //////////////////////////
@@ -77,7 +80,7 @@ RxEvents rx_events;
 Ping ping;
 Beeper beeper;
 Blinker blinker;
-CommandInterpreterx interpreter;
+CommandInterpreter interpreter;
 unsigned long spur_pulse_count = 0;
 unsigned long last_spur_pulse_us;
 unsigned long microseconds_between_spur_pulse_count;
@@ -302,7 +305,7 @@ void odometer_back_right_sensor_b_changed() {
 void setup() {
   Serial.begin(9600);
 
-  interpreter.init2(commands,count_of(commands));
+  interpreter.init(commands,count_of(commands));
   log(LOG_INFO, "setup begun");
 
   circle_mode.name = "circle";

@@ -55,7 +55,7 @@ void Usb::process_data(string data) {
   }
 
   // send last line if it is complete, otherwise save it for later
-  if(has_newline) {
+  if(has_newline && lines[last_index].size() >1){
     send_to_listeners(lines[last_index]);
   } else {
     leftover_data = lines[last_index];
@@ -88,13 +88,16 @@ void Usb::monitor_incoming_data() {
     int us_waited = 0;
     while(usb.is_open() && ! quit) {
 
-      if(usb.is_open() && !quit) {
+      if(usb.is_open() && !quit && pending_write.size() > 0) {
         usb<<pending_write<<flush;
-        pending_write.clear();
+        pending_write = "";
       }
-
       bool did_work = false;
-      auto count = usb.readsome(buf,sizeof(buf)-1);
+      int count = 0;
+      if(usb.good()) {
+        count = usb.readsome(buf,sizeof(buf)-1);
+        buf[count]=0;
+      }
 
       if(count > 0) {
         did_work = true;
@@ -102,11 +105,11 @@ void Usb::monitor_incoming_data() {
         process_data(buf);
       }
       if(!did_work) {
+        us_waited += poll_us;
         if(us_waited > max_wait_us) // one second
           break;
-        us_waited += poll_us;
+        usleep(poll_us);
       }
-      usleep(poll_us);
     }
 
     if(usb.is_open()) {

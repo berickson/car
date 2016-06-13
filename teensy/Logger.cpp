@@ -12,7 +12,5 @@ bool TD = false;
 
 
 String ftos(float f) {
-  char buffer[80];
-  sprintf(buffer,"%.2f",f);
-  return buffer;
+  return String(f,2);
 }
