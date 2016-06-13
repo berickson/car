@@ -46,9 +46,9 @@ bool data_available(int fd) {
   FD_SET(fd, &read_fds);
 
   /* Initialize the timeout data structure. */
-  timeout.tv_sec = 0;
+  timeout.tv_sec = 1;
   timeout.tv_usec = 0;
-  return select(fd,&read_fds,NULL,NULL,&timeout) > 0;
+  return select(fd+1,&read_fds,NULL,NULL,&timeout) > 0;
 }
 
 
@@ -84,7 +84,7 @@ void Usb::write_line(string text) {
 }
 
 void Usb::monitor_incoming_data() {
-  const int buf_size = 20000;
+  const int buf_size = 200;
   char buf[buf_size];
   const int poll_us = 3000;
   const int max_wait_us = 2E6; // two second
@@ -95,8 +95,9 @@ void Usb::monitor_incoming_data() {
   while(!quit) {
     // find and open usb
     for(string usb_path : glob("/dev/ttyACM*")) {
-      fd = open(usb_path.c_str(), O_RDWR | O_NONBLOCK | O_SYNC | O_APPEND);
+      fd = open(usb_path.c_str(), O_RDWR | O_NONBLOCK | O_SYNC | O_APPEND | O_NOCTTY);
       if(fd != fd_error) {
+        cout << "opened " << usb_path << endl;;
 				write_line(_write_on_connect);        
 				break;
       }
@@ -118,13 +119,16 @@ void Usb::monitor_incoming_data() {
       bool did_work = false;
       ssize_t count = 0;
 
-      if(data_available(fd)) {
+      cout << "waiting for data" << endl;
+      if(fd != fd_error && data_available(fd)) {
+        cout <<"data available" << endl;
         count = read(fd, buf, buf_size-1); // read(2)
         if(count==fd_error) {
           count = 0;
           close(fd);
           fd = fd_error;
         }
+        buf[count]=0;
       }
       if(count > 0) {
         did_work = true;
