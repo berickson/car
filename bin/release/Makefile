@@ -36,7 +36,7 @@ DISTNAME      = car-service1.0.0
 DISTDIR = /home/brian/car/bin/release/.tmp/car-service1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-O1 -Wl,-z,origin -Wl,-rpath,\$$ORIGIN
-LIBS          = $(SUBLIBS) -lncurses -lpthread 
+LIBS          = $(SUBLIBS) -lncurses -lwiringPi -lpthread 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -60,7 +60,8 @@ SOURCES       = ../../cpp/main.cpp \
 		../../cpp/system.cpp \
 		../../cpp/car_menu.cpp \
 		../../cpp/console_menu.cpp \
-		../../cpp/geometry.cpp 
+		../../cpp/geometry.cpp \
+		../../cpp/pi_buttons.cpp 
 OBJECTS       = main.o \
 		ackerman.o \
 		usb.o \
@@ -73,7 +74,8 @@ OBJECTS       = main.o \
 		system.o \
 		car_menu.o \
 		console_menu.o \
-		geometry.o
+		geometry.o \
+		pi_buttons.o
 DIST          = ../../../../Qt2.0.3/5.6/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../../Qt2.0.3/5.6/gcc_64/mkspecs/common/unix.conf \
 		../../../../Qt2.0.3/5.6/gcc_64/mkspecs/common/linux.conf \
@@ -218,7 +220,8 @@ DIST          = ../../../../Qt2.0.3/5.6/gcc_64/mkspecs/features/spec_pre.prf \
 		system.h \
 		car_menu.h \
 		console_menu.h \
-		filenames.h ../../cpp/main.cpp \
+		filenames.h \
+		pi_buttons.h ../../cpp/main.cpp \
 		../../cpp/ackerman.cpp \
 		../../cpp/usb.cpp \
 		../../cpp/dynamics.cpp \
@@ -230,7 +233,8 @@ DIST          = ../../../../Qt2.0.3/5.6/gcc_64/mkspecs/features/spec_pre.prf \
 		../../cpp/system.cpp \
 		../../cpp/car_menu.cpp \
 		../../cpp/console_menu.cpp \
-		../../cpp/geometry.cpp
+		../../cpp/geometry.cpp \
+		../../cpp/pi_buttons.cpp
 QMAKE_TARGET  = car-service
 DESTDIR       = 
 TARGET        = car-service
@@ -553,7 +557,8 @@ main.o: ../../cpp/main.cpp ../../cpp/ackerman.h \
 		../../cpp/menu.h \
 		../../cpp/system.h \
 		../../cpp/car_menu.h \
-		../../cpp/console_menu.h
+		../../cpp/console_menu.h \
+		../../cpp/pi_buttons.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../cpp/main.cpp
 
 ackerman.o: ../../cpp/ackerman.cpp ../../cpp/ackerman.h \
@@ -614,15 +619,20 @@ car_menu.o: ../../cpp/car_menu.cpp ../../cpp/car_menu.h \
 		../../cpp/geometry.h \
 		../../cpp/dynamics.h \
 		../../cpp/work_queue.h \
-		../../cpp/usb.h
+		../../cpp/usb.h \
+		../../cpp/filenames.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o car_menu.o ../../cpp/car_menu.cpp
 
 console_menu.o: ../../cpp/console_menu.cpp ../../cpp/console_menu.h \
-		../../cpp/menu.h
+		../../cpp/menu.h \
+		../../cpp/pi_buttons.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o console_menu.o ../../cpp/console_menu.cpp
 
 geometry.o: ../../cpp/geometry.cpp ../../cpp/geometry.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o geometry.o ../../cpp/geometry.cpp
+
+pi_buttons.o: ../../cpp/pi_buttons.cpp ../../cpp/pi_buttons.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o pi_buttons.o ../../cpp/pi_buttons.cpp
 
 ####### Install
 

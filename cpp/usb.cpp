@@ -1,8 +1,9 @@
 #include "usb.h"
-//#include <fcntl.h> // for open,close
+#include <sys/stat.h>
+#include <fcntl.h> // for open,close
 #include <unistd.h> // for file operations, usleep
 #include <iostream>
-#include <fstream>
+//#include <fstream>
 #include <string>
 #include <thread>
 #include "glob_util.h"
@@ -33,6 +34,21 @@ void Usb::send_to_listeners(string s) {
   for(WorkQueue<string>* listener : line_listeners) {
     listener->push(stamped.c_str());
   }
+}
+
+bool data_available(int fd) {
+  struct timeval timeout;
+  /* Initialize the file descriptor set. */
+  fd_set read_fds, write_fds, except_fds;
+  FD_ZERO(&read_fds);
+  FD_ZERO(&write_fds);
+  FD_ZERO(&except_fds);
+  FD_SET(fd, &read_fds);
+
+  /* Initialize the timeout data structure. */
+  timeout.tv_sec = 0;
+  timeout.tv_usec = 0;
+  return select(fd,&read_fds,NULL,NULL,&timeout) > 0;
 }
 
 
@@ -73,12 +89,14 @@ void Usb::monitor_incoming_data() {
   const int poll_us = 3000;
   const int max_wait_us = 2E6; // two second
 
-  fstream usb;
+  //fstream usb;
+  const int fd_error = -1;
+  auto fd = fd_error;
   while(!quit) {
     // find and open usb
     for(string usb_path : glob("/dev/ttyACM*")) {
-      usb.open(usb_path,std::fstream::in|std::fstream::out );
-      if(usb.is_open()) {
+      fd = open(usb_path.c_str(), O_RDWR | O_NONBLOCK | O_SYNC | O_APPEND);
+      if(fd != fd_error) {
 				write_line(_write_on_connect);        
 				break;
       }
@@ -86,19 +104,28 @@ void Usb::monitor_incoming_data() {
 
     // read until we hit an error a a quit
     int us_waited = 0;
-    while(usb.is_open() && ! quit) {
+    while(fd != fd_error && ! quit) {
 
-      if(usb.is_open() && !quit && pending_write.size() > 0) {
-        usb<<pending_write<<flush;
-        pending_write = "";
+      if(fd!=fd_error && !quit && pending_write.size() > 0) {
+        if(write(fd,pending_write.c_str(),pending_write.size()) != fd_error) {
+          pending_write = "";
+        } else {
+          close(fd);
+          fd = fd_error;
+        }
       }
+
       bool did_work = false;
-      int count = 0;
-      if(usb.good()) {
-        count = usb.readsome(buf,sizeof(buf)-1);
-        buf[count]=0;
-      }
+      ssize_t count = 0;
 
+      if(data_available(fd)) {
+        count = read(fd, buf, buf_size-1); // read(2)
+        if(count==fd_error) {
+          count = 0;
+          close(fd);
+          fd = fd_error;
+        }
+      }
       if(count > 0) {
         did_work = true;
         us_waited = 0;
@@ -112,8 +139,8 @@ void Usb::monitor_incoming_data() {
       }
     }
 
-    if(usb.is_open()) {
-      usb.close();
+    if(fd!=fd_error) {
+      close(fd);
     }
     if(!quit){
       usleep(poll_us*10);
