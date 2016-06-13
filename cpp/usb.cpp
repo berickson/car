@@ -78,12 +78,10 @@ void Usb::monitor_incoming_data() {
     // find and open usb
     for(string usb_path : glob("/dev/ttyACM*")) {
       usb.open(usb_path,std::fstream::in|std::fstream::out );
-      if(usb.is_open())
-        break;
-    }
-
-    if(usb.is_open()){
-      write_line(_write_on_connect);
+      if(usb.is_open()) {
+				write_line(_write_on_connect);        
+				break;
+      }
     }
 
     // read until we hit an error a a quit
@@ -134,10 +132,12 @@ void Usb::stop(){
 
 
 void test_usb() {
+  cout << "test usb" << endl;
   Usb usb;
   usb.write_on_connect("\ntd+\n");
   WorkQueue<string> q;
   usb.add_line_listener(&q);
+  cout << "about to run usb " << endl;
   usb.run();
   string s;
   int i = 0;
@@ -146,6 +146,7 @@ void test_usb() {
 
   usb.write_line("td+");
   usb.write_line("td+");
+  cout << "entering loop for usb" << endl;
   while(q.try_pop(s, 15000)) {
     auto d = high_resolution_clock::now()-t_start;
     duration<double> secs = duration_cast<duration<double>>(d);
