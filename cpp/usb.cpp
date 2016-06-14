@@ -97,7 +97,6 @@ void Usb::monitor_incoming_data() {
     for(string usb_path : glob("/dev/ttyACM*")) {
       fd = open(usb_path.c_str(), O_RDWR | O_NONBLOCK | O_SYNC | O_APPEND | O_NOCTTY);
       if(fd != fd_error) {
-        cout << "opened " << usb_path << endl;;
 				write_line(_write_on_connect);        
 				break;
       }
