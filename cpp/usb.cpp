@@ -119,9 +119,7 @@ void Usb::monitor_incoming_data() {
       bool did_work = false;
       ssize_t count = 0;
 
-      cout << "waiting for data" << endl;
       if(fd != fd_error && data_available(fd)) {
-        cout <<"data available" << endl;
         count = read(fd, buf, buf_size-1); // read(2)
         if(count==fd_error) {
           count = 0;

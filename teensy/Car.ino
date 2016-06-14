@@ -44,10 +44,13 @@ void CommandInterpreter::init(const Command * _commands, int _command_count) {
 void CommandInterpreter::execute() {
   while(Serial.available()>0) {
     char c = Serial.read();
+    if( c==-1) continue;
     if( c == '\n') {
       process_command(buffer);
       buffer = "";
     } else {
+      if(buffer.length() > 1000) // avoid large buffers
+        buffer = "";
       buffer += c;
     }
   }
