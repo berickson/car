@@ -11,14 +11,16 @@ extern bool TRACE_MPU;
 extern bool TRACE_LOOP_SPEED;
 extern bool TD;
 
-
-
-#define log(flag,s)    \
-if(flag) {             \
-    Serial.println((String) #flag + "," + s); \
-} 
-
 #include "Arduino.h"
+
+void log_line(String s);
+
+#define log(__flag,__s)    \
+if(__flag) { \
+  String __text =(String) #__flag + "," + __s; \
+  log_line(__text); \
+}  
+
 
 // returns float as string to overcome bug in Arduino casting
 String ftos(float f);
