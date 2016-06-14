@@ -46,8 +46,8 @@ bool data_available(int fd) {
   FD_SET(fd, &read_fds);
 
   /* Initialize the timeout data structure. */
-  timeout.tv_sec = 1;
-  timeout.tv_usec = 0;
+  timeout.tv_sec = 0;
+  timeout.tv_usec = 15000;
   return select(fd+1,&read_fds,NULL,NULL,&timeout) > 0;
 }
 

@@ -30,7 +30,7 @@ int main(int, char *[]) {
   try {
     //test_pi_buttons();
     //test_geometry();
-    //test_car_menu();
+    test_car_menu();
     //test_console_menu();
     //test_system();
     //test_menu();
@@ -39,7 +39,7 @@ int main(int, char *[]) {
     
     //test_dynamics();
     //test_car();
-    test_usb();
+    //test_usb();
     //test_split();
     //test_config();
     //test_work_queue();

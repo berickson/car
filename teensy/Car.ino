@@ -24,7 +24,9 @@
 
 class CommandInterpreter{
 public:
-  String buffer;
+  static const int buf_max = 100;
+  char buffer[buf_max+1];
+  int	 buf_size = 0;
   const Command * commands;
   int command_count;
   String command_args;
@@ -44,14 +46,18 @@ void CommandInterpreter::init(const Command * _commands, int _command_count) {
 void CommandInterpreter::execute() {
   while(Serial.available()>0) {
     char c = Serial.read();
-    if( c==-1) continue;
+    if( c==-1) break;
     if( c == '\n') {
-      process_command(buffer);
-      buffer = "";
+      process_command(String(buffer));
+      buffer[0] = 0;
+      buf_size = 0;
     } else {
-      if(buffer.length() > 1000) // avoid large buffers
-        buffer = "";
-      buffer += c;
+      if(buf_size+1 >= buf_max) {
+         buf_size = 0;
+      }
+      buffer[buf_size] = c;
+      buffer[buf_size+1] = 0;
+      buf_size++;
     }
   }
 }
