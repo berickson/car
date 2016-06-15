@@ -78,18 +78,15 @@ void Route::optimize_velocity(double max_velocity, double max_acceleration) {
     }
   }
 
+  // todo: consider lateral acceleration along with deceleration
+
   // apply slow down / stopping acceleration
   // from end to start
   for(int i = nodes.size()-2; i >= 0; --i) {
     Node & p0 = nodes[i];
     Node & p1 = nodes[i+1];
-    double dv = fabs(p1.velocity - p0.velocity);
     double ds = ::distance(p0.x,p0.y,p1.x,p1.y);
-    double min_v = p1.velocity;
-    double max_dv = velocity_at_position(ds,max_acceleration,min_v);
-    if(dv>max_dv){
-      p0.velocity = min(p0.velocity, velocity_at_position(ds,max_acceleration,p1.velocity));
-    }
+    p0.velocity = min(p0.velocity, velocity_at_position(ds,max_acceleration,p1.velocity));
   }
 }
 
