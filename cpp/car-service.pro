@@ -17,7 +17,8 @@ SOURCES += main.cpp \
     car_menu.cpp \
     console_menu.cpp \
     geometry.cpp \
-    pi_buttons.cpp
+    pi_buttons.cpp \
+    route.cpp
 
 HEADERS += \
     geometry.h \
@@ -37,7 +38,8 @@ HEADERS += \
     car_menu.h \
     console_menu.h \
     filenames.h \
-    pi_buttons.h
+    pi_buttons.h \
+    route.h
 
 
 

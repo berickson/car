@@ -6,7 +6,7 @@
 class FileNames {
 public:
   string tracks_folder;
-  FileNames(string tracks_folder = "../../tracks") {
+  FileNames(string tracks_folder = "/home/brian/car/tracks") {
     this->tracks_folder = tracks_folder;
   }
 
