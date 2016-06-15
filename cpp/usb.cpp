@@ -3,12 +3,14 @@
 #include <fcntl.h> // for open,close
 #include <unistd.h> // for file operations, usleep
 #include <iostream>
+#include <termios.h> // for make_raw
 //#include <fstream>
 #include <string>
 #include <thread>
 #include "glob_util.h"
 #include "ends_with.h"
 #include "split.h"
+#include "system.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -83,6 +85,20 @@ void Usb::write_line(string text) {
   pending_write += text + "\n";
 }
 
+
+void echo_off(string tty) {
+  string command = (string) "stty -F " + tty + " -echo";
+  system(command.c_str());
+}
+
+// see https://www.pjrc.com/teensy/serial_listen.c
+void make_raw(int fd) {
+  struct termios settings;
+  tcgetattr(fd, &settings);
+	cfmakeraw(&settings);
+	tcsetattr(fd, TCSANOW, &settings);
+}
+
 void Usb::monitor_incoming_data() {
   const int buf_size = 200;
   char buf[buf_size];
@@ -97,6 +113,8 @@ void Usb::monitor_incoming_data() {
     for(string usb_path : glob("/dev/ttyACM*")) {
       fd = open(usb_path.c_str(), O_RDWR | O_NONBLOCK | O_SYNC | O_APPEND | O_NOCTTY);
       if(fd != fd_error) {
+        // turn echo off
+        make_raw(fd);
 				write_line(_write_on_connect);        
 				break;
       }
