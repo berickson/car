@@ -1,9 +1,11 @@
 #include "route.h"
 #include "geometry.h"
 #include  <iostream>
+#include <fstream>
 #include <iomanip>
+#include "string_utils.h"
 
-void Route::add_node(Route::Node node){
+void Route::add_node(RouteNode node){
   nodes.push_back(node);
 }
 
@@ -24,7 +26,7 @@ Route get_circle(double r = 1, unsigned steps = 300) {
     Angle theta = Angle::radians(2*M_PI * i / (steps-1));
     double x = r * sin(theta.radians());
     double y = r - r * cos(theta.radians());
-    route.add_node(Route::Node(x,y));
+    route.add_node(RouteNode(x,y));
   }
   return route;
 }
@@ -37,11 +39,59 @@ string Route::to_string() {
   return ss.str();
 }
 
+string Route::header_string() {
+  return join(columns,",");
+}
+
+
+void RouteNode::set_from_standard_file(vector<string> fields) {
+  x = stod(fields[1]);
+  y = stod(fields[2]);
+  velocity = stod(fields[10]);
+  reverse = fields[5]=="True";
+}
+
+void Route::load_from_file(string path) {
+  fstream f;
+  f.open(path,ios_base::in);
+  if(!f.is_open()) {
+    throw (string) "could not open route at " + path;
+  }
+
+  string line;
+  // read header
+  if(!std::getline(f,line)) {
+    throw (string) "error reading header for " + path;
+  }
+  trim(line);
+  if(line != header_string()) {
+    throw (string) "bad header for " + path;
+  }
+  nodes.clear();
+  int line_number = 1;
+  while(std::getline(f, line)) {
+    ++line_number;
+    trim(line);
+    if(line=="") break;
+    auto fields=split(line,',');
+    if(fields.size()!=columns.size()) {
+      stringstream ss;
+      ss << "wrong number of columns in line " << line_number
+          << " expected " << columns.size()
+          << " was "  << fields.size();
+      throw ss.str();
+    }
+    auto node = RouteNode();
+    node.set_from_standard_file(fields);
+    nodes.push_back(node);
+    index = 0;
+  }
+}
 
 void Route::optimize_velocity(double max_velocity, double max_acceleration) {
 
   // all velocities start at max
-  for(Route::Node &node:nodes) {
+  for(RouteNode &node:nodes) {
     node.velocity = max_velocity;
   }
 
@@ -53,8 +103,8 @@ void Route::optimize_velocity(double max_velocity, double max_acceleration) {
 
   // apply speed limit of zero for switching direction
   for(unsigned i=0;i<nodes.size()-2; i++) {
-    Node & p0 = nodes[i];
-    Node & p1 = nodes[i+1];
+    RouteNode & p0 = nodes[i];
+    RouteNode & p1 = nodes[i+1];
     if(p0.reverse != p1.reverse) {
       p1.velocity = 0.0;
     }
@@ -62,9 +112,9 @@ void Route::optimize_velocity(double max_velocity, double max_acceleration) {
 
   // apply speed limits for curves
   for(unsigned i=0; i < nodes.size()-3; i++) {
-    Node & p0 = nodes[i];
-    Node & p1 = nodes[i+1];
-    Node & p2 = nodes[i+2];
+    RouteNode & p0 = nodes[i];
+    RouteNode & p1 = nodes[i+1];
+    RouteNode & p2 = nodes[i+2];
 
     // find two vectors for this and next segment
     Point v1(p1.x-p0.x, p1.y-p0.y);
@@ -83,8 +133,8 @@ void Route::optimize_velocity(double max_velocity, double max_acceleration) {
   // apply slow down / stopping acceleration
   // from end to start
   for(int i = nodes.size()-2; i >= 0; --i) {
-    Node & p0 = nodes[i];
-    Node & p1 = nodes[i+1];
+    RouteNode & p0 = nodes[i];
+    RouteNode & p1 = nodes[i+1];
     double ds = ::distance(p0.x,p0.y,p1.x,p1.y);
     p0.velocity = min(p0.velocity, velocity_at_position(ds,max_acceleration,p1.velocity));
   }
@@ -110,5 +160,9 @@ void test_circle() {
 }
 
 void test_route() {
-  test_circle();
+  // test_circle();
+  Route r;
+  r.load_from_file("/home/brian/car/tracks/back yard/routes/A/path.csv");
+  cout << r.to_string();
+
 }
