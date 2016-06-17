@@ -7,6 +7,7 @@
 #include <fstream>
 
 
+
 using namespace std;
 
 class System
@@ -25,7 +26,7 @@ vector<string> child_folders(string folder);
 
 list<string> get_ip_addresses();
 string get_first_ip_address();
-
+void mkdir(string folder);
 void test_system();
 
 #endif // SYSTEM_H

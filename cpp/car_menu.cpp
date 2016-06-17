@@ -123,6 +123,18 @@ void run_car_menu() {
   FakeCar car;
 #endif
 
+  auto record = [&car]() {
+    car.reset_odometry();
+    FileNames f;
+    string track_name = car_settings.track_name;
+    string route_name = f.next_route_name(track_name);
+    mkdir(f.get_route_folder(track_name,route_name));
+    // todo: update display
+    //
+    car_settings.route_name = route_name;
+    update_route_selection_menu();
+  };
+
   selection_menu<double>(acceleration_menu, linspace(0.25,10,0.25), get_max_a, set_max_a );
   selection_menu<double>(velocity_menu, linspace(0.5,20,0.5), get_max_v, set_max_v );
   selection_menu<double>(k_smooth_menu, linspace(0.,1,0.1), get_k_smooth, set_k_smooth );
@@ -140,6 +152,7 @@ void run_car_menu() {
   SubMenu route_menu {
     {[](){return (string)"track ["+car_settings.track_name+"]";},&track_selection_menu},
     {[](){return (string)"route ["+car_settings.route_name+"]";},&route_selection_menu},
+    MenuItem("record",record),
     {[](){return (string)"max_a ["+format(car_settings.max_a)+"]";},&acceleration_menu},
     {[](){return (string)"max_v ["+format(car_settings.max_v)+"]";},&velocity_menu},
     {[](){return (string)"k_smooth ["+format(car_settings.k_smooth)+"]";},&k_smooth_menu},
