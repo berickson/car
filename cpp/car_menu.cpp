@@ -4,6 +4,7 @@
 #include "console_menu.h"
 #include "fake_car.h"
 #include "filenames.h"
+#include "string_utils.h"
 
 
 struct {
@@ -104,6 +105,11 @@ vector<double> linspace(double from, double to, double step) {
 }
 
 SubMenu acceleration_menu{};
+SubMenu velocity_menu{};
+SubMenu k_smooth_menu{};
+SubMenu t_ahead_menu{};
+SubMenu d_ahead_menu{};
+SubMenu capture_video_menu{};
 
 
 
@@ -118,6 +124,11 @@ void run_car_menu() {
 #endif
 
   selection_menu<double>(acceleration_menu, linspace(0.25,10,0.25), get_max_a, set_max_a );
+  selection_menu<double>(velocity_menu, linspace(0.5,20,0.5), get_max_v, set_max_v );
+  selection_menu<double>(k_smooth_menu, linspace(0.,1,0.1), get_k_smooth, set_k_smooth );
+  selection_menu<double>(t_ahead_menu, linspace(0.,1,0.1), get_t_ahead, set_t_ahead );
+  selection_menu<double>(d_ahead_menu, linspace(0.,.1,0.01), get_d_ahead, set_d_ahead );
+  selection_menu<double>(capture_video_menu, {0,1}, get_capture_video, set_capture_video );
 
 
   SubMenu track_selection_menu{};
@@ -129,7 +140,12 @@ void run_car_menu() {
   SubMenu route_menu {
     {[](){return (string)"track ["+car_settings.track_name+"]";},&track_selection_menu},
     {[](){return (string)"route ["+car_settings.route_name+"]";},&route_selection_menu},
-    {[](){return (string)"max_a ["+to_string(car_settings.max_a)+"]";},&acceleration_menu}
+    {[](){return (string)"max_a ["+format(car_settings.max_a)+"]";},&acceleration_menu},
+    {[](){return (string)"max_v ["+format(car_settings.max_v)+"]";},&velocity_menu},
+    {[](){return (string)"k_smooth ["+format(car_settings.k_smooth)+"]";},&k_smooth_menu},
+    {[](){return (string)"t_ahead ["+format(car_settings.t_ahead)+"]";},&t_ahead_menu},
+    {[](){return (string)"d_ahead ["+format(car_settings.d_ahead)+"]";},&d_ahead_menu},
+    {[](){return (string)"cap video ["+format(car_settings.capture_video)+"]";},&capture_video_menu}
 
   };
 
@@ -140,16 +156,16 @@ void run_car_menu() {
 
   SubMenu car_menu {
     {[&car](){return get_first_ip_address();}, &mid_menu},
-    {[&car](){return "v: " + to_string(car.get_voltage());}},
+    {[&car](){return "v: " + format(car.get_voltage());}},
     {[&car](){return "front: " + to_string(car.get_front_position());}},
-    {[&car](){return "usb readings: " + to_string(car.get_reading_count());}},
-    {[&car](){return "usb errors: " + to_string(car .get_usb_error_count());}},
-    {[&car](){return "heading: " + to_string(car.get_heading_degrees());}},
+    {[&car](){return "usb readings: " + format(car.get_reading_count());}},
+    {[&car](){return "usb errors: " + format(car .get_usb_error_count());}},
+    {[&car](){return "heading: " + format(car.get_heading_degrees());}},
     {[&car](){return "rear: " + to_string(car.get_rear_position());}},
-    {[&car](){return "odo_fl: " + to_string(car.get_odometer_front_left());}},
-    {[&car](){return "odo_fr: " + to_string(car.get_odometer_front_right());}},
-    {[&car](){return "odo_bl: " + to_string(car.get_odometer_back_left());}},
-    {[&car](){return "odo_br: " + to_string(car.get_odometer_back_right());}}
+    {[&car](){return "odo_fl: " + format(car.get_odometer_front_left());}},
+    {[&car](){return "odo_fr: " + format(car.get_odometer_front_right());}},
+    {[&car](){return "odo_bl: " + format(car.get_odometer_back_left());}},
+    {[&car](){return "odo_br: " + format(car.get_odometer_back_right());}}
 
   };
 

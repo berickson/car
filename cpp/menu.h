@@ -68,12 +68,16 @@ public:
 };
 
 
+// define this to make to_string avaible below
+inline string to_string(string s) {
+  return s;
+}
 
 template<class T> string selection_text(T option, T current) {
   stringstream ss;
   ss << option;
 
-  if (option == current)
+  if (to_string(option) == to_string(current)) // to_string gets rid of rounding errors to make == work.  Inefficient, but shouldn't matter for menus
     ss << "(*)";
   else
     ss << "( )";

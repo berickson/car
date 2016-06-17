@@ -3,11 +3,21 @@
 
 #include <vector>
 #include <string>
+#include "math.h"
 
 using namespace std;
 
 
 struct RouteNode {
+  // todo: rid if unnecessary variables
+  double secs=NAN;
+  double rear_x=NAN;
+  double rear_y=NAN;
+  double heading=NAN;
+  double heading_adjustment=NAN;
+  double esc=NAN;
+  double str=NAN;
+
   double x;
   double y;
   double velocity;
