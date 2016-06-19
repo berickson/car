@@ -88,6 +88,21 @@ void Route::load_from_file(string path) {
   }
 }
 
+
+double Route::get_max_velocity() {
+  double max_v = 0.0;
+  for(RouteNode& node:nodes) {
+    max_v = max(max_v,node.velocity);
+  }
+  return max_v;
+}
+
+
+void Route::smooth(double k_smooth) {
+
+}
+
+
 void Route::optimize_velocity(double max_velocity, double max_acceleration) {
 
   // all velocities start at max

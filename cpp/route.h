@@ -38,7 +38,11 @@ public:
 
   void load_from_file(string path);
 
+  void smooth(double k_smooth);
+
   void optimize_velocity(double max_velocity = 1, double max_acceleration = 0.1);
+  double get_max_velocity();
+
   void add_node(RouteNode node);
   string to_string();
   string header_string();

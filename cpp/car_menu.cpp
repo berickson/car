@@ -1,11 +1,14 @@
 #include "car_menu.h"
 #include "menu.h"
+#include "route.h"
 #include "system.h"
 #include "console_menu.h"
 #include "fake_car.h"
 #include "filenames.h"
 #include "string_utils.h"
 #include <fstream>
+#include <ncurses.h>
+
 
 #include <ncurses.h> // sudo apt-get install libncurses5-dev
 
@@ -18,6 +21,23 @@ struct {
   double d_ahead = 0.05;
   double k_smooth = 0.4;
   bool capture_video = false;
+  void write_to_file(string path) {
+    fstream file;
+    file.open(path,ios_base::out);
+    if(!file.is_open()) {
+      throw (string) "could not open " + path;
+
+    }
+    file << "track_name = " << track_name << endl
+         << "route_name = " << route_name << endl
+         << "max_a = " << max_a << endl
+         << "max_v = " << max_v << endl
+         << "t_ahead = " << t_ahead << endl
+         << "d_ahead = " << d_ahead << endl
+         << "k_smooth = " << k_smooth << endl
+         << "capture_video = " << capture_video << endl;
+
+  }
 } car_settings;
 
 
@@ -126,7 +146,83 @@ void run_car_menu() {
   FakeCar car;
 #endif
 
-  auto record = [&car]() {
+  struct {
+    void clear() {
+      ::clear();
+    }
+
+    void move(int row, int col) {
+      ::move(row,col);
+      refresh();
+
+    }
+
+    void print(string s) {
+      printw(s.c_str());
+    }
+
+    void refresh() {
+      ::refresh();
+    }
+
+    int getkey() {
+      return getch();
+
+    }
+  } io;
+
+
+
+
+  auto go = [&car,&io]() {
+    auto f = FileNames();
+    string & track_name = car_settings.track_name;
+    string & route_name = car_settings.route_name;
+    string run_name = f.next_run_name(track_name, route_name);
+    string run_folder = f.get_run_folder(track_name,route_name, run_name);
+    mkdir(run_folder);
+    car_settings.write_to_file(f.config_file_path(track_name, route_name, run_name));
+    car.reset_odometry();
+    string input_path = f.path_file_path(track_name,route_name);
+    Route rte;
+    io.clear();
+    io.print("loading route");
+    io.refresh();
+    rte.load_from_file(input_path);
+
+    // todo: smooth
+    // rte.smooth(car_settings.k_smooth);
+    io.clear();
+    io.print("optimizing velocity");
+    io.refresh();
+    rte.optimize_velocity(car_settings.max_v, car_settings.max_a);
+
+    io.clear();
+    io.print((string)"playing route with max velocity " + format(rte.get_max_velocity()));
+    io.refresh();
+
+/*
+        recording_file_path = FileNames().recording_file_path(config.track_name,config.route_name,config.run_name)
+        car.begin_recording_input(recording_file_path)
+        car.begin_recording_commands(FileNames().commands_recording_file_path(config.track_name,config.route_name,config.run_name))
+        try:
+          play_route(rte, car, k_smooth = config.k_smooth, d_ahead = config.d_ahead, t_ahead = config.t_ahead)
+        except:
+          path = f.exception_file_path(config.track_name,config.route_name,config.run_name)
+          with open(path,'w') as log:
+            log.write(exception.exception_text())
+        finally:
+          car.end_recording_input()
+          car.end_recording_commands()
+          if config.capture_video:
+            capture.end()
+        car.lcd.display_text("making path")
+        path_file_path = f.path_file_path(config.track_name,config.route_name,config.run_name)
+        write_path_from_recording_file(inpath=recording_file_path,outpath=path_file_path)
+  */
+  };
+
+  auto record = [&car,&io]() {
     car.reset_odometry();
     FileNames f;
     string track_name = car_settings.track_name;
@@ -141,10 +237,10 @@ void run_car_menu() {
 
 
     string line;
-    clear();
-    move(0,0);
-    printw("Recording - press any key to stop");
-    refresh();
+    io.clear();
+    io.move(0,0);
+    io.print("Recording - press any key to stop");
+    io.refresh();
     while(listener.try_pop(line,1000)) {
       if(split(line)[1]=="TD") {
         recording << line;
@@ -178,6 +274,7 @@ void run_car_menu() {
   SubMenu route_menu {
     {[](){return (string)"track ["+car_settings.track_name+"]";},&track_selection_menu},
     {[](){return (string)"route ["+car_settings.route_name+"]";},&route_selection_menu},
+    MenuItem("go",go),
     MenuItem("record",record),
     {[](){return (string)"max_a ["+format(car_settings.max_a)+"]";},&acceleration_menu},
     {[](){return (string)"max_v ["+format(car_settings.max_v)+"]";},&velocity_menu},
