@@ -102,7 +102,7 @@ void make_raw(int fd) {
 void Usb::monitor_incoming_data() {
   const int buf_size = 200;
   char buf[buf_size];
-  const int poll_us = 3000;
+  const int poll_us = 1000;    
   const int max_wait_us = 2E6; // two second
 
   //fstream usb;
@@ -155,6 +155,7 @@ void Usb::monitor_incoming_data() {
         if(us_waited > max_wait_us) // one second
           break;
         usleep(poll_us);
+        us_waited += poll_us;
       }
     }
 

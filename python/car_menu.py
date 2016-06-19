@@ -354,7 +354,7 @@ class Menu:
         c = lcd.getch()
         if c is not None:
           self.process_key(c)
-        time.sleep(0.03)
+        time.sleep(0.25)
     finally:
       car.display_text("goodbye")
       print('goodbye')
