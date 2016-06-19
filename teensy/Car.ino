@@ -47,6 +47,8 @@ unsigned long microseconds_between_spur_pulse_count;
 
 
 QuadratureEncoder odometer_front_left(PIN_ODOMETER_FRONT_LEFT_SENSOR_A, PIN_ODOMETER_FRONT_LEFT_SENSOR_B);
+QuadratureEncoder odometer_front_right(PIN_ODOMETER_FRONT_RIGHT_SENSOR_A, PIN_ODOMETER_FRONT_RIGHT_SENSOR_B);
+
 QuadratureEncoder odometer_back_left(PIN_ODOMETER_BACK_LEFT_SENSOR_A, PIN_ODOMETER_BACK_LEFT_SENSOR_B);
 QuadratureEncoder odometer_back_right(PIN_ODOMETER_BACK_RIGHT_SENSOR_A, PIN_ODOMETER_BACK_RIGHT_SENSOR_B);
 
@@ -244,6 +246,16 @@ void odometer_front_left_sensor_b_changed() {
   odometer_front_left.sensor_b_changed();
 }
 
+
+void odometer_front_right_sensor_a_changed() {
+  odometer_front_right.sensor_a_changed();
+}
+
+void odometer_front_right_sensor_b_changed() {
+  odometer_front_right.sensor_b_changed();
+}
+
+
 void odometer_back_left_sensor_a_changed() {
   odometer_back_left.sensor_a_changed();
 }
@@ -297,14 +309,18 @@ void setup() {
   pinMode(PIN_MOTOR_RPM, INPUT);
   attachInterrupt(PIN_MOTOR_RPM, motor_rpm_handler, RISING);
 
-  pinMode(PIN_ODOMETER_FRONT_LEFT_SENSOR_A, INPUT);
-  pinMode(PIN_ODOMETER_FRONT_LEFT_SENSOR_B, INPUT);
+  pinMode(PIN_ODOMETER_FRONT_LEFT_SENSOR_A, INPUT_PULLUP);
+  pinMode(PIN_ODOMETER_FRONT_LEFT_SENSOR_B, INPUT_PULLUP);
+  pinMode(PIN_ODOMETER_FRONT_RIGHT_SENSOR_A, INPUT_PULLUP);
+  pinMode(PIN_ODOMETER_FRONT_RIGHT_SENSOR_B, INPUT_PULLUP);
   pinMode(PIN_ODOMETER_BACK_LEFT_SENSOR_A, INPUT_PULLUP);
   pinMode(PIN_ODOMETER_BACK_LEFT_SENSOR_B, INPUT_PULLUP);
   pinMode(PIN_ODOMETER_BACK_RIGHT_SENSOR_A, INPUT_PULLUP);
   pinMode(PIN_ODOMETER_BACK_RIGHT_SENSOR_B, INPUT_PULLUP);
   attachInterrupt(PIN_ODOMETER_FRONT_LEFT_SENSOR_A, odometer_front_left_sensor_a_changed, CHANGE);
   attachInterrupt(PIN_ODOMETER_FRONT_LEFT_SENSOR_B, odometer_front_left_sensor_b_changed, CHANGE);
+  attachInterrupt(PIN_ODOMETER_FRONT_RIGHT_SENSOR_A, odometer_front_right_sensor_a_changed, CHANGE);
+  attachInterrupt(PIN_ODOMETER_FRONT_RIGHT_SENSOR_B, odometer_front_right_sensor_b_changed, CHANGE);
   attachInterrupt(PIN_ODOMETER_BACK_LEFT_SENSOR_A, odometer_back_left_sensor_a_changed, CHANGE);
   attachInterrupt(PIN_ODOMETER_BACK_LEFT_SENSOR_B, odometer_back_left_sensor_b_changed, CHANGE);
   attachInterrupt(PIN_ODOMETER_BACK_RIGHT_SENSOR_A, odometer_back_right_sensor_a_changed, CHANGE);
@@ -407,7 +423,7 @@ void loop() {
        +",spur_odo," + spur_pulse_count
        +",ping_mm,"+ping.millimeters()
        +",odo_fl,"+odometer_front_left.odometer +"," +  odometer_front_left.last_odometer_change_us 
-       +",odo_fr,"+0 +"," +  0
+       +",odo_fr,"+odometer_front_right.odometer +"," +  odometer_front_right.last_odometer_change_us
        +",odo_bl,"+odometer_back_left.odometer +"," +  odometer_back_left.last_odometer_change_us
        +",odo_br,"+odometer_back_right.odometer+"," +  odometer_back_right.last_odometer_change_us
        +",ms,"+millis()
