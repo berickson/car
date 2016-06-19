@@ -2,6 +2,8 @@
 #include "config.h"
 
 #include <iostream>
+#include "lookup_table.h"
+#include "split.h"
 using namespace std;
 
 Car::Car(bool online) {
@@ -25,9 +27,8 @@ void Car::connect_usb() {
 
 void Car::usb_thread_start() {
   usb.add_line_listener(&usb_queue);
+  usb.write_on_connect("\ntd+\n");
   usb.run();
-  usb.write_line("td+"); // twice on purpose
-  usb.write_line("td+");
   while(!quit) {
     string line;
     if(usb_queue.try_pop(line,1)) {
@@ -37,6 +38,12 @@ void Car::usb_thread_start() {
 }
 
 void Car::process_line_from_log(string line) {
+  if(input_recording_file.is_open()) {
+    input_recording_file << line; //todo: make non-blocking
+  }
+  if(split(line)[1]!="TD") {
+    return;
+  }
   Dynamics d;
   bool ok = Dynamics::from_log_string(d,line);
   if(ok) {
@@ -49,6 +56,36 @@ void Car::process_line_from_log(string line) {
     ++usb_error_count;
     cerr << "dynamics not ok for " << line << endl;
   }
+}
+
+void Car::send_command(string command) {
+  usb.write_line(command);
+}
+
+void Car::set_rc_mode() {
+  send_command("rc");
+
+}
+
+void Car::set_manual_mode() {
+  send_command("m");
+}
+
+void Car::set_esc_and_str(unsigned esc, unsigned str)
+{
+  send_command((string)"pse "+to_string(str)+","+to_string(esc));
+}
+
+
+void Car::begin_recording_input(string path) {
+  end_recording_input();
+  input_recording_file.open(path, ios_base::out);
+}
+
+void Car::end_recording_input() {
+  if(input_recording_file.is_open())
+    input_recording_file.flush();
+    input_recording_file.close();
 }
 
 void Car::apply_dynamics(Dynamics & d) {
@@ -174,6 +211,27 @@ double Car::get_heading_radians() {
   return get_heading().radians();
 }
 
+int Car::steering_for_angle(Angle theta)
+{
+  static const LookupTable t({
+    {30,1000},
+    {25,1104},
+    {20,1189},
+    {15,1235},
+    {10,1268},
+    {5, 1390},
+    {0, 1450},
+    {-5, 1528},
+    {-10, 1607},
+    {-15,1688},
+    {-20, 1723},
+    {-25, 1768},
+    {-30, 1858}});
+  return (int) t.lookup(theta.degrees());
+}
+
+
+
 double Car::angle_for_steering(int str) {
 
   const int data[13][2] = {
@@ -206,6 +264,32 @@ double Car::angle_for_steering(int str) {
   }
 
   return NAN;
+}
+
+#include <vector>
+#include <array>
+#include "lookup_table.h"
+
+int Car::esc_for_velocity(double v)
+{
+  LookupTable t(
+  {
+    {-2., 1200},
+    {-1., 1250},
+    {0.0,  1500},
+    {0.1, 1645},
+    {0.34, 1659},
+    {0.85, 1679},
+    {1.2, 1699},
+    {1.71, 1719},
+    {1.88, 1739},
+    {2.22, 1759},
+    {2.6, 1779},
+    {3.0, 1799},
+    {14.0, 2000}
+  });
+  return t.lookup(v);
+
 }
 
 void test_car() {

@@ -43,6 +43,144 @@ string Route::header_string() {
   return join(columns,",");
 }
 
+// returns heading based on current path segment
+Angle Route::heading()
+{
+  RouteNode & p1 = nodes[index];
+  RouteNode & p2 = nodes[index+1];
+  Angle a = Angle::radians(atan2(p2.y-p1.y,p2.x-p1.x));
+  if(p1.reverse)
+    a += Angle::radians(M_PI);
+  a.standardize();
+  return a;
+}
+
+void Route::set_position(Point &front, Point &rear, double velocity)
+{
+  const double stopped_velocity = 0.01;
+  while(true) {
+    RouteNode & p1 = nodes[index];
+    RouteNode & p2 = nodes[index+1];
+    double dx = NAN;
+    double dy = NAN;
+    double drx = NAN;
+    double dry = NAN;
+
+    if(abs(velocity) < stopped_velocity && abs(p2.velocity) < stopped_velocity) {
+      progress = 1.0; // will move to next node
+    } else {
+      if(p1.reverse) {
+        // calculate rear position if not in route
+        if(isnan(p1.rear_x)) {
+          double h = heading().radians();
+          double car_l = ::distance(front,rear);
+          double rear_offset_x = -car_l* cos(h);
+          double rear_offset_y = -car_l* sin(h);
+          dx = p2.x-p1.x;
+          dy = p2.y-p1.y;
+          drx = rear.x - (p1.x + rear_offset_x);
+          dry = rear.y - (p1.y + rear_offset_y);
+
+        } else {
+          // d from p1 to p2
+          dx = p2.rear_x-p1.rear_x;
+          dy = p2.rear_y-p1.rear_y;
+
+          // d from p1 to robot
+          drx = rear.x - p1.rear_x;
+          dry = rear.y - p1.rear_y;
+        }
+      } else {
+
+        // d from p1 to p2
+        dx = p2.x-p1.x;
+        dy = p2.y-p1.y;
+
+        // d from p1 to robot
+        drx = rear.x - p1.x;
+        dry = rear.y - p1.y;
+      }
+    }
+
+    double l = length(dx,dy);
+    if(l < 0.000001) {
+      progress = 1.1;
+    } else {
+      progress = (drx * dx + dry + dy)/(dx * dx + dy * dy);
+      cte = (dry * dx - drx * dy) / l;
+    }
+
+    if (progress < 1.0 || done)
+      break;
+    if (index >= nodes.size()-2) {
+      done = true;
+      break;
+    }
+    ++index;
+
+  }
+
+}
+
+// returns desired velocity for current position
+double Route::get_velocity()
+{
+  if(done)
+    return 0;
+  auto p0 = nodes[index];
+  auto p1 = nodes[index+1];
+  double v = NAN;
+
+  // if we just turned around, take the velocity from the node in the new direction
+  if(index > 0 && nodes[index-1].reverse != p1.reverse){
+    v = p1.velocity;
+  } else if (progress < 0) {
+    v =  p0.velocity;
+  } else if (progress > 1){
+    v = p1.velocity;
+  } else {
+    v = p0.velocity + (p1.velocity - p0.velocity) * progress;
+  }
+
+  // set negative speed for reverse
+  if (p0.reverse){
+    v = -v;
+  }
+  return v ;
+}
+
+Point Route::get_position_ahead(double d)
+{
+  unsigned i = index;
+  double segment_progress = progress;
+  while(true) {
+    RouteNode & p1 = nodes[i];
+    RouteNode & p2 = nodes[i+1];
+    double dx = p2.x-p1.x;
+    double dy = p2.y-p1.y;
+    double l = ::length(dx,dy);
+    double progress_d = l * segment_progress;
+    double remaining_d = l - progress_d;
+
+    // go to next node
+    // if we are past the end of this node
+    // and there are nodes left
+    if (d > remaining_d && i < nodes.size()-2) {
+      ++i;
+      d -= remaining_d;
+      segment_progress = 0;
+      continue;
+    }
+    double unit_x = dx/l;
+    double unit_y = dy/l;
+    double x = p1.x + segment_progress * dx;
+    double y = p1.y + segment_progress * dy;
+    double ahead_x = x + unit_x * d;
+    double ahead_y = y + unit_y * d;
+    return Point(ahead_x, ahead_y);
+  }
+}
+
 
 void RouteNode::set_from_standard_file(vector<string> fields) {
   x = stod(fields[1]);

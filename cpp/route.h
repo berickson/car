@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "geometry.h"
 #include "math.h"
 
 using namespace std;
@@ -47,9 +48,19 @@ public:
   string to_string();
   string header_string();
 
+  Angle heading();
+
+  void set_position(Point & front, Point & rear, double velocity);
+
+  double get_velocity();
+  Point get_position_ahead(double distance);
+
   vector<string> columns = {"secs","x","y","rear_x", "rear_y", "reverse", "heading","adj","esc","str","m/s"};
   vector<RouteNode> nodes;
-  int index = 0;
+  unsigned int index = 0;
+  double cte = 0;
+  double progress = 0;
+  bool done = false;
 };
 
 void test_route();

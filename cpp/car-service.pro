@@ -19,7 +19,10 @@ SOURCES += main.cpp \
     geometry.cpp \
     pi_buttons.cpp \
     route.cpp \
-    string_utils.cpp
+    string_utils.cpp \
+    driver.cpp \
+    car_ui.cpp \
+    lookup_table.cpp
 
 HEADERS += \
     geometry.h \
@@ -41,7 +44,10 @@ HEADERS += \
     filenames.h \
     pi_buttons.h \
     route.h \
-    string_utils.h
+    string_utils.h \
+    driver.h \
+    car_ui.h \
+    lookup_table.h
 
 
 

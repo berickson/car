@@ -3,6 +3,7 @@
 
 #include <list>
 #include <string>
+#include <fstream>
 #include "ackerman.h"
 #include "geometry.h"
 #include "dynamics.h"
@@ -65,6 +66,7 @@ public:
   double get_heading_degrees();
   double get_heading_radians();
 
+
   int get_odometer_front_left() {
     return current_dynamics.odometer_front_left;
   }
@@ -93,17 +95,37 @@ public:
     return ackerman.rear_position();
   };
 
+  inline double get_velocity() {
+    return velocity;
+  }
+
   inline int get_usb_error_count() {
     return usb_error_count;
   }
 
+  int steering_for_angle(Angle theta);
   double angle_for_steering(int str);
+
+  int esc_for_velocity(double v);
+
+  // control
+  void send_command(string command);
+  void set_rc_mode();
+  void set_manual_mode();
+  void set_esc_and_str(unsigned esc, unsigned str);
+
+  // logging
+  void begin_recording_input(string path);
+  void end_recording_input();
+
 
   // infrastructure
   void process_line_from_log(string s);
   void apply_dynamics(Dynamics & d);
   Usb usb;
 private:
+  fstream input_recording_file;
+
   void usb_thread_start();
   WorkQueue<string> usb_queue;
   thread usb_thread;

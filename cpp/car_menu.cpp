@@ -8,6 +8,8 @@
 #include "string_utils.h"
 #include <fstream>
 #include <ncurses.h>
+#include "car_ui.h"
+#include "driver.h"
 
 
 #include <ncurses.h> // sudo apt-get install libncurses5-dev
@@ -145,32 +147,7 @@ void run_car_menu() {
 #else
   FakeCar car;
 #endif
-
-  struct {
-    void clear() {
-      ::clear();
-    }
-
-    void move(int row, int col) {
-      ::move(row,col);
-      refresh();
-
-    }
-
-    void print(string s) {
-      printw(s.c_str());
-    }
-
-    void refresh() {
-      ::refresh();
-    }
-
-    int getkey() {
-      return getch();
-
-    }
-  } io;
-
+  CarUI io;
 
 
 
@@ -200,6 +177,12 @@ void run_car_menu() {
     io.clear();
     io.print((string)"playing route with max velocity " + format(rte.get_max_velocity()));
     io.refresh();
+    string recording_file_path = f.recording_file_path(track_name, route_name, run_name);
+    car.begin_recording_input(recording_file_path);
+    Driver d(car,io);
+    // todo: set parameters
+    d.play_route(rte);
+
 
 /*
         recording_file_path = FileNames().recording_file_path(config.track_name,config.route_name,config.run_name)

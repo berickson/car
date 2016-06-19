@@ -87,6 +87,10 @@ struct Angle {
     return *this;
   }
 
+  inline Angle operator -() {
+    return Angle::radians(-theta);
+  }
+
   inline Angle operator - (const Angle & rhs) const  {
     Angle rv;
     rv.theta = this->theta - rhs.theta;
@@ -215,6 +219,11 @@ inline Angle angle_between(double x1, double y1, double x2, double y2) {
   double dot = x1*x2 + y1*y2; // dot product
   double det = x1*y2 - y1*x2; // determinant
   return Angle::radians( atan2(det, dot) );
+}
+
+// returns direction from p1 to p2
+inline Angle angle_to(Point p1, Point p2) {
+  return Angle::radians(atan2(p2.y-p1.y,p2.x-p1.x));
 }
 
 
