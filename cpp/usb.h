@@ -14,10 +14,10 @@ public:
   void write_line(string text);
   void add_line_listener(WorkQueue<string>*);
   void remove_line_listener(WorkQueue<string>*);
+  void write_on_connect(string s);
 private:
+  string _write_on_connect = "\ntd+\n";
   string pending_write;
-  const int fd_error = -1; // error constant for file operations
-  int fd = fd_error;
   std::mutex usb_mutex;
   bool running = false;
   bool quit = false;

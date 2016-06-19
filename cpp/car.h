@@ -4,6 +4,7 @@
 #include <list>
 #include <string>
 #include "ackerman.h"
+#include "geometry.h"
 #include "dynamics.h"
 #include "work_queue.h"
 #include "usb.h"
@@ -22,6 +23,7 @@ public:
 
   string config_path = "/home/brian/car/python/car.ini";
 
+
   bool online = false;
   bool quit = false;
   bool usb_error_count = 0;
@@ -29,12 +31,16 @@ public:
   Ackerman ackerman;
 
   // state variables
-  Dynamics dynamics;
+  Dynamics current_dynamics;
+  Dynamics previous_dynamics;
+  Dynamics original_dynamics;
+  int reading_count = 0;
 
   double velocity;
+  double last_verified_velocity;
   double last_velocity;
-  double heading_adjustment;
-  int odometer_start;
+  Angle heading_adjustment;
+
   int odometer_front_left_start;
   int odometer_front_right_start;
   int odometer_back_left_start;
@@ -54,6 +60,48 @@ public:
   double length;
   double width;
 
+  // accessors
+  Angle get_heading();
+  double get_heading_degrees();
+  double get_heading_radians();
+
+  int get_odometer_front_left() {
+    return current_dynamics.odometer_front_left;
+  }
+  int get_odometer_front_right() {
+    return current_dynamics.odometer_front_right;
+  }
+  int get_odometer_back_left() {
+    return current_dynamics.odometer_back_left;
+  }
+  int get_odometer_back_right() {
+    return current_dynamics.odometer_back_right;
+  }
+  int get_reading_count() {
+    return reading_count;
+  }
+
+  double get_voltage(){
+    return current_dynamics.battery_voltage;
+  };
+
+  inline Point get_front_position(){
+    return ackerman.front_position();
+  };
+
+  inline Point get_rear_position(){
+    return ackerman.rear_position();
+  };
+
+  inline int get_usb_error_count() {
+    return usb_error_count;
+  }
+
+  double angle_for_steering(int str);
+
+  // infrastructure
+  void process_line_from_log(string s);
+  void apply_dynamics(Dynamics & d);
 private:
   Usb usb;
   void usb_thread_start();

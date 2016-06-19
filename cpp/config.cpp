@@ -16,6 +16,9 @@ Config::Config() {
 void Config::load_from_file(string path) {
   fstream fs;
   fs.open(path,fstream::in);
+  if(fs.fail()) {
+    throw (string) "could not open config file " + path;
+  }
 
   for (string line; getline(fs, line); ) {
     auto kv = split(line,'=');

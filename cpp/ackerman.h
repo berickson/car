@@ -22,20 +22,35 @@ public:
     double arc_len;
   };
 
-  double _w;
-  double _l;
-  double _x;
-  double _y;
-  double _heading;
+  double w; // width of front wheelbase
+  double l;
+  double x; // x and y are at center of rear wheels
+  double y;
+  double heading;
 
   Ackerman(double front_wheelbase_width = 1.0, double wheelbase_length = 1.0, double x=0., double y = 0, double radians = 0);
 
   inline Point front_left_position() {
     Point p;
-    p.x = _x + _l * cos(_heading) - sin(_heading) * _w/2;
-    p.y = _y + _l * sin(_heading) - cos(_heading) * _w/2;
+    p.x = x + l * cos(heading) - sin(heading) * w/2;
+    p.y = y + l * sin(heading) - cos(heading) * w/2;
     return p;
   }
+
+  inline Point front_position() {
+    Point p;
+    p.x = x + l * cos(heading) - sin(heading);
+    p.y = y + l * sin(heading) - cos(heading);
+    return p;
+  }
+
+  inline Point rear_position() {
+    Point p;
+    p.x = x;
+    p.y = y;
+    return p;
+  }
+
 
   void move_left_wheel(double outside_wheel_angle, double wheel_distance, double new_heading = NAN);
   Arc arc_to_relative_location(double x,double y);

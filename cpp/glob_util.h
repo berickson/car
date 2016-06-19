@@ -5,8 +5,10 @@
 #include <vector>
 #include <string>
 
+using namespace std;
+
 // http://stackoverflow.com/a/8615450/383967
-inline std::vector<std::string> glob(const std::string& pat){
+inline std::vector<std::string> glob(const string& pat){
     using namespace std;
     glob_t glob_result;
     glob(pat.c_str(),GLOB_TILDE,NULL,&glob_result);
@@ -17,5 +19,6 @@ inline std::vector<std::string> glob(const std::string& pat){
     globfree(&glob_result);
     return ret;
 }
+
 
 #endif // GLOB_UTIL_H

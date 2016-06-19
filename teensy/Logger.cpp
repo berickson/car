@@ -10,9 +10,13 @@ bool TRACE_MPU = false;
 bool TRACE_LOOP_SPEED = false;
 bool TD = false;
 
+void log_line(String s) {
+  Serial.println(s);
+  Serial.send_now();
+}
+
+
 
 String ftos(float f) {
-  char buffer[80];
-  sprintf(buffer,"%.2f",f);
-  return buffer;
+  return String(f,2);
 }
