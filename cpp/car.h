@@ -102,8 +102,8 @@ public:
   // infrastructure
   void process_line_from_log(string s);
   void apply_dynamics(Dynamics & d);
-private:
   Usb usb;
+private:
   void usb_thread_start();
   WorkQueue<string> usb_queue;
   thread usb_thread;

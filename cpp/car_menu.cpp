@@ -5,7 +5,9 @@
 #include "fake_car.h"
 #include "filenames.h"
 #include "string_utils.h"
+#include <fstream>
 
+#include <ncurses.h> // sudo apt-get install libncurses5-dev
 
 struct {
   string track_name = "desk";
@@ -117,6 +119,7 @@ CarMenu::CarMenu() {
 }
 
 void run_car_menu() {
+#define RASPBERRY_PI
 #ifdef RASPBERRY_PI
   Car car;
 #else
@@ -129,10 +132,33 @@ void run_car_menu() {
     string track_name = car_settings.track_name;
     string route_name = f.next_route_name(track_name);
     mkdir(f.get_route_folder(track_name,route_name));
+    WorkQueue<string> listener;
+    car.usb.add_line_listener(&listener);
+
+    string recording_path = f.recording_file_path(track_name,route_name);
+    fstream recording;
+    recording.open(recording_path,ios_base::out);
+
+
+    string line;
+    clear();
+    move(0,0);
+    printw("Recording - press any key to stop");
+    refresh();
+    while(listener.try_pop(line,1000)) {
+      if(split(line)[1]=="TD") {
+        recording << line;
+      }
+      if(getch()>0)
+        break;
+    }
+    recording.close();
+    car.usb.remove_line_listener(&listener);
     // todo: update display
     //
     car_settings.route_name = route_name;
     update_route_selection_menu();
+    return;
   };
 
   selection_menu<double>(acceleration_menu, linspace(0.25,10,0.25), get_max_a, set_max_a );

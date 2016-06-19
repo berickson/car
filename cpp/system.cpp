@@ -105,6 +105,9 @@ string path_join(string x, string y) {
 void mkdir(string folder) {
   string cmd = "mkdir \""+folder+"\"";
   system(cmd.c_str());
+  if(!file_exists(folder)) {
+    throw (string) "could not create " + folder;
+  }
 }
 
 
