@@ -18,14 +18,13 @@ void Driver::play_route(Route & route) {
   } catch (...) {
 
   }
-  car.set_manual_mode();
-  car.remove_listener(&queue);
   ui.clear();
   ui.print("press any key to abort");
   ui.refresh();
+  bool timed_out = false;
   while(ui.getkey() == -1) {
     Dynamics d;
-    if(queue.try_pop(d,500)) {
+    if(queue.try_pop(d,1000)) {
       auto p_front = car.get_front_position();
       auto p_rear = car.get_rear_position();
       double v = car.get_velocity();
@@ -41,14 +40,22 @@ void Driver::play_route(Route & route) {
       car.set_esc_and_str(esc, str);
 
     } else {
+      timed_out = true;
       // todo: notify user somehow that
       // messaging failed during playback
       break;
     }
-    car.set_esc_and_str(1500,1500);
-    car.set_manual_mode();
-    car.remove_listener(&queue);
   }
+  car.set_esc_and_str(1500,1500);
+  car.set_manual_mode();
+  car.remove_listener(&queue);
+  if(timed_out) {
+    ui.clear();
+    ui.print("timed out waiting for dynamics");
+    ui.refresh();
+    while(ui.getkey() == -1);
+  }
+
 
 }
 
