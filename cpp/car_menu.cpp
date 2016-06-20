@@ -158,6 +158,7 @@ void run_car_menu() {
 
 
   auto go = [&car,&io]() {
+    try {
     auto f = FileNames();
     string & track_name = car_settings.track_name;
     string & route_name = car_settings.route_name;
@@ -197,6 +198,14 @@ void run_car_menu() {
 
     string path_file_path = f.path_file_path(track_name, route_name, run_name);
     write_path_from_recording_file(recording_file_path, path_file_path);
+    } catch (string s) {
+      io.clear();
+      io.move(0,0);
+      io.print("error: " + s);
+      io.refresh();
+      while(io.getkey()==-1);
+
+    }
   };
 
   auto record = [&car,&io]() {
