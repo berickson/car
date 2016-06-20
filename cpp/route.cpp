@@ -55,6 +55,9 @@ Angle Route::heading()
   return a;
 }
 
+bool is_nan(double __x)
+  { return __builtin_isnan(__x); }
+
 void Route::set_position(Point &front, Point &rear, double velocity)
 {
   const double stopped_velocity = 0.01;
@@ -71,7 +74,7 @@ void Route::set_position(Point &front, Point &rear, double velocity)
     } else {
       if(p1.reverse) {
         // calculate rear position if not in route
-        if(isnan(p1.rear_x)) {
+        if(is_nan(p1.rear_x)) {
           double h = heading().radians();
           double car_l = ::distance(front,rear);
           double rear_offset_x = -car_l* cos(h);

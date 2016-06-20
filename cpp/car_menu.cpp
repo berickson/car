@@ -157,6 +157,8 @@ void run_car_menu() {
     string & route_name = car_settings.route_name;
     string run_name = f.next_run_name(track_name, route_name);
     string run_folder = f.get_run_folder(track_name,route_name, run_name);
+    string runs_folder = f.get_runs_folder(track_name,route_name);
+    mkdir(runs_folder);
     mkdir(run_folder);
     car_settings.write_to_file(f.config_file_path(track_name, route_name, run_name));
     car.reset_odometry();

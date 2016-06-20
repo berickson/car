@@ -1,7 +1,7 @@
 #include "lookup_table.h"
 #include <vector>
 #include <array>
-#include <geometry.h>
+#include "geometry.h"
 #include <iostream>
 
 LookupTable::LookupTable(vector<array<double, 2> > table)
