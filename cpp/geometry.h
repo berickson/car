@@ -226,24 +226,6 @@ inline Angle angle_to(Point p1, Point p2) {
   return Angle::radians(atan2(p2.y-p1.y,p2.x-p1.x));
 }
 
-
-/*
-# returns an interpolated value from table of k-v
-# kv must be sorted by key
-def table_lookup(kv, key):
-    last = len(kv)-1
-    if key <= kv[0][0]:
-      return kv[0][1]
-    if key >= kv[last][0]:
-      return kv[last][1]
-    for i in range(0,last):
-      if key <= kv[i+1][0]:
-        return interpolate(
-          key, kv[i][0], kv[i][1], kv[i+1][0], kv[i+1][1])
-
-
-*/
-
 // returns y for given x based on x1,y1,x2,y2
 double interpolate(double x, double x1, double y1, double x2, double y2);
 

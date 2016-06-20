@@ -233,37 +233,25 @@ int Car::steering_for_angle(Angle theta)
 
 
 double Car::angle_for_steering(int str) {
+  static const LookupTable t(
+  {
+    {1000, 30},
+    {1104, 25},
+    {1189, 20},
+    {1235, 15},
+    {1268, 10},
+    {1390, 5},
+    {1450, 0},
+    {1528, -5},
+    {1607, -10},
+    {1688, -15},
+    {1723, -20},
+    {1768, -25},
+    {1858, -30}
+  });
 
-  const int data[13][2] = {
-    {30,1000},
-    {25,1104},
-    {20,1189},
-    {15,1235},
-    {10,1268},
-    {5, 1390},
-    {0, 1450},
-    {-5, 1528},
-    {-10, 1607},
-    {-15,1688},
-    {-20, 1723},
-    {-25, 1768},
-    {-30, 1858}};
+  return t.lookup(str);
 
-  int last = 12;
-  if (str <= data[0][1]){
-    return data[0][0];
-  }
-  if (str >= data[last][1]){
-    return data[last][0];
-  }
-  for(int i=0;i<last;i++){
-    if (str <= data[i+1][1]){
-      return interpolate(
-            str, data[i][1], data[i][0], data[i+1][1], data[i+1][0]);
-    }
-  }
-
-  return NAN;
 }
 
 #include <vector>
@@ -272,7 +260,7 @@ double Car::angle_for_steering(int str) {
 
 int Car::esc_for_velocity(double v)
 {
-  LookupTable t(
+  static const LookupTable t(
   {
     {-2., 1200},
     {-1., 1250},
