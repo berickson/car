@@ -42,10 +42,6 @@ public:
   double last_velocity;
   Angle heading_adjustment;
 
-  int odometer_front_left_start;
-  int odometer_front_right_start;
-  int odometer_back_left_start;
-  int odometer_back_right_start;
 
   // calibrated measurements
   double meters_per_odometer_tick;
@@ -63,8 +59,6 @@ public:
 
   // accessors
   Angle get_heading();
-  double get_heading_degrees();
-  double get_heading_radians();
 
 
   int get_odometer_front_left() {

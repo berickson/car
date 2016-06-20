@@ -113,7 +113,7 @@ void Car::apply_dynamics(Dynamics & d) {
 
   if (fabs(wheel_distance_meters) > 0.) {
     double outside_wheel_angle = radians(angle_for_steering(previous.str));
-    ackerman.move_left_wheel(outside_wheel_angle, wheel_distance_meters, get_heading_radians());
+    ackerman.move_left_wheel(outside_wheel_angle, wheel_distance_meters, get_heading().radians());
   }
 
 
@@ -184,10 +184,7 @@ void Car::reset_odometry() {
   velocity = 0.0;
   last_velocity = 0.0;
   heading_adjustment = Angle::degrees(0.);
-  odometer_front_left_start = 0;
-  odometer_front_right_start = 0;
-  odometer_back_left_start = 0;
-  odometer_back_right_start = 0;
+
   ackerman = Ackerman(
     front_wheelbase_width_in_meters,
     wheelbase_length_in_meters);
@@ -201,14 +198,6 @@ Angle Car::get_heading() {
         + heading_adjustment);
   a.standardize();
   return a;
-}
-
-double Car::get_heading_degrees() {
-  return get_heading().degrees();
-}
-
-double Car::get_heading_radians() {
-  return get_heading().radians();
 }
 
 int Car::steering_for_angle(Angle theta)

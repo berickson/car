@@ -287,7 +287,7 @@ void run_car_menu() {
     {[&car](){return "front: " + to_string(car.get_front_position());}},
     {[&car](){return "usb readings: " + format(car.get_reading_count());}},
     {[&car](){return "usb errors: " + format(car .get_usb_error_count());}},
-    {[&car](){return "heading: " + format(car.get_heading_degrees());}},
+    {[&car](){return "heading: " + format(car.get_heading().degrees());}},
     {[&car](){return "rear: " + to_string(car.get_rear_position());}},
     {[&car](){return "odo_fl: " + format(car.get_odometer_front_left());}},
     {[&car](){return "odo_fr: " + format(car.get_odometer_front_right());}},

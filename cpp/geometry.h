@@ -57,6 +57,11 @@ struct Angle {
     return std::to_string(degrees())+"°";
   }
 
+  inline bool operator == (Angle& rhs)   {
+
+    return theta == rhs.theta;
+  }
+
   inline Angle & operator /= (double d)   {
     theta /= d;
     return *this;
