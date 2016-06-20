@@ -57,7 +57,6 @@ void write_path_from_recording_file(string recording_path, string outpath) {
 
   while(car.step()) {
     ++i;
-    cout << "processing line " << i << endl;
     next = car.current_dynamics;
     Point p_next = car.get_front_position();
     int wheel_ticks = next.odometer_front_left - current.odometer_front_left;
