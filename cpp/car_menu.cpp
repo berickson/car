@@ -14,6 +14,7 @@
 
 #include <ncurses.h> // sudo apt-get install libncurses5-dev
 
+
 struct {
   string track_name = "desk";
   string route_name = FileNames().get_route_names(track_name)[0];
@@ -140,6 +141,11 @@ SubMenu capture_video_menu{};
 CarMenu::CarMenu() {
 }
 
+
+
+
+
+
 void run_car_menu() {
 #define RASPBERRY_PI
 #ifdef RASPBERRY_PI
@@ -184,27 +190,13 @@ void run_car_menu() {
     Driver d(car,io);
     // todo: set parameters
     d.play_route(rte);
+    car.end_recording_input();
 
+    io.clear();
+    io.print("making path");
 
-/*
-        recording_file_path = FileNames().recording_file_path(config.track_name,config.route_name,config.run_name)
-        car.begin_recording_input(recording_file_path)
-        car.begin_recording_commands(FileNames().commands_recording_file_path(config.track_name,config.route_name,config.run_name))
-        try:
-          play_route(rte, car, k_smooth = config.k_smooth, d_ahead = config.d_ahead, t_ahead = config.t_ahead)
-        except:
-          path = f.exception_file_path(config.track_name,config.route_name,config.run_name)
-          with open(path,'w') as log:
-            log.write(exception.exception_text())
-        finally:
-          car.end_recording_input()
-          car.end_recording_commands()
-          if config.capture_video:
-            capture.end()
-        car.lcd.display_text("making path")
-        path_file_path = f.path_file_path(config.track_name,config.route_name,config.run_name)
-        write_path_from_recording_file(inpath=recording_file_path,outpath=path_file_path)
-  */
+    string path_file_path = f.path_file_path(track_name, route_name, run_name);
+    write_path_from_recording_file(recording_file_path, path_file_path);
   };
 
   auto record = [&car,&io]() {
@@ -235,6 +227,15 @@ void run_car_menu() {
     }
     recording.close();
     car.usb.remove_line_listener(&listener);
+
+    io.clear();
+    io.print("making path");
+    io.refresh();
+
+    string path_file_path = f.path_file_path(track_name, route_name);
+    write_path_from_recording_file(recording_path, path_file_path);
+
+
     // todo: update display
     //
     car_settings.route_name = route_name;

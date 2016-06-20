@@ -17,6 +17,8 @@ public:
 
 };
 
+void write_path_from_recording_file(string recording_path, string outpath);
+
 void test_fake_car();
 
 #endif // FAKECAR_H
