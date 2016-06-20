@@ -39,7 +39,7 @@ void Car::usb_thread_start() {
 
 void Car::process_line_from_log(string line) {
   if(input_recording_file.is_open()) {
-    input_recording_file << line; //todo: make non-blocking
+    input_recording_file << line << endl; //todo: make non-blocking
   }
   if(split(line)[1]!="TD") {
     return;

@@ -28,7 +28,7 @@ void FakeCar::reset() {
 
 bool FakeCar::step() {
   string s;
-  if(getline(dynamics_file,s)) {
+  if(getline(dynamics_file,s,'\n')) {
     process_line_from_log(s);
     return true;
   } else {
@@ -56,6 +56,8 @@ void write_path_from_recording_file(string recording_path, string outpath) {
   unsigned i = 0;
 
   while(car.step()) {
+    ++i;
+    cout << "processing line " << i << endl;
     next = car.current_dynamics;
     Point p_next = car.get_front_position();
     int wheel_ticks = next.odometer_front_left - current.odometer_front_left;
@@ -70,7 +72,6 @@ void write_path_from_recording_file(string recording_path, string outpath) {
       continue;
     }
 
-    ++i;
     reverse = next_reverse;
 
     double d = wheel_ticks * car.meters_per_odometer_tick;
@@ -103,8 +104,8 @@ void write_path_from_recording_file(string recording_path, string outpath) {
 #include "route.h"
 void test_fake_car() {
 
-  string recording_path = "/home/brian/car/tracks/desk/routes/A/runs/47/recording.csv";
-  string route_path = "/home/brian/car/tracks/desk/routes/A/runs/47/route.csv";
+  string recording_path = "/home/brian/car/tracks/desk/routes/N/recording.csv";
+  string route_path =     "/home/brian/car/tracks/desk/routes/N/test_route.csv";
   cout << "writing path " << route_path << " from recording " << recording_path << endl;
   write_path_from_recording_file(recording_path, route_path);
   cout << "done" << endl;

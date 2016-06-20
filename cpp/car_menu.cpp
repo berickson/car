@@ -10,7 +10,7 @@
 #include <ncurses.h>
 #include "car_ui.h"
 #include "driver.h"
-
+#include <unistd.h> // usleep
 
 #include <ncurses.h> // sudo apt-get install libncurses5-dev
 
@@ -180,7 +180,7 @@ void run_car_menu() {
     // rte.smooth(car_settings.k_smooth);
     io.clear();
     io.move(0,0);
-    io.print("optimizing velocity");
+    io.print((string) "optimizing velocity for "+input_path);
     io.refresh();
     rte.optimize_velocity(car_settings.max_v, car_settings.max_a);
     io.print("done - press any key to play route");
@@ -218,29 +218,20 @@ void run_car_menu() {
     string track_name = car_settings.track_name;
     string route_name = f.next_route_name(track_name);
     mkdir(f.get_route_folder(track_name,route_name));
-    WorkQueue<string> listener;
-    car.usb.add_line_listener(&listener);
 
     string recording_path = f.recording_file_path(track_name,route_name);
-    fstream recording;
-    recording.open(recording_path,ios_base::out);
-
+    car.begin_recording_input(recording_path);
 
     string line;
     io.clear();
     io.move(0,0);
     io.print("Recording - press any key to stop");
     io.refresh();
-    while(listener.try_pop(line,1000)) {
-      if(split(line)[1]=="TD") {
-        recording << line;
-      }
-      if(getch()>0)
-        break;
+    while(getch()==-1) {
+      usleep(1000);
     }
-    recording.flush();
-    recording.close();
-    car.usb.remove_line_listener(&listener);
+
+    car.end_recording_input();
 
     io.clear();
     io.print("making path");

@@ -37,8 +37,7 @@ int main(int, char *[]) {
     //test_console_menu();
     //test_system();
     //test_menu();
-    //test_menu();
-    // test_fake_car();
+    //test_fake_car();
     
     //test_dynamics();
     //test_car();

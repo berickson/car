@@ -50,6 +50,7 @@ string Dynamics::to_string() {
 bool Dynamics::from_log_string(Dynamics & d, string &s) {
   auto fields = split(s,',');
   if(fields.size() != 39) {
+    cerr << "field size was " << fields.size() << endl;
     // usb_error_count++;
     return false;
   }
