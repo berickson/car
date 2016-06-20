@@ -245,10 +245,7 @@ def table_lookup(kv, key):
 */
 
 // returns y for given x based on x1,y1,x2,y2
-inline double interpolate(double x, double x1, double y1, double x2, double y2){
-  double m = (y2 - y1)/( x2 - x1 );
-  return y1 + m * (x-x1);
-}
+double interpolate(double x, double x1, double y1, double x2, double y2);
 
 
 

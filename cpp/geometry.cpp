@@ -26,3 +26,8 @@ void test_geometry() {
 
 
 }
+
+double interpolate(double x, double x1, double y1, double x2, double y2){
+  double m = (y2 - y1)/( x2 - x1 );
+  return y1 + m * (x-x1);
+}

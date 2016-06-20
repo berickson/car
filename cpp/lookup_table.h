@@ -12,4 +12,6 @@ public:
   double lookup(double v) const;
 };
 
+void test_lookup_table();
+
 #endif // LOOKUPTABLE_H

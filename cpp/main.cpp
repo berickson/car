@@ -21,6 +21,7 @@
 #include "geometry.h"
 #include "pi_buttons.h"
 #include "route.h"
+#include "lookup_table.h"
 
 using namespace std;
 
@@ -45,6 +46,7 @@ int main(int, char *[]) {
     //test_split();
     //test_config();
     //test_work_queue();
+    //test_lookup_table();
   } catch (string & s) {
     cout << "caught: " << s << endl;
   }

@@ -11,13 +11,8 @@ Driver::Driver(Car & car, CarUI ui)
 void Driver::play_route(Route & route) {
 
   WorkQueue<Dynamics> queue;
-  try {
-    car.add_listener(&queue);
-    car.set_rc_mode();
-
-  } catch (...) {
-
-  }
+  car.add_listener(&queue);
+  car.set_rc_mode();
   ui.clear();
   ui.print("press any key to abort");
   ui.refresh();
