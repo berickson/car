@@ -34,6 +34,11 @@ public:
     return k;
   }
 
+  inline void wait_key() {
+    while(getch()==1) {}
+    return;
+  }
+
 
 };
 

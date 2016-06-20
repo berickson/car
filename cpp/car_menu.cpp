@@ -179,9 +179,13 @@ void run_car_menu() {
     // todo: smooth
     // rte.smooth(car_settings.k_smooth);
     io.clear();
+    io.move(0,0);
     io.print("optimizing velocity");
     io.refresh();
     rte.optimize_velocity(car_settings.max_v, car_settings.max_a);
+    io.print("done - press any key to play route");
+    io.refresh();
+    io.wait_key();
 
     io.clear();
     io.print((string)"playing route with max velocity " + format(rte.get_max_velocity()));
