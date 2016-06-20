@@ -18,8 +18,8 @@ void FakeCar::reset() {
   }
   dynamics_file.open(recording_file_path, ios_base::in);
   if(dynamics_file.is_open()) {
-    reset_odometry();
     step();
+    reset_odometry();
   } else {
     throw (string) "could not open " + recording_file_path;
   }
