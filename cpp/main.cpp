@@ -33,9 +33,9 @@ int main(int, char *[]) {
     //test_route();
     //test_pi_buttons();
     //test_geometry();
-    test_car_menu();
+    //test_car_menu();
     //test_console_menu();
-    //test_system();
+    test_system();
     //test_menu();
     //test_fake_car();
     

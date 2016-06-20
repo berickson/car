@@ -28,5 +28,6 @@ list<string> get_ip_addresses();
 string get_first_ip_address();
 void mkdir(string folder);
 void test_system();
+string get_home_folder();
 
 #endif // SYSTEM_H

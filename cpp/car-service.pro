@@ -53,3 +53,6 @@ HEADERS += \
 
 
 unix|win32: LIBS += -lncurses -lwiringPi
+
+DISTFILES += \
+    README.md

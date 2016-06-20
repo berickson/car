@@ -68,11 +68,11 @@ string get_first_ip_address() {
 
 
 
-// returns sorted list of child folders
+// returns sorted list of child folders, empty list if folder doesn't exist
 std::vector<std::string> child_folders (string folder) {
   vector<string> rv;
   DIR *dir = opendir(folder.c_str());
-  if(!dir) throw string("could not open folder" + folder);
+  if(!dir) {return rv;};
   struct dirent *entry = readdir(dir);
 
   while (entry != NULL) {
@@ -110,9 +110,14 @@ void mkdir(string folder) {
   }
 }
 
+string get_home_folder() {
+    return (string) getenv("HOME");
+}
+
 
 
 
 void test_system() {
     test_get_ip_addresses();
+    cout << "home folder: " << get_home_folder() << endl;
 }

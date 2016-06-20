@@ -15,9 +15,26 @@
 #include <ncurses.h> // sudo apt-get install libncurses5-dev
 
 
-struct {
-  string track_name = "desk";
-  string route_name = FileNames().get_route_names(track_name)[0];
+struct CarSettings{
+  CarSettings(){
+      auto f = FileNames();
+      auto track_names = f.get_track_names();
+      if(track_names.size() == 0) {
+          track_name = "";
+          route_name = "";
+          return;
+      }
+      track_name = track_names[0];
+      auto route_names = f.get_route_names(track_name);
+      if(route_names.size()==0) {
+          route_name = "";
+          return;
+      }
+      route_name = route_names[0];
+  }
+
+  string track_name = "";
+  string route_name;// = FileNames().get_route_names(track_name)[0];
   double max_a = 0.25;
   double max_v = 1.0;
   double t_ahead = 0.3;
