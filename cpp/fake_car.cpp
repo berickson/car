@@ -94,10 +94,13 @@ void write_path_from_recording_file(string recording_path, string outpath) {
     p = p_next;
 
   }
+  outfile.flush();
+  outfile.close();
 }
 
 
 
+#include "route.h"
 void test_fake_car() {
 
   string recording_path = "/home/brian/car/tracks/desk/routes/A/runs/47/recording.csv";
@@ -105,6 +108,13 @@ void test_fake_car() {
   cout << "writing path " << route_path << " from recording " << recording_path << endl;
   write_path_from_recording_file(recording_path, route_path);
   cout << "done" << endl;
+  cout << "verifying" << endl;
+  Route r;
+  r.load_from_file(route_path);
+  cout << "max velocity before optimization " << r.get_max_velocity() << endl;
+  r.optimize_velocity();
+  cout << "max velocity after optimization " << r.get_max_velocity() << endl;
+  cout << "optimize done" << endl;
 
 
   FakeCar car(recording_path);
