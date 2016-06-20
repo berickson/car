@@ -39,8 +39,8 @@ public:
 
   inline Point front_position() {
     Point p;
-    p.x = x + l * cos(heading) - sin(heading);
-    p.y = y + l * sin(heading) - cos(heading);
+    p.x = x + l * cos(heading);
+    p.y = y + l * sin(heading) ;
     return p;
   }
 
