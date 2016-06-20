@@ -225,6 +225,7 @@ void run_car_menu() {
       if(getch()>0)
         break;
     }
+    recording.flush();
     recording.close();
     car.usb.remove_line_listener(&listener);
 
