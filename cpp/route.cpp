@@ -186,10 +186,17 @@ Point Route::get_position_ahead(double d)
 
 
 void RouteNode::set_from_standard_file(vector<string> fields) {
+  secs = stod(fields[0]);
   x = stod(fields[1]);
   y = stod(fields[2]);
+  rear_x = stod(fields[3]);
+  rear_y = stod(fields[4]);
+  reverse = stoi(fields[5])>0;
+  heading = stod(fields[6]);
+  heading_adjustment = stod(fields[7]);
+  esc = stod(fields[8]);
+  str = stod(fields[9]);
   velocity = stod(fields[10]);
-  reverse = fields[5]=="True";
 }
 
 void Route::load_from_file(string path) {
