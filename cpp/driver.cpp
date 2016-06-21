@@ -53,6 +53,11 @@ void Driver::play_route(Route & route) {
     ui.print((string) "Error during play route: \n"+error_text);
     ui.refresh();
     while(ui.getkey() == -1);
+  } else {
+    ui.clear();
+    ui.print((string) "completed playback without error");
+    ui.refresh();
+    while(ui.getkey() == -1);
   }
 
 
