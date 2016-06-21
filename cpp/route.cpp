@@ -318,7 +318,9 @@ void test_circle() {
 void test_route() {
   // test_circle();
   Route r;
-  r.load_from_file("/home/brian/car/tracks/back yard/routes/A/path.csv");
+  r.load_from_file("/home/pi/car/tracks/desk/routes/B/path.csv");
   cout << r.to_string();
+
+  cout << "point ahead 0.2 " << r.get_position_ahead(0.2).to_string() << endl;
 
 }

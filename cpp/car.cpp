@@ -202,20 +202,23 @@ Angle Car::get_heading() {
 
 int Car::steering_for_angle(Angle theta)
 {
-  static const LookupTable t({
-    {30,1000},
-    {25,1104},
-    {20,1189},
-    {15,1235},
-    {10,1268},
+  static const LookupTable t(
+  {
+    {-30, 1858},
+    {-25, 1768},
+    {-20, 1723},
+    {-15,1688},
+    {-10, 1607},
+    {-5, 1528},
     {5, 1390},
     {0, 1450},
-    {-5, 1528},
-    {-10, 1607},
-    {-15,1688},
-    {-20, 1723},
-    {-25, 1768},
-    {-30, 1858}});
+    {10,1268},
+    {15,1235},
+    {20,1189},
+    {25,1104},
+    {30,1000}
+
+  });
   return (int) t.lookup(theta.degrees());
 }
 
@@ -285,4 +288,6 @@ void test_car() {
     }
   }
   car.remove_listener(&listener);
+
+  car.get
 }

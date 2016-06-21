@@ -63,4 +63,6 @@ void test_arc_to_relative_location(double l, double x, double y);
 void arc_to_relative_location_tests();
 void move_left_wheel_tests();
 
+void test_ackerman();
+
 #endif // ACKERMAN_H

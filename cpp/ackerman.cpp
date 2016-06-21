@@ -152,3 +152,7 @@ void arc_to_relative_location_tests() {
 
   test_arc_to_relative_location(20,20,0);
 }
+
+void test_ackerman() {
+  arc_to_relative_location_tests();
+}
