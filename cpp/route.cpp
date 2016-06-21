@@ -147,7 +147,7 @@ double Route::get_velocity()
 
   // set negative speed for reverse
   if (p0.reverse){
-    v = -v;
+    v = -fabs(v);
   }
   return v ;
 }
