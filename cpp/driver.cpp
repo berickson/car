@@ -8,6 +8,49 @@ Driver::Driver(Car & car, CarUI ui)
 {
 
 }
+
+
+
+// todo: replace all of this with a proper PID style loop
+int esc_for_velocity(double goal_velocity, Car & car) {
+
+  // special case for goal velocity of zero, always use neutral
+  if (goal_velocity == 0) {
+    return car.esc_for_velocity(0);
+  }
+
+  double esc_ms = NAN;
+
+  // calculate speed
+  double car_velocity = car.get_velocity();
+  double error = car_velocity - goal_velocity;
+
+  if (goal_velocity < 0){
+    // reverse
+    const double speed_up_esc = car.min_reverse_esc - 80;
+    const double slow_down_esc = 1500;
+    const double maintain_esc = car.min_reverse_esc;
+
+    if (error > 0) {
+        esc_ms = speed_up_esc;
+    } else if (error < 0.2){
+      esc_ms = slow_down_esc;
+    } else {
+        esc_ms = maintain_esc;
+    }
+  } else {
+    // forward
+    if (error > 0.2) {
+      esc_ms = 1500; // car.min_reverse_esc # slow down esc
+    } else if (error > 0.) {
+      esc_ms = car.esc_for_velocity(clamp(goal_velocity- 3.*error,0.1,999.));
+    } else {
+      esc_ms = car.esc_for_velocity(goal_velocity  - error);
+    }
+  }
+  return esc_ms;
+}
+
 void Driver::play_route(Route & route) {
 
   // we will set error text if something goes wrong
@@ -33,7 +76,7 @@ void Driver::play_route(Route & route) {
       Angle steering_angle = steering_angle_by_look_ahead(route);
 
       unsigned str = car.steering_for_angle(steering_angle);
-      unsigned esc = car.esc_for_velocity(route.get_velocity());
+      unsigned esc = esc_for_velocity(route.get_velocity(), car); //car.esc_for_velocity(route.get_velocity());
 
       if(route.done && fabs(car.get_velocity()) < 0.05)
         break;
