@@ -126,7 +126,7 @@ Angle Driver::steering_angle_by_look_ahead(Route &route)
   double v = car.get_velocity();
   if(v<0)
     return steering_angle_by_cte(route);
-  Point p = route.get_position_ahead(d_ahead + v*t_ahead);
+  Point p = route.get_position_ahead(d_ahead + v*t_ahead).get_front_position();
   Point car_p = car.get_front_position();
   double d = distance(car_p,p);
   Angle heading = car.get_heading();

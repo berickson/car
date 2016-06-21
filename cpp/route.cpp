@@ -34,7 +34,7 @@ Route get_circle(double r = 1, unsigned steps = 300) {
 string Route::to_string() {
   stringstream ss;
   for(auto node:nodes) {
-    ss << setprecision(3) << "x:"  << node.x << " y:" << node.y << " v: " << node.velocity << " reverse:" << node.reverse << endl;
+    ss << node.to_string() << endl;
   }
   return ss.str();
 }
@@ -152,7 +152,7 @@ double Route::get_velocity()
   return v ;
 }
 
-Point Route::get_position_ahead(double d)
+RouteNode Route::get_position_ahead(double d)
 {
   unsigned i = index;
   double segment_progress = progress;
@@ -168,22 +168,51 @@ Point Route::get_position_ahead(double d)
     // go to next node
     // if we are past the end of this node
     // and there are nodes left
-    if (d > remaining_d && i < nodes.size()-2) {
+    if (d > remaining_d && i < nodes.size()-2 ) {
+      if(p1.reverse != p2.reverse)
+        return p2;
       ++i;
       d -= remaining_d;
       segment_progress = 0;
       continue;
     }
-    double unit_x = dx/l;
-    double unit_y = dy/l;
-    double x = p1.x + segment_progress * dx;
-    double y = p1.y + segment_progress * dy;
-    double ahead_x = x + unit_x * d;
-    double ahead_y = y + unit_y * d;
-    return Point(ahead_x, ahead_y);
+
+    double fraction = d / l;
+
+    // interpolate node between p1 and p2
+    RouteNode rv;
+    rv.x = p1.x + fraction * (p2.x-p1.x);
+    rv.y = p1.y + fraction * (p2.y-p1.y);
+    rv.rear_x = p1.rear_x + fraction * (p2.rear_x-p1.rear_x);
+    rv.rear_y = p1.rear_y + fraction * (p2.rear_y-p1.rear_y);
+    rv.secs = p1.secs + fraction * (p2.secs-p1.secs);
+    rv.heading = p1.heading + fraction * (p2.heading-p1.heading);
+    rv.velocity = p1.velocity+ fraction * (p2.velocity-p1.velocity);
+    rv.str = p1.str+ fraction * (p2.str-p1.str);
+    rv.esc = p1.esc+ fraction * (p2.esc-p1.esc);
+    rv.reverse = p1.reverse;
+
+    return rv;
   }
 }
 
+
+string RouteNode::to_string()
+{
+  stringstream ss;
+  ss << "secs: " << secs << " "
+     << "x: " << x <<  " "
+     << "y: " << y <<  " "
+     << "rear_x: " << rear_x <<  " "
+     << "rear_y: " << rear_y <<  " "
+     << "heading: " << heading <<  " "
+     << "velocity: " << velocity <<  " "
+     << "heading_adjustment: " << heading_adjustment <<  " "
+     << "esc: " << esc <<  " "
+     << "str: " << str << " "
+     << "reverse: " << reverse;
+  return ss.str();
+}
 
 void RouteNode::set_from_standard_file(vector<string> fields) {
   secs = stod(fields[0]);
@@ -329,5 +358,6 @@ void test_route() {
   cout << r.to_string();
 
   cout << "point ahead 0.2 " << r.get_position_ahead(0.2).to_string() << endl;
+  cout << "point ahead 100 " << r.get_position_ahead(100).to_string() << endl;
 
 }

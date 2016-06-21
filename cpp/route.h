@@ -24,6 +24,12 @@ struct RouteNode {
   double velocity;
   bool reverse;
 
+  Point get_front_position() {
+    return Point(x,y);
+  }
+
+  string to_string();
+
   RouteNode(double _x=0.0, double _y=0.0, double _velocity = 0.0, bool _reverse=false) :
     x(_x),y(_y),velocity(_velocity),reverse(_reverse) {
   }
@@ -53,7 +59,7 @@ public:
   void set_position(Point & front, Point & rear, double velocity);
 
   double get_velocity();
-  Point get_position_ahead(double distance);
+  RouteNode get_position_ahead(double distance);
 
   vector<string> columns = {"secs","x","y","rear_x", "rear_y", "reverse", "heading","adj","esc","str","m/s"};
   vector<RouteNode> nodes;
