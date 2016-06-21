@@ -10,16 +10,21 @@ Driver::Driver(Car & car, CarUI ui)
 }
 void Driver::play_route(Route & route) {
 
+  // we will set error text if something goes wrong
+  string error_text = "";
+
   WorkQueue<Dynamics> queue;
   car.add_listener(&queue);
-  car.set_rc_mode();
   ui.clear();
   ui.print("press any key to abort");
   ui.refresh();
-  bool timed_out = false;
-  while(ui.getkey() == -1) {
-    Dynamics d;
-    if(queue.try_pop(d,1000)) {
+  try {
+    car.set_rc_mode();
+    while(ui.getkey() == -1) {
+      Dynamics d;
+      if(!queue.try_pop(d,1000)) {
+        throw (string) "timed out waiting to read dynamics";
+      }
       auto p_front = car.get_front_position();
       auto p_rear = car.get_rear_position();
       double v = car.get_velocity();
@@ -33,20 +38,19 @@ void Driver::play_route(Route & route) {
       if(route.done && fabs(car.get_velocity()) < 0.05)
         break;
       car.set_esc_and_str(esc, str);
-
-    } else {
-      timed_out = true;
-      // todo: notify user somehow that
-      // messaging failed during playback
-      break;
     }
+  } catch (string s) {
+    error_text = s;
+  } catch (...) {
+    error_text = "unknown exception caught during play_route";
   }
+
   car.set_esc_and_str(1500,1500);
   car.set_manual_mode();
   car.remove_listener(&queue);
-  if(timed_out) {
+  if(error_text.size()) {
     ui.clear();
-    ui.print("timed out waiting for dynamics");
+    ui.print((string) "Error during play route: \n"+error_text);
     ui.refresh();
     while(ui.getkey() == -1);
   }

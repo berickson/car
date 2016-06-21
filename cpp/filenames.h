@@ -6,7 +6,7 @@
 class FileNames {
 public:
   string tracks_folder;
-  FileNames(string tracks_folder = get_home_folder() + "car/tracks") {
+  FileNames(string tracks_folder = path_join(get_home_folder() , "car/tracks")) {
     this->tracks_folder = tracks_folder;
   }
 
