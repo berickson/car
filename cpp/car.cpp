@@ -273,6 +273,7 @@ int Car::esc_for_velocity(double v)
 }
 
 void test_car() {
+  /*
   Car car;
   cout << "front_wheelbase_width_in_meters: " << car.front_wheelbase_width_in_meters << endl;
 
@@ -288,6 +289,9 @@ void test_car() {
     }
   }
   car.remove_listener(&listener);
-
-  car.get
+*/
+  Car car;
+  for(auto i:linspace(-35,25,5)) {
+     cout << "degrees: " << i << " steering: " << car.steering_for_angle(Angle::degrees(i)) << endl;
+  }
 }

@@ -30,11 +30,12 @@ using namespace std;
 
 int main(int, char *[]) {
   try {
-    test_route();
-    test_ackerman();
+    //test_car();
+    //test_route();
+    //test_ackerman();
     //test_pi_buttons();
     //test_geometry();
-    //test_car_menu();
+    test_car_menu();
     //test_console_menu();
     //test_system();
     //test_menu();

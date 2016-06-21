@@ -244,6 +244,14 @@ inline double clamp(double value, double min_value, double max_value) {
   return value;
 }
 
+inline vector<double> linspace(double from, double to, double step) {
+  vector<double> v;
+  for(double d = from; d <= to; d+= step) {
+    v.push_back(d);
+  }
+  return v;
+}
+
 
 void test_geometry();
 

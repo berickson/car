@@ -138,13 +138,6 @@ SubMenu pi_menu {
   {"restart",restart}
 };
 
-vector<double> linspace(double from, double to, double step) {
-  vector<double> v;
-  for(double d = from; d <= to; d+= step) {
-    v.push_back(d);
-  }
-  return v;
-}
 
 SubMenu acceleration_menu{};
 SubMenu velocity_menu{};
