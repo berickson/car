@@ -76,7 +76,7 @@ void Driver::play_route(Route & route) {
       Angle steering_angle = steering_angle_by_look_ahead(route);
 
       unsigned str = car.steering_for_angle(steering_angle);
-      unsigned esc = esc_for_velocity(route.get_velocity(), car); //car.esc_for_velocity(route.get_velocity());
+      unsigned esc = esc_for_velocity(route.get_velocity(), car);
 
       if(route.done && fabs(car.get_velocity()) < 0.05)
         break;
