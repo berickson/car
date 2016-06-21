@@ -204,7 +204,7 @@ void run_car_menu() {
     car.begin_recording_input(recording_file_path);
     Driver d(car,io);
     // todo: set parameters
-    d.play_route(rte);
+    d.drive_route(rte);
     car.end_recording_input();
 
     io.clear();

@@ -14,7 +14,7 @@ double Route::distance() {
   for(unsigned i=0;i<nodes.size()-1;i++){
     auto n1=nodes[i];
     auto n2=nodes[i+1];
-    d+=::distance(n1.x,n1.y,n2.x,n2.y);
+    d+=::distance(n1.front_x,n1.front_y,n2.front_x,n2.front_y);
   }
   return d;
 }
@@ -48,7 +48,7 @@ Angle Route::heading()
 {
   RouteNode & p1 = nodes[index];
   RouteNode & p2 = nodes[index+1];
-  Angle a = Angle::radians(atan2(p2.y-p1.y,p2.x-p1.x));
+  Angle a = Angle::radians(atan2(p2.front_y-p1.front_y,p2.front_x-p1.front_x));
   if(p1.reverse)
     a += Angle::radians(M_PI);
   a.standardize();
@@ -58,7 +58,7 @@ Angle Route::heading()
 bool is_nan(double __x)
   { return __builtin_isnan(__x); }
 
-void Route::set_position(Point &front, Point &rear, double velocity)
+void Route::set_position(Point front, Point rear, double velocity)
 {
   const double stopped_velocity = 0.01;
   while(true) {
@@ -73,18 +73,6 @@ void Route::set_position(Point &front, Point &rear, double velocity)
       progress = 1.0; // will move to next node
     } else {
       if(p1.reverse) {
-        // calculate rear position if not in route
-        if(is_nan(p1.rear_x)) {
-          double h = heading().radians();
-          double car_l = ::distance(front,rear);
-          double rear_offset_x = -car_l* cos(h);
-          double rear_offset_y = -car_l* sin(h);
-          dx = p2.x-p1.x;
-          dy = p2.y-p1.y;
-          drx = rear.x - (p1.x + rear_offset_x);
-          dry = rear.y - (p1.y + rear_offset_y);
-
-        } else {
           // d from p1 to p2
           dx = p2.rear_x-p1.rear_x;
           dy = p2.rear_y-p1.rear_y;
@@ -92,16 +80,15 @@ void Route::set_position(Point &front, Point &rear, double velocity)
           // d from p1 to robot
           drx = rear.x - p1.rear_x;
           dry = rear.y - p1.rear_y;
-        }
       } else {
 
         // d from p1 to p2
-        dx = p2.x-p1.x;
-        dy = p2.y-p1.y;
+        dx = p2.front_x-p1.front_x;
+        dy = p2.front_y-p1.front_y;
 
         // d from p1 to robot
-        drx = rear.x - p1.x;
-        dry = rear.y - p1.y;
+        drx = front.x - p1.front_x;
+        dry = front.y - p1.front_y;
       }
     }
 
@@ -120,9 +107,7 @@ void Route::set_position(Point &front, Point &rear, double velocity)
       break;
     }
     ++index;
-
   }
-
 }
 
 // returns desired velocity for current position
@@ -157,10 +142,10 @@ RouteNode Route::get_position_ahead(double d)
   unsigned i = index;
   double segment_progress = progress;
   while(true) {
-    RouteNode & p1 = nodes[i];
-    RouteNode & p2 = nodes[i+1];
-    double dx = p2.x-p1.x;
-    double dy = p2.y-p1.y;
+    RouteNode p1 = nodes[i];
+    RouteNode p2 = nodes[i+1];
+    double dx = p2.front_x-p1.front_x;
+    double dy = p2.front_y-p1.front_y;
     double l = ::length(dx,dy);
     double progress_d = l * segment_progress;
     double remaining_d = l - progress_d;
@@ -181,8 +166,8 @@ RouteNode Route::get_position_ahead(double d)
 
     // interpolate node between p1 and p2
     RouteNode rv;
-    rv.x = p1.x + fraction * (p2.x-p1.x);
-    rv.y = p1.y + fraction * (p2.y-p1.y);
+    rv.front_x = p1.front_x + fraction * (p2.front_x-p1.front_x);
+    rv.front_y = p1.front_y + fraction * (p2.front_y-p1.front_y);
     rv.rear_x = p1.rear_x + fraction * (p2.rear_x-p1.rear_x);
     rv.rear_y = p1.rear_y + fraction * (p2.rear_y-p1.rear_y);
     rv.secs = p1.secs + fraction * (p2.secs-p1.secs);
@@ -201,8 +186,8 @@ string RouteNode::to_string()
 {
   stringstream ss;
   ss << "secs: " << secs << " "
-     << "x: " << x <<  " "
-     << "y: " << y <<  " "
+     << "x: " << front_x <<  " "
+     << "y: " << front_y <<  " "
      << "rear_x: " << rear_x <<  " "
      << "rear_y: " << rear_y <<  " "
      << "heading: " << heading <<  " "
@@ -216,8 +201,8 @@ string RouteNode::to_string()
 
 void RouteNode::set_from_standard_file(vector<string> fields) {
   secs = stod(fields[0]);
-  x = stod(fields[1]);
-  y = stod(fields[2]);
+  front_x = stod(fields[1]);
+  front_y = stod(fields[2]);
   rear_x = stod(fields[3]);
   rear_y = stod(fields[4]);
   reverse = stoi(fields[5])>0;
@@ -287,9 +272,6 @@ void Route::optimize_velocity(double max_velocity, double max_acceleration) {
     node.velocity = max_velocity;
   }
 
-  // end velocity must be zero
-  nodes[nodes.size()-1] = 0;
-
   // final velocity must be zero
   nodes[nodes.size()-1].velocity = 0.0;
 
@@ -303,14 +285,14 @@ void Route::optimize_velocity(double max_velocity, double max_acceleration) {
   }
 
   // apply speed limits for curves
-  for(unsigned i=0; i < nodes.size()-3; i++) {
+  for(int i=0; i < (int)nodes.size()-3; i++) {
     RouteNode & p0 = nodes[i];
     RouteNode & p1 = nodes[i+1];
     RouteNode & p2 = nodes[i+2];
 
     // find two vectors for this and next segment
-    Point v1(p1.x-p0.x, p1.y-p0.y);
-    Point v2(p2.x-p1.x, p2.y-p1.y);
+    Point v1(p1.front_x-p0.front_x, p1.front_y-p0.front_y);
+    Point v2(p2.front_x-p1.front_x, p2.front_y-p1.front_y);
 
     Angle theta = angle_between(v1.x,v1.y,v2.x,v2.y);
     if(fabs(theta.radians())>0) {
@@ -327,7 +309,7 @@ void Route::optimize_velocity(double max_velocity, double max_acceleration) {
   for(int i = nodes.size()-2; i >= 0; --i) {
     RouteNode & p0 = nodes[i];
     RouteNode & p1 = nodes[i+1];
-    double ds = ::distance(p0.x,p0.y,p1.x,p1.y);
+    double ds = ::distance(p0.front_x,p0.front_y,p1.front_x,p1.front_y);
     p0.velocity = min(p0.velocity, velocity_at_position(ds,max_acceleration,p1.velocity));
   }
 }

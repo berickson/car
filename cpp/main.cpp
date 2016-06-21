@@ -22,6 +22,7 @@
 #include "pi_buttons.h"
 #include "route.h"
 #include "lookup_table.h"
+#include "driver.h"
 
 using namespace std;
 
@@ -30,9 +31,10 @@ using namespace std;
 
 int main(int, char *[]) {
   try {
+    test_driver();
     //test_car();
-    test_route();
-    test_ackerman();
+    //test_route();
+    //test_ackerman();
     //test_pi_buttons();
     //test_geometry();
     //test_car_menu();

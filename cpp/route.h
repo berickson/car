@@ -19,19 +19,19 @@ struct RouteNode {
   double esc=NAN;
   double str=NAN;
 
-  double x;
-  double y;
+  double front_x;
+  double front_y;
   double velocity;
   bool reverse;
 
   Point get_front_position() {
-    return Point(x,y);
+    return Point(front_x,front_y);
   }
 
   string to_string();
 
   RouteNode(double _x=0.0, double _y=0.0, double _velocity = 0.0, bool _reverse=false) :
-    x(_x),y(_y),velocity(_velocity),reverse(_reverse) {
+    front_x(_x),front_y(_y),velocity(_velocity),reverse(_reverse) {
   }
   void set_from_standard_file(vector<string> fields);
 };
@@ -56,7 +56,7 @@ public:
 
   Angle heading();
 
-  void set_position(Point & front, Point & rear, double velocity);
+  void set_position(Point front, Point rear, double velocity);
 
   double get_velocity();
   RouteNode get_position_ahead(double distance);

@@ -33,7 +33,6 @@ public:
 
   // state variables
   Dynamics current_dynamics;
-  Dynamics previous_dynamics;
   Dynamics original_dynamics;
   int reading_count = 0;
 

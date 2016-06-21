@@ -51,7 +51,7 @@ int esc_for_velocity(double goal_velocity, Car & car) {
   return esc_ms;
 }
 
-void Driver::play_route(Route & route) {
+void Driver::drive_route(Route & route) {
 
   // we will set error text if something goes wrong
   string error_text = "";
@@ -73,7 +73,7 @@ void Driver::play_route(Route & route) {
       double v = car.get_velocity();
       route.set_position(p_front, p_rear, v);
 
-      Angle steering_angle = steering_angle_by_look_ahead(route);
+      Angle steering_angle = steering_angle_by_look_ahead(route, d_ahead + v*t_ahead);
 
       unsigned str = car.steering_for_angle(steering_angle);
       unsigned esc = esc_for_velocity(route.get_velocity(), car);
@@ -121,12 +121,12 @@ Angle Driver::steering_angle_by_cte(Route &route) {
   return steering_angle;
 }
 
-Angle Driver::steering_angle_by_look_ahead(Route &route)
+Angle Driver::steering_angle_by_look_ahead(Route &route, double look_ahead)
 {
   double v = car.get_velocity();
   if(v<0)
     return steering_angle_by_cte(route);
-  Point p = route.get_position_ahead(d_ahead + v*t_ahead).get_front_position();
+  Point p = route.get_position_ahead(look_ahead).get_front_position();
   Point car_p = car.get_front_position();
   double d = distance(car_p,p);
   Angle heading = car.get_heading();
@@ -136,4 +136,44 @@ Angle Driver::steering_angle_by_look_ahead(Route &route)
   double left = d*sin(delta.radians());
   auto arc = car.ackerman.arc_to_relative_location(ahead, left);
   return Angle::radians(arc.steer_radians);
+}
+
+
+#include "fake_car.h"
+
+void test_driver() {
+    Car car(false);
+    Route route;
+    Dynamics d;
+    car.apply_dynamics(d);
+
+    RouteNode n;
+    n.front_x = car.get_front_position().x;
+    n.front_y = car.get_front_position().y;
+    n.rear_x = car.get_rear_position().x;
+    n.rear_y = car.get_rear_position().y;
+    n.heading = car.get_heading().radians();
+    n.reverse = false;
+
+    // make route a 10x10 l shape
+    route.add_node(n);
+    n.front_x += 10;
+    n.rear_x += 10;
+    route.add_node(n);
+    n.front_y += 10;
+    n.rear_y = 10-car.length;
+    route.add_node(n);
+    route.optimize_velocity();
+    cout << route.to_string() << endl;
+
+    CarUI ui;
+    Driver driver(car,ui);
+    for(auto look_ahead : linspace(0,25,1)){
+        cout << "look_ahead: "
+             << look_ahead
+             << " steering angle: "
+             << driver.steering_angle_by_look_ahead(route, look_ahead).degrees()
+             << endl;
+    }
+
 }

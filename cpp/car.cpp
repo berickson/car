@@ -92,7 +92,7 @@ void Car::apply_dynamics(Dynamics & d) {
   // set all the dynamics variables
   reading_count++;
 
-  previous_dynamics = current_dynamics;
+  Dynamics previous = current_dynamics;
   current_dynamics = d;
   if(reading_count == 1) {
     original_dynamics = d;
@@ -101,7 +101,6 @@ void Car::apply_dynamics(Dynamics & d) {
 
   // update state
   Dynamics & current = current_dynamics;
-  Dynamics & previous = previous_dynamics;
 
   // correct heading with adjustment factor
   auto temp = (current.yaw - previous.yaw);
