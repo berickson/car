@@ -163,6 +163,8 @@ RouteNode Route::get_position_ahead(double d)
     }
 
     double fraction = d / l;
+    // clamp fraction to 1, handles end point case where we go off the end of the route
+    fraction = min(fraction, 1.);
 
     // interpolate node between p1 and p2
     RouteNode rv;

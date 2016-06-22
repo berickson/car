@@ -169,8 +169,10 @@ void test_driver() {
     CarUI ui;
     Driver driver(car,ui);
     for(auto look_ahead : linspace(0,25,1)){
+        RouteNode n_ahead = route.get_position_ahead(look_ahead);
         cout << "look_ahead: "
-             << look_ahead
+             << " (" << n_ahead.front_x
+             << " ," << n_ahead.front_y << ")"
              << " steering angle: "
              << driver.steering_angle_by_look_ahead(route, look_ahead).degrees()
              << endl;
