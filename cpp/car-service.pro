@@ -34,7 +34,6 @@ HEADERS += \
     car.h \
     config.h \
     trim.h \
-    glob_util.h \
     ends_with.h \
     fake_car.h \
     menu.h \

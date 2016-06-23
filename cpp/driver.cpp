@@ -6,10 +6,7 @@
 Driver::Driver(Car & car, CarUI ui)
   : car(car), ui(ui)
 {
-
 }
-
-
 
 // todo: replace all of this with a proper PID style loop
 int esc_for_velocity(double goal_velocity, Car & car) {
@@ -102,8 +99,6 @@ void Driver::drive_route(Route & route) {
     ui.refresh();
     while(ui.getkey() == -1);
   }
-
-
 }
 
 Angle Driver::steering_angle_by_cte(Route &route) {
@@ -146,6 +141,8 @@ void test_driver() {
     Route route;
     Dynamics d;
     car.apply_dynamics(d);
+    car.wheelbase_length = 1;
+    car.reset_odometry();
 
     RouteNode n;
     n.front_x = car.get_front_position().x;
@@ -161,7 +158,7 @@ void test_driver() {
     n.rear_x += 10;
     route.add_node(n);
     n.front_y += 10;
-    n.rear_y = 10-car.length;
+    n.rear_y = 10-car.wheelbase_length;
     route.add_node(n);
     route.optimize_velocity();
     cout << route.to_string() << endl;
@@ -170,12 +167,11 @@ void test_driver() {
     Driver driver(car,ui);
     for(auto look_ahead : linspace(0,25,1)){
         RouteNode n_ahead = route.get_position_ahead(look_ahead);
-        cout << "look_ahead: "
+        cout << "look_ahead: " << look_ahead
              << " (" << n_ahead.front_x
              << " ," << n_ahead.front_y << ")"
              << " steering angle: "
              << driver.steering_angle_by_look_ahead(route, look_ahead).degrees()
              << endl;
     }
-
 }

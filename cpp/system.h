@@ -30,4 +30,6 @@ void mkdir(string folder);
 void test_system();
 string get_home_folder();
 
+std::vector<std::string> glob(const string& pat);
+
 #endif // SYSTEM_H

@@ -49,12 +49,9 @@ public:
   int min_forward_esc;
   int min_reverse_esc;
   int reverse_center_steering_us; // ?!
-  double front_wheelbase_width_in_meters;
-  double rear_wheelbase_width_in_meters;
-  double wheelbase_length_in_meters;
-
-  double length;
-  double width;
+  double front_wheelbase_width;
+  double rear_wheelbase_width;
+  double wheelbase_length;
 
   // accessors
   Angle get_heading();

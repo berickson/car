@@ -1,7 +1,6 @@
 #ifndef CARUI_H
 #define CARUI_H
 
-#include "ncurses.h"
 #include <string>
 
 using namespace std;
@@ -10,35 +9,22 @@ class CarUI
 {
 public:
   CarUI();
+  ~CarUI();
 
-  inline void clear() {
-    ::clear();
-  }
+  void init();
 
-  inline void move(int row, int col) {
-    ::move(row,col);
-    refresh();
+  void clear();
+  void move(int row, int col);
+  void print(string s);
+  void refresh();
+  int getkey();
+  void bold(bool b);
 
-  }
+  void wait_key();
+  int h,w;
 
-  inline void print(string s) {
-    printw(s.c_str());
-  }
-
-  inline void refresh() {
-    ::refresh();
-  }
-
-  inline int getkey() {
-    int k = getch();
-    return k;
-  }
-
-  inline void wait_key() {
-    while(getch()==1) {}
-    return;
-  }
-
+private:
+  bool initialized = false;
 
 };
 

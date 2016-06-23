@@ -4,22 +4,16 @@
 #include <sstream>
 #include <functional>
 #include "pi_buttons.h"
-
-#include <ncurses.h> // sudo apt-get install libncurses5-dev
-
+#include "car_ui.h"
 
 void ConsoleMenu::run() {
+  ui.init();
   // curses initialization
-  initscr();
-  curs_set(0); // don't display cursor
-  noecho(); // don't display characters
-  raw();    // read keys immediately
-  getmaxyx(stdscr,h,w); // get screen size y,x
+
   PiButtons buttons;
   try {
     while(true) {
       display();
-      timeout(100);
 
       {
         char p = buttons.get_press();
@@ -30,10 +24,10 @@ void ConsoleMenu::run() {
 
       }
 
-      int c=getch();
+      int c=ui.getkey();
 
       // many types of enter key
-      if(c == KEY_ENTER || c == 10 || c == 13) {
+      if( c == 10 || c == 13) {
          enter();
       }
       //if(c==27) break;
@@ -43,8 +37,8 @@ void ConsoleMenu::run() {
       // get "multi" keys for arrows
       // http://stackoverflow.com/a/11432632/383967
       if(c=='\033') {
-        getch(); // eat '['
-        c=getch();
+        ui.getkey(); // eat '['
+        c=ui.getkey();
 
         if(c=='A') up();
         if(c=='B') down();
@@ -55,23 +49,20 @@ void ConsoleMenu::run() {
     }
   }
   catch(string &e) {
-    endwin();
     cout << "cought error string: " << e << endl;
     throw(e);
   }
   catch(...) {
-    endwin();
     cout << "error caught in menu::run" << endl;
     throw;
   }
-  endwin();
 }
 
 void ConsoleMenu::display() {
-  clear(); // always start by clearing the whole screan
+  ui.clear(); // always start by clearing the whole screan
 
   // see if current item fits on screen, adjust offset if necessary
-  while( ((int)current_submenu->current_index - (int)current_submenu->display_offset) > (h-1) ) {
+  while( ((int)current_submenu->current_index - (int)current_submenu->display_offset) > (ui.h-1) ) {
     ++(current_submenu->display_offset);
   }
   // move up if it is off the top
@@ -84,9 +75,9 @@ void ConsoleMenu::display() {
   auto items = current_submenu->items;
   for(unsigned int i=current_submenu->display_offset;i<items.size();++i) {
     int line = i-current_submenu->display_offset;
-    if(line >= h) break;
+    if(line >= ui.h) break;
 
-    move(line,0);
+    ui.move(line,0);
     auto menu_item = items[i];
     string s = menu_item.display_text();
 
@@ -99,11 +90,11 @@ void ConsoleMenu::display() {
     } else {
       s = " "+s+" ";
     }
-    if(selected) attron(A_BOLD);
-    printw(s.c_str());
-    if(selected) attroff(A_BOLD);
+    if(selected) ui.bold(true);
+    ui.print(s);
+    if(selected) ui.bold(false);
   }
-  refresh();
+  ui.refresh();
 }
 
 

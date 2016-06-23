@@ -117,15 +117,11 @@ DIST          = ../../cpp/README.md \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_bluetooth.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_bluetooth_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_bootstrap_private.pri \
-		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_charts.pri \
-		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_charts_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_clucene_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_concurrent.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_concurrent_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_core.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_core_private.pri \
-		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_datavisualization.pri \
-		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_datavisualization_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_dbus.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_dbus_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_designer.pri \
@@ -158,6 +154,8 @@ DIST          = ../../cpp/README.md \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_positioning_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_printsupport.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_printsupport_private.pri \
+		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_purchasing.pri \
+		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_purchasing_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_qml.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_qml_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_qmldebug_private.pri \
@@ -242,7 +240,6 @@ DIST          = ../../cpp/README.md \
 		car.h \
 		config.h \
 		trim.h \
-		glob_util.h \
 		ends_with.h \
 		fake_car.h \
 		menu.h \
@@ -315,15 +312,11 @@ Makefile: ../../cpp/car-service.pro /opt/Qt/5.7/gcc_64/mkspecs/linux-g++/qmake.c
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_bluetooth.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_bluetooth_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_bootstrap_private.pri \
-		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_charts.pri \
-		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_charts_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_clucene_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_concurrent.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_concurrent_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_core.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_core_private.pri \
-		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_datavisualization.pri \
-		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_datavisualization_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_dbus.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_dbus_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_designer.pri \
@@ -356,6 +349,8 @@ Makefile: ../../cpp/car-service.pro /opt/Qt/5.7/gcc_64/mkspecs/linux-g++/qmake.c
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_positioning_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_printsupport.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_printsupport_private.pri \
+		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_purchasing.pri \
+		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_purchasing_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_qml.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_qml_private.pri \
 		/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_qmldebug_private.pri \
@@ -463,15 +458,11 @@ Makefile: ../../cpp/car-service.pro /opt/Qt/5.7/gcc_64/mkspecs/linux-g++/qmake.c
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_bluetooth.pri:
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_bluetooth_private.pri:
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_bootstrap_private.pri:
-/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_charts.pri:
-/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_charts_private.pri:
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_clucene_private.pri:
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_concurrent.pri:
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_concurrent_private.pri:
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_core.pri:
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_core_private.pri:
-/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_datavisualization.pri:
-/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_datavisualization_private.pri:
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_dbus.pri:
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_dbus_private.pri:
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_designer.pri:
@@ -504,6 +495,8 @@ Makefile: ../../cpp/car-service.pro /opt/Qt/5.7/gcc_64/mkspecs/linux-g++/qmake.c
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_positioning_private.pri:
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_printsupport.pri:
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_printsupport_private.pri:
+/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_purchasing.pri:
+/opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_purchasing_private.pri:
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_qml.pri:
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_qml_private.pri:
 /opt/Qt/5.7/gcc_64/mkspecs/modules/qt_lib_qmldebug_private.pri:
@@ -636,9 +629,11 @@ main.o: ../../cpp/main.cpp ../../cpp/ackerman.h \
 		../../cpp/system.h \
 		../../cpp/car_menu.h \
 		../../cpp/console_menu.h \
+		../../cpp/car_ui.h \
 		../../cpp/pi_buttons.h \
 		../../cpp/route.h \
-		../../cpp/lookup_table.h
+		../../cpp/lookup_table.h \
+		../../cpp/driver.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../cpp/main.cpp
 
 ackerman.o: ../../cpp/ackerman.cpp ../../cpp/ackerman.h \
@@ -647,7 +642,6 @@ ackerman.o: ../../cpp/ackerman.cpp ../../cpp/ackerman.h \
 
 usb.o: ../../cpp/usb.cpp ../../cpp/usb.h \
 		../../cpp/work_queue.h \
-		../../cpp/glob_util.h \
 		../../cpp/ends_with.h \
 		../../cpp/split.h \
 		../../cpp/system.h
@@ -702,6 +696,7 @@ car_menu.o: ../../cpp/car_menu.cpp ../../cpp/car_menu.h \
 		../../cpp/geometry.h \
 		../../cpp/system.h \
 		../../cpp/console_menu.h \
+		../../cpp/car_ui.h \
 		../../cpp/fake_car.h \
 		../../cpp/car.h \
 		../../cpp/ackerman.h \
@@ -712,12 +707,12 @@ car_menu.o: ../../cpp/car_menu.cpp ../../cpp/car_menu.h \
 		../../cpp/string_utils.h \
 		../../cpp/trim.h \
 		../../cpp/split.h \
-		../../cpp/car_ui.h \
 		../../cpp/driver.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o car_menu.o ../../cpp/car_menu.cpp
 
 console_menu.o: ../../cpp/console_menu.cpp ../../cpp/console_menu.h \
 		../../cpp/menu.h \
+		../../cpp/car_ui.h \
 		../../cpp/pi_buttons.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o console_menu.o ../../cpp/console_menu.cpp
 
@@ -747,7 +742,8 @@ driver.o: ../../cpp/driver.cpp ../../cpp/driver.h \
 		../../cpp/work_queue.h \
 		../../cpp/usb.h \
 		../../cpp/car_ui.h \
-		../../cpp/route.h
+		../../cpp/route.h \
+		../../cpp/fake_car.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o driver.o ../../cpp/driver.cpp
 
 car_ui.o: ../../cpp/car_ui.cpp ../../cpp/car_ui.h

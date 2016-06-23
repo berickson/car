@@ -116,6 +116,20 @@ string get_home_folder() {
 
 
 
+#include "glob.h"
+// http://stackoverflow.com/a/8615450/383967
+std::vector<std::string> glob(const string& pat){
+    using namespace std;
+    glob_t glob_result;
+    glob(pat.c_str(),GLOB_TILDE,NULL,&glob_result);
+    vector<string> ret;
+    for(unsigned int i=0;i<glob_result.gl_pathc;++i){
+        ret.push_back(string(glob_result.gl_pathv[i]));
+    }
+    globfree(&glob_result);
+    return ret;
+}
+
 
 void test_system() {
     test_get_ip_addresses();

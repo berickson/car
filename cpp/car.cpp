@@ -167,13 +167,9 @@ void Car::read_configuration(string path){
   reverse_center_steering_us = config.get_int("reverse_center_steering_us");
 
   // car dimensions
-  front_wheelbase_width_in_meters = config.get_double("front_wheelbase_width_in_meters");
-  rear_wheelbase_width_in_meters = config.get_double("rear_wheelbase_width_in_meters");
-  wheelbase_length_in_meters = config.get_double("wheelbase_length_in_meters");
-
-  // infer general dimensions
-  length = wheelbase_length_in_meters;
-  width = front_wheelbase_width_in_meters; // ?! why front?
+  front_wheelbase_width = config.get_double("front_wheelbase_width_in_meters");
+  rear_wheelbase_width = config.get_double("rear_wheelbase_width_in_meters");
+  wheelbase_length = config.get_double("wheelbase_length_in_meters");
 }
 
 void Car::reset_odometry() {
@@ -185,8 +181,8 @@ void Car::reset_odometry() {
   heading_adjustment = Angle::degrees(0.);
 
   ackerman = Ackerman(
-    front_wheelbase_width_in_meters,
-    wheelbase_length_in_meters,-wheelbase_length_in_meters,0,0);
+    front_wheelbase_width,
+    wheelbase_length,-wheelbase_length,0,0);
 }
 
 

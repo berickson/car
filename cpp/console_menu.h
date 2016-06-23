@@ -1,6 +1,7 @@
 #ifndef CONSOLEMENU_H
 #define CONSOLEMENU_H
 #include "menu.h"
+#include "car_ui.h"
 
 
 class ConsoleMenu : public Menu {
@@ -8,8 +9,7 @@ public:
   using Menu::Menu; // inherit constructors
   void run() override;
   void display() override;
-
-  int h,w;
+  CarUI ui;
 };
 
 void test_console_menu();

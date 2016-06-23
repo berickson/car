@@ -7,7 +7,6 @@
 //#include <fstream>
 #include <string>
 #include <thread>
-#include "glob_util.h"
 #include "ends_with.h"
 #include "split.h"
 #include "system.h"
