@@ -66,6 +66,11 @@ void Driver::drive_route(Route & route) {
   try {
     car.set_rc_mode();
     while(ui.getkey() == -1) {
+      if(ui.getkey()!=-1) {
+        error_text = "run aborted by user";
+        break;
+      }
+
       Dynamics d;
       if(!queue.try_pop(d,1000)) {
         throw (string) "timed out waiting to read dynamics";
@@ -104,11 +109,14 @@ void Driver::drive_route(Route & route) {
   if(error_text.size()) {
     ui.clear();
     ui.print((string) "Error during play route: \n"+error_text);
+    ui.print(error_text);
+    ui.print("press any key to continue");
     ui.refresh();
     while(ui.getkey() == -1);
   } else {
     ui.clear();
-    ui.print((string) "completed playback without error");
+    ui.print("completed playback without error");
+    ui.print("press any key to continue");
     ui.refresh();
     while(ui.getkey() == -1) {
       usleep(30000);
