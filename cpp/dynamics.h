@@ -35,7 +35,7 @@ public:
   int odometer_front_left;
   unsigned int odometer_front_left_last_us;
   int odometer_front_right;
-  int odometer_front_right_last_us;
+  unsigned int odometer_front_right_last_us;
 
 
 
