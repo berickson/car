@@ -71,7 +71,7 @@ void Driver::drive_route(Route & route) {
       double ahead = d_ahead + v*t_ahead;
       ui.clear();
       ui.print((string) "p_front: " + p_front.to_string());
-      ui.print((string) "ahead: " + ahead);
+      ui.print((string) "ahead: " + to_string(ahead));
       ui.refresh();
       route.set_position(p_front, p_rear, v);
 
