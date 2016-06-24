@@ -115,10 +115,11 @@ void Driver::drive_route(Route & route) {
     while(ui.getkey() == -1);
   } else {
     ui.clear();
-    ui.print("completed playback without error");
+    ui.print("completed playback without error\n");
     ui.print("press any key to continue");
     ui.refresh();
-    while(ui.getkey() == -1) {
+    int k = ui.getkey();
+    while(ui.getkey() == k) {
       usleep(30000);
     }
   }
