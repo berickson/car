@@ -68,6 +68,9 @@ void Driver::drive_route(Route & route) {
       auto p_front = car.get_front_position();
       auto p_rear = car.get_rear_position();
       double v = car.get_velocity();
+      ui.clear();
+      ui.print((string) "p_front: " + p_front.to_string());
+      ui.refresh();
       route.set_position(p_front, p_rear, v);
 
       Angle steering_angle = steering_angle_by_look_ahead(route, d_ahead + v*t_ahead);
