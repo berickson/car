@@ -69,16 +69,19 @@ void Driver::drive_route(Route & route) {
       auto p_rear = car.get_rear_position();
       double v = car.get_velocity();
       double ahead = d_ahead + v*t_ahead;
-      ui.clear();
-      ui.print((string) "p_front: " + p_front.to_string());
-      ui.print((string) "ahead: " + to_string(ahead));
-      ui.refresh();
       route.set_position(p_front, p_rear, v);
 
       Angle steering_angle = steering_angle_by_look_ahead(route, ahead);
 
       unsigned str = car.steering_for_angle(steering_angle);
       unsigned esc = esc_for_velocity(route.get_velocity(), car);
+
+      ui.clear();
+      ui.print((string) "p_front: " + p_front.to_string());
+      ui.print((string) "position: " + route.get_position_ahead(0).to_string());
+      ui.print((string) "ahead: " + to_string(ahead));
+
+      ui.refresh();
 
       if(route.done && fabs(car.get_velocity()) < 0.05)
         break;
