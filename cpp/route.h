@@ -10,7 +10,6 @@ using namespace std;
 
 
 struct RouteNode {
-  // todo: rid if unnecessary variables
   double secs=NAN;
   double rear_x=NAN;
   double rear_y=NAN;

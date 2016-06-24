@@ -2,10 +2,15 @@
 #include "car.h"
 #include "math.h"
 #include "car_ui.h"
+#include <unistd.h> // usleep
 
-Driver::Driver(Car & car, CarUI ui)
+
+Driver::Driver(Car & car, CarUI ui, RunSettings settings)
   : car(car), ui(ui)
 {
+  t_ahead = settings.t_ahead;
+  d_ahead = settings.d_ahead;
+  k_smooth = settings.k_smooth;
 }
 
 // todo: replace all of this with a proper PID style loop
@@ -105,7 +110,9 @@ void Driver::drive_route(Route & route) {
     ui.clear();
     ui.print((string) "completed playback without error");
     ui.refresh();
-    while(ui.getkey() == -1);
+    while(ui.getkey() == -1) {
+      usleep(30000);
+    }
   }
 }
 
@@ -172,7 +179,8 @@ void test_driver() {
     cout << route.to_string() << endl;
 
     CarUI ui;
-    Driver driver(car,ui);
+    RunSettings settings;
+    Driver driver(car,ui,settings);
     for(auto look_ahead : linspace(0,25,1)){
         RouteNode n_ahead = route.get_position_ahead(look_ahead);
         cout << "look_ahead: " << look_ahead

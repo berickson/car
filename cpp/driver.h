@@ -3,13 +3,14 @@
 #include "car.h"
 #include "car_ui.h"
 #include "route.h"
+#include "run_settings.h"
 
 
 
 class Driver
 {
 public:
-  Driver(Car& car, CarUI ui);
+  Driver(Car& car, CarUI ui, RunSettings settings);
   Car & car;
   CarUI & ui;
   double k_smooth = 0.4;

@@ -22,7 +22,8 @@ SOURCES += main.cpp \
     string_utils.cpp \
     driver.cpp \
     car_ui.cpp \
-    lookup_table.cpp
+    lookup_table.cpp \
+    run_settings.cpp
 
 HEADERS += \
     geometry.h \
@@ -46,7 +47,8 @@ HEADERS += \
     string_utils.h \
     driver.h \
     car_ui.h \
-    lookup_table.h
+    lookup_table.h \
+    run_settings.h
 
 
 

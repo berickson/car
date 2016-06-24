@@ -10,55 +10,14 @@
 #include <ncurses.h>
 #include "car_ui.h"
 #include "driver.h"
+#include "run_settings.h"
 #include <unistd.h> // usleep
 
 #include <ncurses.h> // sudo apt-get install libncurses5-dev
 
 
-struct CarSettings{
-  CarSettings(){
-      auto f = FileNames();
-      auto track_names = f.get_track_names();
-      if(track_names.size() == 0) {
-          track_name = "";
-          route_name = "";
-          return;
-      }
-      track_name = track_names[0];
-      auto route_names = f.get_route_names(track_name);
-      if(route_names.size()==0) {
-          route_name = "";
-          return;
-      }
-      route_name = route_names[0];
-  }
 
-  string track_name = "";
-  string route_name;// = FileNames().get_route_names(track_name)[0];
-  double max_a = 0.25;
-  double max_v = 1.0;
-  double t_ahead = 0.3;
-  double d_ahead = 0.05;
-  double k_smooth = 0.4;
-  bool capture_video = false;
-  void write_to_file(string path) {
-    fstream file;
-    file.open(path,ios_base::out);
-    if(!file.is_open()) {
-      throw (string) "could not open " + path;
-
-    }
-    file << "track_name = " << track_name << endl
-         << "route_name = " << route_name << endl
-         << "max_a = " << max_a << endl
-         << "max_v = " << max_v << endl
-         << "t_ahead = " << t_ahead << endl
-         << "d_ahead = " << d_ahead << endl
-         << "k_smooth = " << k_smooth << endl
-         << "capture_video = " << capture_video << endl;
-
-  }
-} car_settings;
+RunSettings run_settings;
 
 
 void assert0(int n) {
@@ -88,47 +47,47 @@ SubMenu route_selection_menu{};
 
 
 string get_route_name() {
-  return car_settings.route_name;
+  return run_settings.route_name;
 }
 
 void set_route_name(string s) {
-  car_settings.route_name = s;
+  run_settings.route_name = s;
 }
 
 void update_route_selection_menu() {
   route_selection_menu.items.clear();
-  vector<string> route_names = FileNames().get_route_names(car_settings.track_name);
+  vector<string> route_names = FileNames().get_route_names(run_settings.track_name);
   selection_menu<string>(route_selection_menu, route_names, get_route_name, set_route_name);
 }
 
 string get_track_name() {
-  return car_settings.track_name;
+  return run_settings.track_name;
 }
 
 void set_track_name(string s) {
-  car_settings.track_name = s;
+  run_settings.track_name = s;
   update_route_selection_menu();
 }
 
 
 // getters / setters for config
-void set_max_a(double v){car_settings.max_a = v;}
-double get_max_a(){return car_settings.max_a;}
+void set_max_a(double v){run_settings.max_a = v;}
+double get_max_a(){return run_settings.max_a;}
 
-void set_max_v(double v){car_settings.max_v = v;}
-double get_max_v(){return car_settings.max_v;}
+void set_max_v(double v){run_settings.max_v = v;}
+double get_max_v(){return run_settings.max_v;}
 
-void set_t_ahead(double v){car_settings.t_ahead = v;}
-double get_t_ahead(){return car_settings.t_ahead;}
+void set_t_ahead(double v){run_settings.t_ahead = v;}
+double get_t_ahead(){return run_settings.t_ahead;}
 
-void set_d_ahead(double v){car_settings.d_ahead = v;}
-double get_d_ahead(){return car_settings.d_ahead;}
+void set_d_ahead(double v){run_settings.d_ahead = v;}
+double get_d_ahead(){return run_settings.d_ahead;}
 
-void set_k_smooth(double v){car_settings.k_smooth = v;}
-double get_k_smooth(){return car_settings.k_smooth;}
+void set_k_smooth(double v){run_settings.k_smooth = v;}
+double get_k_smooth(){return run_settings.k_smooth;}
 
-void set_capture_video(double v){car_settings.capture_video = v;}
-double get_capture_video(){return car_settings.capture_video;}
+void set_capture_video(double v){run_settings.capture_video = v;}
+double get_capture_video(){return run_settings.capture_video;}
 
 
 
@@ -170,14 +129,14 @@ void run_car_menu() {
   auto go = [&car,&io]() {
     try {
     auto f = FileNames();
-    string & track_name = car_settings.track_name;
-    string & route_name = car_settings.route_name;
+    string & track_name = run_settings.track_name;
+    string & route_name = run_settings.route_name;
     string run_name = f.next_run_name(track_name, route_name);
     string run_folder = f.get_run_folder(track_name,route_name, run_name);
     string runs_folder = f.get_runs_folder(track_name,route_name);
     mkdir(runs_folder);
     mkdir(run_folder);
-    car_settings.write_to_file(f.config_file_path(track_name, route_name, run_name));
+    run_settings.write_to_file(f.config_file_path(track_name, route_name, run_name));
     car.reset_odometry();
     string input_path = f.path_file_path(track_name,route_name);
     Route rte;
@@ -192,7 +151,7 @@ void run_car_menu() {
     io.move(0,0);
     io.print((string) "optimizing velocity for "+input_path);
     io.refresh();
-    rte.optimize_velocity(car_settings.max_v, car_settings.max_a);
+    rte.optimize_velocity(run_settings.max_v, run_settings.max_a);
     io.print("done - press any key to play route");
     io.refresh();
     io.wait_key();
@@ -202,8 +161,7 @@ void run_car_menu() {
     io.refresh();
     string recording_file_path = f.recording_file_path(track_name, route_name, run_name);
     car.begin_recording_input(recording_file_path);
-    Driver d(car,io);
-    // todo: set parameters
+    Driver d(car,io,run_settings);
     d.drive_route(rte);
     car.end_recording_input();
 
@@ -225,7 +183,7 @@ void run_car_menu() {
   auto record = [&car,&io]() {
     car.reset_odometry();
     FileNames f;
-    string track_name = car_settings.track_name;
+    string track_name = run_settings.track_name;
     string route_name = f.next_route_name(track_name);
     mkdir(f.get_route_folder(track_name,route_name));
 
@@ -253,7 +211,7 @@ void run_car_menu() {
 
     // todo: update display
     //
-    car_settings.route_name = route_name;
+    run_settings.route_name = route_name;
     update_route_selection_menu();
     return;
   };
@@ -273,16 +231,16 @@ void run_car_menu() {
   update_route_selection_menu();
 
   SubMenu route_menu {
-    {[](){return (string)"track ["+car_settings.track_name+"]";},&track_selection_menu},
-    {[](){return (string)"route ["+car_settings.route_name+"]";},&route_selection_menu},
+    {[](){return (string)"track ["+run_settings.track_name+"]";},&track_selection_menu},
+    {[](){return (string)"route ["+run_settings.route_name+"]";},&route_selection_menu},
     MenuItem("go",go),
     MenuItem("record",record),
-    {[](){return (string)"max_a ["+format(car_settings.max_a)+"]";},&acceleration_menu},
-    {[](){return (string)"max_v ["+format(car_settings.max_v)+"]";},&velocity_menu},
-    {[](){return (string)"k_smooth ["+format(car_settings.k_smooth)+"]";},&k_smooth_menu},
-    {[](){return (string)"t_ahead ["+format(car_settings.t_ahead)+"]";},&t_ahead_menu},
-    {[](){return (string)"d_ahead ["+format(car_settings.d_ahead)+"]";},&d_ahead_menu},
-    {[](){return (string)"cap video ["+format(car_settings.capture_video)+"]";},&capture_video_menu}
+    {[](){return (string)"max_a ["+format(run_settings.max_a)+"]";},&acceleration_menu},
+    {[](){return (string)"max_v ["+format(run_settings.max_v)+"]";},&velocity_menu},
+    {[](){return (string)"k_smooth ["+format(run_settings.k_smooth)+"]";},&k_smooth_menu},
+    {[](){return (string)"t_ahead ["+format(run_settings.t_ahead)+"]";},&t_ahead_menu},
+    {[](){return (string)"d_ahead ["+format(run_settings.d_ahead)+"]";},&d_ahead_menu},
+    {[](){return (string)"cap video ["+format(run_settings.capture_video)+"]";},&capture_video_menu}
 
   };
 
