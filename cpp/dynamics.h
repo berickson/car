@@ -26,25 +26,25 @@ public:
   double ay;
   double az;
 
-  int spur_delta_us;
+  unsigned int spur_delta_us;
 
-  int spur_last_us;
+  unsigned int spur_last_us;
   int spur_odo;
   int ping_millimeters;
 
   int odometer_front_left;
-  int odometer_front_left_last_us;
+  unsigned int odometer_front_left_last_us;
   int odometer_front_right;
   int odometer_front_right_last_us;
 
 
 
   int odometer_back_left;
-  int odometer_back_left_last_us;
+  unsigned int odometer_back_left_last_us;
   int odometer_back_right;
-  int odometer_back_right_last_us;
-  int ms;
-  int us;
+  unsigned int odometer_back_right_last_us;
+  unsigned int ms;
+  unsigned int us;
   Angle yaw;
   Angle pitch;
   Angle roll;
