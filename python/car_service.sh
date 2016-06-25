@@ -12,7 +12,7 @@
 
 # Change the next 3 lines to suit where you install your script and what you want to call it
 DIR=/home/pi/car/python
-DAEMON=$DIR/car_service.py
+DAEMON=$DIR/start_service.sh
 DAEMON_NAME=car
 
 # Add any command line options for your daemon here
