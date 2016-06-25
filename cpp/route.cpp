@@ -262,7 +262,53 @@ double Route::get_max_velocity() {
 }
 
 
+vector<Point> smooth_points(vector<Point> & path, double weight_smooth = 0.5, double tolerance = 0.0001) {
+  if(weight_smooth >=1 ) throw (string) "weight_smooth must be less than one";
+  if(weight_smooth <=0 ) throw (string) "weight_smooth must be greater than zero";
+  if(tolerance <=0 ) throw (string) "tolerance must be greater than zero";
+
+  double weight_data = 1. - weight_smooth;
+
+
+  vector<Point> new_path(path); // make copy of input
+  double change = tolerance;
+  while(change >= tolerance) {
+    change = 0;
+    // loop through all middle nodes
+    for(int i = 1; i < (int)path.size()-1; ++i) {
+      Point aux = new_path[i];
+
+      new_path[i].x += weight_data * (path[i].x - new_path[i].x);
+      new_path[i].x += weight_smooth * (path[i-1].x + new_path[i+1].x - 2.0 * new_path[i].x);
+      change += abs(aux.x-new_path[i].x);
+
+      new_path[i].y += weight_data * (path[i].y - new_path[i].y);
+      new_path[i].y += weight_smooth * (path[i-1].y + new_path[i+1].y - 2.0 * new_path[i].y);
+      change += abs(aux.y-new_path[i].y);
+    }
+  }
+  return new_path;
+
+}
+
 void Route::smooth(double k_smooth) {
+  // todo: do the sommothing piece-wise for forward and revers
+  vector<Point> path;
+  for(const RouteNode & node:nodes) {
+    path.push_back(node.get_front_position());
+    vector<Point> smoothed = smooth_points(path, k_smooth);
+
+    for(unsigned i = 0; i < smoothed.size(); i++) {
+      const Point & s = smoothed[i];
+      RouteNode & n = nodes[i];
+      double dx = s.x - n.front_x;
+      double dy = s.y - n.front_y;
+      n.front_x += dx;
+      n.rear_x += dx;
+      n.front_y += dy;
+      n.rear_y += dy;
+    }
+  }
 
 }
 
@@ -338,7 +384,10 @@ void test_circle() {
 void test_route() {
   // test_circle();
   Route r;
-  r.load_from_file("/home/pi/car/tracks/desk/routes/B/path.csv");
+  r.load_from_file("/home/pi/car/tracks/desk/routes/A/path.csv");
+  cout << r.to_string();
+  r.smooth(0.1);
+  cout << "smoothed " << endl;
   cout << r.to_string();
 
   cout << "point ahead 0.2 " << r.get_position_ahead(0.2).to_string() << endl;

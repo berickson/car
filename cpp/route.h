@@ -23,7 +23,7 @@ struct RouteNode {
   double velocity;
   bool reverse;
 
-  Point get_front_position() {
+  Point get_front_position() const {
     return Point(front_x,front_y);
   }
 

@@ -140,17 +140,20 @@ void run_car_menu() {
     string input_path = f.path_file_path(track_name,route_name);
     Route rte;
     io.clear();
-    io.print("loading route");
+    io.print("loading route\n");
     io.refresh();
     rte.load_from_file(input_path);
 
-    // todo: smooth
-    // rte.smooth(car_settings.k_smooth);
+    io.clear();
+    io.print("smoothing route\n");
+    io.refresh();
+    rte.smooth(run_settings.k_smooth);
     io.clear();
     io.move(0,0);
-    io.print((string) "optimizing velocity for "+input_path);
+    io.print((string) "optimizing velocity for "+input_path+"\n");
     io.refresh();
     rte.optimize_velocity(run_settings.max_v, run_settings.max_a);
+    io.print((string)"max velocity calculated at" + format(rte.get_max_velocity()) + "\n");
     io.print("done - press any key to play route");
     io.refresh();
     io.wait_key();
