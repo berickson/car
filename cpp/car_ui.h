@@ -9,7 +9,8 @@ using namespace std;
 class CarUI
 {
 public:
-  PiButtons buttons;
+  static PiButtons global_buttons;
+  PiButtons & buttons();
   CarUI();
   ~CarUI();
 

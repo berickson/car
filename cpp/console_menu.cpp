@@ -14,7 +14,7 @@ void ConsoleMenu::run() {
       display();
 
       {
-        char p = ui.buttons.get_press();
+        char p = ui.buttons().get_press();
         if(p=='2') up();
         if(p=='3') down();
         if(p=='4') enter();
