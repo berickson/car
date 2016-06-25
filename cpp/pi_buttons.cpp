@@ -35,6 +35,8 @@ bool PiButtons::check_press(int i) {
   return just_pressed;
 }
 
+// returns char '1','2,'3' or '4' if a button is pressed
+// otherwise, returns zero (0).
 char PiButtons::get_press() {
   if(!wiring_ok)
     return 0;

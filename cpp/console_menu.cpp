@@ -3,20 +3,18 @@
 #include <string>
 #include <sstream>
 #include <functional>
-#include "pi_buttons.h"
 #include "car_ui.h"
 
 void ConsoleMenu::run() {
   ui.init();
   // curses initialization
 
-  PiButtons buttons;
   try {
     while(true) {
       display();
 
       {
-        char p = buttons.get_press();
+        char p = ui.buttons.get_press();
         if(p=='2') up();
         if(p=='3') down();
         if(p=='4') enter();

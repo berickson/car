@@ -1,5 +1,6 @@
 #ifndef CARUI_H
 #define CARUI_H
+#include "pi_buttons.h"
 
 #include <string>
 
@@ -8,6 +9,7 @@ using namespace std;
 class CarUI
 {
 public:
+  PiButtons buttons;
   CarUI();
   ~CarUI();
 

@@ -1,5 +1,6 @@
 #include "car_ui.h"
 #include "ncurses.h"
+#include <unistd.h> // usleep
 
 CarUI::CarUI() {
 
@@ -56,6 +57,8 @@ void CarUI::bold(bool b)
 }
 
 void CarUI::wait_key() {
-  while(getch()==1) {}
+  while(getch()==-1 && buttons.get_press()==0) {
+    usleep(1000);
+  }
   return;
 }

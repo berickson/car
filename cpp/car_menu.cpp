@@ -7,7 +7,6 @@
 #include "filenames.h"
 #include "string_utils.h"
 #include <fstream>
-#include <ncurses.h>
 #include "car_ui.h"
 #include "driver.h"
 #include "run_settings.h"
@@ -195,9 +194,7 @@ void run_car_menu() {
     io.move(0,0);
     io.print("Recording - press any key to stop");
     io.refresh();
-    while(getch()==-1) {
-      usleep(1000);
-    }
+    io.wait_key();
 
     car.end_recording_input();
 
