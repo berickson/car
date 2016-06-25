@@ -49,8 +49,14 @@ void CarUI::refresh() {
   ::refresh();
 }
 
+// reads a key, returns key on success or -1 on error
 int CarUI::getkey() {
-  int k = getch();
+  int k;
+  k = buttons().get_press();
+  if(k > 0) {
+    return k;
+  }
+  k = getch();
   return k;
 }
 
