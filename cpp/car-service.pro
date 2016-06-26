@@ -1,7 +1,7 @@
 TEMPLATE = app
 CONFIG += console c++11
 CONFIG -= app_bundle
-CONFIG -= qt
+#CONFIG -= qt
 CONFIG += c++14
 CONFIG += thread
 SOURCES += main.cpp \
@@ -23,7 +23,8 @@ SOURCES += main.cpp \
     driver.cpp \
     car_ui.cpp \
     lookup_table.cpp \
-    run_settings.cpp
+    run_settings.cpp \
+    camera.cpp
 
 HEADERS += \
     geometry.h \
@@ -48,12 +49,13 @@ HEADERS += \
     driver.h \
     car_ui.h \
     lookup_table.h \
-    run_settings.h
+    run_settings.h \
+    camera.h
 
 
 
 
-unix|win32: LIBS += -lncurses -lwiringPi
+unix|win32: LIBS += -L/usr/local/lib -lncurses -lwiringPi -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d
 
 DISTFILES += \
     README.md

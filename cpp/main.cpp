@@ -23,6 +23,7 @@
 #include "route.h"
 #include "lookup_table.h"
 #include "driver.h"
+#include "camera.h"
 
 using namespace std;
 
@@ -31,25 +32,26 @@ using namespace std;
 
 int main(int, char *[]) {
   try {
-    //test_driver();
-    //test_car();
-    //test_route();
+    //run_car_menu();
+
     //test_ackerman();
-    //test_pi_buttons();
-    //test_geometry();
-    test_car_menu();
-    //test_console_menu();
-    //test_system();
-    //test_menu();
-    //test_fake_car();
-    
-    //test_dynamics();
+    test_camera();
     //test_car();
-    //test_usb();
-    //test_split();
     //test_config();
-    //test_work_queue();
+    //test_console_menu();
+    //test_driver();
+    //test_dynamics();
+    //test_fake_car();
+    //test_geometry();
     //test_lookup_table();
+    //test_menu();
+    //test_pi_buttons();
+    //test_route();
+    //test_split();
+    //test_system();
+    //test_usb();
+    //test_work_queue();
+
   } catch (string & s) {
     cout << "caught: " << s << endl;
   }

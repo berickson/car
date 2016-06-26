@@ -9,6 +9,6 @@ public:
     void run();
 };
 
-void test_car_menu();
+void run_car_menu();
 
 #endif // CARMENU_H
