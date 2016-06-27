@@ -1,12 +1,16 @@
 #include "camera.h"
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <array>
+#include "geometry.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/xfeatures2d.hpp>
 #include "opencv2/videoio.hpp"
+#include "opencv2/calib3d.hpp"
 
 
 using namespace std;
@@ -18,64 +22,71 @@ Camera::Camera()
 }
 
 
-
-void add_features(cv::Mat image) {
-  std::vector< cv::Point2f > corners;
-
-  // maxCorners – The maximum number of corners to return. If there are more corners
-  // than that will be found, the strongest of them will be returned
-  int maxCorners = 50;
-
-  // qualityLevel – Characterizes the minimal accepted quality of image corners;
-  // the value of the parameter is multiplied by the by the best corner quality
-  // measure (which is the min eigenvalue, see cornerMinEigenVal() ,
-  // or the Harris function response, see cornerHarris() ).
-  // The corners, which quality measure is less than the product, will be rejected.
-  // For example, if the best corner has the quality measure = 1500,
-  // and the qualityLevel=0.01 , then all the corners which quality measure is
-  // less than 15 will be rejected.
-  double qualityLevel = 0.01;
-
-  // minDistance – The minimum possible Euclidean distance between the returned corners
-  double minDistance = 3.;
-
-  // mask – The optional region of interest. If the image is not empty (then it
-  // needs to have the type CV_8UC1 and the same size as image ), it will specify
-  // the region in which the corners are detected
-  cv::Mat mask;
-
-  // blockSize – Size of the averaging block for computing derivative covariation
-  // matrix over each pixel neighborhood, see cornerEigenValsAndVecs()
-  int blockSize = 30;
-
-  // useHarrisDetector – Indicates, whether to use operator or cornerMinEigenVal()
-  bool useHarrisDetector = false;
-
-  // k – Free parameter of Harris detector
-  double k = 0.04;
-
+class Tracker {
+public:
+  bool draw_features = false;
   Mat gray_image;
-  blur(image,image,Size(5,5));
-  cvtColor( image, gray_image, CV_BGR2GRAY );
-///  blur(gray_image,gray_image,Size(50,50));
+  //cv::Ptr<Feature2D> sift = xfeatures2d::SIFT::create();
+  cv::Ptr<Feature2D> detector = xfeatures2d::SURF::create();
+  vector<KeyPoint> keypoints;
+  Mat descriptors;
+  double low_distance,high_distance;
 
-  // cv::goodFeaturesToTrack( gray_image, corners, maxCorners, qualityLevel, minDistance, mask, blockSize, useHarrisDetector, k );
 
-  for( auto corner:corners) {
-    cv::circle( image, corner, 10, cv::Scalar( 255.,0,0 ), 1 );
+  void process_image(cv::Mat image, bool annotate = true) {
+    cvtColor( image, gray_image, CV_BGR2GRAY );
+    blur(gray_image,gray_image,Size(5,5));
+
+    vector<KeyPoint> previous_keypoints(keypoints);
+
+    detector->detect(gray_image,keypoints);
+    if(annotate && false){
+      drawKeypoints(image, keypoints, image, cv::Scalar(0,255,0),  DrawMatchesFlags::DRAW_OVER_OUTIMG | DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    }
+    Mat previous_descriptors = descriptors.clone();
+    detector->compute(gray_image, keypoints, descriptors );
+    if(previous_keypoints.size()>0) {
+      BFMatcher matcher;
+      vector<DMatch> matches;
+      matcher.match(descriptors, previous_descriptors, matches);
+
+      vector<float> distances;
+      for(auto match : matches) {
+        auto p1 = previous_keypoints[match.trainIdx].pt;
+        auto p2 = keypoints[match.queryIdx].pt;
+        double d = ::distance(p1.x,p1.y,p2.x,p2.y);
+
+        distances.push_back(d);
+      }
+      // require at least 10 matches to continue
+      if(distances.size() < 10){
+        return;
+      }
+      sort(distances.begin(),distances.end());
+      low_distance = distances[(int)(.1*distances.size())]; // 10th percentile, probably buggy
+      high_distance = distances[(int)(.3*distances.size())]; // 30th percentile, probably buggy
+
+
+      for(DMatch& match: matches) {
+        // skip out of range distances
+        auto p1 = previous_keypoints[match.trainIdx].pt;
+        auto p2 = keypoints[match.queryIdx].pt;
+        double d = ::distance(p1.x,p1.y,p2.x,p2.y);
+
+        if(d < low_distance || d > high_distance)
+          continue;
+        cv::line(
+              image,
+              previous_keypoints[match.trainIdx].pt,
+              keypoints[match.queryIdx].pt,
+              Scalar(0,255,0),5 );
+      }
+    }
   }
 
-  cv::Ptr<Feature2D> f2d = xfeatures2d::SIFT::create();
-  vector<KeyPoint> keypoints;
-  f2d->detect(gray_image,keypoints);
-  drawKeypoints(image, keypoints, image, cv::Scalar(0,255,0),  DrawMatchesFlags::DRAW_OVER_OUTIMG | DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-  //cv::xfeatures2d::SiftFeatureDetector detector;
-  //std::vector<cv::KeyPoint> keypoints;
-  //detector.detect(gray_image, keypoints);
+};
 
 
-
-}
 
 
 void Camera::capture_movie()
@@ -87,18 +98,19 @@ void Camera::capture_movie()
 
 
   if(!cap.open(0)) throw (string) "couldn't open camera";
-  QtFont font = fontQt("Times");
   cv::Mat frame;
+
+  Tracker tracker;
 
   for(;;) {
 
     cap >> frame;
+    tracker.process_image(frame);
     ++frame_count;
-    // void putText(Mat& img, const string& text, Point org, int fontFace, double fontScale, Scalar color, int thickness=1, int lineType=8, bool bottomLeftOrigin=false )
-    putText(frame, (string) to_string(frame_count), Point(50,50), FONT_HERSHEY_SIMPLEX ,1, Scalar(255));
-    add_features(frame);
-
-//    cv::addText(frame,"hello",cv::Point(0,0),font);
+    const Scalar white = Scalar(255,255,255);
+    putText(frame, (string) to_string(frame_count), cv::Point(50,50), FONT_HERSHEY_SIMPLEX ,1, white);
+    putText(frame, (string) to_string(tracker.low_distance), cv::Point(50,100), FONT_HERSHEY_SIMPLEX ,1, white);
+    putText(frame, (string) to_string(tracker.high_distance), cv::Point(50,150), FONT_HERSHEY_SIMPLEX ,1, white);
 
     cv::imshow("window 1", frame);
     if(cv::waitKey(1)==27) break;
