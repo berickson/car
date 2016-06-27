@@ -24,7 +24,8 @@ SOURCES += main.cpp \
     car_ui.cpp \
     lookup_table.cpp \
     run_settings.cpp \
-    camera.cpp
+    camera.cpp \
+    tracker.cpp
 
 HEADERS += \
     geometry.h \
@@ -50,12 +51,13 @@ HEADERS += \
     car_ui.h \
     lookup_table.h \
     run_settings.h \
-    camera.h
+    camera.h \
+    tracker.h
 
 
 
 
-unix|win32: LIBS += -L/usr/local/lib -lncurses -lwiringPi -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d
+unix|win32: LIBS += -L/usr/local/lib -lncurses -lwiringPi -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d
 
 DISTFILES += \
     README.md

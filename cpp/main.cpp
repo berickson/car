@@ -24,6 +24,7 @@
 #include "lookup_table.h"
 #include "driver.h"
 #include "camera.h"
+#include "tracker.h"
 
 using namespace std;
 
@@ -35,7 +36,7 @@ int main(int, char *[]) {
     //run_car_menu();
 
     //test_ackerman();
-    test_camera();
+    //test_camera();
     //test_car();
     //test_config();
     //test_console_menu();
@@ -49,6 +50,7 @@ int main(int, char *[]) {
     //test_route();
     //test_split();
     //test_system();
+    test_tracker();
     //test_usb();
     //test_work_queue();
 
