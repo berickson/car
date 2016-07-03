@@ -59,7 +59,7 @@ void write_path_from_recording_file(string recording_path, string outpath) {
     ++i;
     next = car.current_dynamics;
     Point p_next = car.get_front_position();
-    int wheel_ticks = next.odometer_front_left - current.odometer_front_left;
+    int wheel_ticks = next.odometer_front_right - current.odometer_front_right;
     if (abs(wheel_ticks)>0 ){
       next_reverse = wheel_ticks < 0;
     } else {
