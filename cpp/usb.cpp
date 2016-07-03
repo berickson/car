@@ -87,7 +87,7 @@ void Usb::write_line(string text) {
 
 void echo_off(string tty) {
   string command = (string) "stty -F " + tty + " -echo";
-  system(command.c_str());
+  if(system(command.c_str())!=0) throw "echo off failed";
 }
 
 // see https://www.pjrc.com/teensy/serial_listen.c

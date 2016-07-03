@@ -108,22 +108,22 @@ void Car::apply_dynamics(Dynamics & d) {
   heading_adjustment += adjustment;
 
   // if wheels have moved, update ackerman
-  double wheel_distance_meters = (current.odometer_front_left-previous.odometer_front_left)  * meters_per_odometer_tick;
+  double wheel_distance_meters = (current.odometer_front_right - previous.odometer_front_right)  * meters_per_odometer_tick;
 
   if (fabs(wheel_distance_meters) > 0.) {
     double outside_wheel_angle = radians(angle_for_steering(previous.str));
-    ackerman.move_left_wheel(outside_wheel_angle, wheel_distance_meters, get_heading().radians());
+    ackerman.move_right_wheel(outside_wheel_angle, wheel_distance_meters, get_heading().radians());
   }
 
 
   // update velocity
-  if (current.odometer_front_left_last_us != previous.odometer_front_left_last_us) {
-    double elapsed_seconds = (current.odometer_front_left_last_us - previous.odometer_front_left_last_us) / 1000000.;
+  if (current.odometer_front_right_last_us != previous.odometer_front_right_last_us) {
+    double elapsed_seconds = (current.odometer_front_right_last_us - previous.odometer_front_right_last_us) / 1000000.;
     velocity = wheel_distance_meters / elapsed_seconds;
     last_verified_velocity = velocity;
   } else {
     // no tick this time, how long has it been?
-    double seconds_since_tick = ( current.us - current.odometer_front_left_last_us) / 1000000.;
+    double seconds_since_tick = ( current.us - current.odometer_front_right_last_us) / 1000000.;
     if (seconds_since_tick > 0.1){
       // it's been a long time, let's call velocity zero
       velocity = 0.0;

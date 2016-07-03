@@ -49,7 +49,7 @@ Ackerman::Arc Ackerman::arc_to_relative_location(double x,double y) {
 
 }
 
-void Ackerman::move_left_wheel(double outside_wheel_angle, double wheel_distance, double new_heading){
+void Ackerman::move_right_wheel(double outside_wheel_angle, double wheel_distance, double new_heading){
 
   // avoid errors for very small angles
   if(fabs(outside_wheel_angle) < 0.00001)
@@ -63,21 +63,21 @@ void Ackerman::move_left_wheel(double outside_wheel_angle, double wheel_distance
     forward = arc_distance;
     left = 0.;
   } else {
-    // calculate front wheel horizontal offset from center of rear wheels to left wheel
-    double offset = outside_wheel_angle < 0. ? -w/2. : w/2.;
+    // calculate front wheel horizontal offset from center of rear wheels to right wheel
+    double offset = outside_wheel_angle > 0. ? -w/2. : w/2.;
 
     // calculate turn radius of center rear of car
     double r_car = l / tan(outside_wheel_angle) - offset;
 
     // calculate turn radius of left wheel
-    double r_left = length(r_car + offset,l);
+    double r_right = length(r_car + offset,l);
     // make radius negative for right turns
-    if (outside_wheel_angle < 0) {
-      r_left = -r_left;
+    if (outside_wheel_angle > 0) {
+      r_right = -r_right;
     }
 
     // calculate angle travelled
-    turn_angle = wheel_distance / r_left;
+    turn_angle = wheel_distance / r_right;
     forward = r_car * sin(turn_angle);
     left = r_car * (1.-cos(turn_angle));
   }
@@ -99,7 +99,7 @@ void test_arc_to_relative_location(double l, double x, double y){
   cout << "beginning car fl position:" << car.front_left_position().to_string();
 
   auto arc = car.arc_to_relative_location(x,y);
-  car.move_left_wheel(arc.steer_radians, arc.arc_len);
+  car.move_right_wheel(arc.steer_radians, arc.arc_len);
   cout << " l: " << l
        << " x: " << x
        << " y: " << y
@@ -120,7 +120,7 @@ void test_move_left_wheel(double l, double outside_wheel_angle, double distance)
     << " outside_wheel_angle: " << outside_wheel_angle
     << " distance: " << distance;
 
-  car.move_left_wheel(outside_wheel_angle,distance);
+  car.move_right_wheel(outside_wheel_angle,distance);
 
   cout << " final fl:" << car.front_left_position().to_string()
        << endl;
