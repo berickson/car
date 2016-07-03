@@ -72,7 +72,7 @@ void Ackerman::move_right_wheel(double outside_wheel_angle, double wheel_distanc
     // calculate turn radius of left wheel
     double r_right = length(r_car + offset,l);
     // make radius negative for right turns
-    if (outside_wheel_angle > 0) {
+    if (outside_wheel_angle < 0) {
       r_right = -r_right;
     }
 
@@ -113,7 +113,7 @@ void test_arc_to_relative_location(double l, double x, double y){
 
 
 
-void test_move_left_wheel(double l, double outside_wheel_angle, double distance) {
+void test_move_right_wheel(double l, double outside_wheel_angle, double distance) {
   auto car = Ackerman(0, l, -l, 0, 0); // zero width makes like a bicycle, -l puts front wheel at (0,0)
   cout << "start fl:" << car.front_left_position().to_string()
     << " l: " << l
@@ -127,8 +127,8 @@ void test_move_left_wheel(double l, double outside_wheel_angle, double distance)
 
 }
 
-void move_left_wheel_tests() {
-  test_move_left_wheel(100000,M_PI/4,1);
+void move_right_wheel_tests() {
+  test_move_right_wheel(100000,M_PI/4,1);
 
 }
 
