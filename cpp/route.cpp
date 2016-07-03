@@ -9,7 +9,7 @@ void Route::add_node(RouteNode node){
   nodes.push_back(node);
 }
 
-double Route::distance() {
+double Route::get_length() {
   double d = 0;
   for(unsigned i=0;i<nodes.size()-1;i++){
     auto n1=nodes[i];
@@ -17,6 +17,22 @@ double Route::distance() {
     d+=::distance(n1.front_x,n1.front_y,n2.front_x,n2.front_y);
   }
   return d;
+}
+
+Angle Route::get_total_curvature()
+{
+  double radians = 0;
+  for(unsigned i=0;i<nodes.size()-2;i++){
+    auto n1=nodes[i];
+    auto n2=nodes[i+1];
+    auto n3=nodes[i+2];
+    Point v1(n2.front_x-n1.front_x, n2.front_y-n1.front_y);
+    Point v2(n3.front_x-n2.front_x, n3.front_y-n2.front_y);
+    radians += fabs(::angle_between(v1,v2).radians());
+
+  }
+  return Angle::radians(radians);
+
 }
 
 Route get_circle(double r = 1, unsigned steps = 300) {
@@ -262,7 +278,7 @@ double Route::get_max_velocity() {
 }
 
 
-vector<Point> smooth_points(vector<Point> & path, double weight_smooth = 0.5, double tolerance = 0.0001) {
+vector<Point> smooth_points(vector<Point> & path, double weight_smooth = 0.5, double tolerance = 0.01) {
   if(weight_smooth >=1 ) throw (string) "weight_smooth must be less than one";
   if(weight_smooth <=0 ) throw (string) "weight_smooth must be greater than zero";
   if(tolerance <=0 ) throw (string) "tolerance must be greater than zero";
@@ -272,7 +288,9 @@ vector<Point> smooth_points(vector<Point> & path, double weight_smooth = 0.5, do
 
   vector<Point> new_path(path); // make copy of input
   double change = tolerance;
-  while(change >= tolerance) {
+  int iter = 0;
+  while(change >= tolerance && iter < 100) {
+    ++iter;
     change = 0;
     // loop through all middle nodes
     for(int i = 1; i < (int)path.size()-1; ++i) {
@@ -296,18 +314,18 @@ void Route::smooth(double k_smooth) {
   vector<Point> path;
   for(const RouteNode & node:nodes) {
     path.push_back(node.get_front_position());
-    vector<Point> smoothed = smooth_points(path, k_smooth);
+  }
+  vector<Point> smoothed = smooth_points(path, k_smooth);
 
-    for(unsigned i = 0; i < smoothed.size(); i++) {
-      const Point & s = smoothed[i];
-      RouteNode & n = nodes[i];
-      double dx = s.x - n.front_x;
-      double dy = s.y - n.front_y;
-      n.front_x += dx;
-      n.rear_x += dx;
-      n.front_y += dy;
-      n.rear_y += dy;
-    }
+  for(unsigned i = 0; i < smoothed.size(); i++) {
+    const Point & s = smoothed[i];
+    RouteNode & n = nodes[i];
+    double dx = s.x - n.front_x;
+    double dy = s.y - n.front_y;
+    n.front_x += dx;
+    n.rear_x += dx;
+    n.front_y += dy;
+    n.rear_y += dy;
   }
 
 }
@@ -366,14 +384,14 @@ void Route::optimize_velocity(double max_velocity, double max_acceleration) {
 
 void test_circle() {
   Route r = get_circle(2);
-  cout << "route distance for circle: " << r.distance() << endl;
+  cout << "route distance for circle: " << r.get_length() << endl;
   cout << r.to_string();
   r.optimize_velocity();
   cout << "optimized_velocity defaults" << endl;
   cout << r.to_string();
 
   r = get_circle(10);
-  cout << "route distance for circle: " << r.distance() << endl;
+  cout << "route distance for circle: " << r.get_length() << endl;
   cout << r.to_string();
   r.optimize_velocity();
   cout << "optimized_velocity defaults" << endl;
@@ -384,11 +402,13 @@ void test_circle() {
 void test_route() {
   // test_circle();
   Route r;
-  r.load_from_file("/home/pi/car/tracks/desk/routes/A/path.csv");
-  cout << r.to_string();
-  r.smooth(0.1);
-  cout << "smoothed " << endl;
-  cout << r.to_string();
+  r.load_from_file("/home/brian/car/tracks/sidewalk/routes/K/path.csv");
+  cout << "distance before smooth: " << r.get_length() << endl;
+  cout << "curvature before smooth: " << r.get_total_curvature().degrees() << " degrees" << endl;
+  r.smooth(0.25);
+  cout << "smoothing " << endl;
+  cout << "distance after smooth: " << r.get_length() << endl;
+  cout << "curvature after smooth: " << r.get_total_curvature().degrees() << " degrees" << endl;
 
   cout << "point ahead 0.2 " << r.get_position_ahead(0.2).to_string() << endl;
   cout << "point ahead 100 " << r.get_position_ahead(100).to_string() << endl;

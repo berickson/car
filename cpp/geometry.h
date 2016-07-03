@@ -19,6 +19,7 @@ struct Point {
     ss << "(" << x << "," << y << ")";
     return ss.str();
   }
+  Point operator -(Point p2);
 };
 
 inline string to_string(const Point &p) {
@@ -224,6 +225,10 @@ inline Angle angle_between(double x1, double y1, double x2, double y2) {
   double dot = x1*x2 + y1*y2; // dot product
   double det = x1*y2 - y1*x2; // determinant
   return Angle::radians( atan2(det, dot) );
+}
+
+inline Angle angle_between(Point p1, Point p2) {
+  return angle_between(p1.x,p1.y,p2.x,p2.y);
 }
 
 // returns direction from p1 to p2

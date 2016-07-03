@@ -39,7 +39,8 @@ class Route {
 public:
   Route(){}
 
-  double distance();
+  double get_length();
+  Angle get_total_curvature();
 
 
   void load_from_file(string path);
@@ -58,7 +59,7 @@ public:
   void set_position(Point front, Point rear, double velocity);
 
   double get_velocity();
-  RouteNode get_position_ahead(double distance);
+  RouteNode get_position_ahead(double get_length);
 
   vector<string> columns = {"secs","x","y","rear_x", "rear_y", "reverse", "heading","adj","esc","str","m/s"};
   vector<RouteNode> nodes;
