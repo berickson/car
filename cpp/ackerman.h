@@ -52,7 +52,7 @@ public:
   }
 
 
-  void move_right_wheel(double outside_wheel_angle, double wheel_distance, double new_heading = NAN);
+  void move_right_wheel(Angle outside_wheel_angle, double wheel_distance, double new_heading = NAN);
   Arc arc_to_relative_location(double x,double y);
   string to_string();
 };

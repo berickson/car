@@ -111,7 +111,7 @@ void Car::apply_dynamics(Dynamics & d) {
   double wheel_distance_meters = (current.odometer_front_right - previous.odometer_front_right)  * meters_per_odometer_tick;
 
   if (fabs(wheel_distance_meters) > 0.) {
-    double outside_wheel_angle = radians(angle_for_steering(previous.str));
+    Angle outside_wheel_angle = angle_for_steering(previous.str);
     ackerman.move_right_wheel(outside_wheel_angle, wheel_distance_meters, get_heading().radians());
   }
 
@@ -219,7 +219,7 @@ int Car::steering_for_angle(Angle theta)
 
 
 
-double Car::angle_for_steering(int str) {
+Angle Car::angle_for_steering(int str) {
   static const LookupTable t(
   {
     {1000, 30},
@@ -237,7 +237,7 @@ double Car::angle_for_steering(int str) {
     {1858, -30}
   });
 
-  return t.lookup(str);
+  return Angle::degrees(t.lookup(str));
 
 }
 

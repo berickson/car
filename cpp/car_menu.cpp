@@ -153,7 +153,7 @@ void run_car_menu() {
     io.print((string) "optimizing velocity for "+input_path+"\n");
     io.refresh();
     rte.optimize_velocity(run_settings.max_v, run_settings.max_a);
-    io.print((string)"max velocity calculated at" + format(rte.get_max_velocity()) + "\n");
+    io.print((string)"max velocity calculated at " + format(rte.get_max_velocity()) + "\n");
     io.print("done - press any key to play route");
     io.refresh();
     io.wait_key();
@@ -233,7 +233,7 @@ void run_car_menu() {
   SubMenu route_menu {
     {[](){return (string)"track ["+run_settings.track_name+"]";},&track_selection_menu},
     {[](){return (string)"route ["+run_settings.route_name+"]";},&route_selection_menu},
-    MenuItem("go",go),
+    MenuItem("get set",go),
     MenuItem("record",record),
     {[](){return (string)"max_a ["+format(run_settings.max_a)+"]";},&acceleration_menu},
     {[](){return (string)"max_v ["+format(run_settings.max_v)+"]";},&velocity_menu},
