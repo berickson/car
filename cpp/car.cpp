@@ -103,9 +103,9 @@ void Car::apply_dynamics(Dynamics & d) {
   Dynamics & current = current_dynamics;
 
   // correct heading with adjustment factor
-  auto temp = (current.yaw - previous.yaw);
-  Angle adjustment = temp * (1. - gyro_adjustment_factor) ;
-  heading_adjustment += adjustment;
+  Angle d_theta = (current.yaw - previous.yaw);
+  d_theta.standardize();
+  heading_adjustment += Angle::radians(d_theta.radians() * gyro_adjustment_factor);
 
   // if wheels have moved, update ackerman
   double wheel_distance_meters = (current.odometer_front_right - previous.odometer_front_right)  * meters_per_odometer_tick;
@@ -186,6 +186,7 @@ void Car::reset_odometry() {
 }
 
 Angle Car::get_heading_adjustment() {
+  return heading_adjustment;
 }
 
 Angle Car::get_heading() {
