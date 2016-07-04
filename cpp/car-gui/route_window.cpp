@@ -89,9 +89,7 @@ QString RouteWindow::get_run_name()
   return "";
 }
 
-void add_route_to_scene(QGraphicsScene & scene, string route_path,QPen &pen) {
-  Route r;
-  r.load_from_file(route_path);
+void add_route_to_scene(QGraphicsScene & scene, Route & r,QPen &pen) {
   QPainterPath path;
   RouteNode & n = r.nodes.at(0);
   path.moveTo(n.front_x, -n.front_y);
@@ -106,7 +104,7 @@ void add_route_to_scene(QGraphicsScene & scene, string route_path,QPen &pen) {
 void RouteWindow::on_run_list_itemSelectionChanged()
 {
   scene.clear();
-  QPen route_pen,run_pen;
+  QPen route_pen,run_pen,smooth_pen;
   route_pen.setColor(Qt::green);
   route_pen.setCosmetic(true);
   route_pen.setWidth(2);
@@ -115,21 +113,40 @@ void RouteWindow::on_run_list_itemSelectionChanged()
   run_pen.setWidth(1);
   run_pen.setCosmetic(true);
 
+  smooth_pen.setColor(Qt::red);
+  smooth_pen.setWidth(1);
+  smooth_pen.setStyle(Qt::DashDotLine);
+  smooth_pen.setCosmetic(true);
+
   try {
     if(get_run_name().size()){
-      auto route_path = file_names.path_file_path(get_track_name(),get_route_name());
-      add_route_to_scene(scene, route_path, route_pen);
-      auto run_path = file_names.path_file_path(get_track_name(),get_route_name(),get_run_name().toStdString());
-      add_route_to_scene(scene, run_path, run_pen);
+      Route route,run,smooth;
+      route.load_from_file(file_names.path_file_path(get_track_name(),get_route_name()));
+      add_route_to_scene(scene, route, route_pen);
+      run.load_from_file(file_names.path_file_path(get_track_name(),get_route_name(),get_run_name().toStdString()));
+      add_route_to_scene(scene, run, run_pen);
 
-      //ui->graphicsView->fitInView( scene.sceneRect(), Qt::KeepAspectRatio );
+      smooth.load_from_file(file_names.path_file_path(get_track_name(),get_route_name()));
+      smooth.smooth(get_k_smooth());
+      add_route_to_scene(scene, smooth, smooth_pen);
+
+      for(auto item:scene.items()) {
+        ui->graphicsView->fitInView(item , Qt::KeepAspectRatio );
+      }
     }
-
-    ui->graphicsView->width() / scene.width();
-    ui->graphicsView->sceneRect();
 
   } catch (...) {
     scene.clear();
     scene.addText("could not load run");
   }
+}
+
+
+void RouteWindow::on_k_smooth_slider_valueChanged() {
+  on_run_list_itemSelectionChanged();
+  ui->k_smooth_value_label->setText(QString::number(get_k_smooth(),'.',2));
+}
+
+double RouteWindow::get_k_smooth() {
+  return ui->k_smooth_slider->value()/100.;
 }

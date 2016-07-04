@@ -185,6 +185,8 @@ void Car::reset_odometry() {
     wheelbase_length,-wheelbase_length,0,0);
 }
 
+Angle Car::get_heading_adjustment() {
+}
 
 Angle Car::get_heading() {
   Angle a = (

@@ -54,6 +54,7 @@ public:
   double wheelbase_length;
 
   // accessors
+  Angle get_heading_adjustment();
   Angle get_heading();
 
 

@@ -23,6 +23,9 @@ private slots:
 
   void on_run_list_itemSelectionChanged();
 
+  void on_k_smooth_slider_valueChanged();
+  double get_k_smooth();
+
 private:
   QGraphicsScene scene;
   Ui::RouteWindow *ui;
