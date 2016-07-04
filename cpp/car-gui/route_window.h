@@ -32,7 +32,7 @@ private:
   FileNames file_names;
   string get_track_name();
   string get_route_name();
-  QString get_run_name();
+  string get_run_name();
 };
 
 #endif // ROUTE_WINDOW_H

@@ -37,7 +37,7 @@ void RouteWindow::on_track_list_itemSelectionChanged()
 {
     string track_name = get_track_name();
     if(track_name.size() > 0) {
-      ui->run_list->clear();
+      ui->route_list->clear();
       auto route_names = file_names.get_route_names(track_name);
       for(string route_name:route_names) {
         ui->route_list->addItem(route_name.c_str());
@@ -80,11 +80,11 @@ string RouteWindow::get_route_name()
   return "";
 }
 
-QString RouteWindow::get_run_name()
+string RouteWindow::get_run_name()
 {
   QList<QListWidgetItem *> selection = ui->run_list->selectedItems();
   if(selection.size() == 1) {
-    return (*selection.begin())->text();
+    return (*selection.begin())->text().toStdString();
   }
   return "";
 }
@@ -119,20 +119,23 @@ void RouteWindow::on_run_list_itemSelectionChanged()
   smooth_pen.setCosmetic(true);
 
   try {
-    if(get_run_name().size()){
-      Route route,run,smooth;
-      route.load_from_file(file_names.path_file_path(get_track_name(),get_route_name()));
-      add_route_to_scene(scene, route, route_pen);
-      run.load_from_file(file_names.path_file_path(get_track_name(),get_route_name(),get_run_name().toStdString()));
+    Route route,smooth;
+    route.load_from_file(file_names.path_file_path(get_track_name(),get_route_name()));
+    add_route_to_scene(scene, route, route_pen);
+
+    for(auto item:ui->run_list->selectedItems()) {
+      Route run;
+      string run_path = file_names.path_file_path(get_track_name(),get_route_name(),item->text().toStdString());
+      run.load_from_file(run_path.c_str());
       add_route_to_scene(scene, run, run_pen);
+    }
 
-      smooth.load_from_file(file_names.path_file_path(get_track_name(),get_route_name()));
-      smooth.smooth(get_k_smooth());
-      add_route_to_scene(scene, smooth, smooth_pen);
+    smooth.load_from_file(file_names.path_file_path(get_track_name(),get_route_name()));
+    smooth.smooth(get_k_smooth());
+    add_route_to_scene(scene, smooth, smooth_pen);
 
-      for(auto item:scene.items()) {
-        ui->graphicsView->fitInView(item , Qt::KeepAspectRatio );
-      }
+    for(auto item:scene.items()) {
+      ui->graphicsView->fitInView(item , Qt::KeepAspectRatio );
     }
 
   } catch (...) {
