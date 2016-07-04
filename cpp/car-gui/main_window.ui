@@ -18,7 +18,7 @@
     <normaloff>anaranjado_icon.svg</normaloff>anaranjado_icon.svg</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="webcamButton">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -34,14 +34,27 @@
    <widget class="QLabel" name="display_image">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>50</y>
+      <x>50</x>
+      <y>60</y>
       <width>261</width>
       <height>161</height>
      </rect>
     </property>
     <property name="text">
      <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="routesButton">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>10</y>
+      <width>80</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Routes</string>
     </property>
    </widget>
   </widget>

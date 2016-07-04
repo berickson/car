@@ -34,7 +34,9 @@ SOURCES += main.cpp\
     ../run_settings.cpp \
     ../string_utils.cpp \
     ../system.cpp \
-    ../tracker.cpp
+    ../tracker.cpp \
+    route_window.cpp \
+    ../file_names.cpp
 
 HEADERS  += main_window.h \
     ../ackerman.h \
@@ -47,14 +49,16 @@ HEADERS  += main_window.h \
     ../split.h \
     ../trim.h \
     ../usb.h \
-    ../work_queue.h
+    ../work_queue.h \
+    route_window.h
 
 images.path    = $${DESTDIR}/
 
 images.files   += ./anaranjado_icon.svg
 INSTALLS       += images
 
-FORMS    += main_window.ui
+FORMS    += main_window.ui \
+    route_window.ui
 
 unix|win32: LIBS += -L/usr/local/lib -lncurses -lwiringPi -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d
 s

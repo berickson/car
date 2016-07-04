@@ -25,7 +25,8 @@ SOURCES += main.cpp \
     lookup_table.cpp \
     run_settings.cpp \
     camera.cpp \
-    tracker.cpp
+    tracker.cpp \
+    file_names.cpp
 
 HEADERS += \
     geometry.h \
@@ -43,7 +44,6 @@ HEADERS += \
     system.h \
     car_menu.h \
     console_menu.h \
-    filenames.h \
     pi_buttons.h \
     route.h \
     string_utils.h \
@@ -52,7 +52,8 @@ HEADERS += \
     lookup_table.h \
     run_settings.h \
     camera.h \
-    tracker.h
+    tracker.h \
+    file_names.h
 
 
 

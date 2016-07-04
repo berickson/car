@@ -1,5 +1,6 @@
 #include "main_window.h"
 #include "ui_main_window.h"
+#include "route_window.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -70,4 +71,11 @@ void MainWindow::on_pushButton_clicked()
     //if(cv::waitKey(1)==27) break;
   }
 
+}
+
+void MainWindow::on_routesButton_clicked()
+{
+    RouteWindow r(this);
+
+    r.exec();
 }

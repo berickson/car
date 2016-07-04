@@ -29,6 +29,8 @@ private slots:
 
   void on_pushButton_clicked();
 
+  void on_routesButton_clicked();
+
 private:
   QTimer timer;
   Ui::MainWindow *ui;
