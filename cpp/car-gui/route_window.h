@@ -4,6 +4,7 @@
 #include <QDialog>
 #include "../file_names.h"
 #include <QGraphicsScene>
+#include <QStandardItemModel>
 
 namespace Ui {
 class RouteWindow;
@@ -30,6 +31,7 @@ private:
   QGraphicsScene scene;
   Ui::RouteWindow *ui;
   FileNames file_names;
+  QStandardItemModel runs_model;
   string get_track_name();
   string get_route_name();
   string get_run_name();

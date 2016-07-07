@@ -37,7 +37,7 @@ void reboot(){
 
 }
 void restart(){
-  int rv = system("sudo service car restart");
+  int rv = system("sudo ./run");
   assert0(rv);
 }
 
@@ -233,7 +233,7 @@ void run_car_menu() {
   SubMenu route_menu {
     {[](){return (string)"track ["+run_settings.track_name+"]";},&track_selection_menu},
     {[](){return (string)"route ["+run_settings.route_name+"]";},&route_selection_menu},
-    MenuItem("get set",go),
+    MenuItem("go...",go),
     MenuItem("record",record),
     {[](){return (string)"max_a ["+format(run_settings.max_a)+"]";},&acceleration_menu},
     {[](){return (string)"max_v ["+format(run_settings.max_v)+"]";},&velocity_menu},
@@ -255,6 +255,7 @@ void run_car_menu() {
     {[&car](){return "front: " + to_string(car.get_front_position());}},
     {[&car](){return "usb readings: " + format(car.get_reading_count());}},
     {[&car](){return "usb errors: " + format(car .get_usb_error_count());}},
+    {[&car](){return "reset odo ";}, [&car]() {car.reset_odometry();}},
     {[&car](){return "heading: " + format(car.get_heading().degrees());}},
     {[&car](){return "heading_adj: " + format(car.get_heading_adjustment().degrees());}},
     {[&car](){return "rear: " + to_string(car.get_rear_position());}},

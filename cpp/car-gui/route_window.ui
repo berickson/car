@@ -98,7 +98,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="run_list">
+        <widget class="QTableWidget" name="run_list">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
            <horstretch>0</horstretch>
