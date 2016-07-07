@@ -121,11 +121,11 @@ void run_car_menu() {
 #else
   FakeCar car;
 #endif
-  CarUI io;
+  CarUI ui;
 
 
 
-  auto go = [&car,&io]() {
+  auto go = [&car,&ui]() {
     try {
     auto f = FileNames();
     string & track_name = run_settings.track_name;
@@ -139,71 +139,72 @@ void run_car_menu() {
     car.reset_odometry();
     string input_path = f.path_file_path(track_name,route_name);
     Route rte;
-    io.clear();
-    io.print("loading route\n");
-    io.refresh();
+    ui.clear();
+    ui.print("loading route\n");
+    ui.refresh();
     rte.load_from_file(input_path);
 
-    io.clear();
-    io.print("smoothing route\n");
-    io.refresh();
+    ui.clear();
+    ui.print("smoothing route\n");
+    ui.refresh();
     rte.smooth(run_settings.k_smooth);
-    io.clear();
-    io.move(0,0);
-    io.print((string) "optimizing velocity for "+input_path+"\n");
-    io.refresh();
+    ui.clear();
+    ui.move(0,0);
+    ui.print((string) "optimizing velocity for "+input_path+"\n");
+    ui.refresh();
     rte.optimize_velocity(run_settings.max_v, run_settings.max_a);
-    io.print((string)"max velocity calculated at " + format(rte.get_max_velocity()) + "\n");
-    io.print("done - press any key to play route");
-    io.refresh();
-    io.wait_key();
+    ui.print((string)"max velocity calculated at " + format(rte.get_max_velocity()) + "\n");
+    ui.print("done - press any key to play route");
+    ui.refresh();
+    ui.wait_key();
 
-    io.clear();
-    io.print((string)"playing route with max velocity " + format(rte.get_max_velocity()));
-    io.refresh();
+    ui.clear();
+    ui.print((string)"playing route with max velocity " + format(rte.get_max_velocity()));
+    ui.refresh();
     string recording_file_path = f.recording_file_path(track_name, route_name, run_name);
     car.begin_recording_input(recording_file_path);
-    Driver d(car,io,run_settings);
+    Driver d(car,ui,run_settings);
     d.drive_route(rte);
     car.end_recording_input();
 
-    io.clear();
-    io.print("making path");
+    ui.clear();
+    ui.print("making path");
 
     string path_file_path = f.path_file_path(track_name, route_name, run_name);
     write_path_from_recording_file(recording_file_path, path_file_path);
     } catch (string s) {
-      io.clear();
-      io.move(0,0);
-      io.print("error: " + s);
-      io.refresh();
-      while(io.getkey()==-1);
+      ui.clear();
+      ui.move(0,0);
+      ui.print("error: " + s);
+      ui.refresh();
+      while(ui.getkey()==-1);
 
     }
   };
 
-  auto record = [&car,&io]() {
+  auto record = [&car,&ui]() {
     car.reset_odometry();
     FileNames f;
     string track_name = run_settings.track_name;
     string route_name = f.next_route_name(track_name);
+    mkdir(f.get_routes_folder(track_name));
     mkdir(f.get_route_folder(track_name,route_name));
 
     string recording_path = f.recording_file_path(track_name,route_name);
     car.begin_recording_input(recording_path);
 
     string line;
-    io.clear();
-    io.move(0,0);
-    io.print("Recording - press any key to stop");
-    io.refresh();
-    io.wait_key();
+    ui.clear();
+    ui.move(0,0);
+    ui.print("Recording - press any key to stop");
+    ui.refresh();
+    ui.wait_key();
 
     car.end_recording_input();
 
-    io.clear();
-    io.print("making path");
-    io.refresh();
+    ui.clear();
+    ui.print("making path");
+    ui.refresh();
 
     string path_file_path = f.path_file_path(track_name, route_name);
     write_path_from_recording_file(recording_path, path_file_path);

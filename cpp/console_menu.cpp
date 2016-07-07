@@ -4,6 +4,7 @@
 #include <sstream>
 #include <functional>
 #include "car_ui.h"
+#include <unistd.h> // usleep
 
 void ConsoleMenu::run() {
   ui.init();
@@ -12,6 +13,7 @@ void ConsoleMenu::run() {
   try {
     while(true) {
       display();
+      usleep(30000);
 
       {
         char p = ui.buttons().get_press();
