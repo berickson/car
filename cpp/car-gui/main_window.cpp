@@ -10,6 +10,7 @@
 #include "opencv2/calib3d.hpp"
 
 #include <string>
+#include "../tracker.h"
 using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -45,12 +46,12 @@ void MainWindow::on_pushButton_clicked()
 
   cv::Mat frame;
 
-  //Tracker tracker;
+  Tracker tracker;
 
   for(;;) {
 
     cap >> frame;
-    //tracker.process_image(frame);
+    tracker.process_image(frame);
     ++frame_count;
     const cv::Scalar white = cv::Scalar(255,255,255);
     const cv::Scalar green = cv::Scalar(0,255,0);
