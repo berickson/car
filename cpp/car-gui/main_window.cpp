@@ -61,7 +61,8 @@ void MainWindow::on_pushButton_clicked()
 
     cv::cvtColor(frame,frame,cv::COLOR_BGR2RGB);
     QImage imdisplay((uchar*)frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
-    ui->display_image->setPixmap(QPixmap::fromImage(imdisplay));
+    auto pixmap = QPixmap::fromImage(imdisplay);
+    ui->display_image->setPixmap(pixmap);
     break;
 
 
