@@ -10,7 +10,6 @@
 #include "opencv2/calib3d.hpp"
 
 #include <string>
-#include "../tracker.h"
 using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -23,7 +22,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
   if(!cap.open(0)) throw (string) "couldn't open camera";
 
-  connect(&timer, SIGNAL(timeout()), this, SLOT(on_pushButton_clicked()));
+  timer.setSingleShot(false);
+  timer.setInterval(100);
+  connect(&timer, SIGNAL(timeout()), this, SLOT(process_one_frame()));
   timer.start();
 
 }
@@ -40,38 +41,25 @@ void MainWindow::on_actionExit_triggered()
 
 
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::process_one_frame()
 {
-  int frame_count = 0;
-
-  cv::Mat frame;
-
-  Tracker tracker;
-
-  for(;;) {
-
     cap >> frame;
     tracker.process_image(frame);
     ++frame_count;
-    const cv::Scalar white = cv::Scalar(255,255,255);
-    const cv::Scalar green = cv::Scalar(0,255,0);
+    //const cv::Scalar white = cv::Scalar(255,255,255);
+    //const cv::Scalar green = cv::Scalar(0,255,0);
     const cv::Scalar red = cv::Scalar(0,0,255);
 
     cv::putText(frame, (string) to_string(frame_count), cv::Point(50,50), cv::FONT_HERSHEY_SIMPLEX, 1, red, 3);
 
     cv::cvtColor(frame,frame,cv::COLOR_BGR2RGB);
     QImage imdisplay((uchar*)frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
+    ui->display_image->setFixedSize(imdisplay.size());
     ui->display_image->setPixmap(QPixmap::fromImage(imdisplay));
-    break;
 
 
-    //putText(frame, (string) to_string(tracker.low_distance), cv::Point(50,100), cv::FONT_HERSHEY_SIMPLEX ,1, red, 3);
-    //putText(frame, (string) to_string(tracker.high_distance), cv::Point(50,150), cv::FONT_HERSHEY_SIMPLEX ,1, red, 3);
-
-    //cv::imshow("window 1", frame);
-    //if(cv::waitKey(1)==27) break;
-  }
-
+    putText(frame, (string) to_string(tracker.low_distance), cv::Point(50,100), cv::FONT_HERSHEY_SIMPLEX ,1, red, 3);
+    putText(frame, (string) to_string(tracker.high_distance), cv::Point(50,150), cv::FONT_HERSHEY_SIMPLEX ,1, red, 3);
 }
 
 void MainWindow::on_routesButton_clicked()

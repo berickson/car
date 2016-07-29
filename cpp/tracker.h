@@ -10,6 +10,7 @@ public:
   Tracker();
 
   bool draw_features = false;
+  bool draw_feature_connectors = true;
 
   cv::Mat gray_image;
 
@@ -20,7 +21,8 @@ public:
   double low_distance,high_distance;
 
 
-  void process_image(cv::Mat image, bool annotate = true);
+  void process_image(cv::Mat image);
+
 };
 
 void test_tracker();

@@ -10,6 +10,7 @@
 #include <opencv2/xfeatures2d.hpp>
 #include "opencv2/videoio.hpp"
 #include "opencv2/calib3d.hpp"
+#include "../tracker.h"
 
 
 namespace Ui {
@@ -27,7 +28,7 @@ public:
 private slots:
   void on_actionExit_triggered();
 
-  void on_pushButton_clicked();
+  void process_one_frame();
 
   void on_routesButton_clicked();
 
@@ -35,6 +36,11 @@ private:
   QTimer timer;
   Ui::MainWindow *ui;
   cv::VideoCapture cap;
+
+  int frame_count = 0;
+  cv::Mat frame;
+  Tracker tracker;
+
 };
 
 #endif // MAIN_WINDOW_H
