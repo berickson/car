@@ -47,6 +47,7 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::process_one_frame()
 {
+  ui->cam_frame_count_text->setText(QString::number(frame_grabber.get_frame_count_grabbed()));
   if(!frame_grabber.get_latest_frame(frame))
     return;
 
@@ -54,7 +55,7 @@ void MainWindow::process_one_frame()
   ++frame_count;
   //const cv::Scalar white = cv::Scalar(255,255,255);
   //const cv::Scalar green = cv::Scalar(0,255,0);
-  const cv::Scalar red = cv::Scalar(0,0,255);
+  //const cv::Scalar red = cv::Scalar(0,0,255);
 
   //cv::putText(frame, (string) to_string(frame_count), cv::Point(50,50), cv::FONT_HERSHEY_SIMPLEX, 1, red, 3);
   ui->frame_count_text->setText(QString::number(frame_count));

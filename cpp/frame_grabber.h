@@ -25,11 +25,14 @@ public:
   void end_grabbing();
   bool get_one_frame(cv::Mat & frame);
   bool get_latest_frame(cv::Mat & frame);
+  int  get_frame_count_grabbed();
+
   cv::VideoCapture * cap;
 
   std::queue<cv::Mat> buffer;
   std::mutex mtxCam;
   std::atomic<bool> grabOn; //this is lock free
+  int frames_grabbed = 0;
 
   std::thread grab_thread;
   void grab_thread_proc();

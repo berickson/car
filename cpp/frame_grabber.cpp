@@ -51,12 +51,16 @@ bool FrameGrabber::get_latest_frame(cv::Mat & frame) {
   return get_one_frame(frame);
 }
 
+int FrameGrabber::get_frame_count_grabbed() {
+  return frames_grabbed;
+}
+
 
 void FrameGrabber::grab_thread_proc()
 {
-    Mat tmp;
+  Mat tmp;
 
-    //To know how many memory blocks will be allocated to store frames in the queue.
+  //To know how many memory blocks will be allocated to store frames in the queue.
     //Even if you grab N frames and create N x Mat in the queue
     //only few real memory blocks will be allocated
     //thanks to std::queue and cv::Mat memory recycling
@@ -74,6 +78,7 @@ void FrameGrabber::grab_thread_proc()
 
         //get lock only when we have a frame
         mtxCam.lock();
+        ++frames_grabbed;
         //buffer.push(tmp) stores item by reference than avoid
         //this will create a new cv::Mat for each grab
         buffer.push(Mat(tmp.size(), tmp.type()));
