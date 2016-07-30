@@ -12,6 +12,8 @@
 #include "opencv2/calib3d.hpp"
 #include "../tracker.h"
 
+#include "../frame_grabber.h"
+
 
 namespace Ui {
 class MainWindow;
@@ -29,6 +31,7 @@ private slots:
   void on_actionExit_triggered();
 
   void process_one_frame();
+  void fps_changed(int fps);
 
   void on_routesButton_clicked();
 
@@ -36,6 +39,7 @@ private:
   QTimer timer;
   Ui::MainWindow *ui;
   cv::VideoCapture cap;
+  FrameGrabber frame_grabber;
 
   int frame_count = 0;
   cv::Mat frame;

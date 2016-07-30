@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     ../system.cpp \
     ../tracker.cpp \
     route_window.cpp \
-    ../file_names.cpp
+    ../file_names.cpp \
+    ../frame_grabber.cpp
 
 HEADERS  += main_window.h \
     ../ackerman.h \
@@ -50,7 +51,8 @@ HEADERS  += main_window.h \
     ../trim.h \
     ../usb.h \
     ../work_queue.h \
-    route_window.h
+    route_window.h \
+    ../frame_grabber.h
 
 images.path    = $${DESTDIR}/
 
