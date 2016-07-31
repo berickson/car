@@ -1,5 +1,6 @@
 #include "frame_grabber.h"
 #include <map>
+#include <unistd.h> // usleep
 
 using namespace std;
 using namespace cv;
@@ -60,32 +61,29 @@ void FrameGrabber::grab_thread_proc()
 {
   Mat tmp;
 
-  //To know how many memory blocks will be allocated to store frames in the queue.
-    //Even if you grab N frames and create N x Mat in the queue
-    //only few real memory blocks will be allocated
-    //thanks to std::queue and cv::Mat memory recycling
-    std::map<unsigned char*, int> matMemoryCounter;
-    uchar * frameMemoryAddr;
+  //Even if you grab N frames and create N x Mat in the queue
+  //only few real memory blocks will be allocated
+  //thanks to std::queue and cv::Mat memory recycling
 
-    while (grabOn.load() == true) //this is lock free
-    {
-        //grab will wait for cam FPS
-        //keep grab out of lock so that
-        //idle time can be used by other threads
-        *cap >> tmp; //this will wait for cam FPS
+  while (grabOn.load() == true) //this is lock free
+  {
+      //grab will wait for cam FPS
+      //keep grab out of lock so that
+      //idle time can be used by other threads
+      *cap >> tmp; //this will wait for cam FPS
 
-        if (tmp.empty()) continue;
+      if (tmp.empty()){
+        usleep(1000);
+        continue;
+      }
 
-        //get lock only when we have a frame
-        mtxCam.lock();
-        ++frames_grabbed;
-        //buffer.push(tmp) stores item by reference than avoid
-        //this will create a new cv::Mat for each grab
-        buffer.push(Mat(tmp.size(), tmp.type()));
-        tmp.copyTo(buffer.back());
-        frameMemoryAddr = buffer.front().data;
-        mtxCam.unlock();
-        //count how many times this memory block has been used
-        matMemoryCounter[frameMemoryAddr]++;
-    }
+      //get lock only when we have a frame
+      mtxCam.lock();
+      ++frames_grabbed;
+      //buffer.push(tmp) stores item by reference than avoid
+      //this will create a new cv::Mat for each grab
+      buffer.push(Mat(tmp.size(), tmp.type()));
+      tmp.copyTo(buffer.back());
+      mtxCam.unlock();
+  }
 }
