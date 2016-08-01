@@ -22,14 +22,14 @@ Tracker::Tracker() {
   detector = cv::xfeatures2d::SURF::create();
 }
 
-void Tracker::process_image(cv::Mat image, bool annotate) {
+void Tracker::process_image(cv::Mat image) {
   cvtColor( image, gray_image, CV_BGR2GRAY );
   cv::blur(gray_image, gray_image, cv::Size(5,5));
 
   vector<cv::KeyPoint> previous_keypoints(keypoints);
 
   detector->detect(gray_image,keypoints);
-  if(annotate && false){
+  if(draw_features){
     drawKeypoints(
           image,
           keypoints,
@@ -71,13 +71,16 @@ void Tracker::process_image(cv::Mat image, bool annotate) {
 
       if(d < low_distance || d > high_distance)
         continue;
-      /*
-      cv::line(
-            image,
-            previous_keypoints[match.trainIdx].pt,
-          keypoints[match.queryIdx].pt,
-          cv::Scalar(0,255,0),5 );
-      */
+
+
+      if(draw_feature_connectors) {
+        cv::line(
+              image,
+              previous_keypoints[match.trainIdx].pt,
+            keypoints[match.queryIdx].pt,
+            cv::Scalar(255,0,0),1 );
+      }
+
       src.push_back(p1);
       dest.push_back(p2);
 
@@ -101,7 +104,7 @@ void Tracker::process_image(cv::Mat image, bool annotate) {
               image,
               from_points[i],
               to_points[i],
-            cv::Scalar(0,255,255),5 );
+            cv::Scalar(0,255,255), 2 );
       }
     }
   }
@@ -125,8 +128,8 @@ void test_tracker() {
     cap >> frame;
     tracker.process_image(frame);
     ++frame_count;
-    const cv::Scalar white = cv::Scalar(255,255,255);
-    const cv::Scalar green = cv::Scalar(0,255,0);
+    //const cv::Scalar white = cv::Scalar(255,255,255);
+    //const cv::Scalar green = cv::Scalar(0,255,0);
     const cv::Scalar red = cv::Scalar(0,0,255);
 
     cv::putText(frame, (string) to_string(frame_count), cv::Point(50,50), cv::FONT_HERSHEY_SIMPLEX, 1, red, 3);
