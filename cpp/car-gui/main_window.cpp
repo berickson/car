@@ -151,8 +151,9 @@ void MainWindow::process_one_frame()
   //cv::putText(frame, ss.str(), cv::Point(50,50), cv::FONT_HERSHEY_SIMPLEX, 1, red, 3);
 
 
-  //putText(frame, (string) to_string(tracker.low_distance), cv::Point(50,100), cv::FONT_HERSHEY_SIMPLEX ,1, red, 3);
-  //putText(frame, (string) to_string(tracker.high_distance), cv::Point(50,150), cv::FONT_HERSHEY_SIMPLEX ,1, red, 3);
+  cv::cvtColor(frame,frame,cv::COLOR_BGR2RGB);
+  auto pixmap = QPixmap::fromImage(imdisplay);
+  ui->display_image->setPixmap(pixmap);
 
   ui->display_image->setFixedSize(imdisplay.size());
   if(ui->show_image_checkbox->checkState()==Qt::CheckState::Checked) {
