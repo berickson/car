@@ -61,6 +61,7 @@ private:
 
   int frame_count = 0;
   cv::Mat frame;
+  cv::Mat view;
   Tracker tracker;
 
 };
