@@ -151,10 +151,6 @@ void MainWindow::process_one_frame()
   //cv::putText(frame, ss.str(), cv::Point(50,50), cv::FONT_HERSHEY_SIMPLEX, 1, red, 3);
 
 
-  cv::cvtColor(frame,frame,cv::COLOR_BGR2RGB);
-  auto pixmap = QPixmap::fromImage(imdisplay);
-  ui->display_image->setPixmap(pixmap);
-
   ui->display_image->setFixedSize(imdisplay.size());
   if(ui->show_image_checkbox->checkState()==Qt::CheckState::Checked) {
     QPixmap pixmap = QPixmap::fromImage(imdisplay);
@@ -267,7 +263,7 @@ void MainWindow::on_resolutions_combo_box_currentIndexChanged()
   QSize resolution = supported_resolutions[ui->resolutions_combo_box->currentIndex()];
   cap.set(cv::CAP_PROP_FRAME_WIDTH, resolution.width());
   cap.set(cv::CAP_PROP_FRAME_HEIGHT, resolution.height());
-  ui->scroll_area_contents->setMinimumSize(resolution);
-  ui->display_image->setMinimumSize(resolution);
+  ui->scroll_area_contents->setFixedSize(resolution);
+  ui->display_image->setFixedSize(resolution);
 
 }
