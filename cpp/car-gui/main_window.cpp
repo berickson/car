@@ -69,6 +69,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ss << res.width() << " x " << res.height();
     ui->resolutions_combo_box->addItem(QString::fromStdString(ss.str()));
   }
+  ui->resolutions_combo_box->setCurrentIndex(1);
 
 
   if(!cap.open(0)) throw (string) "couldn't open camera";
@@ -80,8 +81,8 @@ MainWindow::MainWindow(QWidget *parent) :
   //cap.set(cv::CAP_PROP_SATURATION, .66);
   //cap.set(cv::CAP_PROP_FOURCC, CV_FOURCC('M','J','P','G'));
   //cap.set(cv::CAP_PROP_FPS,120.001);
-  cap.set(cv::CAP_PROP_FRAME_WIDTH,320);
-  cap.set(cv::CAP_PROP_FRAME_HEIGHT,240);
+  cap.set(cv::CAP_PROP_FRAME_WIDTH,640);
+  cap.set(cv::CAP_PROP_FRAME_HEIGHT,480);
 
   ui->brightness_slider->setValue(cap.get(cv::CAP_PROP_BRIGHTNESS)*100);
   ui->contrast_slider->setValue(cap.get(cv::CAP_PROP_CONTRAST)*100);
@@ -118,6 +119,21 @@ void MainWindow::process_one_frame()
     return;
 
   tracker.process_image(frame);
+
+
+  // below calibration matrix is for 640 x 480 ELP mono camera
+  cv::Mat intrinsic = (cv::Mat1d(3, 3) <<  5.2212093413002049e+02, 0., 3.2542419118701633e+02, 0.,
+      5.2212093413002049e+02, 2.5473325838824445e+02, 0., 0., 1. );
+
+  cv::Mat distortionCoefficients = (cv::Mat1d(1, 5) << -4.0852862075720786e-01, 2.4086510135654188e-01,
+                                    -9.7223521589240465e-04, 1.7209244108669266e-04,
+                                    -8.6751876741832365e-02);
+
+
+  cv::undistort(frame,view,intrinsic,distortionCoefficients);
+
+
+
   ++frame_count;
   //const cv::Scalar white = cv::Scalar(255,255,255);
   //const cv::Scalar green = cv::Scalar(0,255,0);
@@ -127,23 +143,21 @@ void MainWindow::process_one_frame()
   ui->frame_count_text->setText(QString::number(frame_count));
 
 
-  cv::cvtColor(frame,frame,cv::COLOR_BGR2RGB);
-  QImage imdisplay((uchar*)frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
+  cv::cvtColor(view,view,cv::COLOR_BGR2RGB);
+  QImage imdisplay((uchar*)view.data, view.cols, view.rows, view.step, QImage::Format_RGB888);
   std::stringstream ss;
   ss << tracker.homography;
   ui->homography_text->setText(QString::fromStdString(ss.str()));
   //cv::putText(frame, ss.str(), cv::Point(50,50), cv::FONT_HERSHEY_SIMPLEX, 1, red, 3);
 
 
-  //putText(frame, (string) to_string(tracker.low_distance), cv::Point(50,100), cv::FONT_HERSHEY_SIMPLEX ,1, red, 3);
-  //putText(frame, (string) to_string(tracker.high_distance), cv::Point(50,150), cv::FONT_HERSHEY_SIMPLEX ,1, red, 3);
 
-//  ui->display_image->setFixedSize(imdisplay.size());
-  QPixmap pixmap = QPixmap::fromImage(imdisplay);
-
-  //ui->display_image->setScaledContents(true);
-  ui->display_image->setPixmap(QPixmap::fromImage(imdisplay));
-  ui->scroll_area_contents->setBaseSize(imdisplay.size());
+  ui->display_image->setFixedSize(imdisplay.size());
+  if(ui->show_image_checkbox->checkState()==Qt::CheckState::Checked) {
+    QPixmap pixmap = QPixmap::fromImage(imdisplay);
+    ui->display_image->setPixmap(QPixmap::fromImage(imdisplay));
+    ui->scroll_area_contents->setBaseSize(imdisplay.size());
+  }
 
 }
 
@@ -250,5 +264,7 @@ void MainWindow::on_resolutions_combo_box_currentIndexChanged()
   QSize resolution = supported_resolutions[ui->resolutions_combo_box->currentIndex()];
   cap.set(cv::CAP_PROP_FRAME_WIDTH, resolution.width());
   cap.set(cv::CAP_PROP_FRAME_HEIGHT, resolution.height());
+  ui->scroll_area_contents->setFixedSize(resolution);
+  ui->display_image->setFixedSize(resolution);
 
 }
