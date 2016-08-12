@@ -117,6 +117,7 @@ void MainWindow::process_one_frame()
   ui->cam_frame_count_text->setText(QString::number(frame_grabber.get_frame_count_grabbed()));
   if(!frame_grabber.get_latest_frame(frame))
     return;
+  cv::flip(frame,frame,-1);
 
   tracker.process_image(frame);
 

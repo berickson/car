@@ -39,8 +39,8 @@ void Camera::grab_thread_proc()
     cv::VideoCapture cap;
 
     //if(mode == Mode::cap_320_by_240_by_30fps) {
-      cap.set(cv::CAP_PROP_FRAME_WIDTH,320);
-      cap.set(cv::CAP_PROP_FRAME_HEIGHT,240);
+      cap.set(cv::CAP_PROP_FRAME_WIDTH,640);
+      cap.set(cv::CAP_PROP_FRAME_HEIGHT,480);
       cap.set(cv::CAP_PROP_FPS,1);
     //}
     if(!cap.open(cam_number)) throw (string) "couldn't open camera";
@@ -68,12 +68,13 @@ void test_camera() {
   left.cam_number = 1;
   right.cam_number = 0;
   vector<Camera *> cameras;
-  //cameras.push_back(&left);
+  cameras.push_back(&left);
   cameras.push_back(&right);
 
-  cout << "grabbing cameras for 2 seconds x 2" << endl;
+  int seconds_to_grab = 10;
+  cout << "grabbing cameras for "<< seconds_to_grab << " seconds x 2" << endl;
   for(Camera * camera: cameras) {camera->begin_capture_movie();}
-  for(int i=0;i<2;++i) {
+  for(int i=0;i<seconds_to_grab;++i) {
     usleep(2 * 1E6);
     for(auto camera: cameras) {cout << "camera " << camera->cam_number<< " grabbed " << camera->frame_count << " images" << endl;}
   }
