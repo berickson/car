@@ -1,5 +1,6 @@
 #include "camera.h"
 #include <string>
+#include <sstream>
 #include <vector>
 #include <algorithm>
 #include <array>
@@ -10,7 +11,7 @@
 #include <thread>
 #include <unistd.h> // usleep
 
-
+#include <iostream>
 
 using namespace std;
 
@@ -20,41 +21,56 @@ Camera::Camera()
 }
 
 void Camera::begin_capture_movie() {
-  quit = false;
-  grab_thread = thread(&Camera::grab_thread_proc, this);
+  cap.open(cam_number);
+  grabber.begin_grabbing(&cap);
+  record_on.store(true);
+  this->record_thread = std::thread(&Camera::record_thread_proc, this);
+
 }
 
 void Camera::end_capture_movie() {
-  quit = true;
-  if(grab_thread.joinable())
-    grab_thread.join();
+  record_on.store(false);
+  if(record_thread.joinable()){
+    record_thread.join();
+  }
+  grabber.end_grabbing();
 }
 
-
-
-void Camera::grab_thread_proc()
+int Camera::get_frame_count_grabbed()
 {
-  try {
-    frame_count = 0;
-    cv::VideoCapture cap;
+  return grabber.frames_grabbed;
+}
 
-    //if(mode == Mode::cap_320_by_240_by_30fps) {
-      cap.set(cv::CAP_PROP_FRAME_WIDTH,640);
-      cap.set(cv::CAP_PROP_FRAME_HEIGHT,480);
-      cap.set(cv::CAP_PROP_FPS,1);
-    //}
-    if(!cap.open(cam_number)) throw (string) "couldn't open camera";
+int Camera::get_frame_count_saved()
+{
+  return this->frame_count_saved;
+}
 
-    cv::Mat frame;
-    while(!quit) {
-      if(!cap.read(frame)) throw (string) "couldn't grab a frame";
-      ++frame_count;
+void Camera::record_thread_proc() {
+  cout << "inside record thread proc" << endl;
 
+  cv::Size frame_size = cv::Size((int) cap.get(CV_CAP_PROP_FRAME_WIDTH),    // Acquire input size
+                (int) cap.get(CV_CAP_PROP_FRAME_HEIGHT));
+  int fourcc = (int) cap.get(CV_CAP_PROP_FOURCC);
+  int fps = (int) cap.get(CV_CAP_PROP_FPS);
+  bool is_color = true;
+
+
+  cv::VideoWriter output_video;
+  stringstream ss;
+  ss << "video" << cam_number << ".avi";
+  string filename = ss.str();
+
+  output_video.open(filename, fourcc, fps, frame_size, is_color);
+
+  while(record_on.load() == true) {
+    if(grabber.get_latest_frame(latest_frame)) {
+      output_video.write(latest_frame);
+      ++frame_count_saved;
     }
-  } catch (string s) {
-    grab_thread_error_string = s;
+    usleep(1000); // 1000 = one ms
   }
-
+  cout << "leaving record thread proc" << endl;
 }
 
 
@@ -76,7 +92,12 @@ void test_camera() {
   for(Camera * camera: cameras) {camera->begin_capture_movie();}
   for(int i=0;i<seconds_to_grab;++i) {
     usleep(2 * 1E6);
-    for(auto camera: cameras) {cout << "camera " << camera->cam_number<< " grabbed " << camera->frame_count << " images" << endl;}
+    for(Camera * camera: cameras) {
+      cout << "camera " << camera->cam_number
+           << " grabbed " << camera->get_frame_count_grabbed()
+           << " saved "<< camera->get_frame_count_saved() << " images"
+           << endl;
+    }
   }
   for(auto camera: cameras) {camera->end_capture_movie();}
 

@@ -7,6 +7,7 @@
 #include <opencv2/core/core.hpp>
 #include "opencv2/videoio.hpp"
 #include <thread>
+#include "frame_grabber.h"
 
 class Camera
 {
@@ -21,15 +22,22 @@ public:
   Camera();
   void begin_capture_movie();
   void end_capture_movie();
-  bool quit;
-  std::atomic<int> frame_count;
+
+  int get_frame_count_grabbed();
+  int get_frame_count_saved();
 
 private:
-  cv::VideoCapture cap;
-  void grab_thread_proc();
+  int frame_count_saved = 0;
+  cv::Mat latest_frame;
 
-  std::thread grab_thread;
-  std::string grab_thread_error_string;
+  std::atomic<bool> record_on; //this is lock free
+
+  std::thread record_thread;
+  void record_thread_proc();
+
+  cv::VideoCapture cap;
+
+  FrameGrabber grabber;
 
 };
 
