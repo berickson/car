@@ -12,6 +12,7 @@
 #include <unistd.h> // usleep
 
 #include <iostream>
+#include <chrono>
 
 using namespace std;
 
@@ -25,9 +26,38 @@ void Camera::set_recording_path(string path)
   recording_path = path;
 }
 
-void Camera::begin_capture_movie() {
+void Camera::warm_up()
+{
+  if(warmed_up) return;
+
   cap.open(cam_number);
   grabber.begin_grabbing(&cap);
+  warmed_up = true;
+}
+
+void Camera::prepare_video_writer(string path)
+{
+  cv::Size frame_size = cv::Size((int) cap.get(CV_CAP_PROP_FRAME_WIDTH),    // Acquire input size
+                (int) cap.get(CV_CAP_PROP_FRAME_HEIGHT));
+  int fourcc = (int) cap.get(CV_CAP_PROP_FOURCC);
+  int fps = (int) cap.get(CV_CAP_PROP_FPS);
+  bool is_color = true;
+  recording_path = path;
+
+
+
+  // get default recording path if none set
+  if(recording_path.length()==0) {
+    stringstream ss;
+    ss << "video" << cam_number << ".avi";
+    recording_path = ss.str();
+  }
+
+  output_video.open(recording_path , fourcc, fps, frame_size, is_color);
+}
+
+void Camera::begin_capture_movie() {
+  warm_up();
   record_on.store(true);
   this->record_thread = std::thread(&Camera::record_thread_proc, this);
 
@@ -39,6 +69,18 @@ void Camera::end_capture_movie() {
     record_thread.join();
   }
   grabber.end_grabbing();
+}
+
+void Camera::release_video_writer()
+{
+  output_video.release();
+}
+
+bool Camera::get_latest_frame()
+{
+  grabber.get_latest_frame(latest_frame);
+  return grabber.get_frame_count_grabbed() > 0;
+
 }
 
 int Camera::get_frame_count_grabbed()
@@ -53,34 +95,23 @@ int Camera::get_frame_count_saved()
 
 void Camera::record_thread_proc() {
   cout << "inside record thread proc" << endl;
+  prepare_video_writer(recording_path);
 
-  cv::Size frame_size = cv::Size((int) cap.get(CV_CAP_PROP_FRAME_WIDTH),    // Acquire input size
-                (int) cap.get(CV_CAP_PROP_FRAME_HEIGHT));
-  int fourcc = (int) cap.get(CV_CAP_PROP_FOURCC);
-  int fps = (int) cap.get(CV_CAP_PROP_FPS);
-  bool is_color = true;
-
-
-  cv::VideoWriter output_video;
-
-  // get default recording path if none set
-  if(recording_path.length()==0) {
-    stringstream ss;
-    ss << "video" << cam_number << ".avi";
-    recording_path = ss.str();
-  }
-
-  output_video.open(recording_path , fourcc, fps, frame_size, is_color);
 
   while(record_on.load() == true) {
     if(grabber.get_latest_frame(latest_frame)) {
-      output_video.write(latest_frame);
-      ++frame_count_saved;
+      write_latest_frame();
     }
     usleep(1000); // 1000 = one ms
   }
+  release_video_writer();
 
   cout << "leaving record thread proc" << endl;
+}
+
+void Camera::write_latest_frame() {
+  output_video.write(latest_frame);
+  ++frame_count_saved;
 }
 
 
@@ -113,4 +144,57 @@ void test_camera() {
 
 
 }
+
+
+StereoCamera::StereoCamera()
+{
+  cameras.push_back(&left_camera);
+  cameras.push_back(&right_camera);
+}
+
+void StereoCamera::warm_up()
+{
+  for(Camera* camera : cameras) {
+    camera->warm_up();
+  }
+}
+
+void StereoCamera::begin_recording(string left_recording_path_, string right_recording_path_)
+{
+  left_recording_path = left_recording_path_;
+  right_recording_path = right_recording_path_;
+  warm_up();
+  record_on.store(true);
+  this->record_thread = std::thread(&StereoCamera::record_thread_proc, this);
+}
+
+void StereoCamera::record_thread_proc()
+{
+
+  left_camera.prepare_video_writer(left_recording_path);
+  right_camera.prepare_video_writer(right_recording_path);
+
+  cv::Mat left_frame;
+  cv::Mat right_frame;
+
+  using namespace std::chrono_literals;
+  double fps = 50.;
+  auto t_start = std::chrono::high_resolution_clock::now();
+  auto t_next_frame = t_start;
+  std::chrono::microseconds us_per_frame((int) (1E6/fps) );
+
+  while(this->record_on.load()) {
+    std::this_thread::sleep_until(t_next_frame);
+    if(!left_camera.get_latest_frame())
+      continue;
+    if(!right_camera.get_latest_frame())
+      continue;
+    left_camera.write_latest_frame();
+    right_camera.write_latest_frame();
+    t_next_frame += us_per_frame;
+
+  }
+
+}
+
 
