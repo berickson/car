@@ -8,6 +8,7 @@
 #include "opencv2/videoio.hpp"
 #include <thread>
 #include "frame_grabber.h"
+#include <string>
 
 class Camera
 {
@@ -20,6 +21,7 @@ public:
   Mode mode = cap_320_by_240_by_30fps;
 
   Camera();
+  void set_recording_path(std::string path);
   void begin_capture_movie();
   void end_capture_movie();
 
@@ -27,6 +29,7 @@ public:
   int get_frame_count_saved();
 
 private:
+  std::string recording_path;
   int frame_count_saved = 0;
   cv::Mat latest_frame;
 

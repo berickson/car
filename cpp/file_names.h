@@ -35,7 +35,7 @@ public:
   string commands_file_path(string track_name, string route_name, string run_name = "");
 
 
-  vector<string> stereo_video_file_paths(string track_name, string route_name, string run_name);
+  vector<string> stereo_video_file_paths(string track_name, string route_name, string run_name = "");
 
   string exception_file_path(string track_name, string route_name, string run_name = "");
 

@@ -20,6 +20,11 @@ Camera::Camera()
 {
 }
 
+void Camera::set_recording_path(string path)
+{
+  recording_path = path;
+}
+
 void Camera::begin_capture_movie() {
   cap.open(cam_number);
   grabber.begin_grabbing(&cap);
@@ -57,11 +62,15 @@ void Camera::record_thread_proc() {
 
 
   cv::VideoWriter output_video;
-  stringstream ss;
-  ss << "video" << cam_number << ".avi";
-  string filename = ss.str();
 
-  output_video.open(filename, fourcc, fps, frame_size, is_color);
+  // get default recording path if none set
+  if(recording_path.length()==0) {
+    stringstream ss;
+    ss << "video" << cam_number << ".avi";
+    recording_path = ss.str();
+  }
+
+  output_video.open(recording_path , fourcc, fps, frame_size, is_color);
 
   while(record_on.load() == true) {
     if(grabber.get_latest_frame(latest_frame)) {
@@ -70,6 +79,7 @@ void Camera::record_thread_proc() {
     }
     usleep(1000); // 1000 = one ms
   }
+
   cout << "leaving record thread proc" << endl;
 }
 

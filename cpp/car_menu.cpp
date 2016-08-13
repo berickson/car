@@ -11,6 +11,7 @@
 #include "driver.h"
 #include "run_settings.h"
 #include <unistd.h> // usleep
+#include "camera.h"
 
 #include <ncurses.h> // sudo apt-get install libncurses5-dev
 
@@ -190,6 +191,20 @@ void run_car_menu() {
     mkdir(f.get_routes_folder(track_name));
     mkdir(f.get_route_folder(track_name,route_name));
 
+    Camera left_camera, right_camera;
+    vector<Camera*> cameras;
+    if(run_settings.capture_video) {
+      cameras.push_back(&left_camera);
+      cameras.push_back(&right_camera);
+      vector<string> video_paths = f.stereo_video_file_paths(track_name,route_name);
+      left_camera.set_recording_path(video_paths[0]);
+      right_camera.set_recording_path(video_paths[1]);
+    }
+
+    for(Camera* camera : cameras) {
+      camera->begin_capture_movie();
+    }
+
     string recording_path = f.recording_file_path(track_name,route_name);
     car.begin_recording_input(recording_path);
 
@@ -201,6 +216,10 @@ void run_car_menu() {
     ui.wait_key();
 
     car.end_recording_input();
+
+    for(Camera* camera:cameras) {
+      camera->end_capture_movie();
+    }
 
     ui.clear();
     ui.print("making path");
