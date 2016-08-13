@@ -195,8 +195,8 @@ void run_car_menu() {
     vector<Camera*> cameras;
     if(run_settings.capture_video) {
       vector<string> video_paths = f.stereo_video_file_paths(track_name,route_name);
-      left_camera.cam_number = 0;
-      right_camera.cam_number = 1;
+      left_camera.cam_number = 1;
+      right_camera.cam_number = 0;
       left_camera.set_recording_path(video_paths[0]);
       right_camera.set_recording_path(video_paths[1]);
       cameras.push_back(&left_camera);
