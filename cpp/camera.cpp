@@ -188,6 +188,8 @@ void StereoCamera::record_thread_proc()
     t_next_frame += us_per_frame;
 
   }
+  left_camera.release_video_writer();
+  right_camera.release_video_writer();
 
 }
 

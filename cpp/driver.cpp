@@ -53,7 +53,7 @@ int esc_for_velocity(double goal_velocity, Car & car) {
   return esc_ms;
 }
 
-void Driver::drive_route(Route & route) {
+string Driver::drive_route(Route & route) {
 
   // we will set error text if something goes wrong
   string error_text = "";
@@ -106,20 +106,7 @@ void Driver::drive_route(Route & route) {
   car.set_esc_and_str(1500,1500);
   car.set_manual_mode();
   car.remove_listener(&queue);
-  if(error_text.size()) {
-    ui.clear();
-    ui.print((string) "Error during play route: \n"+error_text);
-    ui.print(error_text);
-    ui.print("press any key to continue");
-    ui.refresh();
-    ui.wait_key();
-  } else {
-    ui.clear();
-    ui.print("completed playback without error\n");
-    ui.print("press any key to continue");
-    ui.refresh();
-    ui.wait_key();
-  }
+  return error_text; // todo: why not throw?
 }
 
 Angle Driver::steering_angle_by_cte(Route &route) {

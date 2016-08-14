@@ -176,17 +176,32 @@ void run_car_menu() {
     string recording_file_path = f.recording_file_path(track_name, route_name, run_name);
     car.begin_recording_input(recording_file_path);
     Driver d(car,ui,run_settings);
-    d.drive_route(rte);
+    string error_text = d.drive_route(rte);
+    if(run_settings.capture_video) {
+      camera.end_recording();
+    }
     car.end_recording_input();
+    if(error_text.size()) {
+      ui.clear();
+      ui.print((string) "Error during play route: \n"+error_text);
+      ui.print(error_text);
+      ui.print("press any key to continue");
+      ui.refresh();
+      ui.wait_key();
+    } else {
+      ui.clear();
+      ui.print("completed playback without error\n");
+      ui.print("press any key to continue");
+      ui.refresh();
+      ui.wait_key();
+    }
+
 
     ui.clear();
     ui.print("making path");
 
     string path_file_path = f.path_file_path(track_name, route_name, run_name);
     write_path_from_recording_file(recording_file_path, path_file_path);
-    if(run_settings.capture_video) {
-      camera.end_recording();
-    }
 
     } catch (string s) {      
       ui.clear();
