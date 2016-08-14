@@ -90,9 +90,10 @@ void ConsoleMenu::display() {
     } else {
       s = " "+s+" ";
     }
-    if(selected) ui.bold(true);
+    //if(selected) ui.bold(true);
+    ui.bold(true);
     ui.print(s);
-    if(selected) ui.bold(false);
+    //if(selected) ui.bold(false);
   }
   ui.refresh();
 }

@@ -177,6 +177,12 @@ void run_car_menu() {
     car.begin_recording_input(recording_file_path);
     Driver d(car,ui,run_settings);
     string error_text = d.drive_route(rte);
+    ui.clear();
+    ui.print("making path");
+
+    string path_file_path = f.path_file_path(track_name, route_name, run_name);
+    write_path_from_recording_file(recording_file_path, path_file_path);
+
     if(run_settings.capture_video) {
       camera.end_recording();
     }
@@ -197,11 +203,6 @@ void run_car_menu() {
     }
 
 
-    ui.clear();
-    ui.print("making path");
-
-    string path_file_path = f.path_file_path(track_name, route_name, run_name);
-    write_path_from_recording_file(recording_file_path, path_file_path);
 
     } catch (string s) {      
       ui.clear();
