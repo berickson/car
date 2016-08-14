@@ -18,6 +18,7 @@ public:
     cap_320_by_240_by_30fps
   };
   int cam_number = 0;
+  double get_fps();
 
   Mode mode = cap_320_by_240_by_30fps;
 
@@ -35,6 +36,7 @@ public:
   int get_frame_count_saved();
 
 private:
+  int fps = 0;
   bool warmed_up = false;
   std::string recording_path;
   int frame_count_saved = 0;
@@ -53,11 +55,12 @@ private:
 };
 
 class StereoCamera {
-
+public:
   StereoCamera();
 
   void warm_up();
   void begin_recording(std::string left_recording_path, std::string right_recording_path);
+  void end_recording();
 
   std::atomic<bool> record_on;
 
@@ -79,6 +82,7 @@ private:
 };
 
 void test_camera();
+void test_stereo_camera();
 
 
 #endif // CAMERA_H

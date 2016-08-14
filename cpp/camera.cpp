@@ -17,6 +17,11 @@
 using namespace std;
 
 
+double Camera::get_fps()
+{
+  return fps;
+}
+
 Camera::Camera()
 {
 }
@@ -40,7 +45,7 @@ void Camera::prepare_video_writer(string path)
   cv::Size frame_size = cv::Size((int) cap.get(CV_CAP_PROP_FRAME_WIDTH),    // Acquire input size
                 (int) cap.get(CV_CAP_PROP_FRAME_HEIGHT));
   int fourcc = (int) cap.get(CV_CAP_PROP_FOURCC);
-  int fps = (int) cap.get(CV_CAP_PROP_FPS);
+  fps = (int) cap.get(CV_CAP_PROP_FPS);
   bool is_color = true;
   recording_path = path;
 
@@ -78,7 +83,10 @@ void Camera::release_video_writer()
 
 bool Camera::get_latest_frame()
 {
-  grabber.get_latest_frame(latest_frame);
+  if(grabber.get_latest_frame(latest_frame)) {
+    cv::flip(latest_frame,latest_frame,-1); // todo: make separate function and accessor
+  }
+
   return grabber.get_frame_count_grabbed() > 0;
 
 }
@@ -117,6 +125,75 @@ void Camera::write_latest_frame() {
 
 #include <iostream>
 
+
+
+
+StereoCamera::StereoCamera()
+{
+  left_camera.cam_number = 1;
+  right_camera.cam_number = 0;
+  cameras.push_back(&left_camera);
+  cameras.push_back(&right_camera);
+}
+
+void StereoCamera::warm_up()
+{
+  for(Camera* camera : cameras) {
+    camera->warm_up();
+  }
+}
+
+void StereoCamera::begin_recording(string left_recording_path_, string right_recording_path_)
+{
+  left_recording_path = left_recording_path_;
+  right_recording_path = right_recording_path_;
+  warm_up();
+  record_on.store(true);
+  this->record_thread = std::thread(&StereoCamera::record_thread_proc, this);
+}
+
+
+void StereoCamera::end_recording()
+{
+  record_on.store(false);
+  if(record_thread.joinable()){
+    record_thread.join();
+  }
+
+}
+
+void StereoCamera::record_thread_proc()
+{
+
+  left_camera.prepare_video_writer(left_recording_path);
+  right_camera.prepare_video_writer(right_recording_path);
+
+  cv::Mat left_frame;
+  cv::Mat right_frame;
+
+  using namespace std::chrono_literals;
+  double fps = left_camera.get_fps();
+  auto t_start = std::chrono::high_resolution_clock::now();
+  auto t_next_frame = t_start;
+  std::chrono::microseconds us_per_frame((int) (1E6/fps) );
+
+  while(this->record_on.load()) {
+    std::this_thread::sleep_until(t_next_frame);
+    if(!left_camera.get_latest_frame())
+      continue;
+    if(!right_camera.get_latest_frame())
+      continue;
+    left_camera.write_latest_frame();
+    right_camera.write_latest_frame();
+    t_next_frame += us_per_frame;
+
+  }
+
+}
+
+
+
+
 void test_camera() {
 
 
@@ -146,55 +223,21 @@ void test_camera() {
 }
 
 
-StereoCamera::StereoCamera()
-{
-  cameras.push_back(&left_camera);
-  cameras.push_back(&right_camera);
-}
+void test_stereo_camera() {
 
-void StereoCamera::warm_up()
-{
-  for(Camera* camera : cameras) {
-    camera->warm_up();
+
+  StereoCamera camera;
+  camera.warm_up();
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+
+  int seconds_to_grab = 10;
+  cout << "grabbing cameras for "<< seconds_to_grab << " seconds x 2" << endl;
+  camera.begin_recording("left.avi","right.avi");
+
+  for(int i=0;i<seconds_to_grab;++i) {
+    usleep(2 * 1E6);
   }
-}
+  camera.end_recording();
 
-void StereoCamera::begin_recording(string left_recording_path_, string right_recording_path_)
-{
-  left_recording_path = left_recording_path_;
-  right_recording_path = right_recording_path_;
-  warm_up();
-  record_on.store(true);
-  this->record_thread = std::thread(&StereoCamera::record_thread_proc, this);
-}
-
-void StereoCamera::record_thread_proc()
-{
-
-  left_camera.prepare_video_writer(left_recording_path);
-  right_camera.prepare_video_writer(right_recording_path);
-
-  cv::Mat left_frame;
-  cv::Mat right_frame;
-
-  using namespace std::chrono_literals;
-  double fps = 50.;
-  auto t_start = std::chrono::high_resolution_clock::now();
-  auto t_next_frame = t_start;
-  std::chrono::microseconds us_per_frame((int) (1E6/fps) );
-
-  while(this->record_on.load()) {
-    std::this_thread::sleep_until(t_next_frame);
-    if(!left_camera.get_latest_frame())
-      continue;
-    if(!right_camera.get_latest_frame())
-      continue;
-    left_camera.write_latest_frame();
-    right_camera.write_latest_frame();
-    t_next_frame += us_per_frame;
-
-  }
 
 }
-
-
