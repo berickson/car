@@ -169,7 +169,7 @@ void run_car_menu() {
     ui.refresh();
 
     if(run_settings.capture_video) {
-      vector<string> video_paths = f.stereo_video_file_paths(track_name,route_name);
+      vector<string> video_paths = f.stereo_video_file_paths(track_name,route_name,run_name);
       camera.begin_recording(video_paths[0],video_paths[1]);
     }
 
