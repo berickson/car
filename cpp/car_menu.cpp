@@ -144,6 +144,11 @@ void run_car_menu() {
     ui.print("loading route\n");
     ui.refresh();
     rte.load_from_file(input_path);
+    StereoCamera camera;
+    if(run_settings.capture_video) {
+      camera.warm_up();
+    }
+
 
     ui.clear();
     ui.print("smoothing route\n");
@@ -162,6 +167,12 @@ void run_car_menu() {
     ui.clear();
     ui.print((string)"playing route with max velocity " + format(rte.get_max_velocity()));
     ui.refresh();
+
+    if(run_settings.capture_video) {
+      vector<string> video_paths = f.stereo_video_file_paths(track_name,route_name);
+      camera.begin_recording(video_paths[0],video_paths[1]);
+    }
+
     string recording_file_path = f.recording_file_path(track_name, route_name, run_name);
     car.begin_recording_input(recording_file_path);
     Driver d(car,ui,run_settings);
@@ -173,7 +184,11 @@ void run_car_menu() {
 
     string path_file_path = f.path_file_path(track_name, route_name, run_name);
     write_path_from_recording_file(recording_file_path, path_file_path);
-    } catch (string s) {
+    if(run_settings.capture_video) {
+      camera.end_recording();
+    }
+
+    } catch (string s) {      
       ui.clear();
       ui.move(0,0);
       ui.print("error: " + s);
@@ -191,26 +206,16 @@ void run_car_menu() {
     mkdir(f.get_routes_folder(track_name));
     mkdir(f.get_route_folder(track_name,route_name));
 
-    Camera left_camera, right_camera;
-    vector<Camera*> cameras;
+    StereoCamera camera;
     if(run_settings.capture_video) {
+      camera.warm_up();
       vector<string> video_paths = f.stereo_video_file_paths(track_name,route_name);
-      left_camera.cam_number = 1;
-      right_camera.cam_number = 0;
-      left_camera.set_recording_path(video_paths[0]);
-      right_camera.set_recording_path(video_paths[1]);
-      cameras.push_back(&left_camera);
-      cameras.push_back(&right_camera);
-    }
-
-    for(Camera* camera : cameras) {
-      camera->begin_capture_movie();
+      camera.begin_recording(video_paths[0],video_paths[1]);
     }
 
     string recording_path = f.recording_file_path(track_name,route_name);
     car.begin_recording_input(recording_path);
 
-    string line;
     ui.clear();
     ui.move(0,0);
     ui.print("Recording - press any key to stop");
@@ -219,8 +224,8 @@ void run_car_menu() {
 
     car.end_recording_input();
 
-    for(Camera* camera:cameras) {
-      camera->end_capture_movie();
+    if(run_settings.capture_video){
+      camera.end_recording();
     }
 
     ui.clear();
