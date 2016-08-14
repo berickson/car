@@ -116,7 +116,6 @@ CarMenu::CarMenu() {
 
 
 void run_car_menu() {
-#define RASPBERRY_PI
 #ifdef RASPBERRY_PI
   Car car;
 #else
@@ -204,12 +203,12 @@ void run_car_menu() {
 
 
 
-    } catch (string s) {      
+    } catch (string s) {
       ui.clear();
       ui.move(0,0);
       ui.print("error: " + s);
       ui.refresh();
-      while(ui.getkey()==-1);
+      ui.wait_key();
 
     }
   };
