@@ -16,10 +16,8 @@
 
 class FrameGrabber {
 public:
-  FrameGrabber(){}
-  ~FrameGrabber() {
-    end_grabbing();
-  }
+  FrameGrabber();
+  ~FrameGrabber();
 
   void begin_grabbing(cv::VideoCapture * cap);
   void end_grabbing();
@@ -31,7 +29,7 @@ public:
 
   std::queue<cv::Mat> buffer;
   std::mutex mtxCam;
-  std::atomic<bool> grabOn; //this is lock free
+  std::atomic<bool> grab_on; //this is lock free
   int frames_grabbed = 0;
 
   std::thread grab_thread;

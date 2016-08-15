@@ -6,16 +6,25 @@ using namespace std;
 using namespace cv;
 
 
+FrameGrabber::FrameGrabber(){
+  grab_on.store(false);
+
+}
+
+FrameGrabber::~FrameGrabber() {
+  end_grabbing();
+}
+
 void FrameGrabber::begin_grabbing(cv::VideoCapture * _cap)
 {
   this->cap = _cap;
   this->grab_thread = std::thread(&FrameGrabber::grab_thread_proc, this);
-  grabOn.store(true);
+  grab_on.store(true);
 }
 
 void FrameGrabber::end_grabbing() {
-  if(grabOn.load()==true) {
-    grabOn.store(false);    //stop the grab loop
+  if(grab_on.load()==true) {
+    grab_on.store(false);    //stop the grab loop
     grab_thread.join();               //wait for the grab loop
 
     while (!buffer.empty())    //flushing the buffer
@@ -65,7 +74,7 @@ void FrameGrabber::grab_thread_proc()
   //only few real memory blocks will be allocated
   //thanks to std::queue and cv::Mat memory recycling
 
-  while (grabOn.load() == true) //this is lock free
+  while (grab_on.load() == true) //this is lock free
   {
       //grab will wait for cam FPS
       //keep grab out of lock so that

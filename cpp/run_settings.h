@@ -17,6 +17,7 @@ struct RunSettings{
   double k_smooth = 0.4;
   bool capture_video = false;
   void write_to_file(string path);
+  void load_from_file(string path);
 };
 
 

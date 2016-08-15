@@ -2,6 +2,7 @@
 #include "ui_route_window.h"
 #include <QListView>
 #include <QStandardItemModel>
+#include "../run_settings.h"
 
 #include <fstream>
 #include <string>
@@ -54,19 +55,27 @@ void RouteWindow::on_route_list_itemSelectionChanged()
   if(selection.size()==1) {
     //ui->run_list->clear();
     ui->run_list->setRowCount(0);
-    ui->run_list->setColumnCount(2);
+    ui->run_list->setColumnCount(3);
     ui->run_list->setSortingEnabled(true);
     QStringList labels;
-    labels << "name" << "name2";
+    labels << "run" << "a" << "v";
     ui->run_list->setHorizontalHeaderLabels(labels);
     ui->run_list->verticalHeader()->setVisible(false);
     auto run_names = file_names.get_run_names(get_track_name(), get_route_name());
     for(string run_name:run_names) {
       run_name = run_name ;
       int row = ui->run_list->rowCount();
+
       ui->run_list->insertRow(row);
+      RunSettings run_settings;
+      try {
+        run_settings.load_from_file(file_names.config_file_path(get_track_name(),get_route_name(),run_name));
+      } catch (...) {}
+
       ui->run_list->setItem(row,0,new QTableWidgetItem(run_name.c_str()));
-      ui->run_list->setItem(row,1,new QTableWidgetItem(QString::number(-(row-5))));
+      ui->run_list->setItem(row,1,new QTableWidgetItem(QString::number(run_settings.max_a)));
+      ui->run_list->setItem(row,2,new QTableWidgetItem(QString::number(run_settings.max_v)));
+
     }
   }
   if(ui->run_list->rowCount() > 0) {
@@ -131,32 +140,40 @@ void RouteWindow::on_run_list_itemSelectionChanged()
   smooth_pen.setWidth(1);
   smooth_pen.setStyle(Qt::DashDotLine);
   smooth_pen.setCosmetic(true);
+  string run_path;
 
   try {
     Route route,smooth;
     route.load_from_file(file_names.path_file_path(get_track_name(),get_route_name()));
     add_route_to_scene(scene, route, route_pen);
 
-    /*
-    for(auto item:ui->run_list->selectedItems()) {
-      Route run;
-      string run_path = file_names.path_file_path(get_track_name(),get_route_name(),item->text().toStdString());
-      run.load_from_file(run_path.c_str());
-      add_route_to_scene(scene, run, run_pen);
-    }
-    */
 
-    smooth.load_from_file(file_names.path_file_path(get_track_name(),get_route_name()));
-    smooth.smooth(get_k_smooth());
-    add_route_to_scene(scene, smooth, smooth_pen);
+    for(auto item:ui->run_list->selectedItems()) {
+      string run_name = item->text().toStdString();
+      try {
+        Route run;
+        string run_path = file_names.path_file_path(get_track_name(),get_route_name(),run_name);
+        run.load_from_file(run_path.c_str());
+        add_route_to_scene(scene, run, run_pen);
+      }
+      catch (...){
+        string m = "could not load run" + run_name;
+        scene.addText(m.c_str());
+      }
+    }
+
+
+    //smooth.load_from_file(file_names.path_file_path(get_track_name(),get_route_name()));
+    //smooth.smooth(get_k_smooth());
+    //add_route_to_scene(scene, smooth, smooth_pen);
 
     for(auto item:scene.items()) {
       ui->graphicsView->fitInView(item , Qt::KeepAspectRatio );
     }
 
   } catch (...) {
-    scene.clear();
-    scene.addText("could not load run");
+    //scene.clear();
+
   }
 }
 

@@ -23,6 +23,7 @@ public:
   Mode mode = cap_320_by_240_by_30fps;
 
   Camera();
+  ~Camera();
   void set_recording_path(std::string path);
   void warm_up();
   void prepare_video_writer(std::string path);

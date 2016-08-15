@@ -26,6 +26,15 @@ Camera::Camera()
 {
 }
 
+Camera::~Camera()
+{
+  // shut down anything that may or may not have started
+  end_capture_movie();
+  if(cap.isOpened())
+    cap.release();
+
+}
+
 void Camera::set_recording_path(string path)
 {
   recording_path = path;
@@ -78,7 +87,8 @@ void Camera::end_capture_movie() {
 
 void Camera::release_video_writer()
 {
-  output_video.release();
+  if(output_video.isOpened())
+    output_video.release();
 }
 
 bool Camera::get_latest_frame()
@@ -171,7 +181,6 @@ void StereoCamera::record_thread_proc()
   cv::Mat left_frame;
   cv::Mat right_frame;
 
-  using namespace std::chrono_literals;
   double fps = left_camera.get_fps();
   auto t_start = std::chrono::high_resolution_clock::now();
   auto t_next_frame = t_start;
