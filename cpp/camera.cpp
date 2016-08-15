@@ -54,7 +54,9 @@ void Camera::prepare_video_writer(string path)
   cv::Size frame_size = cv::Size((int) cap.get(CV_CAP_PROP_FRAME_WIDTH),    // Acquire input size
                 (int) cap.get(CV_CAP_PROP_FRAME_HEIGHT));
   int fourcc = (int) cap.get(CV_CAP_PROP_FOURCC);
+  fourcc == CV_FOURCC('M','J','P','G');
   fps = (int) cap.get(CV_CAP_PROP_FPS);
+  fps = 10;
   bool is_color = true;
   recording_path = path;
 
@@ -181,7 +183,7 @@ void StereoCamera::record_thread_proc()
   cv::Mat left_frame;
   cv::Mat right_frame;
 
-  double fps = left_camera.get_fps();
+  double fps = 10;
   auto t_start = std::chrono::high_resolution_clock::now();
   auto t_next_frame = t_start;
   std::chrono::microseconds us_per_frame((int) (1E6/fps) );
@@ -195,6 +197,7 @@ void StereoCamera::record_thread_proc()
     left_camera.write_latest_frame();
     right_camera.write_latest_frame();
     t_next_frame += us_per_frame;
+    ++frames_recorded;
 
   }
   left_camera.release_video_writer();
@@ -217,10 +220,10 @@ void test_camera() {
   cameras.push_back(&right);
 
   int seconds_to_grab = 10;
-  cout << "grabbing cameras for "<< seconds_to_grab << " seconds x 2" << endl;
+  cout << "grabbing cameras for "<< seconds_to_grab << " seconds" << endl;
   for(Camera * camera: cameras) {camera->begin_capture_movie();}
   for(int i=0;i<seconds_to_grab;++i) {
-    usleep(2 * 1E6);
+    usleep(1 * 1E6);
     for(Camera * camera: cameras) {
       cout << "camera " << camera->cam_number
            << " grabbed " << camera->get_frame_count_grabbed()
@@ -246,7 +249,8 @@ void test_stereo_camera() {
   camera.begin_recording("left.avi","right.avi");
 
   for(int i=0;i<seconds_to_grab;++i) {
-    usleep(2 * 1E6);
+    usleep( 1E6);
+    cout << "frames recorded: " << camera.frames_recorded << endl;
   }
   camera.end_recording();
 

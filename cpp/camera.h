@@ -67,6 +67,7 @@ public:
 
   std::thread record_thread;
   void record_thread_proc();
+  int frames_recorded = 0;
 
 private:
   std::string left_recording_path, right_recording_path;
