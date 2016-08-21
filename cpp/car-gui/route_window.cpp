@@ -127,7 +127,7 @@ void add_route_to_scene(QGraphicsScene & scene, Route & r,QPen &pen) {
 void RouteWindow::on_run_list_itemSelectionChanged()
 {
   scene.clear();
-  QPen route_pen,run_pen,smooth_pen;
+  QPen route_pen,run_pen;
   route_pen.setColor(Qt::green);
   route_pen.setCosmetic(true);
   route_pen.setWidth(2);
@@ -136,19 +136,16 @@ void RouteWindow::on_run_list_itemSelectionChanged()
   run_pen.setWidth(1);
   run_pen.setCosmetic(true);
 
-  smooth_pen.setColor(Qt::red);
-  smooth_pen.setWidth(1);
-  smooth_pen.setStyle(Qt::DashDotLine);
-  smooth_pen.setCosmetic(true);
   string run_path;
 
   try {
-    Route route,smooth;
+    Route route;
     route.load_from_file(file_names.path_file_path(get_track_name(),get_route_name()));
     add_route_to_scene(scene, route, route_pen);
 
 
     QModelIndexList selected_list = ui->run_list->selectionModel()->selectedRows();
+    ui->run_data->clear();
     for( int i=0; i<selected_list.count(); i++) {
       int selected_row = selected_list.at(i).row();
       string run_name = ui->run_list->item(selected_row,0)->text().toStdString();
@@ -156,6 +153,9 @@ void RouteWindow::on_run_list_itemSelectionChanged()
         Route run;
         string run_path = file_names.path_file_path(get_track_name(),get_route_name(),run_name);
         run.load_from_file(run_path.c_str());
+        if(i==0) {
+          show_run_data(run);
+        }
         add_route_to_scene(scene, run, run_pen);
       }
       catch (...){
@@ -164,10 +164,6 @@ void RouteWindow::on_run_list_itemSelectionChanged()
       }
     }
 
-
-    //smooth.load_from_file(file_names.path_file_path(get_track_name(),get_route_name()));
-    //smooth.smooth(get_k_smooth());
-    //add_route_to_scene(scene, smooth, smooth_pen);
 
     for(auto item:scene.items()) {
       ui->graphicsView->fitInView(item , Qt::KeepAspectRatio );
@@ -187,4 +183,33 @@ void RouteWindow::on_k_smooth_slider_valueChanged() {
 
 double RouteWindow::get_k_smooth() {
   return ui->k_smooth_slider->value()/100.;
+}
+
+void RouteWindow::show_run_data(Route &run)
+{
+   QTableWidget &t = *(ui->run_data);
+  t.clear();
+  QStringList labels;
+  labels << "secs" << "str" << "esc" << "front_x" << "front_y" << "heading" << "velocity";
+  t.setColumnCount(labels.size());
+  t.setRowCount(run.nodes.size());
+  t.horizontalHeader()->setVisible(true);
+
+  t.setHorizontalHeaderLabels(labels);
+  t.verticalHeader()->setVisible(false);
+  for(unsigned int i = 0; i < run.nodes.size(); i++) {
+    RouteNode & node = run.nodes[i];
+    int col=-1;
+
+    t.setItem(i,++col,new QTableWidgetItem(QString::number(node.secs)));
+    t.setItem(i,++col,new QTableWidgetItem(QString::number(node.str)));
+    t.setItem(i,++col,new QTableWidgetItem(QString::number(node.esc)));
+    t.setItem(i,++col,new QTableWidgetItem(QString::number(node.front_x)));
+    t.setItem(i,++col,new QTableWidgetItem(QString::number(node.front_y)));
+    t.setItem(i,++col,new QTableWidgetItem(QString::number(node.heading)));
+    t.setItem(i,++col,new QTableWidgetItem(QString::number(node.velocity)));
+
+  }
+  t.resizeColumnsToContents();
+
 }

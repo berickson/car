@@ -5,6 +5,7 @@
 #include "../file_names.h"
 #include <QGraphicsScene>
 #include <QStandardItemModel>
+#include "../route.h"
 
 namespace Ui {
 class RouteWindow;
@@ -26,6 +27,8 @@ private slots:
 
   void on_k_smooth_slider_valueChanged();
   double get_k_smooth();
+
+  void show_run_data(Route & run);
 
 private:
   QGraphicsScene scene;
