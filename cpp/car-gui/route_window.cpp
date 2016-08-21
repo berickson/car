@@ -148,8 +148,10 @@ void RouteWindow::on_run_list_itemSelectionChanged()
     add_route_to_scene(scene, route, route_pen);
 
 
-    for(auto item:ui->run_list->selectedItems()) {
-      string run_name = item->text().toStdString();
+    QModelIndexList selected_list = ui->run_list->selectionModel()->selectedRows();
+    for( int i=0; i<selected_list.count(); i++) {
+      int selected_row = selected_list.at(i).row();
+      string run_name = ui->run_list->item(selected_row,0)->text().toStdString();
       try {
         Route run;
         string run_path = file_names.path_file_path(get_track_name(),get_route_name(),run_name);
