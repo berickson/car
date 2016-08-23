@@ -305,8 +305,8 @@ void run_car_menu() {
     {[&car](){return "odo_fr: " + format(car.get_odometer_front_right());}},
     {[&car](){return "odo_bl: " + format(car.get_odometer_back_left());}},
     {[&car](){return "odo_br: " + format(car.get_odometer_back_right());}},
-    {[&car](){return "str: " + format(car.get_esc());}},
-    {[&car](){return "esc: " + format(car.get_str());}}
+    {[&car](){return "str: " + format(car.get_str());}},
+    {[&car](){return "esc: " + format(car.get_esc());}}
 
   };
 
