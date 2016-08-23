@@ -32,7 +32,193 @@ double interpolate(double x, double x1, double y1, double x2, double y2){
   return y1 + m * (x-x1);
 }
 
+Point::Point(double x, double y) :
+  x(x),y(y){}
+
+string Point::to_string() const {
+  stringstream ss;
+  ss << "(" << x << "," << y << ")";
+  return ss.str();
+}
+
 Point Point::operator -(Point rhs)
 {
   return Point(x-rhs.x,y-rhs.y);
+}
+
+string to_string(const Point &p) {
+  return p.to_string();
+}
+
+Angle Angle::degrees(double d) {
+  Angle a;
+  a.set_degrees(d);
+  return a;
+}
+
+Angle Angle::radians(double rad) {
+  Angle a;
+  a.theta = rad;
+  return a;
+}
+
+double Angle::radians() const {
+  return theta;
+}
+
+double Angle::degrees() const  {
+  return theta * 180. / M_PI;
+}
+
+void Angle::set_degrees(double d) {
+  theta = d * M_PI/180.;
+}
+
+void Angle::standardize() {
+  theta = fmod(theta + M_PI , 2.*M_PI) - M_PI;
+}
+
+const string Angle::to_string() {
+  return std::to_string(degrees())+"°";
+}
+
+bool Angle::operator ==(Angle &rhs)   {
+
+  return theta == rhs.theta;
+}
+
+Angle &Angle::operator /=(double d)   {
+  theta /= d;
+  return *this;
+}
+
+Angle Angle::operator /(double d) const  {
+  Angle rv;
+  rv.theta = this->theta / d;
+  return rv;
+}
+
+Angle Angle::operator *(double d) const  {
+  Angle rv;
+  rv.theta = this->theta * d;
+  return rv;
+}
+
+Angle Angle::operator +(const Angle &rhs) const  {
+  Angle rv;
+  rv.theta = this->theta + rhs.theta;
+  return rv;
+}
+
+Angle &Angle::operator +=(const Angle &rhs) {
+  theta += rhs.theta;
+  return *this;
+}
+
+Angle Angle::operator -() {
+  return Angle::radians(-theta);
+}
+
+Angle Angle::operator -(const Angle &rhs) const  {
+  Angle rv;
+  rv.theta = this->theta - rhs.theta;
+  rv.standardize();
+  return rv;
+}
+
+double degrees(double radians) {
+  return radians * 180 / M_PI;
+}
+
+double radians(double degrees) {
+  return degrees* M_PI / 180;
+}
+
+double standardized_radians(double theta) {
+  return fmod(theta + M_PI , 2.*M_PI) - M_PI;
+}
+
+double standardized_degrees(double theta) {
+  return  fmod(theta + 180., 360) - 180.;
+}
+
+double degrees_diff(double theta1, double theta2) {
+  return standardized_degrees(theta2 - theta1);
+}
+
+double length(double x, double y) {
+  return sqrt(x*x+y*y);
+}
+
+vector<double> quadratic(double a, double b, double c) {
+
+  return {(-b +sqrt(b*b - 4.*a*c))/(2.*a) ,(-b -sqrt(b*b-4.*a*c))/(2.*a)};
+}
+
+double distance(double x1, double y1, double x2, double y2) {
+  return length(x2-x1,y2-y1);
+}
+
+double distance(Point p1, Point p2) {
+  return distance(p1.x,p1.y,p2.x,p2.y);
+}
+
+double velocity_at_time(double t, double a, double v0){
+  return v0 + a * t;
+}
+
+double velocity_at_position(double x, double a, double v0, double x0){
+  x = x-x0;
+  double t = time_at_position(x,a,v0);
+  return velocity_at_time(t,a,v0);
+}
+
+Point unit_vector(Point p) {
+  auto l=length(p.x,p.y);
+  return Point(p.x/l,p.y/l);
+}
+
+Angle angle_between(double x1, double y1, double x2, double y2) {
+  double dot = x1*x2 + y1*y2; // dot product
+  double det = x1*y2 - y1*x2; // determinant
+  return Angle::radians( atan2(det, dot) );
+}
+
+Angle angle_between(Point p1, Point p2) {
+  return angle_between(p1.x,p1.y,p2.x,p2.y);
+}
+
+Angle angle_to(Point p1, Point p2) {
+  return Angle::radians(atan2(p2.y-p1.y,p2.x-p1.x));
+}
+
+double clamp(double value, double min_value, double max_value) {
+  if(value < min_value)
+    return min_value;
+  if (value > max_value)
+    return max_value;
+  return value;
+}
+
+vector<double> linspace(double from, double to, double step) {
+  vector<double> v;
+  for(double d = from; d <= to; d+= step) {
+    v.push_back(d);
+  }
+  return v;
+}
+
+double time_at_position(double x, double a, double v0, double x0){
+  x = x-x0;
+
+  if(a==0)
+    return x/v0;
+  auto t = quadratic(0.5*a,v0,-x);
+  if (t[0] < 0){
+    return t[1] > 0 ? t[1] : NAN;
+  }
+  if (t[1] < 0){
+    return t[0];
+  }
+  return min(t[0],t[1]);
 }

@@ -86,12 +86,14 @@ string Driver::drive_route(Route & route) {
       unsigned str = car.steering_for_angle(steering_angle);
       unsigned esc = esc_for_velocity(route.get_velocity(), car);
 
+      /*
       ui.clear();
       ui.print((string) "p_front: " + p_front.to_string());
       ui.print((string) "position: " + route.get_position_ahead(0).to_string());
       ui.print((string) "ahead: " + to_string(ahead));
 
       ui.refresh();
+      */
 
       if(route.done && fabs(car.get_velocity()) < 0.05)
         break;

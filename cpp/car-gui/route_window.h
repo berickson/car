@@ -6,6 +6,7 @@
 #include <QGraphicsScene>
 #include <QStandardItemModel>
 #include "../route.h"
+#include <memory>
 
 namespace Ui {
 class RouteWindow;
@@ -30,7 +31,12 @@ private slots:
 
   void show_run_data(Route & run);
 
+  void on_run_data_itemSelectionChanged();
+
 private:
+  QGraphicsItem * car_graphic = NULL;
+  unique_ptr<Route> current_route = NULL;
+  unique_ptr<Route> current_run = NULL;
   QGraphicsScene scene;
   Ui::RouteWindow *ui;
   FileNames file_names;
@@ -38,6 +44,7 @@ private:
   string get_track_name();
   string get_route_name();
   string get_run_name();
+  void clear_scene();
 };
 
 #endif // ROUTE_WINDOW_H

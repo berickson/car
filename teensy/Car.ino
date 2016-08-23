@@ -189,8 +189,8 @@ void help();
 
 const Command commands[] = {
   {"?", "help", help},
-  {"td+", "trace dynamics on", trace_dynamics_on},
-  {"td-", "trace dynamics off", trace_dynamics_off},
+  {"td+", "trace dynamics on", _on},
+  {"td-", "trace dynamics off", _off},
   {"tp+", "trace ping on", trace_ping_on},
   {"tp-", "trace ping off", trace_ping_off},
   {"te+", "trace esc on", trace_esc_on},

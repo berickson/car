@@ -124,9 +124,15 @@ void add_route_to_scene(QGraphicsScene & scene, Route & r,QPen &pen) {
 
 }
 
+void RouteWindow::clear_scene()
+{
+  car_graphic = NULL;
+  scene.clear();
+}
+
 void RouteWindow::on_run_list_itemSelectionChanged()
 {
-  scene.clear();
+  clear_scene();
   QPen route_pen,run_pen;
   route_pen.setColor(Qt::green);
   route_pen.setCosmetic(true);
@@ -137,6 +143,7 @@ void RouteWindow::on_run_list_itemSelectionChanged()
   run_pen.setCosmetic(true);
 
   string run_path;
+  current_run = NULL;
 
   try {
     Route route;
@@ -150,13 +157,14 @@ void RouteWindow::on_run_list_itemSelectionChanged()
       int selected_row = selected_list.at(i).row();
       string run_name = ui->run_list->item(selected_row,0)->text().toStdString();
       try {
-        Route run;
+        unique_ptr<Route> r(new Route());
+        current_run = std::move(r);
         string run_path = file_names.path_file_path(get_track_name(),get_route_name(),run_name);
-        run.load_from_file(run_path.c_str());
+        current_run->load_from_file(run_path.c_str());
         if(i==0) {
-          show_run_data(run);
+          show_run_data(*current_run);
         }
-        add_route_to_scene(scene, run, run_pen);
+        add_route_to_scene(scene, *current_run, run_pen);
       }
       catch (...){
         string m = "could not load run" + run_name;
@@ -211,5 +219,28 @@ void RouteWindow::show_run_data(Route &run)
 
   }
   t.resizeColumnsToContents();
+
+}
+
+void RouteWindow::on_run_data_itemSelectionChanged()
+{
+  QModelIndexList selected_list = ui->run_data->selectionModel()->selectedRows();
+  if(selected_list.size()==1) {
+    int selected_row = selected_list.at(0).row();
+
+    QPen car_pen;
+    car_pen.setColor(Qt::black);
+    car_pen.setCosmetic(true);
+    car_pen.setWidth(2);
+
+    RouteNode & node = current_run->nodes[selected_row];
+
+
+    if(car_graphic){
+      scene.removeItem(car_graphic);
+    }
+    car_graphic = (QGraphicsItem*) scene.addEllipse(node.front_x-0.5,-node.front_y-0.5,1,1,car_pen);
+
+  }
 
 }
