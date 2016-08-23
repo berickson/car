@@ -74,6 +74,14 @@ public:
     return reading_count;
   }
 
+  int get_esc() {
+    return current_dynamics.esc;
+  }
+
+  int get_str() {
+    return current_dynamics.str;
+  }
+
   double get_voltage(){
     return current_dynamics.battery_voltage;
   };
