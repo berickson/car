@@ -53,8 +53,8 @@ void Camera::prepare_video_writer(string path)
 {
   cv::Size frame_size = cv::Size((int) cap.get(CV_CAP_PROP_FRAME_WIDTH),    // Acquire input size
                 (int) cap.get(CV_CAP_PROP_FRAME_HEIGHT));
-  int fourcc = (int) cap.get(CV_CAP_PROP_FOURCC);
-  fourcc == CV_FOURCC('M','J','P','G');
+  // int fourcc = (int) cap.get(CV_CAP_PROP_FOURCC);
+  int fourcc = CV_FOURCC('M','J','P','G');
   fps = (int) cap.get(CV_CAP_PROP_FPS);
   fps = 10;
   bool is_color = true;
@@ -256,3 +256,4 @@ void test_stereo_camera() {
 
 
 }
+
