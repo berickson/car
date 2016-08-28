@@ -65,7 +65,7 @@ string Driver::drive_route(Route & route) {
   ui.refresh();
   try {
     car.set_rc_mode();
-    while(ui.getkey() == -1) {
+    while(true) {
       if(ui.getkey()!=-1) {
         error_text = "run aborted by user";
         break;
