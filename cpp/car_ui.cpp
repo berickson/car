@@ -56,7 +56,7 @@ int CarUI::getkey() {
   if(k > 0) {
     return k;
   }
-  k = getch();
+  //k = getch();
   return k;
 }
 
