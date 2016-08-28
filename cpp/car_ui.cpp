@@ -56,8 +56,9 @@ int CarUI::getkey() {
   if(k > 0) {
     return k;
   }
+  return -1;
   //k = getch();
-  return k;
+  //return k;
 }
 
 void CarUI::bold(bool b)
