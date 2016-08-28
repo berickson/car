@@ -33,7 +33,7 @@ using namespace std;
 
 int main(int, char *[]) {
   try {
-    //run_car_menu();
+    run_car_menu();
 
     //test_ackerman();
     //test_camera();
@@ -49,7 +49,7 @@ int main(int, char *[]) {
     //test_pi_buttons();
     //test_route();
     //test_split();
-    test_stereo_camera();
+    //test_stereo_camera();
     //test_system();
     //test_tracker();
     //test_usb();
