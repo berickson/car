@@ -26,12 +26,13 @@ private slots:
 
   void on_run_list_itemSelectionChanged();
 
-  void on_k_smooth_slider_valueChanged();
   double get_k_smooth();
 
   void show_run_data(Route & run);
 
   void on_run_data_itemSelectionChanged();
+
+  void on_run_position_slider_valueChanged(int value);
 
 private:
   QGraphicsItem * car_graphic = NULL;

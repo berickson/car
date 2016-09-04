@@ -114,11 +114,11 @@ string RouteWindow::get_run_name()
 
 void add_route_to_scene(QGraphicsScene & scene, Route & r,QPen &pen) {
   QPainterPath path;
-  RouteNode & n = r.nodes.at(0);
-  path.moveTo(n.front_x, -n.front_y);
+  RouteNode * n = & r.nodes.at(0);
+  path.moveTo(n->front_x, -n->front_y);
   for(unsigned i = 1; i< r.nodes.size(); i++) {
-    n = r.nodes.at(i);
-    path.lineTo(n.front_x,-n.front_y);
+    n = &r.nodes.at(i);
+    path.lineTo(n->front_x,-n->front_y);
   }
   scene.addPath(path,pen);
 
@@ -165,6 +165,7 @@ void RouteWindow::on_run_list_itemSelectionChanged()
           show_run_data(*current_run);
         }
         add_route_to_scene(scene, *current_run, run_pen);
+        ui->run_position_slider->setMaximum(current_run->nodes.size());
       }
       catch (...){
         string m = "could not load run" + run_name;
@@ -184,18 +185,14 @@ void RouteWindow::on_run_list_itemSelectionChanged()
 }
 
 
-void RouteWindow::on_k_smooth_slider_valueChanged() {
-  on_run_list_itemSelectionChanged();
-  ui->k_smooth_value_label->setText(QString::number(get_k_smooth(),'.',2));
-}
 
 double RouteWindow::get_k_smooth() {
-  return ui->k_smooth_slider->value()/100.;
+  return ui->run_position_slider->value()/100.;
 }
 
 void RouteWindow::show_run_data(Route &run)
 {
-   QTableWidget &t = *(ui->run_data);
+  QTableWidget &t = *(ui->run_data);
   t.clear();
   QStringList labels;
   labels << "secs" << "str" << "esc" << "front_x" << "front_y" << "heading" << "velocity";
@@ -227,6 +224,7 @@ void RouteWindow::on_run_data_itemSelectionChanged()
   QModelIndexList selected_list = ui->run_data->selectionModel()->selectedRows();
   if(selected_list.size()==1) {
     int selected_row = selected_list.at(0).row();
+    ui->run_position_slider->setValue(selected_row);
 
     QPen car_pen;
     car_pen.setColor(Qt::black);
@@ -239,8 +237,16 @@ void RouteWindow::on_run_data_itemSelectionChanged()
     if(car_graphic){
       scene.removeItem(car_graphic);
     }
-    car_graphic = (QGraphicsItem*) scene.addEllipse(node.front_x-0.5,-node.front_y-0.5,1,1,car_pen);
+    double car_width = .5;
+    car_graphic = (QGraphicsItem*) scene.addEllipse(
+          node.front_x-car_width/2,
+          -node.front_y-car_width/2,car_width,car_width,car_pen);
 
   }
 
+}
+
+void RouteWindow::on_run_position_slider_valueChanged(int value)
+{
+  ui->run_data->selectRow(value);
 }

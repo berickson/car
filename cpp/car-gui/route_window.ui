@@ -120,7 +120,7 @@
        </layout>
       </widget>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -128,7 +128,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="k_smooth_value_label">
+          <widget class="QLabel" name="run_position_label">
            <property name="minimumSize">
             <size>
              <width>50</width>
@@ -144,7 +144,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QSlider" name="k_smooth_slider">
+          <widget class="QSlider" name="run_position_slider">
            <property name="minimum">
             <number>0</number>
            </property>

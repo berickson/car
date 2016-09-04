@@ -27,7 +27,7 @@ void CarUI::init()
   noecho(); // don't display characters
   raw();    // read keys immediately
   getmaxyx(stdscr,h,w); // get screen size y,x
-  timeout(100); // timeout for key presses in ms
+  timeout(0); // timeout for key presses in ms
   initialized = true;
 }
 
@@ -56,9 +56,8 @@ int CarUI::getkey() {
   if(k > 0) {
     return k;
   }
-  return -1;
-  //k = getch();
-  //return k;
+  k = getch();
+  return k;
 }
 
 void CarUI::bold(bool b)
