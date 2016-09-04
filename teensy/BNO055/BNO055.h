@@ -1,5 +1,5 @@
 #pragma once
-#include <arduino.h>
+#include <Arduino.h>
 #include <Wire.h>
 #include "BNODEFS.h"
 
@@ -14,6 +14,7 @@ class BNO055 {
 	uint8_t meas_units, opmode;
 	uint8_t init(POWER_MODE _Power, OPERATION_MODE _Config, PLACEMENT _orientation);
 
+public:
 #ifdef MyCalibrations
 	bool printCalib(); //Print calibrations to serial monitor
 	bool loadMyCal(); //Load calibrations from EEPROM or MyCal[]
@@ -27,7 +28,6 @@ class BNO055 {
 #endif
 #endif
 
-public:
 	BNO055() { Wire.begin(); }
 	//if orientation is > 7 you need to call orientation yourself before begin. Default orient is P1 otherwise.
 	uint8_t begin(POWER_MODE _Power_Mode, OPERATION_MODE _Operation_Mode, PLACEMENT _orientation=PLACEMENT::P1, bool _Load=false, uint8_t _ResetPin=255, uint8_t _AddressPin=255, bool _SlaveHigh=false); 

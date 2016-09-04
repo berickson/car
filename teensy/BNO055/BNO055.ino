@@ -5,8 +5,10 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   while (!Serial) {};
+  Serial.print("starting mpu...");
   mpu.setTempSource(true);
-  mpu.begin(POWER_MODE::NORMAL, OPERATION_MODE::FUSION_NDOF_NORMAL, PLACEMENT::P4, true); //P2
+  mpu.begin(POWER_MODE::NORMAL, OPERATION_MODE::FUSION_NDOF_NORMAL, PLACEMENT::P1, false); //P2
+  Serial.println("done");
 }
 float data[3]{0.0,0.0,0.0};
 bool calib = false;
@@ -14,13 +16,20 @@ void Calprint();
 void HRPprint();
 void accelprint();
 
+
+bool print_calibration = false;
+bool print_eulers = false;
+
 void loop() {
   if (Serial.available() > 0) {
     char c = Serial.read();
     if (c=='s') mpu.saveCalib();
     if (c=='l') mpu.loadCalib();
-    if (c=='c') Calprint();
-    if (c=='e') HRPprint();
+    if (c=='c') print_calibration = !print_calibration;
+    
+    if (c=='e') {
+      print_eulers = !print_eulers;
+    }
     if (c=='a') accelprint();
     if (c=='t') {
       Serial.print("Temperature: ");
@@ -31,7 +40,9 @@ void loop() {
       mpu.saveCalib();
       calib=true;
     }
-    delay(500);
+    if(print_eulers) HRPprint();
+    if(print_calibration) Calprint();
+    delay(10);
 }
 
 void Calprint() {
@@ -44,13 +55,13 @@ void Calprint() {
 }
 
 void HRPprint() {
-  Serial.println("Eulers:");
+  Serial.print("Eulers - ");
   mpu.getEuler(data);
   Serial.print("Heading: ");
-  Serial.println(data[0]);
-  Serial.print("Roll: ");
-  Serial.println(data[1]);
-  Serial.print("Pitch: ");
+  Serial.print(data[0]);
+  Serial.print("  Roll: ");
+  Serial.print(data[1]);
+  Serial.print("  Pitch: ");
   Serial.println(data[2]);
 }
 
