@@ -27,6 +27,7 @@ struct Angle {
   double radians() const;
   double degrees() const;
   void set_degrees(double d);
+  void set_radians(double theta);
 
   void standardize();
 

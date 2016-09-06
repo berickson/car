@@ -67,6 +67,7 @@ public:
   double cte = 0;
   double progress = 0;
   bool done = false;
+  Angle get_curvature_at_current_position();
 };
 
 void test_route();

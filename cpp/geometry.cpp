@@ -74,6 +74,11 @@ void Angle::set_degrees(double d) {
   theta = d * M_PI/180.;
 }
 
+void Angle::set_radians(double theta_)
+{
+  theta = theta_;
+}
+
 void Angle::standardize() {
   theta = fmod(theta + M_PI , 2.*M_PI) - M_PI;
 }

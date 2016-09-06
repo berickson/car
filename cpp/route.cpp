@@ -74,6 +74,28 @@ Angle Route::heading()
 bool is_nan(double __x)
   { return __builtin_isnan(__x); }
 
+// returns curvature in radians per meter
+Angle Route::get_curvature_at_current_position() {
+
+  Angle start_angle;
+
+  Point p1 = nodes[index].get_front_position();
+  Point p2 = nodes[index+1].get_front_position();
+  // get the start angle
+  if(index == 0) {
+    start_angle.set_radians(0);
+  } else {
+    Point p0 = nodes[index-1].get_front_position();
+    start_angle = angle_to(p0, p1);
+  }
+  Angle end_angle = angle_to(p1,p2);
+
+  return (end_angle - start_angle) / distance(p2,p1);
+
+
+
+}
+
 void Route::set_position(Point front, Point rear, double velocity)
 {
   const double stopped_velocity = 0.01;
@@ -399,7 +421,24 @@ void test_circle() {
 
 }
 
+void test_curvature() {
+  Route r;
+  r.add_node(RouteNode(0,0));
+  r.add_node(RouteNode(1,0));
+  r.add_node(RouteNode(2,.5));
+  r.add_node(RouteNode(3,0));
+  r.add_node(RouteNode(4,0));
+  r.add_node(RouteNode(5,0));
+  r.add_node(RouteNode(6,0));
+  for(double d = 0; d < 8.; d+=0.1) {
+    r.set_position(Point(d,0),Point(d-1,0),1.0);
+    cout << "d: " << d << " c: "<< r.get_curvature_at_current_position().degrees() << endl;
+  }
+}
+
 void test_route() {
+  test_curvature();
+  return;
   // test_circle();
   Route r;
   r.load_from_file("/home/brian/car/tracks/sidewalk/routes/K/path.csv");
