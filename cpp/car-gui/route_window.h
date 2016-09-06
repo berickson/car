@@ -8,6 +8,12 @@
 #include "../route.h"
 #include <memory>
 
+
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+
+QT_CHARTS_USE_NAMESPACE
+
 namespace Ui {
 class RouteWindow;
 }
@@ -46,6 +52,12 @@ private:
   string get_route_name();
   string get_run_name();
   void clear_scene();
+  void add_chart(Route & run);
+  QChart * line_chart = nullptr;
+  QChartView * chart_view = nullptr;
+
+  void hide_run_data();
+  void remove_line_chart();
 };
 
 #endif // ROUTE_WINDOW_H

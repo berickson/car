@@ -2,6 +2,10 @@
 #include "ui_route_window.h"
 #include <QListView>
 #include <QStandardItemModel>
+
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+
 #include "../run_settings.h"
 
 #include <fstream>
@@ -11,7 +15,7 @@
 #include "../route.h"
 
 using namespace std;
-
+QT_CHARTS_USE_NAMESPACE
 RouteWindow::RouteWindow(QWidget *parent) :
   QDialog(parent),
   ui(new Ui::RouteWindow)
@@ -130,6 +134,33 @@ void RouteWindow::clear_scene()
   scene.clear();
 }
 
+void RouteWindow::add_chart(Route & run)
+{
+  QLineSeries *series = new QLineSeries();
+  for(RouteNode & node: run.nodes) {
+     series->append(node.secs, node.velocity);
+  }
+  if(line_chart!=nullptr) {
+    delete line_chart;
+    line_chart = nullptr;
+  }
+
+  line_chart= new QChart();
+  line_chart->legend()->hide();
+  line_chart->addSeries(series);
+  line_chart->createDefaultAxes();
+  line_chart->setTitle("Run velocity vs. time");
+  if(chart_view != nullptr) {
+    delete chart_view;
+    chart_view = nullptr;
+  }
+  chart_view = new QChartView(line_chart);
+
+
+  chart_view->setRenderHint(QPainter::Antialiasing);
+  ui->splitter_3->addWidget(chart_view);
+}
+
 void RouteWindow::on_run_list_itemSelectionChanged()
 {
   clear_scene();
@@ -153,6 +184,7 @@ void RouteWindow::on_run_list_itemSelectionChanged()
 
     QModelIndexList selected_list = ui->run_list->selectionModel()->selectedRows();
     ui->run_data->clear();
+    hide_run_data();
     for( int i=0; i<selected_list.count(); i++) {
       int selected_row = selected_list.at(i).row();
       string run_name = ui->run_list->item(selected_row,0)->text().toStdString();
@@ -190,8 +222,28 @@ double RouteWindow::get_k_smooth() {
   return ui->run_position_slider->value()/100.;
 }
 
+void RouteWindow::hide_run_data() {
+  remove_line_chart();
+  ui->run_data->clear();
+}
+
+void RouteWindow::remove_line_chart() {
+  if(line_chart!=nullptr) {
+    delete line_chart;
+    line_chart = nullptr;
+  }
+
+  if(chart_view != nullptr) {
+    delete chart_view;
+    chart_view = nullptr;
+  }
+
+}
+
 void RouteWindow::show_run_data(Route &run)
 {
+  add_chart(run);
+
   QTableWidget &t = *(ui->run_data);
   t.clear();
   QStringList labels;
