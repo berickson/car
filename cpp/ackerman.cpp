@@ -35,12 +35,14 @@ Ackerman::Arc Ackerman::arc_to_relative_location(double x,double y) {
     arc.steer_radians = asin(clamp(l/arc.r,-.99,0.99));
     arc.arc_radians = 2*asin(c/arc.r);
     arc.arc_len = arc.r * arc.arc_radians;
+    arc.curvature = arc.arc_radians / arc.arc_len;
 
   } else {
     arc.r = 1.0E100;
     arc.steer_radians = 0.0;
     arc.arc_radians = 0.0;
     arc.arc_len = distance(0.0,0.0,x,y);
+    arc.curvature = 0.0;
   }
 
   if(y < 0.)

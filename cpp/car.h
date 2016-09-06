@@ -103,6 +103,7 @@ public:
   }
 
   int steering_for_angle(Angle theta);
+  int steering_for_curvature(Angle theta_per_meter);
   Angle angle_for_steering(int str);
 
   int esc_for_velocity(double v);

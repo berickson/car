@@ -53,16 +53,24 @@ int esc_for_velocity(double goal_velocity, Car & car) {
   return esc_ms;
 }
 
-//void Driver::drive_route_2(Route & route) {
+/*
+// todo: complete drive_route_2
+void Driver::drive_route_2(Route & route) {
+
+  double p_error;
+  double i_error;
+  double d_error;
+
   // while route not done
   // update route position
 
   // calculate desired curvature
   // d_error = (car.heading  - route.heading(current_point))*car.velocity
   // deisred_curvature = route.curvature(current_point, look_ahead) + kp * error / min(speed,1) + kd * d_error
-//}
+}
+*/
 
-string Driver::drive_route(Route & route) {
+void Driver::drive_route(Route & route) {
 
   // we will set error text if something goes wrong
   string error_text = "";
@@ -84,25 +92,19 @@ string Driver::drive_route(Route & route) {
       if(!queue.try_pop(d,1000)) {
         throw (string) "timed out waiting to read dynamics";
       }
+
       auto p_front = car.get_front_position();
       auto p_rear = car.get_rear_position();
       double v = car.get_velocity();
       double ahead = d_ahead + v*t_ahead;
       route.set_position(p_front, p_rear, v);
 
-      Angle steering_angle = steering_angle_by_look_ahead(route, ahead);
+      //Angle steering_angle = steering_angle_by_look_ahead(route, ahead);
+      Angle curvature = curvature_by_look_ahead(route,ahead);
 
-      unsigned str = car.steering_for_angle(steering_angle);
+      unsigned str = car.steering_for_curvature(curvature);
       unsigned esc = esc_for_velocity(route.get_velocity(), car);
 
-      /*
-      ui.clear();
-      ui.print((string) "p_front: " + p_front.to_string());
-      ui.print((string) "position: " + route.get_position_ahead(0).to_string());
-      ui.print((string) "ahead: " + to_string(ahead));
-
-      ui.refresh();
-      */
 
       if(route.done && fabs(car.get_velocity()) < 0.05)
         break;
@@ -117,7 +119,7 @@ string Driver::drive_route(Route & route) {
   car.set_esc_and_str(1500,1500);
   car.set_manual_mode();
   car.remove_listener(&queue);
-  return error_text; // todo: why not throw?
+  if(error_text.size() > 0) throw error_text;
 }
 
 Angle Driver::steering_angle_by_cte(Route &route) {
@@ -135,7 +137,7 @@ Angle Driver::steering_angle_by_cte(Route &route) {
   return steering_angle;
 }
 
-Angle Driver::steering_angle_by_look_ahead(Route &route, double look_ahead)
+Angle Driver::curvature_by_look_ahead(Route &route, double look_ahead)
 {
   double v = car.get_velocity();
   if(v<0)
@@ -149,7 +151,7 @@ Angle Driver::steering_angle_by_look_ahead(Route &route, double look_ahead)
   double ahead = d*cos(delta.radians());
   double left = d*sin(delta.radians());
   auto arc = car.ackerman.arc_to_relative_location(ahead, left);
-  return Angle::radians(arc.steer_radians);
+  return Angle::radians(arc.curvature);
 }
 
 
@@ -190,8 +192,8 @@ void test_driver() {
         cout << "look_ahead: " << look_ahead
              << " (" << n_ahead.front_x
              << " ," << n_ahead.front_y << ")"
-             << " steering angle: "
-             << driver.steering_angle_by_look_ahead(route, look_ahead).degrees()
+             << " curvature: "
+             << driver.curvature_by_look_ahead(route, look_ahead).degrees()
              << endl;
     }
 }

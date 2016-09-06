@@ -198,6 +198,28 @@ Angle Car::get_heading() {
   return a;
 }
 
+
+int Car::steering_for_curvature(Angle theta_per_meter) {
+  static const LookupTable t(
+  {
+    {-85.1, 1929},
+    {-71.9, 1839},
+    {-58.2, 1794},
+    {-44.1,1759},
+    {-29.6, 1678},
+    {-14.8, 1599},
+    {0, 1521},
+    {14.8, 1461},
+    {29.6,1339},
+    {44.0,1306},
+    {58.2,1260},
+    {71.9,1175},
+    {85.1,1071}
+
+  });
+  return (int) t.lookup(theta_per_meter.degrees());
+}
+
 int Car::steering_for_angle(Angle theta)
 {
   static const LookupTable t(

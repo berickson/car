@@ -175,7 +175,12 @@ void run_car_menu() {
     string recording_file_path = f.recording_file_path(track_name, route_name, run_name);
     car.begin_recording_input(recording_file_path);
     Driver d(car,ui,run_settings);
-    string error_text = d.drive_route(rte);
+    std::string error_text = "";
+    try {
+      d.drive_route(rte);
+    } catch (std::string e) {
+      error_text = e;
+    }
     if(run_settings.capture_video) {
       camera.end_recording();
     }

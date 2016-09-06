@@ -5,6 +5,8 @@
 #include <iomanip>
 #include "string_utils.h"
 
+// todo:  make separate object for current location
+
 void Route::add_node(RouteNode node){
   nodes.push_back(node);
 }
@@ -91,9 +93,23 @@ Angle Route::get_curvature_at_current_position() {
   Angle end_angle = angle_to(p1,p2);
 
   return (end_angle - start_angle) / distance(p2,p1);
+}
 
+Angle Route::get_heading_at_current_position()
+{
+  Angle start_angle;
 
-
+  Point p1 = nodes[index].get_front_position();
+  Point p2 = nodes[index+1].get_front_position();
+  // get the start angle
+  if(index == 0) {
+    start_angle.set_radians(0);
+  } else {
+    Point p0 = nodes[index-1].get_front_position();
+    start_angle = angle_to(p0, p1);
+  }
+  Angle end_angle = angle_to(p1,p2);
+  return start_angle + (end_angle - start_angle) * this->progress;
 }
 
 void Route::set_position(Point front, Point rear, double velocity)
@@ -332,7 +348,7 @@ vector<Point> smooth_points(vector<Point> & path, double weight_smooth = 0.5, do
 }
 
 void Route::smooth(double k_smooth) {
-  // todo: do the sommothing piece-wise for forward and revers
+  // todo: do the sommothing piece-wise for forward and reverse
   vector<Point> path;
   for(const RouteNode & node:nodes) {
     path.push_back(node.get_front_position());
@@ -425,14 +441,18 @@ void test_curvature() {
   Route r;
   r.add_node(RouteNode(0,0));
   r.add_node(RouteNode(1,0));
-  r.add_node(RouteNode(2,.5));
+  r.add_node(RouteNode(2,.1));
   r.add_node(RouteNode(3,0));
   r.add_node(RouteNode(4,0));
   r.add_node(RouteNode(5,0));
   r.add_node(RouteNode(6,0));
   for(double d = 0; d < 8.; d+=0.1) {
     r.set_position(Point(d,0),Point(d-1,0),1.0);
-    cout << "d: " << d << " c: "<< r.get_curvature_at_current_position().degrees() << endl;
+    cout << "d: " << d
+         << " c: "<< r.get_curvature_at_current_position().degrees()
+         << "heading:  " << r.get_heading_at_current_position().degrees()
+         << endl;
+
   }
 }
 

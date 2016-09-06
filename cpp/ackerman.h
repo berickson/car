@@ -20,6 +20,7 @@ public:
     double arc_radians;
     double r;
     double arc_len;
+    double curvature; // radians per unit length of arc
   };
 
   double w; // width of front wheelbase
