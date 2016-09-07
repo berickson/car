@@ -55,22 +55,6 @@ int esc_for_velocity(double goal_velocity, Car & car) {
   return esc_ms;
 }
 
-/*
-// todo: complete drive_route_2
-void Driver::drive_route_2(Route & route) {
-
-  double p_error;
-  double i_error;
-  double d_error;
-
-  // while route not done
-  // update route position
-
-  // calculate desired curvature
-  // d_error = (car.heading  - route.heading(current_point))*car.velocity
-  // deisred_curvature = route.curvature(current_point, look_ahead) + kp * error / min(speed,1) + kd * d_error
-}
-*/
 
 void Driver::drive_route(Route & route) {
 

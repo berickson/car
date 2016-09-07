@@ -5,6 +5,7 @@
 #include <functional>
 #include "car_ui.h"
 #include <unistd.h> // usleep
+#include "system.h"
 
 void ConsoleMenu::run() {
   ui.init();
@@ -100,29 +101,7 @@ void ConsoleMenu::display() {
 
 
 
-#include <ctime>
-#include <chrono>
 
-using namespace chrono;
-
-
-std::string time_string(std::chrono::system_clock::time_point &tp)
-{
-    auto ttime_t = system_clock::to_time_t(tp);
-
-    std::tm * ttm = localtime(&ttime_t);
-    char date_time_format[] = "%Y-%m-%d %H:%M:%S";
-    char time_str[100];
-    strftime(time_str, 99, date_time_format, ttm);
-
-    return time_str;
-}
-
-string time_string() {
-  system_clock::time_point t = system_clock::now();
-
-  return time_string(t);
-}
 
 string letter = "a";
 string get_letter() {

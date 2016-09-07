@@ -27,7 +27,8 @@ SOURCES += main.cpp \
     camera.cpp \
     tracker.cpp \
     file_names.cpp \
-    frame_grabber.cpp
+    frame_grabber.cpp \
+    logger.cpp
 
 HEADERS += \
     geometry.h \
@@ -55,7 +56,8 @@ HEADERS += \
     camera.h \
     tracker.h \
     file_names.h \
-    frame_grabber.h
+    frame_grabber.h \
+    logger.h
 
 
 

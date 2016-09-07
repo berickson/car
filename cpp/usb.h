@@ -22,6 +22,7 @@ private:
   bool running = false;
   bool quit = false;
   void monitor_incoming_data();
+  void monitor_incoming_data_thread();
   void send_to_listeners(string s);
   void process_data(string data);
   string leftover_data;

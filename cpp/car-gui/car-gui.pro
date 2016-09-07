@@ -37,7 +37,8 @@ SOURCES += main.cpp\
     ../tracker.cpp \
     route_window.cpp \
     ../file_names.cpp \
-    ../frame_grabber.cpp
+    ../frame_grabber.cpp \
+    ../logger.cpp
 
 HEADERS  += main_window.h \
     ../ackerman.h \

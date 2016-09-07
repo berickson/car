@@ -5,7 +5,7 @@
 #include <list>
 #include <vector>
 #include <fstream>
-
+#include <chrono>
 
 
 using namespace std;
@@ -31,5 +31,13 @@ void test_system();
 string get_home_folder();
 
 std::vector<std::string> glob(const string& pat);
+
+
+// returns a formated time string for time point
+std::string time_string(std::chrono::system_clock::time_point &tp);
+
+// returns a formatted time string for now
+string time_string();
+
 
 #endif // SYSTEM_H

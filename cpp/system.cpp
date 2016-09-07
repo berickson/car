@@ -13,6 +13,10 @@
 #include <arpa/inet.h>
 #include <dirent.h>
 
+#include <ctime>
+#include <chrono>
+
+
 using namespace std;
 
 
@@ -134,4 +138,22 @@ std::vector<std::string> glob(const string& pat){
 void test_system() {
     test_get_ip_addresses();
     cout << "home folder: " << get_home_folder() << endl;
+}
+
+string time_string(std::chrono::system_clock::time_point &tp)
+{
+  auto ttime_t = std::chrono::system_clock::to_time_t(tp);
+
+  std::tm * ttm = localtime(&ttime_t);
+  char date_time_format[] = "%Y-%m-%d %H:%M:%S";
+  char time_str[100];
+  strftime(time_str, 99, date_time_format, ttm);
+
+  return time_str;
+}
+
+string time_string() {
+  std::chrono::system_clock::time_point t = std::chrono::system_clock::now();
+
+  return time_string(t);
 }

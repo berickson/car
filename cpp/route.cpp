@@ -348,7 +348,6 @@ vector<Point> smooth_points(vector<Point> & path, double weight_smooth = 0.5, do
 }
 
 void Route::smooth(double k_smooth) {
-  // todo: do the sommothing piece-wise for forward and reverse
   vector<Point> path;
   for(const RouteNode & node:nodes) {
     path.push_back(node.get_front_position());

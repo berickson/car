@@ -10,6 +10,7 @@
 #include "ends_with.h"
 #include "split.h"
 #include "system.h"
+#include "logger.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -98,6 +99,18 @@ void make_raw(int fd) {
 	tcsetattr(fd, TCSANOW, &settings);
 }
 
+void Usb::monitor_incoming_data_thread() {
+  log_info("begining usb monitor thread");
+  try {
+    monitor_incoming_data();
+    log_info("exiting usb monitor thread normally");
+  }
+  catch(...) {
+    log_error("usb monitoring thread exiting because of unknown exception");
+  }
+
+}
+
 void Usb::monitor_incoming_data() {
   const int buf_size = 200;
   char buf[buf_size];
@@ -169,7 +182,7 @@ void Usb::monitor_incoming_data() {
 
 
 void Usb::run(){
-  run_thread = thread(&Usb::monitor_incoming_data,this);
+  run_thread = thread(&Usb::monitor_incoming_data_thread,this);
 }
 
 void Usb::stop(){
