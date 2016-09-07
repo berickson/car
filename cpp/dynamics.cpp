@@ -104,5 +104,8 @@ void test_dynamics() {
   bool ok = Dynamics::from_log_string(d,s);
   cout << "ok:" << ok;
   cout << "log string: " << s << endl;
-  cout << "from_log_string(s): " << d.to_string() << endl;
+  cout << "d.tostring(): " << d.to_string() << endl;
+  Dynamics d2 = d;
+  cout << "d2.tostring(): " << d2.to_string() << endl;
+
 }

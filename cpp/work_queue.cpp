@@ -1,11 +1,13 @@
 #include "work_queue.h"
 #include "iostream"
+#include <string>
 
 using namespace std;
 
 void test_work_queue() {
   WorkQueue<string> q;
-  q.push("hello");
+  string t = "hello";
+  q.push(t);
   string s;
   if(q.try_pop(s, 500)){
     cout << "got " << s << " from queue" << endl;

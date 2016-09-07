@@ -49,7 +49,7 @@ void Car::process_line_from_log(string line) {
   if(ok) {
     apply_dynamics(d);
     for(auto listener:listeners) {
-      listener->push(std::move(d));
+      listener->push(d);
     }
   }
   else {

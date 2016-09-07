@@ -15,10 +15,10 @@ class WorkQueue {
   std::condition_variable cv;
 
 public:
-  void push(T&& s) {
+  void push(T& s) {
     {
       std::lock_guard<std::mutex> lock(q_mutex);
-      q.push(std::move(s));
+      q.push(s);
     }
 
     cv.notify_one();
@@ -31,7 +31,7 @@ public:
       if (cv.wait_for(lock, timeout) == std::cv_status::timeout )
         return false;
     }
-    s = std::move(q.front());
+    s = q.front();
     q.pop();
 
     return true;
