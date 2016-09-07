@@ -59,10 +59,10 @@ void RouteWindow::on_route_list_itemSelectionChanged()
   if(selection.size()==1) {
     //ui->run_list->clear();
     ui->run_list->setRowCount(0);
-    ui->run_list->setColumnCount(3);
+    ui->run_list->setColumnCount(5);
     ui->run_list->setSortingEnabled(true);
     QStringList labels;
-    labels << "run" << "a" << "v";
+    labels << "run" << "a" << "v" << "k_p" << "k_d";
     ui->run_list->setHorizontalHeaderLabels(labels);
     ui->run_list->verticalHeader()->setVisible(false);
     auto run_names = file_names.get_run_names(get_track_name(), get_route_name());
@@ -79,8 +79,10 @@ void RouteWindow::on_route_list_itemSelectionChanged()
       ui->run_list->setItem(row,0,new QTableWidgetItem(run_name.c_str()));
       ui->run_list->setItem(row,1,new QTableWidgetItem(QString::number(run_settings.max_a)));
       ui->run_list->setItem(row,2,new QTableWidgetItem(QString::number(run_settings.max_v)));
-
+      ui->run_list->setItem(row,3,new QTableWidgetItem(QString::number(run_settings.k_p)));
+      ui->run_list->setItem(row,4,new QTableWidgetItem(QString::number(run_settings.k_d)));
     }
+    ui->run_list->resizeColumnsToContents();
   }
   if(ui->run_list->rowCount() > 0) {
     ui->run_list->selectRow(0);
@@ -136,7 +138,7 @@ void RouteWindow::clear_scene()
 
 void RouteWindow::add_chart(Route & run)
 {
-  QLineSeries *series = new QLineSeries();
+  series = new QLineSeries();
   for(RouteNode & node: run.nodes) {
      series->append(node.secs, node.velocity);
   }
@@ -155,6 +157,12 @@ void RouteWindow::add_chart(Route & run)
     chart_view = nullptr;
   }
   chart_view = new QChartView(line_chart);
+
+  QPen car_pen;
+  car_pen.setColor(Qt::black);
+  car_pen.setCosmetic(true);
+  car_pen.setWidth(5);
+  chart_marker = chart_view->scene()->addEllipse(0,0,10,10,car_pen);
 
 
   chart_view->setRenderHint(QPainter::Antialiasing);
@@ -197,7 +205,7 @@ void RouteWindow::on_run_list_itemSelectionChanged()
           show_run_data(*current_run);
         }
         add_route_to_scene(scene, *current_run, run_pen);
-        ui->run_position_slider->setMaximum(current_run->nodes.size());
+        ui->run_position_slider->setMaximum(current_run->nodes.size()-1);
       }
       catch (...){
         string m = "could not load run" + run_name;
@@ -247,7 +255,7 @@ void RouteWindow::show_run_data(Route &run)
   QTableWidget &t = *(ui->run_data);
   t.clear();
   QStringList labels;
-  labels << "secs" << "str" << "esc" << "front_x" << "front_y" << "heading" << "velocity";
+  labels << "secs" << "str" << "esc" << "front_x" << "front_y" << "heading" << "velocity" << "crv";
   t.setColumnCount(labels.size());
   t.setRowCount(run.nodes.size());
   t.horizontalHeader()->setVisible(true);
@@ -255,7 +263,7 @@ void RouteWindow::show_run_data(Route &run)
   t.setHorizontalHeaderLabels(labels);
   t.verticalHeader()->setVisible(false);
   for(unsigned int i = 0; i < run.nodes.size(); i++) {
-    RouteNode & node = run.nodes[i];
+    const RouteNode & node = run.nodes[i];
     int col=-1;
 
     t.setItem(i,++col,new QTableWidgetItem(QString::number(node.secs)));
@@ -265,6 +273,17 @@ void RouteWindow::show_run_data(Route &run)
     t.setItem(i,++col,new QTableWidgetItem(QString::number(node.front_y)));
     t.setItem(i,++col,new QTableWidgetItem(QString::number(node.heading)));
     t.setItem(i,++col,new QTableWidgetItem(QString::number(node.velocity)));
+    if(i>0) {
+      const RouteNode & prev = run.nodes[i-1];
+      double ds = distance(prev.get_front_position(),node.get_front_position());
+      Angle dtheta = (Angle::degrees(node.heading) - Angle::degrees(prev.heading));
+      dtheta.standardize();
+      double curvature = NAN;
+      if(ds > 0 ) {
+        curvature = dtheta.degrees()/ds;
+      }
+      t.setItem(i,++col,new QTableWidgetItem(QString::number(curvature)));
+    }
 
   }
   t.resizeColumnsToContents();
@@ -301,4 +320,14 @@ void RouteWindow::on_run_data_itemSelectionChanged()
 void RouteWindow::on_run_position_slider_valueChanged(int value)
 {
   ui->run_data->selectRow(value);
+
+
+
+
+  QPointF pos = line_chart->mapToPosition(series->at(value));
+  auto x =3;
+  pos.setX(pos.x()-chart_marker->boundingRect().width()/2+x);
+  pos.setY(pos.y()-chart_marker->boundingRect().height()/2+x);
+
+  chart_marker->setPos(pos);
 }

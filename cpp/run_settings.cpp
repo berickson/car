@@ -71,6 +71,10 @@ void RunSettings::load_from_file(string path)
       this->d_ahead = stod(value);
     else if (name == "t_ahead")
       this->t_ahead = stod(value);
+    else if (name == "k_p")
+      this->k_p = stod(value);
+    else if (name == "k_d")
+      this->k_d = stod(value);
     else if (name == "k_smooth")
       this->k_smooth = stod(value);
     else if (name == "capture_video")

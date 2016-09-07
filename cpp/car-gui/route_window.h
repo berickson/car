@@ -42,6 +42,7 @@ private slots:
 
 private:
   QGraphicsItem * car_graphic = NULL;
+  QGraphicsItem * chart_marker = NULL;
   unique_ptr<Route> current_route = NULL;
   unique_ptr<Route> current_run = NULL;
   QGraphicsScene scene;
@@ -55,6 +56,7 @@ private:
   void add_chart(Route & run);
   QChart * line_chart = nullptr;
   QChartView * chart_view = nullptr;
+  QLineSeries *series;
 
   void hide_run_data();
   void remove_line_chart();
