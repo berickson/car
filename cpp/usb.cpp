@@ -32,7 +32,7 @@ void Usb::remove_line_listener(WorkQueue<string>*listener){
 }
 
 void Usb::send_to_listeners(string s) {
-  string stamped = "0,"+s;
+  string stamped = time_string()+","+s;
   for(WorkQueue<string>* listener : line_listeners) {
     listener->push(stamped.c_str());
   }

@@ -12,6 +12,7 @@
 #include "run_settings.h"
 #include <unistd.h> // usleep
 #include "camera.h"
+#include "logger.h"
 
 #include <ncurses.h> // sudo apt-get install libncurses5-dev
 
@@ -38,8 +39,18 @@ void reboot(){
 
 }
 void restart(){
+  log_info("restarting service based on user request");
   int rv = system("sudo ./run");
+  terminate();
   assert0(rv);
+}
+void update_software() {
+  log_info("restarting based on user update request");
+  system("git pull");
+  system("./build");
+  system("sudo ./run");
+  log_info("terminating");
+
 }
 
 
@@ -100,7 +111,8 @@ double get_capture_video(){return run_settings.capture_video;}
 SubMenu pi_menu {
   {"shutdown",shutdown},
   {"reboot",reboot},
-  {"restart",restart}
+  {"restart",restart},
+  {"update software",restart}
 };
 
 
