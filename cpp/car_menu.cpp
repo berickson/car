@@ -175,9 +175,11 @@ void run_car_menu() {
     ui.refresh();
     rte.optimize_velocity(run_settings.max_v, run_settings.max_a);
     ui.print((string)"max velocity calculated at " + format(rte.get_max_velocity()) + "\n");
-    ui.print("done - press any key to play route");
+    ui.print("done - press right key to play route");
     ui.refresh();
-    ui.wait_key();
+    if(ui.wait_key()!='4') {
+      return;
+    }
 
     ui.clear();
     ui.print((string)"playing route with max velocity " + format(rte.get_max_velocity()));

@@ -23,7 +23,7 @@ public:
   int getkey();
   void bold(bool b);
 
-  void wait_key();
+  int wait_key();
   int h,w;
 
 private:

@@ -68,9 +68,12 @@ void CarUI::bold(bool b)
     attroff(A_BOLD);
 }
 
-void CarUI::wait_key() {
-  while(getch()==-1 && buttons().get_press()==0) {
+int CarUI::wait_key() {
+  while(true) {
+  int c = getkey();
+    if(c!= -1) {
+      return c;
+    }
     usleep(1000);
-  }
-  return;
+  }\
 }
