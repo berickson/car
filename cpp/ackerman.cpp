@@ -34,8 +34,9 @@ Ackerman::Arc Ackerman::arc_to_relative_location(double x,double y) {
     arc.r = length(z,c);
     arc.steer_radians = asin(clamp(l/arc.r,-.99,0.99));
     arc.arc_radians = 2*asin(c/arc.r);
+    cout << "arc_radians: " << arc.arc_radians << endl;
     arc.arc_len = arc.r * arc.arc_radians;
-    arc.curvature = arc.arc_radians / arc.arc_len;
+    arc.curvature = 1 / arc.r;
 
   } else {
     arc.r = 1.0E100;
@@ -45,8 +46,10 @@ Ackerman::Arc Ackerman::arc_to_relative_location(double x,double y) {
     arc.curvature = 0.0;
   }
 
-  if(y < 0.)
+  if(y < 0.) {
     arc.steer_radians = -arc.steer_radians;
+    arc.curvature = -arc.curvature;
+  }
   return arc;
 
 }

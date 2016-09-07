@@ -178,8 +178,8 @@ void test_driver() {
     n.front_x += 10;
     n.rear_x += 10;
     route.add_node(n);
-    n.front_y += 10;
-    n.rear_y = 10-car.wheelbase_length;
+    n.front_y = -10;
+    n.rear_y = -10-car.wheelbase_length;
     route.add_node(n);
     route.optimize_velocity();
     cout << route.to_string() << endl;
