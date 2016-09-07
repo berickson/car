@@ -26,6 +26,8 @@
 #include "camera.h"
 #include "tracker.h"
 
+#include "logger.h"
+
 using namespace std;
 
 
@@ -33,6 +35,7 @@ using namespace std;
 
 int main(int, char *[]) {
   try {
+    log_info("enter main");
     run_car_menu();
 
     //test_ackerman();
@@ -56,6 +59,10 @@ int main(int, char *[]) {
     //test_work_queue();
 
   } catch (string & s) {
-    cout << "caught: " << s << endl;
+    log_error(s);
+    log_error("main exiting because of erorr");
+  } catch (...) {
+    log_error("main exiting because of erorr");
   }
+  log_info("exit main");
 }

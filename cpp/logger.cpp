@@ -7,7 +7,7 @@ using namespace std;
 void log(string severity, string message)
 {
   ofstream f;
-  f.open("car_log.txt", ofstream::out | ofstream::app);
+  f.open("car_log.txt", ofstream::out | ofstream::app );
   f << time_string() << "," << severity << "," << message << endl;
 }
 
