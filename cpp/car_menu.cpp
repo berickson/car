@@ -86,6 +86,12 @@ double get_d_ahead(){return run_settings.d_ahead;}
 void set_k_smooth(double v){run_settings.k_smooth = v;}
 double get_k_smooth(){return run_settings.k_smooth;}
 
+void set_k_p(double v){run_settings.k_p = v;}
+double get_k_p(){return run_settings.k_p;}
+
+void set_k_d(double v){run_settings.k_d = v;}
+double get_k_d(){return run_settings.k_d;}
+
 void set_capture_video(double v){run_settings.capture_video = v;}
 double get_capture_video(){return run_settings.capture_video;}
 
@@ -100,6 +106,8 @@ SubMenu pi_menu {
 
 SubMenu acceleration_menu{};
 SubMenu velocity_menu{};
+SubMenu k_p_menu{};
+SubMenu k_d_menu{};
 SubMenu k_smooth_menu{};
 SubMenu t_ahead_menu{};
 SubMenu d_ahead_menu{};
@@ -265,6 +273,8 @@ void run_car_menu() {
 
   selection_menu<double>(acceleration_menu, linspace(0.25,10,0.25), get_max_a, set_max_a );
   selection_menu<double>(velocity_menu, linspace(0.5,20,0.5), get_max_v, set_max_v );
+  selection_menu<double>(k_p_menu, linspace(0.,50,1), get_k_p, set_k_p );
+  selection_menu<double>(k_d_menu, linspace(0.,2,0.1), get_k_d, set_k_d );
   selection_menu<double>(k_smooth_menu, linspace(0.,1,0.1), get_k_smooth, set_k_smooth );
   selection_menu<double>(t_ahead_menu, linspace(0.,1,0.1), get_t_ahead, set_t_ahead );
   selection_menu<double>(d_ahead_menu, linspace(0.,.1,0.01), get_d_ahead, set_d_ahead );
@@ -284,6 +294,8 @@ void run_car_menu() {
     MenuItem("record",record),
     {[](){return (string)"max_a ["+format(run_settings.max_a)+"]";},&acceleration_menu},
     {[](){return (string)"max_v ["+format(run_settings.max_v)+"]";},&velocity_menu},
+    {[](){return (string)"k_smooth ["+format(run_settings.k_p)+"]";},&k_p_menu},
+    {[](){return (string)"k_smooth ["+format(run_settings.k_d)+"]";},&k_d_menu},
     {[](){return (string)"k_smooth ["+format(run_settings.k_smooth)+"]";},&k_smooth_menu},
     {[](){return (string)"t_ahead ["+format(run_settings.t_ahead)+"]";},&t_ahead_menu},
     {[](){return (string)"d_ahead ["+format(run_settings.d_ahead)+"]";},&d_ahead_menu},

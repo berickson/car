@@ -104,9 +104,6 @@ void Driver::drive_route(Route & route) {
 
       Angle curvature = track_curvature + Angle::degrees(30) * route.cte  / (car.get_velocity()+1);
 
-
-
-
       unsigned str = car.steering_for_curvature(curvature);
       unsigned esc = esc_for_velocity(route.get_velocity(), car);
 

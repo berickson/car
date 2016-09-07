@@ -33,6 +33,8 @@ void RunSettings::write_to_file(string path) {
        << "route_name = " << route_name << endl
        << "max_a = " << max_a << endl
        << "max_v = " << max_v << endl
+       << "k_p = " << k_p << endl
+       << "k_d = " << k_d << endl
        << "t_ahead = " << t_ahead << endl
        << "d_ahead = " << d_ahead << endl
        << "k_smooth = " << k_smooth << endl

@@ -15,6 +15,8 @@ struct RunSettings{
   double t_ahead = 0.3;
   double d_ahead = 0.05;
   double k_smooth = 0.4;
+  double k_p = 30.0;
+  double k_d = 1.0;
   bool capture_video = false;
   void write_to_file(string path);
   void load_from_file(string path);
