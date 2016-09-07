@@ -36,11 +36,11 @@ using namespace std;
 int main(int, char *[]) {
   try {
     log_info("enter main");
-    //run_car_menu();
+    run_car_menu();
 
     //test_ackerman();
     //test_camera();
-    test_dynamics();
+    //test_dynamics();
     //test_car();
     //test_config();
     //test_console_menu();
