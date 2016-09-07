@@ -100,7 +100,12 @@ void Driver::drive_route(Route & route) {
       route.set_position(p_front, p_rear, v);
 
       //Angle steering_angle = steering_angle_by_look_ahead(route, ahead);
-      Angle curvature = curvature_by_look_ahead(route,ahead);
+      Angle track_curvature = curvature_by_look_ahead(route,ahead);
+
+      Angle curvature = track_curvature + Angle::degrees(30) * route.cte  / (car.get_velocity()+1);
+
+
+
 
       unsigned str = car.steering_for_curvature(curvature);
       unsigned esc = esc_for_velocity(route.get_velocity(), car);
