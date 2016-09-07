@@ -50,6 +50,7 @@ void update_software() {
   system("./build");
   system("sudo ./run");
   log_info("terminating");
+  terminate();
 
 }
 
