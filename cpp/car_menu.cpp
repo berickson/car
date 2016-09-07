@@ -113,7 +113,7 @@ SubMenu pi_menu {
   {"shutdown",shutdown},
   {"reboot",reboot},
   {"restart",restart},
-  {"update software",update_software}
+  {"update software 2",update_software}
 };
 
 
