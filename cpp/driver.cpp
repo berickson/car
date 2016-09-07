@@ -104,7 +104,14 @@ void Driver::drive_route(Route & route) {
       //Angle steering_angle = steering_angle_by_look_ahead(route, ahead);
       Angle track_curvature = curvature_by_look_ahead(route,ahead);
 
-      Angle curvature = track_curvature + Angle::degrees(30) * route.cte  / (car.get_velocity()+1);
+      // calculate derivitive term of the error
+      Angle e_heading = car.get_heading() - route.get_heading_at_current_position();
+      double d_error = sin(e_heading.radians())*v;
+      Angle d_adjust = Angle::degrees(clamp(k_d * d_error,-30,30));
+
+
+      Angle p_adjust = Angle::degrees(clamp(k_p * route.cte  / (v+1),-30,30));
+      Angle curvature = track_curvature + p_adjust + d_adjust;
 
       unsigned str = car.steering_for_curvature(curvature);
       unsigned esc = esc_for_velocity(route.get_velocity(), car);
