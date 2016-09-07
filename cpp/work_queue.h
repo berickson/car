@@ -24,15 +24,25 @@ public:
     cv.notify_one();
   }
 
-  bool try_pop(T& s, int milliseconds) {
+  bool queue_is_empty() {
     std::unique_lock<std::mutex> lock(q_mutex);
-    while(q.empty()) {
+    return q.empty();
+  }
+
+  bool try_pop(T& s, int milliseconds) {
+
+    while(queue_is_empty()) {
+      std::unique_lock<std::mutex> lock(q_mutex);
       chrono::milliseconds timeout(milliseconds);
-      if (cv.wait_for(lock, timeout) == std::cv_status::timeout )
+      if (cv.wait_for(lock, timeout) == std::cv_status::timeout ) {
         return false;
+      }
     }
-    s = q.front();
-    q.pop();
+    {
+      std::unique_lock<std::mutex> lock(q_mutex);
+      s = q.front();
+      q.pop();
+    }
 
     return true;
   }
