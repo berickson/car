@@ -11,6 +11,8 @@ Driver::Driver(Car & car, CarUI ui, RunSettings settings)
   t_ahead = settings.t_ahead;
   d_ahead = settings.d_ahead;
   k_smooth = settings.k_smooth;
+  k_p = settings.k_p;
+  k_d = settings.k_d;
 }
 
 // todo: replace all of this with a proper PID style loop
