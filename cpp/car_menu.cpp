@@ -127,13 +127,8 @@ SubMenu d_ahead_menu{};
 SubMenu capture_video_menu{};
 
 
-
 CarMenu::CarMenu() {
 }
-
-
-
-
 
 
 void run_car_menu() {
@@ -201,6 +196,7 @@ void run_car_menu() {
       d.drive_route(rte);
     } catch (std::string e) {
       error_text = e;
+      log_error(e);
     }
     if(run_settings.capture_video) {
       camera.end_recording();

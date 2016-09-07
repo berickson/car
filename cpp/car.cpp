@@ -293,23 +293,7 @@ int Car::esc_for_velocity(double v)
 }
 
 void test_car() {
-  /*
-  Car car;
-  cout << "front_wheelbase_width_in_meters: " << car.front_wheelbase_width_in_meters << endl;
 
-  WorkQueue<Dynamics> listener;
-  car.add_listener(&listener);
-  int message_count = 10000;
-  for(int i=0;i<message_count;i++) {
-    Dynamics d;
-    if(listener.try_pop(d,100)) {
-      cout << "." << flush;//cout << d.to_string() << endl;
-    } else {
-      cout << "timed out waiting for dynamics" << endl;
-    }
-  }
-  car.remove_listener(&listener);
-*/
   Car car;
   for(auto i:linspace(-35,25,5)) {
      cout << "degrees: " << i << " steering: " << car.steering_for_angle(Angle::degrees(i)) << endl;
