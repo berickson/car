@@ -12,6 +12,11 @@ void test_work_queue() {
   if(q.try_pop(s, 500)){
     cout << "got " << s << " from queue" << endl;
   }
-  bool timed_out = q.try_pop(s,500);
-  cout << "executed queue success of 0, was " << timed_out << endl;
+  bool ok = q.try_pop(s,500);
+  if(ok) {
+    cout << "failed, should have timed out" << endl;
+  }
+  else{
+    cout << "passed, timed out as expected" << endl;
+  }
 }

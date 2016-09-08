@@ -12,8 +12,9 @@ void ConsoleMenu::run() {
   // curses initialization
 
   try {
+    int i = 0;
     while(true) {
-      display();
+      if(i%5==0) display();
       usleep(30000);
 
       {
