@@ -9,6 +9,7 @@
 #include "dynamics.h"
 #include "work_queue.h"
 #include "usb.h"
+#include "speedometer.h"
 
 using namespace std;
 
@@ -35,6 +36,8 @@ public:
   Dynamics current_dynamics;
   Dynamics original_dynamics;
   int reading_count = 0;
+
+  Speedometer front_right_wheel;
 
   double velocity;
   double last_verified_velocity;

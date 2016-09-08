@@ -4,10 +4,16 @@
 #include <iostream>
 #include "lookup_table.h"
 #include "split.h"
+#include "logger.h"
+
 using namespace std;
+
+
+
 
 Car::Car(bool online) {
   read_configuration(config_path);
+  front_right_wheel.meters_per_tick = this->meters_per_odometer_tick;
   this->online = online;
   reset_odometry();
   if(online) {
@@ -117,6 +123,8 @@ void Car::apply_dynamics(Dynamics & d) {
 
 
   // update velocity
+  front_right_wheel.update_from_sensor(current.us, current.odometer_front_right_last_us, current.odometer_front_right);
+
   if (current.odometer_front_right_last_us != previous.odometer_front_right_last_us) {
     double elapsed_seconds = (current.odometer_front_right_last_us - previous.odometer_front_right_last_us) / 1000000.;
     velocity = wheel_distance_meters / elapsed_seconds;
@@ -140,6 +148,10 @@ void Car::apply_dynamics(Dynamics & d) {
           velocity = -max_possible;
       }
     }
+  }
+
+  if(velocity != front_right_wheel.velocity) {
+    log_error("car and wheel velocities do not match");
   }
 
 }

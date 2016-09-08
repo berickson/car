@@ -16,6 +16,13 @@ Driver::Driver(Car & car, CarUI ui, RunSettings settings)
   k_d = settings.k_d;
 }
 
+
+int esc_for_max_decel(Car & car) {
+  // todo: complete this function
+  return 1500;
+
+}
+
 // todo: replace all of this with a proper PID style loop
 int esc_for_velocity(double goal_velocity, Car & car) {
 
@@ -101,9 +108,9 @@ void Driver::drive_route(Route & route) {
       Angle p_adjust = Angle::degrees(clamp(k_p * route.cte  / (v+1),-30,30));
       Angle curvature = track_curvature + p_adjust + d_adjust;
 
-      unsigned str = car.steering_for_curvature(curvature);
-      unsigned esc = esc_for_velocity(route.get_velocity(), car);
 
+      unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);
+      unsigned esc = route.done ? 1500 : esc_for_velocity(route.get_velocity(), car);
 
       if(route.done && fabs(car.get_velocity()) < 0.05) {
         log_info("route completed normally");
