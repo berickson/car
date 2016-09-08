@@ -10,7 +10,6 @@ using namespace std;
 using namespace std::chrono;
 template <class T>
 class WorkQueue {
-  std::mutex cv_mutex;
   std::mutex q_mutex;
   std::queue<T> q;
   std::condition_variable cv;
@@ -25,25 +24,15 @@ public:
     cv.notify_one();
   }
 
-  bool queue_is_empty() {
-    std::unique_lock<std::mutex> lock(q_mutex);
-    return q.empty();
-  }
-
   bool try_pop(T& s, int milliseconds) {
-
-    while(queue_is_empty()) {
-      std::unique_lock<std::mutex> lock(cv_mutex);
+    std::unique_lock<std::mutex> lock(q_mutex);
+    while(q.empty()) {
       chrono::milliseconds timeout(milliseconds);
-      if (cv.wait_for(lock, timeout) == std::cv_status::timeout ) {
+      if (cv.wait_for(lock, timeout) == std::cv_status::timeout )
         return false;
-      }
     }
-    {
-      std::unique_lock<std::mutex> lock(q_mutex);
-      s = q.front();
-      q.pop();
-    }
+    s = q.front();
+    q.pop();
 
     return true;
   }
