@@ -142,6 +142,7 @@ void run_car_menu() {
 
 
   auto go = [&car,&ui]() {
+    log_info("entering go menu command");
     try {
     auto f = FileNames();
     string & track_name = run_settings.track_name;
@@ -196,6 +197,7 @@ void run_car_menu() {
     std::string error_text = "";
     try {
       d.drive_route(rte);
+      log_info("back from drive_route");
     } catch (std::string e) {
       error_text = e;
       log_error(e);
@@ -235,6 +237,7 @@ void run_car_menu() {
       ui.wait_key();
 
     }
+    log_info("exiting go menu command");
   };
 
   auto record = [&car,&ui]() {
