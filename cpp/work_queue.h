@@ -26,9 +26,9 @@ public:
 
   bool try_pop(T& s, int milliseconds) {
     std::unique_lock<std::mutex> lock(q_mutex);
-    while(q.empty()) {
+    if(q.empty()) {
       chrono::milliseconds timeout(milliseconds);
-      if (cv.wait_for(lock, timeout) == std::cv_status::timeout )
+      if (!cv.wait_for(lock, timeout,[this](){return !q.empty(); }))
         return false;
     }
     s = q.front();
