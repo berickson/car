@@ -3,6 +3,7 @@
 #include "math.h"
 #include "car_ui.h"
 #include <unistd.h> // usleep
+#include "logger.h"
 
 
 Driver::Driver(Car & car, CarUI ui, RunSettings settings)
@@ -57,6 +58,7 @@ int esc_for_velocity(double goal_velocity, Car & car) {
 
 
 void Driver::drive_route(Route & route) {
+  log_info("entering drive_route");
 
   // we will set error text if something goes wrong
   string error_text = "";
@@ -71,11 +73,13 @@ void Driver::drive_route(Route & route) {
     while(true) {
       if(ui.getkey()!=-1) {
         error_text = "run aborted by user";
+        log_info("run aborted by user");
         break;
       }
 
       Dynamics d;
       if(!queue.try_pop(d,1000)) {
+        log_error("timed out reading dynamics in drive_route");
         throw (string) "timed out waiting to read dynamics";
       }
 
@@ -101,8 +105,10 @@ void Driver::drive_route(Route & route) {
       unsigned esc = esc_for_velocity(route.get_velocity(), car);
 
 
-      if(route.done && fabs(car.get_velocity()) < 0.05)
+      if(route.done && fabs(car.get_velocity()) < 0.05) {
+        log_info("route completed normally");
         break;
+      }
       car.set_esc_and_str(esc, str);
     }
   } catch (string s) {
@@ -115,6 +121,7 @@ void Driver::drive_route(Route & route) {
   car.set_manual_mode();
   car.remove_listener(&queue);
   if(error_text.size() > 0) throw error_text;
+  log_info("exiting drive_route");
 }
 
 Angle Driver::steering_angle_by_cte(Route &route) {
