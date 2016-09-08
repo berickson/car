@@ -36,7 +36,7 @@ using namespace std;
 int main(int, char *[]) {
   try {
     log_info("enter main");
-    //run_car_menu();
+    run_car_menu();
 
     //test_ackerman();
     //test_camera();
@@ -57,7 +57,7 @@ int main(int, char *[]) {
     //test_system();
     //test_tracker();
     //test_usb();
-    test_work_queue();
+    //test_work_queue();
 
   } catch (string & s) {
     log_error(s);
