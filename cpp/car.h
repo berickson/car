@@ -38,10 +38,6 @@ public:
   int reading_count = 0;
 
   Speedometer front_right_wheel;
-
-  double velocity;
-  double last_verified_velocity;
-  double last_velocity;
   Angle heading_adjustment;
 
 
@@ -65,12 +61,13 @@ public:
     return current_dynamics.odometer_front_left;
   }
   int get_odometer_front_right() {
-    return current_dynamics.odometer_front_right;
+    return front_right_wheel.last_ticks;
   }
   int get_odometer_back_left() {
     return current_dynamics.odometer_back_left;
   }
   int get_odometer_back_right() {
+
     return current_dynamics.odometer_back_right;
   }
   int get_reading_count() {
@@ -98,7 +95,7 @@ public:
   };
 
   inline double get_velocity() {
-    return velocity;
+    return front_right_wheel.velocity;
   }
 
   inline int get_usb_error_count() {

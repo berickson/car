@@ -125,34 +125,6 @@ void Car::apply_dynamics(Dynamics & d) {
   // update velocity
   front_right_wheel.update_from_sensor(current.us, current.odometer_front_right_last_us, current.odometer_front_right);
 
-  if (current.odometer_front_right_last_us != previous.odometer_front_right_last_us) {
-    double elapsed_seconds = (current.odometer_front_right_last_us - previous.odometer_front_right_last_us) / 1000000.;
-    velocity = wheel_distance_meters / elapsed_seconds;
-    last_verified_velocity = velocity;
-  } else {
-    // no tick this time, how long has it been?
-    double seconds_since_tick = ( current.us - current.odometer_front_right_last_us) / 1000000.;
-    if (seconds_since_tick > 0.1){
-      // it's been a long time, let's call velocity zero
-      velocity = 0.0;
-    } else {
-      // we've had a tick recently, fastest possible speed is when a tick is about to happen
-      // let's use smaller of that and previously certain velocity
-      double  max_possible = meters_per_odometer_tick / seconds_since_tick;
-      if(max_possible > fabs(last_verified_velocity)){
-        velocity = last_verified_velocity;
-      } else {
-        if(last_verified_velocity > 0)
-          velocity = max_possible;
-        else
-          velocity = -max_possible;
-      }
-    }
-  }
-
-  if(velocity != front_right_wheel.velocity) {
-    log_error("car and wheel velocities do not match");
-  }
 
 }
 
@@ -188,8 +160,6 @@ void Car::reset_odometry() {
   //dynamics = Dynamics();
   original_dynamics = current_dynamics;
 
-  velocity = 0.0;
-  last_velocity = 0.0;
   heading_adjustment = Angle::degrees(0.);
 
   ackerman = Ackerman(
