@@ -14,6 +14,7 @@ void ConsoleMenu::run() {
   try {
     int i = 0;
     while(true) {
+      i++;
       if(i%5==0) display();
       usleep(30000);
 
