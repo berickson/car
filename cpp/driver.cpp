@@ -52,7 +52,7 @@ int esc_for_velocity(double goal_velocity, Car & car) {
 
     if (error > 0) {
         esc_ms = speed_up_esc;
-    } else if (error < 0.2){
+    } else if (error < -0.2){
       esc_ms = esc_for_max_decel(car);
     } else {
         esc_ms = maintain_esc;
