@@ -136,21 +136,9 @@ SubMenu capture_video_menu{};
 CarMenu::CarMenu() {
 }
 
-
-
-void run_car_menu() {
-#ifdef RASPBERRY_PI
-  Car car;
-#else
-  FakeCar car;
-#endif
-  CarUI ui;
-
-
-
-  auto go = [&car,&ui]() {
-    log_info("entering go menu command");
-    try {
+void go(Car& car, CarUI & ui) {
+  log_info("entering go menu command");
+  try {
     auto f = FileNames();
     string & track_name = run_settings.track_name;
     string & route_name = run_settings.route_name;
@@ -200,9 +188,9 @@ void run_car_menu() {
 
     string recording_file_path = f.recording_file_path(track_name, route_name, run_name);
     car.begin_recording_input(recording_file_path);
-    Driver d(car,ui,run_settings);
     std::string error_text = "";
     try {
+      Driver d(car,ui,run_settings);
       d.drive_route(rte);
       log_info("back from drive_route");
     } catch (std::string e) {
@@ -212,85 +200,96 @@ void run_car_menu() {
     if(run_settings.capture_video) {
       camera.end_recording();
     }
+    car.end_recording_input();
     ui.clear();
     ui.print("making path");
+    log_info("making path");
 
     string path_file_path = f.path_file_path(track_name, route_name, run_name);
     write_path_from_recording_file(recording_file_path, path_file_path);
 
-    car.end_recording_input();
     if(error_text.size()) {
       ui.clear();
       ui.print((string) "Error during play route: \n"+error_text);
-      ui.print(error_text);
+      log_error((string) "Error during play route: "+error_text);
+
       ui.print("press any key to continue");
       ui.refresh();
       ui.wait_key();
     } else {
       ui.clear();
-      ui.print("completed playback without error\n");
+      ui.print("playback completed OK\n");
       ui.print("press any key to continue");
       ui.refresh();
       ui.wait_key();
     }
 
-
-
-    } catch (string s) {
-      ui.clear();
-      ui.move(0,0);
-      ui.print("error: " + s);
-      ui.refresh();
-      ui.wait_key();
-
-    }
-    log_info("exiting go menu command");
-  };
-
-  auto record = [&car,&ui]() {
-    car.reset_odometry();
-    FileNames f;
-    string track_name = run_settings.track_name;
-    string route_name = f.next_route_name(track_name);
-    mkdir(f.get_routes_folder(track_name));
-    mkdir(f.get_route_folder(track_name,route_name));
-
-    StereoCamera camera;
-    if(run_settings.capture_video) {
-      camera.warm_up();
-      vector<string> video_paths = f.stereo_video_file_paths(track_name,route_name);
-      camera.begin_recording(video_paths[0],video_paths[1]);
-    }
-
-    string recording_path = f.recording_file_path(track_name,route_name);
-    car.begin_recording_input(recording_path);
-
+  } catch (string s) {
     ui.clear();
     ui.move(0,0);
-    ui.print("Recording - press any key to stop");
+    ui.print("error: " + s);
+    log_error("go caught error:" + s);
     ui.refresh();
     ui.wait_key();
 
-    car.end_recording_input();
+  }
+  log_info("exiting go menu command");
+}
 
-    if(run_settings.capture_video){
-      camera.end_recording();
-    }
+void record(Car& car, CarUI & ui) {
+  car.reset_odometry();
+  FileNames f;
+  string track_name = run_settings.track_name;
+  string route_name = f.next_route_name(track_name);
+  mkdir(f.get_routes_folder(track_name));
+  mkdir(f.get_route_folder(track_name,route_name));
 
-    ui.clear();
-    ui.print("making path");
-    ui.refresh();
+  StereoCamera camera;
+  if(run_settings.capture_video) {
+    camera.warm_up();
+    vector<string> video_paths = f.stereo_video_file_paths(track_name,route_name);
+    camera.begin_recording(video_paths[0],video_paths[1]);
+  }
 
-    string path_file_path = f.path_file_path(track_name, route_name);
-    write_path_from_recording_file(recording_path, path_file_path);
+  string recording_path = f.recording_file_path(track_name,route_name);
+  car.begin_recording_input(recording_path);
+
+  ui.clear();
+  ui.move(0,0);
+  ui.print("Recording - press any key to stop");
+  ui.refresh();
+  ui.wait_key();
+
+  car.end_recording_input();
+
+  if(run_settings.capture_video){
+    camera.end_recording();
+  }
+
+  ui.clear();
+  ui.print("making path");
+  ui.refresh();
+
+  string path_file_path = f.path_file_path(track_name, route_name);
+  write_path_from_recording_file(recording_path, path_file_path);
 
 
-    // todo: update display
-    //
-    run_settings.route_name = route_name;
-    update_route_selection_menu();
-    return;
-  };
+  // todo: update display
+  //
+  run_settings.route_name = route_name;
+  update_route_selection_menu();
+  return;
+}
+
+
+
+void run_car_menu() {
+#ifdef RASPBERRY_PI
+  Car car;
+#else
+  FakeCar car;
+#endif
+  CarUI ui;
 
   selection_menu<double>(acceleration_menu, linspace(0.25,10,0.25), get_max_a, set_max_a );
   selection_menu<double>(velocity_menu, linspace(0.5,20,0.5), get_max_v, set_max_v );
@@ -311,8 +310,8 @@ void run_car_menu() {
   SubMenu route_menu {
     {[](){return (string)"track ["+run_settings.track_name+"]";},&track_selection_menu},
     {[](){return (string)"route ["+run_settings.route_name+"]";},&route_selection_menu},
-    MenuItem("go...",go),
-    MenuItem("record",record),
+    MenuItem("go...",[&car,&ui](){go(car,ui);}),
+    MenuItem("record",[&car,&ui](){record(car,ui);}),
     {[](){return (string)"max_a ["+format(run_settings.max_a)+"]";},&acceleration_menu},
     {[](){return (string)"max_v ["+format(run_settings.max_v)+"]";},&velocity_menu},
     {[](){return (string)"k_p ["+format(run_settings.k_p)+"]";},&k_p_menu},
