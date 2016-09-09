@@ -51,14 +51,14 @@ int esc_for_velocity(double goal_velocity, Car & car) {
 
     if (error > 0) {
         esc_ms = speed_up_esc;
-    } else if (error < -0.2){
+    } else if (error < -0.5){
       esc_ms = esc_for_max_decel(car);
     } else {
         esc_ms = maintain_esc;
     }
   } else {
     // forward
-    if (error > 0.2) {
+    if (error > 0.5) {
       esc_ms = esc_for_max_decel(car);
     } else if (error > 0.) {
       esc_ms = car.esc_for_velocity(clamp(goal_velocity- 3.*error,0.1,999.));
