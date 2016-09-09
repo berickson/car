@@ -52,6 +52,7 @@ void restart(){
 }
 void update_software() {
   log_info("restarting based on user update request");
+#pragme igno
   system("git pull");
   system("./build");
   system("sudo ./run");

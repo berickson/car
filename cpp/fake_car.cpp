@@ -62,41 +62,29 @@ void write_path_from_recording_file(string recording_path, string outpath) {
 
   log_info("stepping through recording to create path");
   while(car.step()) {
-    log_trace("1");
     ++i;
-    log_trace("2");
     next = car.current_dynamics;
-    log_trace("3");
     Point p_next = car.get_front_position();
-    log_trace("3");
     int wheel_ticks = next.odometer_front_right - current.odometer_front_right;
-    log_trace("4");
     if (abs(wheel_ticks)>0 ){
-      log_trace("5");
       next_reverse = wheel_ticks < 0;
     } else {
-      log_trace("6");
       next_reverse = reverse;
     }
 
     // skip node if distance threshold hasn't been met
-    log_trace("7");
     if (distance(p,p_next) < min_length){
       continue;
     }
-    log_trace("8");
 
     reverse = next_reverse;
-    log_trace("9");
 
     double d = wheel_ticks * car.meters_per_odometer_tick;
     double wheel_meters_per_second = d / ((next.ms - current.ms) / 1000.);
-    log_trace("10");
 
     double seconds = (current.ms - start.ms)/1000.;
     Point rear_p = car.get_rear_position();
     current = next;
-    log_trace("11");
 
     outfile << seconds << ","
             << p.x << ","
@@ -109,9 +97,7 @@ void write_path_from_recording_file(string recording_path, string outpath) {
             << current.esc << ","
             << current.str << ","
             << wheel_meters_per_second << endl;
-    log_trace("12");
     p = p_next;
-    log_trace("13");
   }
   outfile.flush();
   outfile.close();
