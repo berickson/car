@@ -1,0 +1,5 @@
+git pull
+./build
+sudo killall car-service
+sudo ./run
+
