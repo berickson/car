@@ -69,6 +69,7 @@ public:
   bool done = false;
   Angle get_curvature_at_current_position();
   Angle get_heading_at_current_position();
+  double get_acceleration();
 };
 
 void test_route();

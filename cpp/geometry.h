@@ -82,6 +82,10 @@ double distance(Point p1, Point p2);
 // Kinematics
 //
 
+
+// acceleration to go from v1 to v2 in distance d
+double acceleration_for_distance_and_velocities(double x, double v1, double v2);
+
 // returns first t greater than zero that will reach position x
 double time_at_position(double x,double a,double v0,double x0=0.);
 

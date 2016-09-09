@@ -1,31 +1,6 @@
 #include "geometry.h"
 #include "iostream"
 
-void test_geometry() {
-  Angle a;
-  cout << "setting a to 30 degrees" << endl;
-  a.set_degrees(30);
-  cout << "a: " << a.to_string() << endl;
-  cout << "a.degrees(): " << a.degrees() << endl;
-  cout << "a.radians(): " << a.radians() << endl;
-  cout << " a * 2" << (a * 2).to_string();
-  a+=Angle::degrees(360);
-  cout << "adding 360 degrees" << endl;
-  cout << "a.degrees(): " << a.degrees() << endl;
-  a.standardize();
-  cout << "a.standardize() " << endl;
-  cout << "a.degrees(): " << a.degrees() << endl;
-  cout << "a /= 2" <<endl;
-  a/=2.;
-  cout << "a.degrees(): " << a.degrees() << endl;
-  cout << "a.to_string(): " << a.to_string() << endl;
-
-  a = Angle::degrees(10);
-  Angle b = Angle::degrees(20);
-  cout << "a + b " << (a+b).degrees() << endl;
-
-
-}
 
 double interpolate(double x, double x1, double y1, double x2, double y2){
   double m = (y2 - y1)/( x2 - x1 );
@@ -213,6 +188,22 @@ vector<double> linspace(double from, double to, double step) {
   return v;
 }
 
+double acceleration_for_distance_and_velocities(double d, double v1, double v2) {
+  bool same_signs = (v2 >= 0) == (v1 >= 0);
+
+  double a;
+  if(same_signs) {
+    a = (v2*v2 - v1*v1) / (2*d);
+  } else {
+    a = (v2*v2 + v1*v1) / (2*d);
+  }
+  if(v2 < v1) {
+    a = -a;
+  }
+
+  return a;
+}
+
 double time_at_position(double x, double a, double v0, double x0){
   x = x-x0;
 
@@ -226,4 +217,41 @@ double time_at_position(double x, double a, double v0, double x0){
     return t[0];
   }
   return min(t[0],t[1]);
+}
+
+
+void test_acceleration_for_distance_and_velocities(double d, double v1, double v2) {
+  cout << "from " << v1 << "m/s to " << v2 << "m/s in " << d
+       <<  "m requires a of "
+       <<  acceleration_for_distance_and_velocities(d, v1, v2)
+       << "m/s^2" << endl;
+}
+
+void test_geometry() {
+  test_acceleration_for_distance_and_velocities(1,0,3);
+  test_acceleration_for_distance_and_velocities(2,0,3);
+  test_acceleration_for_distance_and_velocities(1,-3,3);
+  test_acceleration_for_distance_and_velocities(1,3,-3);
+  test_acceleration_for_distance_and_velocities(1,-2,-3);
+  Angle a;
+  cout << "setting a to 30 degrees" << endl;
+  a.set_degrees(30);
+  cout << "a: " << a.to_string() << endl;
+  cout << "a.degrees(): " << a.degrees() << endl;
+  cout << "a.radians(): " << a.radians() << endl;
+  cout << " a * 2" << (a * 2).to_string();
+  a+=Angle::degrees(360);
+  cout << "adding 360 degrees" << endl;
+  cout << "a.degrees(): " << a.degrees() << endl;
+  a.standardize();
+  cout << "a.standardize() " << endl;
+  cout << "a.degrees(): " << a.degrees() << endl;
+  cout << "a /= 2" <<endl;
+  a/=2.;
+  cout << "a.degrees(): " << a.degrees() << endl;
+  cout << "a.to_string(): " << a.to_string() << endl;
+
+  a = Angle::degrees(10);
+  Angle b = Angle::degrees(20);
+  cout << "a + b " << (a+b).degrees() << endl;
 }

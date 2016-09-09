@@ -5,6 +5,7 @@
 #include <iomanip>
 #include "string_utils.h"
 
+
 // todo:  make separate object for current location
 
 void Route::add_node(RouteNode node){
@@ -162,6 +163,20 @@ void Route::set_position(Point front, Point rear, double velocity)
     }
     ++index;
   }
+}
+
+double Route::get_acceleration() {
+
+  if(done)
+    return 0;
+
+
+  const RouteNode & p0 = nodes[index];
+  const RouteNode & p1 = nodes[index+1];
+  double d = distance(p0.get_front_position(), p1.get_front_position());
+
+  return acceleration_for_distance_and_velocities(d,p0.velocity,p1.velocity);
+
 }
 
 // returns desired velocity for current position
