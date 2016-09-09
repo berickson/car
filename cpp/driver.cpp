@@ -44,7 +44,7 @@ int esc_for_velocity(double goal_velocity, Car & car) {
   double car_velocity = car.get_velocity();
   double error = car_velocity - goal_velocity;
 
-  if (goal_velocity < 0){
+  if (car_velocity < 0){
     // reverse
     const double speed_up_esc = car.min_reverse_esc - 80;
     const double slow_down_esc = 1500;
