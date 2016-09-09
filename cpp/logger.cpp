@@ -29,3 +29,9 @@ void log_info(string message)
   static string severity = "INFO";
   log(severity, message);
 }
+
+void log_trace(string message)
+{
+  static string severity = "TRACE";
+  log(severity, message);
+}
