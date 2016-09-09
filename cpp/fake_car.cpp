@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include "string_utils.h"
+#include "logger.h"
 
 using namespace std;
 FakeCar::FakeCar(string recording_file_path):
@@ -40,8 +41,9 @@ bool FakeCar::step() {
 }
 
 void write_path_from_recording_file(string recording_path, string outpath) {
-  const double min_length = 0.03;
+  log_info("entering write_path_from_recording_file");
 
+  const double min_length = 0.03;
   FakeCar car(recording_path);
   fstream outfile;
   outfile.open(outpath, ios_base::out);
@@ -58,6 +60,7 @@ void write_path_from_recording_file(string recording_path, string outpath) {
   bool next_reverse = false;
   unsigned i = 0;
 
+  log_info("stepping through recording to create path");
   while(car.step()) {
     ++i;
     next = car.current_dynamics;
@@ -99,6 +102,7 @@ void write_path_from_recording_file(string recording_path, string outpath) {
   }
   outfile.flush();
   outfile.close();
+  log_info("entering write_path_from_recording_file");
 }
 
 
@@ -106,8 +110,8 @@ void write_path_from_recording_file(string recording_path, string outpath) {
 #include "route.h"
 void test_fake_car() {
 
-  string recording_path = "/home/brian/car/tracks/desk/routes/N/recording.csv";
-  string route_path =     "/home/brian/car/tracks/desk/routes/N/test_route.csv";
+  string recording_path = "../../cpp/test_data/1/recording.csv";
+  string route_path =     "../../cpp/test_data/1/test_route.csv";
   cout << "writing path " << route_path << " from recording " << recording_path << endl;
   write_path_from_recording_file(recording_path, route_path);
   cout << "done" << endl;
