@@ -25,6 +25,6 @@ string format(double d) {
 string format(double d, int width, int precision) {
   stringstream ss;
   ss<< std::fixed << std::setw( width ) << std::setprecision( precision )
-   << std::setfill( '0' ) << d;
+   <<  d;
   return ss.str();
 }
