@@ -23,7 +23,8 @@ RunSettings run_settings;
 
 string wheel_display_string(const Speedometer & wheel){
   return format(wheel.get_meters_travelled(),7,2)+"m "
-              + format(wheel.get_velocity(),4,1)+"m/s" + format(wheel.get_ticks()) + "t ";
+         + format(wheel.get_velocity(),4,1)+"m/s "
+         + format(wheel.get_ticks()) + "t";
 }
 
 void assert0(int n) {
@@ -339,7 +340,7 @@ void run_car_menu() {
     {[&car](){return "heading: " + format(car.get_heading().degrees());}},
     {[&car](){return "heading_adj: " + format(car.get_heading_adjustment().degrees());}},
     {[&car](){return "rear: " + to_string(car.get_rear_position());}},
-    {[&car](){return "fr: " + wheel_display_string(car.get_front_left_wheel());}},
+    {[&car](){return "fl: " + wheel_display_string(car.get_front_left_wheel());}},
     {[&car](){return "fr: " + wheel_display_string(car.get_front_right_wheel());}},
     {[&car](){return "bl: " + wheel_display_string(car.get_back_left_wheel());}},
     {[&car](){return "br: " + wheel_display_string(car.get_back_right_wheel());}},
