@@ -21,6 +21,11 @@
 RunSettings run_settings;
 
 
+string wheel_display_string(const Speedometer & wheel){
+  return format(wheel.get_ticks()) + "t " + format(wheel.get_meters_travelled(),7,2)+"m "
+              + format(wheel.get_velocity(),4,1)+"m/s";
+}
+
 void assert0(int n) {
   if(n!=0) {
     throw (string) "expected zero, got" + to_string(n);
@@ -129,6 +134,7 @@ SubMenu capture_video_menu{};
 
 CarMenu::CarMenu() {
 }
+
 
 
 void run_car_menu() {
@@ -322,6 +328,7 @@ void run_car_menu() {
     {"pi",&pi_menu}
   };
 
+
   SubMenu car_menu {
     {[&car](){return get_first_ip_address();}, &mid_menu},
     {[&car](){return "v: " + format(car.get_voltage());}},
@@ -332,11 +339,10 @@ void run_car_menu() {
     {[&car](){return "heading: " + format(car.get_heading().degrees());}},
     {[&car](){return "heading_adj: " + format(car.get_heading_adjustment().degrees());}},
     {[&car](){return "rear: " + to_string(car.get_rear_position());}},
-    {[&car](){return "odo_fl: " + format(car.get_odometer_front_left()) + "t " + format(car.get_front_left_wheel().get_meters_travelled())+"m "
-            + format(car.get_front_left_wheel().get_velocity(),4,2)+"m/s" ;}},
-    {[&car](){return "odo_fr: " + format(car.get_odometer_front_right());}},
-    {[&car](){return "odo_bl: " + format(car.get_odometer_back_left());}},
-    {[&car](){return "odo_br: " + format(car.get_odometer_back_right());}},
+    {[&car](){return "fr: " + wheel_display_string(car.get_front_left_wheel());}},
+    {[&car](){return "fr: " + wheel_display_string(car.get_front_right_wheel());}},
+    {[&car](){return "bl: " + format(car.get_odometer_back_left());}},
+    {[&car](){return "br: " + format(car.get_odometer_back_right());}},
     {[&car](){return "str: " + format(car.get_str());}},
     {[&car](){return "esc: " + format(car.get_esc());}}
 
