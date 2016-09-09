@@ -11,5 +11,6 @@ using namespace std;
 
 string join(vector<string> strings, string separator = ",");
 string format(double d);
+string format(double d, int width, int precision);
 
 #endif // STRING_UTILS_H

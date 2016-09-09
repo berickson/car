@@ -22,7 +22,7 @@ string format(double d) {
   return ss.str();
 }
 
-string format(double d, int width, precision) {
+string format(double d, int width, int precision) {
   stringstream ss;
   ss<< std::fixed << std::setw( width ) << std::setprecision( precision )
    << std::setfill( '0' ) << d;
