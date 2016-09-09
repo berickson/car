@@ -21,10 +21,10 @@ int esc_for_max_decel(Car & car) {
   int esc = 1500;
   double v_front = (car.get_front_left_wheel().get_velocity(), car.get_front_right_wheel().get_velocity()) / 2.0;
   double v_back = (car.get_back_left_wheel().get_velocity(), car.get_back_right_wheel().get_velocity()) / 2.0;
-  if(v_front >= 0.5 && v_back >= v_front * 0.8) {
+  if(v_front >= 0.1 && v_back >= v_front * 0.8) {
     esc = 1100;
   }
-  if(v_front <= -0.5 && v_back <= v_front * 0.8) {
+  if(v_front <= -0.1 && v_back <= v_front * 0.8) {
     esc = 1800;
   }
   return esc;
