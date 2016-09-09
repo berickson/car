@@ -98,6 +98,7 @@ void Driver::drive_route(Route & route) {
       auto p_rear = car.get_rear_position();
       double v = car.get_velocity();
       double ahead = d_ahead + v*t_ahead;
+      if(!route.done)
       route.set_position(p_front, p_rear, v);
 
       //Angle steering_angle = steering_angle_by_look_ahead(route, ahead);
@@ -114,7 +115,7 @@ void Driver::drive_route(Route & route) {
 
 
       unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);
-      unsigned esc = route.done ? 1500 : esc_for_velocity(route.get_velocity(), car);
+      unsigned esc = esc_for_velocity(route.get_velocity(), car);
 
       if(route.done && fabs(car.get_velocity()) < 0.05) {
         log_info("route completed normally");

@@ -123,14 +123,10 @@ void Car::apply_dynamics(Dynamics & d) {
   back_right_wheel.update_from_sensor(current.us, current.odometer_back_right_last_us, current.odometer_back_right);
   front_left_wheel.update_from_sensor(current.us, current.odometer_front_left_last_us, current.odometer_front_left);
   double wheel_distance_meters = front_right_wheel.update_from_sensor(current.us, current.odometer_front_right_last_us, current.odometer_front_right);
-  if (fabs(wheel_distance_meters) > 0.) {
+  if (reading_count > 2 && fabs(wheel_distance_meters) > 0.) { // adding 2 keeps out the big jump after a reset
     Angle outside_wheel_angle = angle_for_steering(previous.str);
     ackerman.move_right_wheel(outside_wheel_angle, wheel_distance_meters, get_heading().radians());
   }
-
-
-  // update velocity
-  front_right_wheel.update_from_sensor(current.us, current.odometer_front_right_last_us, current.odometer_front_right);
 
 
 }
