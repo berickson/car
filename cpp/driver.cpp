@@ -24,6 +24,9 @@ int esc_for_max_decel(Car & car) {
   if(v_front >= 0.5 && v_back >= v_front * 0.8) {
     esc = 1100;
   }
+  if(v_front <= -0.5 && v_back <= v_front * 0.8) {
+    esc = 1800;
+  }
   return esc;
 }
 
@@ -50,7 +53,7 @@ int esc_for_velocity(double goal_velocity, Car & car) {
     if (error > 0) {
         esc_ms = speed_up_esc;
     } else if (error < 0.2){
-      esc_ms = slow_down_esc;
+      esc_ms = esc_for_max_decel(car);
     } else {
         esc_ms = maintain_esc;
     }
