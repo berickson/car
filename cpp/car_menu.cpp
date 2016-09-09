@@ -52,10 +52,10 @@ void restart(){
 }
 void update_software() {
   log_info("restarting based on user update request");
-#pragme igno
-  system("git pull");
-  system("./build");
-  system("sudo ./run");
+  int ignored __attribute__((unused));
+  ignored = system("git pull");
+  ignored = system("./build");
+  ignored = system("sudo ./run");
   log_info("terminating");
   terminate();
 
