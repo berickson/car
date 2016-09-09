@@ -48,12 +48,13 @@ void Car::usb_thread_start() {
   }
 }
 
-void Car::process_line_from_log(string line) {
+// returns true if the line is a valid TD
+bool Car::process_line_from_log(string line) {
   if(input_recording_file.is_open()) {
     input_recording_file << line << endl; //todo: make non-blocking
   }
   if(split(line)[1]!="TD") {
-    return;
+    return false;
   }
   Dynamics d;
   bool ok = Dynamics::from_log_string(d,line);
@@ -67,6 +68,7 @@ void Car::process_line_from_log(string line) {
     ++usb_error_count;
     cerr << "dynamics not ok for " << line << endl;
   }
+  return ok;
 }
 
 void Car::send_command(string command) {

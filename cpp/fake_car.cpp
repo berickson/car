@@ -28,12 +28,16 @@ void FakeCar::reset() {
 
 bool FakeCar::step() {
   string s;
-  if(getline(dynamics_file,s,'\n')) {
-    process_line_from_log(s);
-    return true;
-  } else {
-    return false;
+  bool got_td = false;
+  while(got_td == false) {
+    if(getline(dynamics_file,s,'\n')) {
+      got_td = process_line_from_log(s);
+      got_td = true;
+    } else {
+      return false;
+    }
   }
+  return got_td;
 }
 
 void write_path_from_recording_file(string recording_path, string outpath) {

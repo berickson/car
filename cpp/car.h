@@ -136,7 +136,7 @@ public:
 
 
   // infrastructure
-  void process_line_from_log(string s);
+  bool process_line_from_log(string s);
   void apply_dynamics(Dynamics & d);
   Usb usb;
 private:
