@@ -332,7 +332,8 @@ void run_car_menu() {
     {[&car](){return "heading: " + format(car.get_heading().degrees());}},
     {[&car](){return "heading_adj: " + format(car.get_heading_adjustment().degrees());}},
     {[&car](){return "rear: " + to_string(car.get_rear_position());}},
-    {[&car](){return "odo_fl: " + format(car.get_odometer_front_left()) + "t " + format(car.get_front_left_wheel().get_meters_travelled())+"m " + format(car.get_front_left_wheel().get_velocity())+"m/s" ;}},
+    {[&car](){return "odo_fl: " + format(car.get_odometer_front_left()) + "t " + format(car.get_front_left_wheel().get_meters_travelled())+"m "
+            + format(car.get_front_left_wheel().get_velocity(),4,2)+"m/s" ;}},
     {[&car](){return "odo_fr: " + format(car.get_odometer_front_right());}},
     {[&car](){return "odo_bl: " + format(car.get_odometer_back_left());}},
     {[&car](){return "odo_br: " + format(car.get_odometer_back_right());}},

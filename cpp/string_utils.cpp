@@ -1,6 +1,8 @@
 #include "string_utils.h"
 #include <sstream>
 
+#include <iomanip>
+
 using namespace std;
 string join(vector<string> strings, string separator) {
   bool first = true;
@@ -17,5 +19,12 @@ string join(vector<string> strings, string separator) {
 string format(double d) {
   stringstream ss;
   ss<<d;
+  return ss.str();
+}
+
+string format(double d, int width, precision) {
+  stringstream ss;
+  ss<< std::fixed << std::setw( width ) << std::setprecision( precision )
+   << std::setfill( '0' ) << d;
   return ss.str();
 }

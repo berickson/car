@@ -27,7 +27,7 @@ public:
   double update_from_sensor(unsigned int clock_us, unsigned int tick_us, int ticks) {
     double meters_moved = 0.0;
     if (tick_us != last_tick_us) {
-      double elapsed_seconds = (last_tick_us - tick_us) / 1000000.;
+      double elapsed_seconds = (tick_us - last_tick_us) / 1000000.;
       meters_moved = meters_per_tick * (ticks - last_ticks);
 
       velocity = meters_moved / elapsed_seconds;
