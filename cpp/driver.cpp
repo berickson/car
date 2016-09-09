@@ -30,6 +30,15 @@ int esc_for_max_decel(Car & car) {
   return esc;
 }
 
+int esc_for_velocity2(double goal_velocity, double goal_accel, Car & car) {
+  double kp = 1;
+  double ka = 3;
+
+  double velocity_output = goal_velocity + kp * (goal_velocity - car.get_velocity()) * ka * goal_accel;
+  return car.esc_for_velocity(velocity_output);
+}
+
+
 // todo: replace all of this with a proper PID style loop
 int esc_for_velocity(double goal_velocity, Car & car) {
 
@@ -117,7 +126,7 @@ void Driver::drive_route(Route & route) {
 
 
       unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);
-      unsigned esc = esc_for_velocity(route.get_velocity(), car);
+      unsigned esc = esc_for_velocity2(route.get_velocity(), route.get_acceleration(), car);
 
       if(route.done && fabs(car.get_velocity()) < 0.05) {
         log_info("route completed normally");
