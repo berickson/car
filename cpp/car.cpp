@@ -114,8 +114,10 @@ void Car::apply_dynamics(Dynamics & d) {
   heading_adjustment += Angle::radians(d_theta.radians() * gyro_adjustment_factor);
 
   // if wheels have moved, update ackerman
-  double wheel_distance_meters = (current.odometer_front_right - previous.odometer_front_right)  * meters_per_odometer_tick;
-
+  back_left_wheel.update_from_sensor(current.us, current.odometer_back_left_last_us, current.odometer_back_left);
+  back_right_wheel.update_from_sensor(current.us, current.odometer_back_right_last_us, current.odometer_back_right);
+  front_left_wheel.update_from_sensor(current.us, current.odometer_front_left_last_us, current.odometer_front_left);
+  double wheel_distance_meters = front_right_wheel.update_from_sensor(current.us, current.odometer_front_right_last_us, current.odometer_front_right);
   if (fabs(wheel_distance_meters) > 0.) {
     Angle outside_wheel_angle = angle_for_steering(previous.str);
     ackerman.move_right_wheel(outside_wheel_angle, wheel_distance_meters, get_heading().radians());
@@ -142,6 +144,7 @@ void Car::read_configuration(string path){
 
   // odometery
   meters_per_odometer_tick = config.get_double("meters_per_odometer_tick");
+  rear_meters_per_odometer_tick = config.get_double("rear_meters_per_odometer_tick");
   gyro_adjustment_factor = config.get_double("gyro_adjustment_factor");
 
   // esc and steering

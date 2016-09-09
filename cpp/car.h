@@ -37,12 +37,13 @@ public:
   Dynamics original_dynamics;
   int reading_count = 0;
 
-  Speedometer front_right_wheel;
+  Speedometer front_right_wheel, front_left_wheel, back_left_wheel, back_right_wheel;
   Angle heading_adjustment;
 
 
   // calibrated measurements
   double meters_per_odometer_tick;
+  double rear_meters_per_odometer_tick;
   double gyro_adjustment_factor;
   int center_steering_us;
   int min_forward_esc;
@@ -56,6 +57,21 @@ public:
   Angle get_heading_adjustment();
   Angle get_heading();
 
+  const Speedometer & get_back_left_wheel() const {
+    return back_left_wheel;
+  }
+
+  const Speedometer & get_back_right_wheel() const {
+    return back_right_wheel;
+  }
+
+  const Speedometer & get_front_left_wheel() const {
+    return front_left_wheel;
+  }
+
+  const Speedometer & get_front_right_wheel() const {
+    return front_right_wheel;
+  }
 
   int get_odometer_front_left() {
     return current_dynamics.odometer_front_left;

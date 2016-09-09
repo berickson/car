@@ -12,6 +12,16 @@ public:
   int last_ticks = 0;
   unsigned int last_tick_us = 0;
   double velocity = 0.0;
+  double meters_travelled = 0.0;
+
+  double get_velocity() const {
+    return velocity;
+  }
+
+  double get_meters_travelled() const {
+    return meters_travelled;
+  }
+
 
   // updates internal state and returns meters just moved
   double update_from_sensor(unsigned int clock_us, unsigned int tick_us, int ticks) {
@@ -41,6 +51,7 @@ public:
         }
       }
     }
+    meters_travelled += meters_moved;
     return meters_moved;
   }
 };

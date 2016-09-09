@@ -38,7 +38,8 @@ SOURCES += main.cpp\
     route_window.cpp \
     ../file_names.cpp \
     ../frame_grabber.cpp \
-    ../logger.cpp
+    ../logger.cpp \
+    ../speedometer.cpp
 
 HEADERS  += main_window.h \
     ../ackerman.h \
@@ -53,7 +54,8 @@ HEADERS  += main_window.h \
     ../usb.h \
     ../work_queue.h \
     route_window.h \
-    ../frame_grabber.h
+    ../frame_grabber.h \
+    ../speedometer.h
 
 images.path    = $${DESTDIR}/
 
