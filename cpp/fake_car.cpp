@@ -32,7 +32,6 @@ bool FakeCar::step() {
   while(got_td == false) {
     if(getline(dynamics_file,s,'\n')) {
       got_td = process_line_from_log(s);
-      got_td = true;
     } else {
       return false;
     }

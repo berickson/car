@@ -369,6 +369,9 @@ void Route::smooth(double k_smooth) {
 
 
 void Route::optimize_velocity(double max_velocity, double max_acceleration) {
+  // must have at least one node to optimize
+  if(nodes.size() == 0)
+    return;
 
   // all velocities start at max
   for(RouteNode &node:nodes) {
