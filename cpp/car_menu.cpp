@@ -170,7 +170,7 @@ void go(Car& car, CarUI & ui) {
     ui.refresh();
     rte.optimize_velocity(run_settings.max_v, run_settings.max_a);
     ui.print((string)"max_v calculated at " + format(rte.get_max_velocity()) + "\n");
-    ui.print("[<-back go->]");
+    ui.print("[back] [] []  [go]");
     ui.refresh();
     if(ui.wait_key()!='4') {
       return;
