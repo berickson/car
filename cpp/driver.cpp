@@ -47,7 +47,6 @@ int esc_for_velocity(double goal_velocity, Car & car) {
   if (car_velocity < 0){
     // reverse
     const double speed_up_esc = car.min_reverse_esc - 80;
-    const double slow_down_esc = 1500;
     const double maintain_esc = car.min_reverse_esc;
 
     if (error > 0) {
@@ -80,7 +79,7 @@ void Driver::drive_route(Route & route) {
   WorkQueue<Dynamics> queue;
   car.add_listener(&queue);
   ui.clear();
-  ui.print("press any key to abort");
+  ui.print("[abort]");
   ui.refresh();
   try {
     car.set_rc_mode();
