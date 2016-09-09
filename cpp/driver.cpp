@@ -18,9 +18,13 @@ Driver::Driver(Car & car, CarUI ui, RunSettings settings)
 
 
 int esc_for_max_decel(Car & car) {
-  // todo: complete this function
-  return 1500;
-
+  int esc = 1500;
+  double v_front = (car.get_front_left_wheel().get_velocity(), car.get_front_right_wheel().get_velocity()) / 2.0;
+  double v_back = (car.get_back_left_wheel().get_velocity(), car.get_back_right_wheel().get_velocity()) / 2.0;
+  if(v_front >= 0.5 && v_back >= v_front * 0.8) {
+    esc = 1100;
+  }
+  return esc;
 }
 
 // todo: replace all of this with a proper PID style loop
@@ -53,7 +57,7 @@ int esc_for_velocity(double goal_velocity, Car & car) {
   } else {
     // forward
     if (error > 0.2) {
-      esc_ms = 1500; // car.min_reverse_esc # slow down esc
+      esc_ms = esc_for_max_decel(car);
     } else if (error > 0.) {
       esc_ms = car.esc_for_velocity(clamp(goal_velocity- 3.*error,0.1,999.));
     } else {
