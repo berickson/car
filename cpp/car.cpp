@@ -14,6 +14,9 @@ using namespace std;
 Car::Car(bool online) {
   read_configuration(config_path);
   front_right_wheel.meters_per_tick = this->meters_per_odometer_tick;
+  front_left_wheel.meters_per_tick = this->meters_per_odometer_tick;
+  back_left_wheel.meters_per_tick = this->meters_per_odometer_tick;
+  back_right_wheel.meters_per_tick = this->meters_per_odometer_tick;
   this->online = online;
   reset_odometry();
   if(online) {
