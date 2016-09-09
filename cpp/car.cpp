@@ -60,8 +60,11 @@ bool Car::process_line_from_log(string line) {
   bool ok = Dynamics::from_log_string(d,line);
   if(ok) {
     apply_dynamics(d);
-    for(auto listener:listeners) {
-      listener->push(d);
+    {
+      lock_guard<mutex> lock(listeners_mutex);
+      for(auto listener:listeners) {
+        listener->push(d);
+      }
     }
   }
   else {
@@ -134,10 +137,12 @@ void Car::apply_dynamics(Dynamics & d) {
 }
 
 void Car::add_listener(WorkQueue<Dynamics>* listener) {
+  lock_guard<mutex> lock(listeners_mutex);
   listeners.push_back(listener);
 }
 
 void Car::remove_listener(WorkQueue<Dynamics>*listener) {
+  lock_guard<mutex> lock(listeners_mutex);
   listeners.remove(listener);
 }
 

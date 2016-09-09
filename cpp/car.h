@@ -149,6 +149,7 @@ private:
 
   void read_configuration(string path);
   list<WorkQueue<Dynamics>*> listeners;
+  std::mutex listeners_mutex;
 };
 
 
