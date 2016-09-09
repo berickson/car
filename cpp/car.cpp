@@ -12,11 +12,13 @@ using namespace std;
 
 
 Car::Car(bool online) {
+  log_info("reading configuration");
   read_configuration(config_path);
   front_right_wheel.meters_per_tick = this->meters_per_odometer_tick;
   front_left_wheel.meters_per_tick = this->meters_per_odometer_tick;
-  back_left_wheel.meters_per_tick = this->meters_per_odometer_tick;
-  back_right_wheel.meters_per_tick = this->meters_per_odometer_tick;
+  back_left_wheel.meters_per_tick = this->rear_meters_per_odometer_tick;
+  back_right_wheel.meters_per_tick = this->rear_meters_per_odometer_tick;
+  log_info("all wheels set");
   this->online = online;
   reset_odometry();
   if(online) {
