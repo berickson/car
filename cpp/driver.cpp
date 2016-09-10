@@ -100,11 +100,11 @@ void Driver::drive_route(Route & route) {
 
 
       unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);
-      unsigned esc = esc_for_velocity(route.get_velocity(), route.get_acceleration());
+      unsigned esc = route.done? esc_for_max_decel : esc_for_velocity(route.get_velocity(), route.get_acceleration());
       if(rear_slipping())
         esc = 1500;
 
-      if(route.done && fabs(car.get_velocity()) < 0.0) {
+      if(fabs(car.get_velocity()) == 0.0) {
         log_info("route completed normally");
         break;
       }
