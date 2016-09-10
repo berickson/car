@@ -4,6 +4,7 @@
 #include "car_ui.h"
 #include <unistd.h> // usleep
 #include "logger.h"
+#include "pid.h"
 
 
 Driver::Driver(Car & car, CarUI& ui, RunSettings& settings)
@@ -39,46 +40,6 @@ int Driver::esc_for_velocity(double goal_velocity, double goal_accel) {
   return car.esc_for_velocity(velocity_output/2);
 }
 
-
-class PID {
-public:
-  double k_p = 1;
-  double k_i = 1;
-  double k_d = 1;
-
-  double last_e = NAN;
-  double last_t = NAN;
-  double sum_e = 0;
-  double slope_e = 0;
-
-  void add_reading(double t, double error) {
-    double dt = t - last_t;
-    if(dt<=0)
-      return;
-    if(!isnan(last_e))
-      slope_e = (error-last_e) / dt;
-    sum_e += error;
-    last_e = error;
-    last_t = t;
-  }
-
-  double output() {
-    double rv = 0;
-
-    // P
-    if(!isnan(last_e))
-      rv += k_p + last_e;
-
-    // I
-    rv += sum_e;
-
-    // D
-    if(!isnan(slope_e))
-      rv += k_d * slope_e;
-
-    return rv;
-  }
-};
 
 
 void Driver::drive_route(Route & route) {

@@ -29,7 +29,8 @@ SOURCES += main.cpp \
     file_names.cpp \
     frame_grabber.cpp \
     logger.cpp \
-    speedometer.cpp
+    speedometer.cpp \
+    pid.cpp
 
 HEADERS += \
     geometry.h \
@@ -59,7 +60,8 @@ HEADERS += \
     file_names.h \
     frame_grabber.h \
     logger.h \
-    speedometer.h
+    speedometer.h \
+    pid.h
 
 
 
