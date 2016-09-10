@@ -82,7 +82,7 @@ void Driver::drive_route(Route & route) {
       Angle d_adjust = Angle::degrees(clamp(settings.steering_k_d * d_error,-30,30));
 
 
-      Angle p_adjust = Angle::degrees(clamp(settings.steering_k_p * route.cte  / (v+1),-30,30));
+      Angle p_adjust = Angle::degrees(clamp(-1. * settings.steering_k_p * route.cte  / (v+1),-30,30));
       Angle curvature = track_curvature + p_adjust + d_adjust;
 
 
