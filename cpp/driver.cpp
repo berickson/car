@@ -31,7 +31,7 @@ int esc_for_max_decel(Car & car) {
 }
 
 int esc_for_velocity2(double goal_velocity, double goal_accel, Car & car) {
-  double kp = 2;
+  double kp = 1;
   double kd = 3;
 
   double velocity_output = goal_velocity + kp * (goal_velocity - car.get_velocity()) * kd * goal_accel;
