@@ -17,6 +17,14 @@ Driver::Driver(Car & car, CarUI ui, RunSettings settings)
 }
 
 
+bool rear_spinning(Car & car) {
+  double v_front = (car.get_front_left_wheel().get_velocity(), car.get_front_right_wheel().get_velocity()) / 2.0;
+  double v_back = (car.get_back_left_wheel().get_velocity(), car.get_back_right_wheel().get_velocity()) / 2.0;
+  bool spinning = fabs(v_front - v_back) > 1.5;
+  return spinning;
+
+}
+
 int esc_for_max_decel(Car & car) {
   int esc = 1500;
   double v_front = (car.get_front_left_wheel().get_velocity(), car.get_front_right_wheel().get_velocity()) / 2.0;
@@ -127,6 +135,8 @@ void Driver::drive_route(Route & route) {
 
       unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);
       unsigned esc = esc_for_velocity2(route.get_velocity(), route.get_acceleration(), car);
+      if(rear_spinning(car))
+        esc = 1500;
 
       if(route.done && fabs(car.get_velocity()) < 0.05) {
         log_info("route completed normally");
