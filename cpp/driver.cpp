@@ -40,6 +40,46 @@ int Driver::esc_for_velocity(double goal_velocity, double goal_accel) {
 }
 
 
+class PID {
+public:
+  double k_p = 1;
+  double k_i = 1;
+  double k_d = 1;
+
+  double last_e = NAN;
+  double last_t = NAN;
+  double sum_e = 0;
+  double slope_e = 0;
+
+  void add_reading(double t, double error) {
+    double dt = t - last_t;
+    if(dt<=0)
+      return;
+    if(!isnan(last_e))
+      slope_e = (error-last_e) / dt;
+    slope_e += error;
+    last_e = error;
+  }
+
+  double output() {
+    double rv = 0;
+
+    // P
+    if(!isnan(last_e))
+      rv += k_p + last_e;
+
+    // I
+    rv += sum_e;
+
+    // D
+    if(!isnan(slope_e))
+      rv += k_d * slope_e;
+
+    return rv;
+  }
+};
+
+
 void Driver::drive_route(Route & route) {
   log_info("entering drive_route");
 
@@ -53,6 +93,10 @@ void Driver::drive_route(Route & route) {
   ui.refresh();
   try {
     car.set_rc_mode();
+    PID pid;
+    pid.k_p = settings.steering_k_p;
+    pid.k_i = settings.steering_k_i;
+    pid.k_d = settings.steering_k_d;
     while(true) {
       if(ui.getkey()!=-1) {
         error_text = "run aborted by user";
@@ -77,6 +121,7 @@ void Driver::drive_route(Route & route) {
       Angle track_curvature = curvature_by_look_ahead(route,ahead);
 
       // calculate derivitive term of the error
+      /*
       Angle e_heading = car.get_heading() - route.get_heading_at_current_position();
       double d_error = sin(e_heading.radians())*v;
       Angle d_adjust = Angle::degrees(clamp(settings.steering_k_d * d_error,-30,30));
@@ -85,7 +130,12 @@ void Driver::drive_route(Route & route) {
       Angle p_adjust = Angle::degrees(clamp(-1. * settings.steering_k_p * route.cte  / (v+1),-30,30));
 
       // Angle curvature = track_curvature + p_adjust + d_adjust;
-      Angle curvature = p_adjust + d_adjust; // todo: remove this and replace line above
+      */
+      pid.add_reading(car.current_dynamics.us / 1E6, route.cte);
+      Angle pid_adjust = Angle::degrees(clamp(pid.output(),-30,30));
+
+      Angle curvature = pid_adjust; // todo: remove this and replace line above
+      // Angle curvature = p_adjust + d_adjust; // todo: remove this and replace line above
 
 
       unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);
@@ -187,3 +237,4 @@ void test_driver() {
              << endl;
     }
 }
+
