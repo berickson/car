@@ -314,7 +314,7 @@ void run_car_menu() {
 
   selection_menu<double>(acceleration_menu, linspace(0.25,10,0.25), get_max_a, set_max_a );
   selection_menu<double>(velocity_menu, linspace(0.5,20,0.5), get_max_v, set_max_v );
-  selection_menu<double>(k_p_menu, linspace(0.,50,1), get_k_p, set_k_p );
+  selection_menu<double>(k_p_menu, linspace(0.,300,10), get_k_p, set_k_p );
   selection_menu<double>(k_d_menu, linspace(0.,2,0.1), get_k_d, set_k_d );
 
   selection_menu<double>(v_k_p_menu, linspace(0.,3,0.25), get_v_k_p, set_v_k_p );
