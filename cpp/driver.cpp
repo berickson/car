@@ -20,7 +20,8 @@ Driver::Driver(Car & car, CarUI ui, RunSettings settings)
 bool rear_spinning(Car & car) {
   double v_front = (car.get_front_left_wheel().get_velocity(), car.get_front_right_wheel().get_velocity()) / 2.0;
   double v_back = (car.get_back_left_wheel().get_velocity(), car.get_back_right_wheel().get_velocity()) / 2.0;
-  bool spinning = fabs(v_front - v_back) > 1.5;
+
+  bool spinning = fabs(v_front - v_back) > (.25 + (.2 * v_front));
   return spinning;
 
 }
