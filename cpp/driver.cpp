@@ -35,7 +35,7 @@ int esc_for_velocity2(double goal_velocity, double goal_accel, Car & car) {
   double kd = 3;
 
   double velocity_output = goal_velocity + kp * (goal_velocity - car.get_velocity()) * kd * goal_accel;
-  return car.esc_for_velocity(velocity_output);
+  return car.esc_for_velocity(velocity_output/2);
 }
 
 
