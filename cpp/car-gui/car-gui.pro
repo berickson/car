@@ -39,7 +39,8 @@ SOURCES += main.cpp\
     ../file_names.cpp \
     ../frame_grabber.cpp \
     ../logger.cpp \
-    ../speedometer.cpp
+    ../speedometer.cpp \
+    ../pid.cpp
 
 HEADERS  += main_window.h \
     ../ackerman.h \

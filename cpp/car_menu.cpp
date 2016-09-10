@@ -344,6 +344,7 @@ void run_car_menu() {
     {[](){return (string)"max_v ["+format(run_settings.max_v)+"]";},&velocity_menu},
 
     {[](){return (string)"k_p ["+format(run_settings.steering_k_p)+"]";},&k_p_menu},
+    {[](){return (string)"k_i ["+format(run_settings.steering_k_i)+"]";},&k_i_menu},
     {[](){return (string)"k_d ["+format(run_settings.steering_k_d)+"]";},&k_d_menu},
 
     {[](){return (string)"v_k_p ["+format(run_settings.v_k_p)+"]";},&v_k_p_menu},
