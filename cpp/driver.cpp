@@ -91,13 +91,12 @@ void Driver::drive_route(Route & route) {
 
       Angle p_adjust = Angle::degrees(clamp(-1. * settings.steering_k_p * route.cte  / (v+1),-30,30));
 
-      // Angle curvature = track_curvature + p_adjust + d_adjust;
+      //
       */
       pid.add_reading((double)car.current_dynamics.us / 1E6, -route.cte);
-      Angle pid_adjust = Angle::degrees(clamp(pid.output(),-30,30));
+      Angle pid_adjust = Angle::degrees(clamp(pid.output(),-60,60));
+      Angle curvature = track_curvature + pid_adjust;
 
-      Angle curvature = pid_adjust; // todo: remove this and replace line above
-      // Angle curvature = p_adjust + d_adjust; // todo: remove this and replace line above
 
 
       unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);
@@ -105,7 +104,7 @@ void Driver::drive_route(Route & route) {
       if(rear_slipping())
         esc = 1500;
 
-      if(route.done && fabs(car.get_velocity()) < 0.05) {
+      if(route.done && fabs(car.get_velocity()) < 0.0) {
         log_info("route completed normally");
         break;
       }

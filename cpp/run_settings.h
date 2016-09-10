@@ -16,9 +16,9 @@ struct RunSettings{
   double d_ahead = 0.05;
   double k_smooth = 0.4;
 
-  double steering_k_p = 30.0;
-  double steering_k_i = 1.0;
-  double steering_k_d = 1.0;
+  double steering_k_p = 300.0;
+  double steering_k_i = 10.0;
+  double steering_k_d = 20.0;
 
   double v_k_p = 1.0;
   double v_k_d = 1.0;
