@@ -344,9 +344,9 @@ void run_car_menu() {
     {[](){return (string)"k_p ["+format(run_settings.steering_k_p)+"]";},&k_p_menu},
     {[](){return (string)"k_d ["+format(run_settings.steering_k_d)+"]";},&k_d_menu},
 
-    {[](){return (string)"v_k_p ["+format(run_settings.steering_k_p)+"]";},&v_k_p_menu},
-    {[](){return (string)"v_k_i ["+format(run_settings.steering_k_d)+"]";},&v_k_i_menu},
-    {[](){return (string)"v_k_d ["+format(run_settings.steering_k_d)+"]";},&v_k_d_menu},
+    {[](){return (string)"v_k_p ["+format(run_settings.v_k_p)+"]";},&v_k_p_menu},
+    {[](){return (string)"v_k_i ["+format(run_settings.v_k_d)+"]";},&v_k_i_menu},
+    {[](){return (string)"v_k_d ["+format(run_settings.v_k_d)+"]";},&v_k_d_menu},
 
 
     {[](){return (string)"k_smooth ["+format(run_settings.k_smooth)+"]";},&k_smooth_menu},
