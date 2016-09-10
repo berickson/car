@@ -33,8 +33,17 @@ void RunSettings::write_to_file(string path) {
        << "route_name = " << route_name << endl
        << "max_a = " << max_a << endl
        << "max_v = " << max_v << endl
-       << "k_p = " << k_p << endl
-       << "k_d = " << k_d << endl
+       << "steering_k_p = " << steering_k_p << endl
+       << "steering_k_i = " << steering_k_i << endl
+       << "steering_k_d = " << steering_k_d << endl
+
+       << "v_k_p = " << v_k_p << endl
+       << "v_k_i = " << v_k_i << endl
+       << "v_k_d = " << v_k_d << endl
+
+       << "slip_rate = " << slip_rate << endl
+       << "slip_slop = " << slip_slop << endl
+
        << "t_ahead = " << t_ahead << endl
        << "d_ahead = " << d_ahead << endl
        << "k_smooth = " << k_smooth << endl
@@ -72,22 +81,26 @@ void RunSettings::load_from_file(string path)
     else if (name == "t_ahead")
       this->t_ahead = stod(value);
     else if (name == "k_p")
-      this->k_p = stod(value);
+      this->steering_k_p = stod(value);
     else if (name == "k_d")
-      this->k_d = stod(value);
+      this->steering_k_d = stod(value);
+    else if (name == "steering_k_p")
+      this->steering_k_p = stod(value);
+    else if (name == "steering_k_i")
+      this->steering_k_i = stod(value);
+    else if (name == "steering_k_d")
+      this->steering_k_d = stod(value);
+
+    else if (name == "v_k_p")
+      this->steering_k_d = stod(value);
+    else if (name == "v_k_i")
+      this->steering_k_d = stod(value);
+    else if (name == "v_k_d")
+      this->steering_k_d = stod(value);
     else if (name == "k_smooth")
       this->k_smooth = stod(value);
     else if (name == "capture_video")
       this->capture_video = stod(value)>0;
-/*
-  file << "track_name = " << track_name << endl
-       << "route_name = " << route_name << endl
-       << "max_a = " << max_a << endl
-       << "max_v = " << max_v << endl
-       << "t_ahead = " << t_ahead << endl
-       << "d_ahead = " << d_ahead << endl
-       << "k_smooth = " << k_smooth << endl
-       << "capture_video = " << capture_video << endl;
-*/
+
   }
 }

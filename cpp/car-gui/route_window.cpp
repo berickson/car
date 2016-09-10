@@ -79,8 +79,8 @@ void RouteWindow::on_route_list_itemSelectionChanged()
       ui->run_list->setItem(row,0,new QTableWidgetItem(run_name.c_str()));
       ui->run_list->setItem(row,1,new QTableWidgetItem(QString::number(run_settings.max_a)));
       ui->run_list->setItem(row,2,new QTableWidgetItem(QString::number(run_settings.max_v)));
-      ui->run_list->setItem(row,3,new QTableWidgetItem(QString::number(run_settings.k_p)));
-      ui->run_list->setItem(row,4,new QTableWidgetItem(QString::number(run_settings.k_d)));
+      ui->run_list->setItem(row,3,new QTableWidgetItem(QString::number(run_settings.steering_k_p)));
+      ui->run_list->setItem(row,4,new QTableWidgetItem(QString::number(run_settings.steering_k_d)));
     }
     ui->run_list->resizeColumnsToContents();
   }

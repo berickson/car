@@ -6,85 +6,37 @@
 #include "logger.h"
 
 
-Driver::Driver(Car & car, CarUI ui, RunSettings settings)
-  : car(car), ui(ui)
+Driver::Driver(Car & car, CarUI& ui, RunSettings& settings)
+  : car(car), ui(ui), settings(settings)
 {
-  t_ahead = settings.t_ahead;
-  d_ahead = settings.d_ahead;
-  k_smooth = settings.k_smooth;
-  k_p = settings.k_p;
-  k_d = settings.k_d;
 }
 
 
-bool rear_spinning(Car & car) {
+bool Driver::rear_slipping() {
   double v_front = (car.get_front_left_wheel().get_velocity(), car.get_front_right_wheel().get_velocity()) / 2.0;
   double v_back = (car.get_back_left_wheel().get_velocity(), car.get_back_right_wheel().get_velocity()) / 2.0;
 
-  bool spinning = fabs(v_front - v_back) > (.25 + (.2 * v_front));
+  bool spinning = fabs(v_front - v_back) > (settings.slip_slop + (settings.slip_rate * v_front));
   return spinning;
 
 }
 
-int esc_for_max_decel(Car & car) {
+int Driver::esc_for_max_decel() {
   int esc = 1500;
   double v_front = (car.get_front_left_wheel().get_velocity(), car.get_front_right_wheel().get_velocity()) / 2.0;
   double v_back = (car.get_back_left_wheel().get_velocity(), car.get_back_right_wheel().get_velocity()) / 2.0;
-  if(v_front >= 0.1 && v_back >= v_front * 0.8) {
+  if(v_front >= 0.1 && v_back >= v_front * (1.0-settings.slip_rate)) {
     esc = 1100;
   }
-  if(v_front <= -0.1 && v_back <= v_front * 0.8) {
+  if(v_front <= -0.1 && v_back <= v_front * (1.0-settings.slip_rate)) {
     esc = 1800;
   }
   return esc;
 }
 
-int esc_for_velocity2(double goal_velocity, double goal_accel, Car & car) {
-  double kp = 1;
-  double kd = 3;
-
-  double velocity_output = goal_velocity + kp * (goal_velocity - car.get_velocity()) * kd * goal_accel;
+int Driver::esc_for_velocity(double goal_velocity, double goal_accel) {
+  double velocity_output = goal_velocity + settings.v_k_p * (goal_velocity - car.get_velocity()) * settings.v_k_d * goal_accel;
   return car.esc_for_velocity(velocity_output/2);
-}
-
-
-// todo: replace all of this with a proper PID style loop
-int esc_for_velocity(double goal_velocity, Car & car) {
-
-  // special case for goal velocity of zero, always use neutral
-  if (goal_velocity == 0) {
-    return car.esc_for_velocity(0);
-  }
-
-  double esc_ms = NAN;
-
-  // calculate speed
-  double car_velocity = car.get_velocity();
-  double error = car_velocity - goal_velocity;
-
-  if (car_velocity < 0){
-    // reverse
-    const double speed_up_esc = car.min_reverse_esc - 80;
-    const double maintain_esc = car.min_reverse_esc;
-
-    if (error > 0) {
-        esc_ms = speed_up_esc;
-    } else if (error < -0.5){
-      esc_ms = esc_for_max_decel(car);
-    } else {
-        esc_ms = maintain_esc;
-    }
-  } else {
-    // forward
-    if (error > 0.5) {
-      esc_ms = esc_for_max_decel(car);
-    } else if (error > 0.) {
-      esc_ms = car.esc_for_velocity(clamp(goal_velocity- 3.*error,0.1,999.));
-    } else {
-      esc_ms = car.esc_for_velocity(goal_velocity  - error);
-    }
-  }
-  return esc_ms;
 }
 
 
@@ -117,7 +69,7 @@ void Driver::drive_route(Route & route) {
       auto p_front = car.get_front_position();
       auto p_rear = car.get_rear_position();
       double v = car.get_velocity();
-      double ahead = d_ahead + v*t_ahead;
+      double ahead = settings.d_ahead + v*settings.t_ahead;
       if(!route.done)
       route.set_position(p_front, p_rear, v);
 
@@ -127,16 +79,16 @@ void Driver::drive_route(Route & route) {
       // calculate derivitive term of the error
       Angle e_heading = car.get_heading() - route.get_heading_at_current_position();
       double d_error = sin(e_heading.radians())*v;
-      Angle d_adjust = Angle::degrees(clamp(k_d * d_error,-30,30));
+      Angle d_adjust = Angle::degrees(clamp(settings.steering_k_d * d_error,-30,30));
 
 
-      Angle p_adjust = Angle::degrees(clamp(k_p * route.cte  / (v+1),-30,30));
+      Angle p_adjust = Angle::degrees(clamp(settings.steering_k_p * route.cte  / (v+1),-30,30));
       Angle curvature = track_curvature + p_adjust + d_adjust;
 
 
       unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);
-      unsigned esc = esc_for_velocity2(route.get_velocity(), route.get_acceleration(), car);
-      if(rear_spinning(car))
+      unsigned esc = esc_for_velocity(route.get_velocity(), route.get_acceleration());
+      if(rear_slipping())
         esc = 1500;
 
       if(route.done && fabs(car.get_velocity()) < 0.05) {
