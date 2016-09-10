@@ -104,7 +104,7 @@ void Driver::drive_route(Route & route) {
       if(rear_slipping())
         esc = 1500;
 
-      if(fabs(car.get_velocity()) == 0.0) {
+      if(route.done && fabs(car.get_velocity()) == 0.0) {
         log_info("route completed normally");
         break;
       }
