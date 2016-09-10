@@ -131,7 +131,7 @@ void Driver::drive_route(Route & route) {
 
       // Angle curvature = track_curvature + p_adjust + d_adjust;
       */
-      pid.add_reading(car.current_dynamics.us / 1E6, route.cte);
+      pid.add_reading(car.current_dynamics.us / 1E6, -route.cte);
       Angle pid_adjust = Angle::degrees(clamp(pid.output(),-30,30));
 
       Angle curvature = pid_adjust; // todo: remove this and replace line above
