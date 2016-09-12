@@ -196,7 +196,7 @@ void go(Car& car, CarUI & ui) {
     ui.move(0,0);
     ui.refresh();
     rte.optimize_velocity(run_settings.max_v, run_settings.max_a);
-    ui.print((string)"max_v calculated at " + format(rte.get_max_velocity()) + "\n");
+    ui.print((string)"max_v calculated at " + format(rte.get_max_velocity()) + "\n\n");
     ui.print("[back] [] []  [go]");
     ui.refresh();
     if(ui.wait_key()!='4') {
@@ -316,7 +316,7 @@ void run_car_menu() {
   selection_menu<double>(acceleration_menu, linspace(0.25,10,0.25), get_max_a, set_max_a );
   selection_menu<double>(velocity_menu, linspace(0.5,20,0.5), get_max_v, set_max_v );
   selection_menu<double>(k_p_menu, linspace(0.,300,10), get_k_p, set_k_p );
-  selection_menu<double>(k_i_menu, linspace(0.,300,5), get_k_i, set_k_i );
+  selection_menu<double>(k_i_menu, linspace(0.,30,0.5), get_k_i, set_k_i );
   selection_menu<double>(k_d_menu, linspace(0.,300,5), get_k_d, set_k_d );
 
   selection_menu<double>(v_k_p_menu, linspace(0.,3,0.25), get_v_k_p, set_v_k_p );
@@ -336,6 +336,7 @@ void run_car_menu() {
   update_route_selection_menu();
 
   SubMenu route_menu {
+    {[&car](){return (string)"v: "+format(car.current_dynamics.battery_voltage,4,1)+ " heading: " + format(car.get_heading().degrees(),5,1) + "usb: " + format(car.get_reading_count(),7,0); }},
     {[](){return (string)"track ["+run_settings.track_name+"]";},&track_selection_menu},
     {[](){return (string)"route ["+run_settings.route_name+"]";},&route_selection_menu},
     MenuItem("go...",[&car,&ui](){go(car,ui);}),
