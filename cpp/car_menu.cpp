@@ -336,7 +336,7 @@ void run_car_menu() {
   update_route_selection_menu();
 
   SubMenu route_menu {
-    {[&car](){return (string)"v: "+format(car.current_dynamics.battery_voltage,4,1)+ " heading: " + format(car.get_heading().degrees(),5,1) + "usb: " + format(car.get_reading_count(),7,0); }},
+    {[&car](){return (string)" heading: " + format(car.get_heading().degrees(),5,1) + " usb: " + format(car.get_reading_count(),6,0) + " v: "+format(car.current_dynamics.battery_voltage,4,1); }},
     {[](){return (string)"track ["+run_settings.track_name+"]";},&track_selection_menu},
     {[](){return (string)"route ["+run_settings.route_name+"]";},&route_selection_menu},
     MenuItem("go...",[&car,&ui](){go(car,ui);}),
