@@ -171,7 +171,7 @@ void Car::reset_odometry() {
   //dynamics = Dynamics();
   original_dynamics = current_dynamics;
 
-//  heading_adjustment = Angle::degrees(0.);
+  heading_adjustment = Angle::degrees(0.);
 
   ackerman = Ackerman(
     front_wheelbase_width,

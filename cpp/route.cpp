@@ -263,7 +263,7 @@ string RouteNode::to_string()
      << "rear_y: " << rear_y <<  " "
      << "heading: " << heading <<  " "
      << "velocity: " << velocity <<  " "
-     << "heading_adjustment: " << heading_adjustment <<  " "
+     << "heading_adjustment: " << 0.0 <<  " "
      << "esc: " << esc <<  " "
      << "str: " << str << " "
      << "reverse: " << reverse;
