@@ -1,8 +1,9 @@
 #include "Arduino.h"
 #include "CircleMode.h"
 #include "Esc.h"
-#include "Mpu9150.h"
+//#include "Mpu9150.h"
 #include "Logger.h"
+/*
 
 extern Esc esc;
 extern Servo steering;
@@ -12,7 +13,7 @@ bool CircleMode::is_done() {
   return done;
 }
 
-void CircleMode::init(Mpu9150 * _mpu) {
+void CircleMode::init(bno_055 * _mpu) {
   mpu = _mpu;
 }
 
@@ -73,3 +74,4 @@ void CircleMode::end() {
     done = true;
     Serial.println("circle complete"); 
 }
+*/

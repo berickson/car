@@ -1,7 +1,8 @@
 #pragma once
 #include "Pid.h"
 #include "Task.h"
-class Mpu9150;
+//class Mpu9150;
+/*
 
 class CircleMode : public Task {
 public:
@@ -20,3 +21,5 @@ public:
   virtual void end();
   virtual void execute();
 };
+
+*/

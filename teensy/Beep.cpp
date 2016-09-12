@@ -1,6 +1,6 @@
 #include "Beep.h"
 
-#include <cstddef>
+#include "stdint.h"
 #include "Arduino.h"
 
 Beep::Beep() {

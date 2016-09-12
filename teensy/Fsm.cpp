@@ -1,6 +1,6 @@
 #include "Fsm.h"
 
-#include <cstddef>
+#include <stdlib.h>
 #include "Arduino.h"
 #include <string.h> // including for strcomp had no impact on firmware size
 

@@ -59,10 +59,25 @@ void RouteWindow::on_route_list_itemSelectionChanged()
   if(selection.size()==1) {
     //ui->run_list->clear();
     ui->run_list->setRowCount(0);
-    ui->run_list->setColumnCount(5);
+    ui->run_list->setColumnCount(14);
     ui->run_list->setSortingEnabled(true);
     QStringList labels;
-    labels << "run" << "a" << "v" << "k_p" << "k_d";
+    labels
+        << "run"
+        << "a"
+        << "v"
+        << "t_ahead"
+        << "k_p"
+        << "k_i"
+        << "k_d"
+        << "v_k_p"
+        << "v_k_i"
+        << "v_k_d"
+        << "k_smooth"
+        << "capture_video"
+        << "slip_rate"
+        << "slip_slop";
+
     ui->run_list->setHorizontalHeaderLabels(labels);
     ui->run_list->verticalHeader()->setVisible(false);
     auto run_names = file_names.get_run_names(get_track_name(), get_route_name());
@@ -79,8 +94,18 @@ void RouteWindow::on_route_list_itemSelectionChanged()
       ui->run_list->setItem(row,0,new QTableWidgetItem(run_name.c_str()));
       ui->run_list->setItem(row,1,new QTableWidgetItem(QString::number(run_settings.max_a)));
       ui->run_list->setItem(row,2,new QTableWidgetItem(QString::number(run_settings.max_v)));
-      ui->run_list->setItem(row,3,new QTableWidgetItem(QString::number(run_settings.steering_k_p)));
-      ui->run_list->setItem(row,4,new QTableWidgetItem(QString::number(run_settings.steering_k_d)));
+      ui->run_list->setItem(row,3,new QTableWidgetItem(QString::number(run_settings.t_ahead)));
+      ui->run_list->setItem(row,4,new QTableWidgetItem(QString::number(run_settings.steering_k_p)));
+      ui->run_list->setItem(row,5,new QTableWidgetItem(QString::number(run_settings.steering_k_i)));
+      ui->run_list->setItem(row,6,new QTableWidgetItem(QString::number(run_settings.steering_k_d)));
+      ui->run_list->setItem(row,7,new QTableWidgetItem(QString::number(run_settings.v_k_p)));
+      ui->run_list->setItem(row,8,new QTableWidgetItem(QString::number(run_settings.v_k_i)));
+      ui->run_list->setItem(row,9,new QTableWidgetItem(QString::number(run_settings.v_k_d)));
+      ui->run_list->setItem(row,10,new QTableWidgetItem(QString::number(run_settings.k_smooth)));
+      ui->run_list->setItem(row,11,new QTableWidgetItem(QString::number(run_settings.capture_video)));
+      ui->run_list->setItem(row,12,new QTableWidgetItem(QString::number(run_settings.slip_rate)));
+      ui->run_list->setItem(row,13,new QTableWidgetItem(QString::number(run_settings.slip_slop?1:0)));
+
     }
     ui->run_list->resizeColumnsToContents();
   }
