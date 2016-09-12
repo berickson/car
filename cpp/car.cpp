@@ -121,7 +121,7 @@ void Car::apply_dynamics(Dynamics & d) {
   // correct heading with adjustment factor
   Angle d_theta = (current.yaw - previous.yaw);
   d_theta.standardize();
-  heading_adjustment += Angle::radians(d_theta.radians() * gyro_adjustment_factor);
+  //heading_adjustment += Angle::radians(d_theta.radians() * gyro_adjustment_factor);
 
   // if wheels have moved, update ackerman
   back_left_wheel.update_from_sensor(current.us, current.odometer_back_left_last_us, current.odometer_back_left);
@@ -171,7 +171,7 @@ void Car::reset_odometry() {
   //dynamics = Dynamics();
   original_dynamics = current_dynamics;
 
-  heading_adjustment = Angle::degrees(0.);
+//  heading_adjustment = Angle::degrees(0.);
 
   ackerman = Ackerman(
     front_wheelbase_width,
@@ -179,14 +179,11 @@ void Car::reset_odometry() {
 }
 
 Angle Car::get_heading_adjustment() {
-  return heading_adjustment;
+  return Angle::degrees(0.0);//heading_adjustment;
 }
 
 Angle Car::get_heading() {
-  Angle a = (
-        current_dynamics.yaw
-        - original_dynamics.yaw
-        + heading_adjustment);
+  Angle a = (current_dynamics.yaw);
   a.standardize();
   return a;
 }
