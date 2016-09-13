@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iomanip>
 #include "string_utils.h"
+#include <vector>
 
 
 // todo:  make separate object for current location
@@ -382,6 +383,44 @@ void Route::smooth(double k_smooth) {
 
 }
 
+void Route::prune(double max_segment_length, double tolerance)
+{
+  // need at least 3 nodes to start pruning
+  vector<int> nodes_to_prune;
+
+  unsigned int i_segment_start = 0;
+  unsigned int i_segment_end = 2;
+
+  while(i_segment_end < nodes.size()) {
+    const RouteNode & start_node = nodes[i_segment_start];
+    const RouteNode & end_node = nodes[i_segment_end];
+    bool segment_ok = true; // segment within tolerance
+    Point s1 = start_node.get_front_position();
+    Point s2 = end_node.get_front_position();
+    if(distance(s1,s2)>max_segment_length)
+      segment_ok = false;
+    for(unsigned int j=i_segment_start + 1; segment_ok && j < i_segment_end; j++) {
+      // all candidates must be closer than tolerance
+      const RouteNode & candidate= nodes[j];
+      Point p = candidate.get_front_position();
+      if(distance_from_segment_to_pointt(s1, s2, p) > tolerance)
+        segment_ok = false;
+    }
+    if(segment_ok ) {
+      ++i_segment_end;
+    }
+    else {
+      for(unsigned int i_prune = i_segment_start + 1; i_prune < i_segment_end-1; ++i_prune) {
+        nodes_to_prune.push_back(i_prune);
+      }
+      i_segment_start = i_segment_end;
+      i_segment_end = i_segment_start + 2;
+    }
+  }
+  for (auto it = nodes_to_prune.rbegin(); it != nodes_to_prune.rend(); ++it) {
+   nodes.erase(nodes.begin()+*it);
+  }
+}
 
 void Route::optimize_velocity(double max_velocity, double max_acceleration) {
   // must have at least one node to optimize
@@ -415,7 +454,7 @@ void Route::optimize_velocity(double max_velocity, double max_acceleration) {
     Point v1(p1.front_x-p0.front_x, p1.front_y-p0.front_y);
     Point v2(p2.front_x-p1.front_x, p2.front_y-p1.front_y);
 
-    Angle theta = angle_between(v1.x,v1.y,v2.x,v2.y);
+    Angle theta = angle_between(v1,v2);
     if(fabs(theta.radians())>0) {
       double r=fabs(length(v2.x,v2.y)/theta.radians());
       double v_circle_max = sqrt(max_acceleration * r);
@@ -474,19 +513,37 @@ void test_curvature() {
 }
 
 void test_route() {
-  test_curvature();
-  return;
+  //test_curvature();
+  //return;
   // test_circle();
+  double max_a = 8.;
+  double max_v = 10000;
   Route r;
-  r.load_from_file("/home/brian/car/tracks/sidewalk/routes/K/path.csv");
-  cout << "distance before smooth: " << r.get_length() << endl;
-  cout << "curvature before smooth: " << r.get_total_curvature().degrees() << " degrees" << endl;
+  r.load_from_file("/home/brian/car/tracks/2016-09-12 prisk/routes/F/path.csv");
+  cout << "original distance: " << r.get_length() << endl;
+  cout << "original curvature: " << r.get_total_curvature().degrees() << " degrees" << endl;
+  cout << "original max velocity" << r.get_max_velocity() << endl;
+  r.optimize_velocity(max_v, max_a);
+  cout << "optimized max velocity " << r.get_max_velocity() << endl;
   r.smooth(0.25);
+  r.optimize_velocity(max_v, max_a);
+
   cout << "smoothing " << endl;
   cout << "distance after smooth: " << r.get_length() << endl;
   cout << "curvature after smooth: " << r.get_total_curvature().degrees() << " degrees" << endl;
-
   cout << "point ahead 0.2 " << r.get_position_ahead(0.2).to_string() << endl;
   cout << "point ahead 100 " << r.get_position_ahead(100).to_string() << endl;
+  r.optimize_velocity(max_v, max_a);
+  //cout << r.to_string() << endl;
+  cout << "max velocity after smooth " << r.get_max_velocity() << endl;
+  cout << "node count " << r.nodes.size() << endl;
+  r.prune(5.0, 0.02);
+  r.optimize_velocity(max_v, max_a);
+  cout << "max velocity after prune " << r.get_max_velocity() << endl;
+  cout << "node count after prune " << r.nodes.size() << endl;
+  cout << "curvature after prune: " << r.get_total_curvature().degrees() << " degrees" << endl;
+  cout << "point ahead 0.2 " << r.get_position_ahead(0.2).to_string() << endl;
+  cout << "point ahead 100 " << r.get_position_ahead(100).to_string() << endl;
+  //cout << r.to_string() << endl;
 
 }

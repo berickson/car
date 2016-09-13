@@ -46,6 +46,7 @@ public:
   void load_from_file(string path);
 
   void smooth(double k_smooth);
+  void prune(double max_segment_length, double tolerance);
 
   void optimize_velocity(double max_velocity = 1, double max_acceleration = 0.1);
   double get_max_velocity();

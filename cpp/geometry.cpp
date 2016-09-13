@@ -143,6 +143,24 @@ double distance(Point p1, Point p2) {
   return distance(p1.x,p1.y,p2.x,p2.y);
 }
 
+// returns distance of point p from segment from start to end
+double distance_from_segment_to_pointt(Point start, Point end, Point p ) {
+  double dx = end.x - start.x;
+  double dy = end.y - start.y;
+  double drx = p.x - start.x;
+  double dry = p.y - start.y;
+
+  double progress = (drx * dx + dry * dy)/(dx * dx + dy * dy);
+  if(progress < 0)
+    return distance(start,p);
+  if(progress > 1)
+    return distance(end,p);
+  double l = length(dx,dy);
+  double cte = (dry * dx - drx * dy) / l;
+  return fabs(cte);
+}
+
+
 double velocity_at_time(double t, double a, double v0){
   return v0 + a * t;
 }
@@ -171,6 +189,7 @@ Angle angle_between(Point p1, Point p2) {
 Angle angle_to(Point p1, Point p2) {
   return Angle::radians(atan2(p2.y-p1.y,p2.x-p1.x));
 }
+
 
 double clamp(double value, double min_value, double max_value) {
   if(value < min_value)
