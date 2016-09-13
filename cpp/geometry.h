@@ -77,6 +77,7 @@ vector<double> quadratic(double a,double b,double c);
 // returns distane from (x1,y1) to (x2,y2)
 double distance(double x1, double y1, double x2, double y2);
 double distance(Point p1, Point p2);
+double distance_from_segment_to_pointt(Point start, Point end, Point p );
 
 //
 // Kinematics

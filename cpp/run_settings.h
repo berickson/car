@@ -20,9 +20,9 @@ struct RunSettings{
   double steering_k_i = 0.0;
   double steering_k_d = 20.0;
 
-  double v_k_p = 1.0;
-  double v_k_d = 1.0;
-  double v_k_i = 1.0;
+  double v_k_p = 0.5;
+  double v_k_i = 0.0;
+  double v_k_d = 0.5;
 
   double slip_rate = 0.2;
   double slip_slop = 0.5;

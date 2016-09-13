@@ -138,8 +138,8 @@ double get_capture_video(){return run_settings.capture_video;}
 SubMenu pi_menu {
   {"shutdown",shutdown},
   {"reboot",reboot},
-  {"restart",restart},
-  {"update software 2",update_software}
+  //{"restart",restart},
+  //{"update software 2",update_software}
 };
 
 
@@ -349,7 +349,7 @@ void run_car_menu() {
     {[](){return (string)"k_d ["+format(run_settings.steering_k_d)+"]";},&k_d_menu},
 
     {[](){return (string)"v_k_p ["+format(run_settings.v_k_p)+"]";},&v_k_p_menu},
-    {[](){return (string)"v_k_i ["+format(run_settings.v_k_d)+"]";},&v_k_i_menu},
+    {[](){return (string)"v_k_i ["+format(run_settings.v_k_i)+"]";},&v_k_i_menu},
     {[](){return (string)"v_k_d ["+format(run_settings.v_k_d)+"]";},&v_k_d_menu},
 
 
