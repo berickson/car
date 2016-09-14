@@ -36,7 +36,11 @@ int Driver::esc_for_max_decel() {
 }
 
 int Driver::esc_for_velocity(double goal_velocity, double goal_accel) {
-  double velocity_output = goal_velocity + settings.v_k_p * (goal_velocity - car.get_velocity()) * settings.v_k_d * goal_accel;
+  double v = car.get_velocity();
+  if(fabs(v) > 1.2 * fabs(goal_velocity) && fabs(v) > 0.5) {
+    return esc_for_max_decel();
+  }
+  double velocity_output = goal_velocity + settings.v_k_p * (goal_velocity - v) * settings.v_k_d * goal_accel;
   return car.esc_for_velocity(velocity_output);
 }
 
@@ -55,10 +59,10 @@ void Driver::drive_route(Route & route) {
   ui.refresh();
   try {
     car.set_rc_mode();
-    PID pid;
-    pid.k_p = settings.steering_k_p;
-    pid.k_i = settings.steering_k_i;
-    pid.k_d = settings.steering_k_d;
+    PID steering_pid;
+    steering_pid.k_p = settings.steering_k_p;
+    steering_pid.k_i = settings.steering_k_i;
+    steering_pid.k_d = settings.steering_k_d;
     while(true) {
       if(ui.getkey()!=-1) {
         error_text = "run aborted by user";
@@ -93,14 +97,15 @@ void Driver::drive_route(Route & route) {
 
       //
       */
-      pid.add_reading((double)car.current_dynamics.us / 1E6, -route.cte);
-      Angle pid_adjust = Angle::degrees(clamp(pid.output(),-60,60));
+      steering_pid.add_reading((double)car.current_dynamics.us / 1E6, -route.cte);
+      Angle pid_adjust = Angle::degrees(clamp(steering_pid.output(),-60,60));
       Angle curvature = track_curvature + pid_adjust;
 
 
 
       unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);
       unsigned esc = route.done? esc_for_max_decel() : esc_for_velocity(route.get_velocity(), route.get_acceleration());
+
       if(rear_slipping())
         esc = 1500;
 

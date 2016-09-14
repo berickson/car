@@ -27,8 +27,8 @@ struct RunSettings{
   double slip_rate = 0.2;
   double slip_slop = 0.5;
 
-  double prune_max = 2.0;
-  double prune_tolerance = 0.2;
+  double prune_max = 0.5;
+  double prune_tolerance = 0.02;
 
 
   bool capture_video = false;
