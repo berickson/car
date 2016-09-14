@@ -56,7 +56,7 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
     return false;
   if(fields.size() != 41) {
     cerr << "field size was " << fields.size() << endl;
-    usb_error_count++;
+    //usb_error_count++;
     return false;
   }
 //    self.datetime = dateutil.parser.parse(fields[0])
