@@ -413,7 +413,7 @@ void Route::prune(double max_segment_length, double tolerance)
       for(unsigned int i_prune = i_segment_start + 1; i_prune < i_segment_end-1; ++i_prune) {
         nodes_to_prune.push_back(i_prune);
       }
-      i_segment_start = i_segment_end;
+      i_segment_start = i_segment_end-1;
       i_segment_end = i_segment_start + 2;
     }
   }
@@ -493,6 +493,23 @@ void test_circle() {
 
 }
 
+void test_prune() {
+  Route r;
+  r.add_node(RouteNode(0,0));
+  r.add_node(RouteNode(1,0));
+  r.add_node(RouteNode(2,.1));
+  r.add_node(RouteNode(3,0));
+  r.add_node(RouteNode(4,0));
+  r.add_node(RouteNode(5,0));
+  r.add_node(RouteNode(6,0));
+  r.add_node(RouteNode(7,0));
+  r.add_node(RouteNode(8,0));
+  cout << r.to_string() << endl;
+  r.prune(3,0.1);
+  cout << r.to_string() << endl;
+
+}
+
 void test_curvature() {
   Route r;
   r.add_node(RouteNode(0,0));
@@ -513,6 +530,8 @@ void test_curvature() {
 }
 
 void test_route() {
+  //test_prune();
+  //return;
   //test_curvature();
   //return;
   // test_circle();
