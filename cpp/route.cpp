@@ -215,6 +215,14 @@ void Route::set_position(Point front, Point rear, double velocity)
   }
 }
 
+void Route::reset_position_to_start()
+{
+  index = 0;
+  cte = 0;
+  progress = 0;
+  done = false;
+}
+
 double Route::get_acceleration() {
 
   if(done)
@@ -489,6 +497,15 @@ void Route::prune(double max_segment_length, double tolerance)
   }
   for (auto it = nodes_to_prune.rbegin(); it != nodes_to_prune.rend(); ++it) {
    nodes.erase(nodes.begin()+*it);
+  }
+}
+
+void Route::write_to_file(string path) {
+  fstream f;
+  f.open(path, ios_base::out);
+  f<<RouteNode::csv_header() << endl;
+  for(auto node:nodes) {
+    f << node.csv_row() << endl;
   }
 }
 

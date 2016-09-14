@@ -6,6 +6,7 @@
 #include <QGraphicsScene>
 #include <QStandardItemModel>
 #include "../route.h"
+#include "../run_settings.h"
 #include <memory>
 
 
@@ -41,10 +42,13 @@ private slots:
   void on_run_position_slider_valueChanged(int value);
 
 private:
+  QPen route_pen,run_pen;
+
   QGraphicsItem * car_graphic = NULL;
   QGraphicsItem * chart_marker = NULL;
-  unique_ptr<Route> current_route = NULL;
-  unique_ptr<Route> current_run = NULL;
+  shared_ptr<Route> current_route = NULL;
+  shared_ptr<Route> current_run = NULL;
+  shared_ptr<RunSettings> current_run_settings = NULL;
   QGraphicsScene scene;
   Ui::RouteWindow *ui;
   FileNames file_names;
@@ -56,7 +60,8 @@ private:
   void add_chart(Route & run);
   QChart * line_chart = nullptr;
   QChartView * chart_view = nullptr;
-  QLineSeries *series;
+  QLineSeries *run_series;
+  QLineSeries *route_series;
 
   void hide_run_data();
   void remove_line_chart();

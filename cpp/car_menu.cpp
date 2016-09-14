@@ -249,6 +249,7 @@ void go(Car& car, CarUI & ui) {
 
     string path_file_path = f.path_file_path(track_name, route_name, run_name);
     write_path_from_recording_file(recording_file_path, path_file_path);
+    rte.write_to_file(f.planned_path_file_path(track_name, route_name, run_name));
 
     if(error_text.size()) {
       ui.clear();

@@ -20,6 +20,14 @@ RouteWindow::RouteWindow(QWidget *parent) :
   QDialog(parent),
   ui(new Ui::RouteWindow)
 {
+  route_pen.setColor(Qt::green);
+  route_pen.setCosmetic(true);
+  route_pen.setWidth(2);
+
+  run_pen.setColor(Qt::blue);
+  run_pen.setWidth(1);
+  run_pen.setCosmetic(true);
+
   ui->setupUi(this);
   ui->graphicsView->setScene(&scene);
   scene.addText("Hello, world!");
@@ -89,7 +97,12 @@ void RouteWindow::on_route_list_itemSelectionChanged()
       int row = ui->run_list->rowCount();
 
       ui->run_list->insertRow(row);
-      RunSettings run_settings;
+      {
+        unique_ptr<RunSettings> rs(new RunSettings);
+        current_run_settings = std::move(rs);
+      }
+
+      RunSettings & run_settings = *current_run_settings;
       try {
         run_settings.load_from_file(file_names.config_file_path(get_track_name(),get_route_name(),run_name));
       } catch (...) {}
@@ -171,9 +184,20 @@ void RouteWindow::clear_scene()
 
 void RouteWindow::add_chart(Route & run)
 {
-  series = new QLineSeries();
+  run_series = new QLineSeries();
+  route_series = new QLineSeries();
+
+
+  current_route->reset_position_to_start();
+
+
   for(RouteNode & node: run.nodes) {
-     series->append(node.secs, node.velocity);
+    current_route->set_position(node.get_front_position(), node.get_front_position(), node.velocity);
+
+    route_series->append(node.secs, current_route->get_velocity());
+
+    run_series->append(node.secs, node.velocity);
+
   }
   if(line_chart!=nullptr) {
     delete line_chart;
@@ -182,7 +206,8 @@ void RouteWindow::add_chart(Route & run)
 
   line_chart= new QChart();
   line_chart->legend()->hide();
-  line_chart->addSeries(series);
+  line_chart->addSeries(run_series);
+  line_chart->addSeries(route_series);
   line_chart->createDefaultAxes();
   line_chart->setTitle("Run velocity vs. time");
   if(chart_view != nullptr) {
@@ -205,20 +230,20 @@ void RouteWindow::add_chart(Route & run)
 void RouteWindow::on_run_list_itemSelectionChanged()
 {
   clear_scene();
-  QPen route_pen,run_pen;
-  route_pen.setColor(Qt::green);
-  route_pen.setCosmetic(true);
-  route_pen.setWidth(2);
-
-  run_pen.setColor(Qt::blue);
-  run_pen.setWidth(1);
-  run_pen.setCosmetic(true);
 
   string run_path;
   current_run = NULL;
 
   try {
-    Route route;
+    std::unique_ptr<Route> r (new Route());
+    current_route = std::move(r);
+
+    // todo: get this from planned route, but first car needs to save planned route
+    current_route->smooth(current_run_settings->k_smooth);
+    current_route->prune(current_run_settings->prune_max, current_run_settings->prune_max);
+    current_route->optimize_velocity(current_run_settings->max_v, current_run_settings->max_a);
+
+    Route & route = *current_route;
     route.load_from_file(file_names.path_file_path(get_track_name(),get_route_name()));
     add_route_to_scene(scene, route, route_pen);
 
@@ -357,7 +382,7 @@ void RouteWindow::on_run_position_slider_valueChanged(int value)
 
 
 
-  QPointF pos = line_chart->mapToPosition(series->at(value));
+  QPointF pos = line_chart->mapToPosition(run_series->at(value));
   auto x =3;
   pos.setX(pos.x()-chart_marker->boundingRect().width()/2+x);
   pos.setY(pos.y()-chart_marker->boundingRect().height()/2+x);

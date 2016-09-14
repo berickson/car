@@ -72,6 +72,10 @@ string FileNames::config_file_path(string track_name, string route_name, string 
   return path_join(get_folder(track_name, route_name, run_name),"config.json");
 }
 
+string FileNames::planned_path_file_path(string track_name, string route_name, string run_name){
+  return path_join(get_folder(track_name, route_name, run_name),"planned_path.csv");
+}
+
 string FileNames::path_file_path(string track_name, string route_name, string run_name){
   return path_join(get_folder(track_name, route_name, run_name),"path.csv");
 }

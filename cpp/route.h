@@ -62,6 +62,7 @@ public:
   Angle heading();
 
   void set_position(Point front, Point rear, double velocity);
+  void reset_position_to_start();
 
   double get_velocity();
   RouteNode get_position_ahead(double get_length);
@@ -75,6 +76,7 @@ public:
   Angle get_curvature_at_current_position();
   Angle get_heading_at_current_position();
   double get_acceleration();
+  void write_to_file(string path);
 };
 
 void test_route();
