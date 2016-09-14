@@ -49,13 +49,16 @@ string Dynamics::to_string() {
 
 bool Dynamics::from_log_string(Dynamics & d, string &s) {
   auto fields = split(s,',');
-  if(fields.size() != 40) {
-    cerr << "field size was " << fields.size() << endl;
-    // usb_error_count++;
+  if(fields.size() <2) {
     return false;
   }
   if(fields[1] != "TD")
     return false;
+  if(fields.size() != 41) {
+    cerr << "field size was " << fields.size() << endl;
+    usb_error_count++;
+    return false;
+  }
 //    self.datetime = dateutil.parser.parse(fields[0])
 
   try {
@@ -84,7 +87,7 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
     d.pitch = Angle::degrees(stod(fields[35]));
     d.roll = Angle::degrees(stod(fields[36]));
     d.battery_voltage = stod(fields[38]);
-    d.calibration_status = stod(fields[40]);
+    d.calibration_status = stoui(fields[40]);
   } catch (...)
   {
     return false;
