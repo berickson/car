@@ -20,9 +20,13 @@ RouteWindow::RouteWindow(QWidget *parent) :
   QDialog(parent),
   ui(new Ui::RouteWindow)
 {
-  route_pen.setColor(Qt::green);
-  route_pen.setCosmetic(true);
-  route_pen.setWidth(2);
+  original_route_pen.setColor(Qt::black);
+  original_route_pen.setCosmetic(true);
+  original_route_pen.setWidth(4);
+
+  planned_route_pen.setColor(Qt::darkGray);
+  planned_route_pen.setCosmetic(true);
+  planned_route_pen.setWidth(2);
 
   run_pen.setColor(Qt::blue);
   run_pen.setWidth(1);
@@ -184,21 +188,33 @@ void RouteWindow::clear_scene()
 
 void RouteWindow::add_chart(Route & run)
 {
-  run_series = new QLineSeries();
-  route_series = new QLineSeries();
-
-
-  current_route->reset_position_to_start();
+  run_series = new QLineSeries(); // deleted by qt
+  run_series->setPen(run_pen);
+  original_route_series = new QLineSeries();
+  original_route_series->setPen(original_route_pen);
+  planned_route_series = NULL;
+  if(planned_route) {
+    planned_route_series = new QLineSeries();
+    planned_route->reset_position_to_start();
+    planned_route_series->setPen(planned_route_pen);
+  }
+  original_route->reset_position_to_start();
 
 
   for(RouteNode & node: run.nodes) {
-    current_route->set_position(node.get_front_position(), node.get_front_position(), node.velocity);
+    if(planned_route) {
+      planned_route->set_position(node.get_front_position(), node.get_front_position(), node.velocity);
+      planned_route_series->append(node.secs, planned_route->get_velocity());
+    }
 
-    route_series->append(node.secs, current_route->get_velocity());
+    original_route->set_position(node.get_front_position(), node.get_front_position(), node.velocity);
+    original_route_series->append(node.secs, original_route->get_velocity());
 
     run_series->append(node.secs, node.velocity);
-
   }
+
+
+
   if(line_chart!=nullptr) {
     delete line_chart;
     line_chart = nullptr;
@@ -206,8 +222,11 @@ void RouteWindow::add_chart(Route & run)
 
   line_chart= new QChart();
   line_chart->legend()->hide();
+  line_chart->addSeries(original_route_series);
+  if(planned_route_series) {
+    line_chart->addSeries(planned_route_series);
+  }
   line_chart->addSeries(run_series);
-  line_chart->addSeries(route_series);
   line_chart->createDefaultAxes();
   line_chart->setTitle("Run velocity vs. time");
   if(chart_view != nullptr) {
@@ -236,16 +255,12 @@ void RouteWindow::on_run_list_itemSelectionChanged()
 
   try {
     std::unique_ptr<Route> r (new Route());
-    current_route = std::move(r);
+    original_route = std::move(r);
 
-    // todo: get this from planned route, but first car needs to save planned route
-    current_route->smooth(current_run_settings->k_smooth);
-    current_route->prune(current_run_settings->prune_max, current_run_settings->prune_max);
-    current_route->optimize_velocity(current_run_settings->max_v, current_run_settings->max_a);
 
-    Route & route = *current_route;
-    route.load_from_file(file_names.path_file_path(get_track_name(),get_route_name()));
-    add_route_to_scene(scene, route, route_pen);
+
+    original_route->load_from_file(file_names.path_file_path(get_track_name(),get_route_name()));
+    add_route_to_scene(scene, *original_route, original_route_pen);
 
 
     QModelIndexList selected_list = ui->run_list->selectionModel()->selectedRows();
@@ -255,6 +270,18 @@ void RouteWindow::on_run_list_itemSelectionChanged()
       int selected_row = selected_list.at(i).row();
       string run_name = ui->run_list->item(selected_row,0)->text().toStdString();
       try {
+        // load planned route
+        {
+          std::string file_path;
+          planned_route = NULL;
+          file_path = file_names.planned_path_file_path(get_track_name(),get_route_name(),run_name);
+          if(file_exists(file_path)){
+            planned_route = std::make_shared<Route>();
+            planned_route->load_from_file(file_path);
+            add_route_to_scene(scene, *planned_route, planned_route_pen);
+          }
+        }
+
         unique_ptr<Route> r(new Route());
         current_run = std::move(r);
         string run_path = file_names.path_file_path(get_track_name(),get_route_name(),run_name);

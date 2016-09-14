@@ -37,7 +37,7 @@ int Driver::esc_for_max_decel() {
 
 int Driver::esc_for_velocity(double goal_velocity, double goal_accel) {
   double velocity_output = goal_velocity + settings.v_k_p * (goal_velocity - car.get_velocity()) * settings.v_k_d * goal_accel;
-  return car.esc_for_velocity(velocity_output/2);
+  return car.esc_for_velocity(velocity_output);
 }
 
 

@@ -42,11 +42,12 @@ private slots:
   void on_run_position_slider_valueChanged(int value);
 
 private:
-  QPen route_pen,run_pen;
+  QPen original_route_pen,planned_route_pen,run_pen;
 
   QGraphicsItem * car_graphic = NULL;
   QGraphicsItem * chart_marker = NULL;
-  shared_ptr<Route> current_route = NULL;
+  shared_ptr<Route> original_route = NULL;
+  shared_ptr<Route> planned_route = NULL;
   shared_ptr<Route> current_run = NULL;
   shared_ptr<RunSettings> current_run_settings = NULL;
   QGraphicsScene scene;
@@ -61,7 +62,8 @@ private:
   QChart * line_chart = nullptr;
   QChartView * chart_view = nullptr;
   QLineSeries *run_series;
-  QLineSeries *route_series;
+  QLineSeries *planned_route_series;
+  QLineSeries *original_route_series;
 
   void hide_run_data();
   void remove_line_chart();

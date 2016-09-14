@@ -266,6 +266,20 @@ int Car::esc_for_velocity(double v)
   {
     {-2., 1200},
     {-1., 1250},
+    {-.1, 1326},
+    {0.0,  1500},
+    {0.1, 1620},
+    {1.5, 1663},
+    {7, 1887},
+    {20, 2000}
+  });
+  return t.lookup(v);
+
+  /* old, ts table
+  static const LookupTable t(
+  {
+    {-2., 1200},
+    {-1., 1250},
     {0.0,  1500},
     {0.1, 1645},
     {0.34, 1659},
@@ -279,6 +293,7 @@ int Car::esc_for_velocity(double v)
     {14.0, 2000}
   });
   return t.lookup(v);
+  */
 
 }
 
