@@ -125,6 +125,13 @@ double get_v_k_i(){return run_settings.v_k_i;}
 void set_v_k_d(double v){run_settings.v_k_d = v;}
 double get_v_k_d(){return run_settings.v_k_d;}
 
+void set_prune_max(double v){run_settings.prune_max = v;}
+double get_prune_max(){return run_settings.prune_max;}
+
+void set_prune_tolerance(double v){run_settings.prune_tolerance = v;}
+double get_prune_tolerance(){return run_settings.prune_tolerance;}
+
+
 void set_slip_rate(double v){run_settings.slip_rate = v;}
 double get_slip_rate(){return run_settings.slip_rate;}
 
@@ -155,6 +162,9 @@ SubMenu k_d_menu{};
 SubMenu v_k_p_menu{};
 SubMenu v_k_i_menu{};
 SubMenu v_k_d_menu{};
+
+SubMenu prune_max_menu{};
+SubMenu prune_tolerance_menu{};
 
 SubMenu k_smooth_menu{};
 SubMenu t_ahead_menu{};
@@ -194,6 +204,10 @@ void go(Car& car, CarUI & ui) {
     ui.print("smoothing route\n");
     ui.refresh();
     rte.smooth(run_settings.k_smooth);
+    ui.print("pruning route\n");
+    rte.prune(run_settings.prune_max, run_settings.prune_tolerance);
+    ui.refresh();
+
     ui.clear();
     ui.move(0,0);
     ui.refresh();
@@ -333,6 +347,10 @@ void run_car_menu() {
   selection_menu<double>(v_k_i_menu, linspace(0.,3,0.25), get_v_k_i, set_v_k_i );
   selection_menu<double>(v_k_d_menu, linspace(0.,3,0.25), get_v_k_d, set_v_k_d );
 
+  selection_menu<double>(prune_max_menu, linspace(0.0 ,3.0, 0.1), get_prune_max, set_prune_max );
+  selection_menu<double>(prune_tolerance_menu, linspace(0.0, 0.2, 0.01), get_prune_tolerance, set_prune_tolerance);
+
+
   selection_menu<double>(k_smooth_menu, linspace(0.,1,0.1), get_k_smooth, set_k_smooth );
   selection_menu<double>(t_ahead_menu, linspace(0.,1,0.1), get_t_ahead, set_t_ahead );
   selection_menu<double>(d_ahead_menu, linspace(0.,.1,0.01), get_d_ahead, set_d_ahead );
@@ -363,6 +381,9 @@ void run_car_menu() {
     {[](){return (string)"v_k_i ["+format(run_settings.v_k_i)+"]";},&v_k_i_menu},
     {[](){return (string)"v_k_d ["+format(run_settings.v_k_d)+"]";},&v_k_d_menu},
 
+
+    {[](){return (string)"prune tol ["+format(run_settings.prune_tolerance)+"]";},&prune_tolerance_menu},
+    {[](){return (string)"prune max ["+format(run_settings.prune_max)+"]";},&prune_max_menu},
 
     {[](){return (string)"k_smooth ["+format(run_settings.k_smooth)+"]";},&k_smooth_menu},
     {[](){return (string)"t_ahead ["+format(run_settings.t_ahead)+"]";},&t_ahead_menu},

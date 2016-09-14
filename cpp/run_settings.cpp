@@ -47,6 +47,9 @@ void RunSettings::write_to_file(string path) {
        << "t_ahead = " << t_ahead << endl
        << "d_ahead = " << d_ahead << endl
        << "k_smooth = " << k_smooth << endl
+
+       << "prune_max = " << prune_max << endl
+       << "prune_tolerance = " << prune_tolerance << endl
        << "capture_video = " << capture_video << endl;
 
 }
@@ -94,9 +97,13 @@ void RunSettings::load_from_file(string path)
     else if (name == "v_k_p")
       this->steering_k_d = stod(value);
     else if (name == "v_k_i")
-      this->steering_k_d = stod(value);
+      this->steering_k_i = stod(value);
     else if (name == "v_k_d")
       this->steering_k_d = stod(value);
+    else if (name == "prune_max")
+      this->prune_max = stod(value);
+    else if (name == "prune_tolerance")
+      this->prune_tolerance = stod(value);
     else if (name == "k_smooth")
       this->k_smooth = stod(value);
     else if (name == "capture_video")
