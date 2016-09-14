@@ -87,7 +87,7 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
     d.pitch = Angle::degrees(stod(fields[35]));
     d.roll = Angle::degrees(stod(fields[36]));
     d.battery_voltage = stod(fields[38]);
-    d.calibration_status = stoui(fields[40]);
+    d.calibration_status = stoi(fields[40]);
   } catch (...)
   {
     return false;
