@@ -49,6 +49,7 @@ public:
   Angle pitch;
   Angle roll;
   double battery_voltage;
+  int calibration_status;
 };
 
 void test_dynamics();

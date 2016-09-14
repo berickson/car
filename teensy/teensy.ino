@@ -371,6 +371,13 @@ struct Eulers {
   float roll;
 };
 
+struct Acceleration {
+  float ax;
+  float ay;
+  float az;
+};
+
+
 void loop() {
   // set global loop values
   loop_count++;
@@ -433,18 +440,17 @@ void loop() {
     // constants below based on 220k and 1M resistor, 1023 steps and 3.3 reference voltage
     float battery_voltage = analogRead(PIN_BATTERY_VOLTAGE_DIVIDER) * ((3.3/1023.) / 220.)*(220.+1000.);
     Eulers eulers;
-	  eulers.yaw = -1;
-		float data[3];
-    data[0]=-2;
+    Acceleration acceleration;
  
-    mpu_bno.getEuler(data);
+    mpu_bno.getEuler((float *)&eulers);
+    mpu_bno.getAccel((float *)&acceleration);
     
     
     log(TD,
        "str," + steering.readMicroseconds()
        + ",esc," + speed.readMicroseconds()
        //+ ",aa,"+ ftos(mpu9150.ax) + "," + ftos(mpu9150.ay)+","+ ftos(mpu9150.az)
-       + ",aa,"+ ftos(0.0) + "," + ftos(0.0)+","+ ftos(0.0)
+       + ",aa,"+ ftos(acceleration.ax) + "," + ftos(acceleration.ay)+","+ ftos(acceleration.az)
        +",spur_us,"+   microseconds_between_spur_pulse_count + "," + last_spur_pulse_us
        +",spur_odo," + spur_pulse_count
        +",ping_mm,"+ping.millimeters()
@@ -454,9 +460,10 @@ void loop() {
        +",odo_br,"+odometer_back_right.odometer+"," +  odometer_back_right.last_odometer_change_us
        +",ms,"+millis()
        +",us,"+micros()
-       +",ypr,"+ ftos(-data[0]) + "," + ftos(data[1]) + "," + ftos(data[2])
+       +",ypr,"+ ftos(eulers.yaw) + "," + ftos(eulers.pitch) + "," + ftos(eulers.roll)
        //+",ypr,"+ ftos(-mpu9150.yaw* 180. / M_PI) + "," + ftos(-mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
        +",vbat,"+ftos(battery_voltage)
+       +",cal,"+mpu_bno.getCalibration()
        );
   }
 

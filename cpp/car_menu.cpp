@@ -7,6 +7,8 @@
 #include "file_names.h"
 #include "string_utils.h"
 #include <fstream>
+#include <sstream>
+#include <bitset>
 #include "car_ui.h"
 #include "driver.h"
 #include "run_settings.h"
@@ -304,6 +306,14 @@ void record(Car& car, CarUI & ui) {
 }
 
 
+string calibration_string(int a) {
+  std::bitset<8> x(a);
+  stringstream ss;
+   ss << x;
+  return ss.str();
+
+
+}
 
 void run_car_menu() {
 #ifdef RASPBERRY_PI
@@ -337,6 +347,7 @@ void run_car_menu() {
 
   SubMenu route_menu {
     {[&car](){return (string)" heading: " + format(car.get_heading().degrees(),5,1) + " usb: " + format(car.get_reading_count(),6,0) + " v: "+format(car.current_dynamics.battery_voltage,4,1); }},
+    {[&car](){return (string)" calibration: " + calibration_string(car.current_dynamics.calibration_status); }},
     {[](){return (string)"track ["+run_settings.track_name+"]";},&track_selection_menu},
     {[](){return (string)"route ["+run_settings.route_name+"]";},&route_selection_menu},
     MenuItem("go...",[&car,&ui](){go(car,ui);}),
