@@ -73,7 +73,8 @@ SOURCES       = ../../cpp/main.cpp \
 		../../cpp/file_names.cpp \
 		../../cpp/frame_grabber.cpp \
 		../../cpp/logger.cpp \
-		../../cpp/speedometer.cpp 
+		../../cpp/speedometer.cpp \
+		../../cpp/pid.cpp 
 OBJECTS       = main.o \
 		ackerman.o \
 		usb.o \
@@ -99,7 +100,8 @@ OBJECTS       = main.o \
 		file_names.o \
 		frame_grabber.o \
 		logger.o \
-		speedometer.o
+		speedometer.o \
+		pid.o
 DIST          = ../../cpp/README.md \
 		../../../../Qt/5.7/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../../Qt/5.7/gcc_64/mkspecs/common/unix.conf \
@@ -236,6 +238,7 @@ DIST          = ../../cpp/README.md \
 		../../../../Qt/5.7/gcc_64/mkspecs/features/qt_config.prf \
 		../../../../Qt/5.7/gcc_64/mkspecs/linux-g++/qmake.conf \
 		../../../../Qt/5.7/gcc_64/mkspecs/features/spec_post.prf \
+		../../cpp/.qmake.stash \
 		../../../../Qt/5.7/gcc_64/mkspecs/features/exclusive_builds.prf \
 		../../../../Qt/5.7/gcc_64/mkspecs/features/default_pre.prf \
 		../../../../Qt/5.7/gcc_64/mkspecs/features/resolve_config.prf \
@@ -279,7 +282,8 @@ DIST          = ../../cpp/README.md \
 		../../cpp/file_names.h \
 		../../cpp/frame_grabber.h \
 		../../cpp/logger.h \
-		../../cpp/speedometer.h ../../cpp/main.cpp \
+		../../cpp/speedometer.h \
+		../../cpp/pid.h ../../cpp/main.cpp \
 		../../cpp/ackerman.cpp \
 		../../cpp/usb.cpp \
 		../../cpp/dynamics.cpp \
@@ -304,7 +308,8 @@ DIST          = ../../cpp/README.md \
 		../../cpp/file_names.cpp \
 		../../cpp/frame_grabber.cpp \
 		../../cpp/logger.cpp \
-		../../cpp/speedometer.cpp
+		../../cpp/speedometer.cpp \
+		../../cpp/pid.cpp
 QMAKE_TARGET  = car-service
 DESTDIR       = 
 TARGET        = car-service
@@ -451,6 +456,7 @@ Makefile: ../../cpp/car-service.pro ../../../Qt/5.7/gcc_64/mkspecs/features/spec
 		../../../Qt/5.7/gcc_64/mkspecs/features/qt_config.prf \
 		../../../Qt/5.7/gcc_64/mkspecs/linux-g++/qmake.conf \
 		../../../Qt/5.7/gcc_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		../../../Qt/5.7/gcc_64/mkspecs/features/exclusive_builds.prf \
 		../../../Qt/5.7/gcc_64/mkspecs/features/default_pre.prf \
 		../../../Qt/5.7/gcc_64/mkspecs/features/resolve_config.prf \
@@ -606,6 +612,7 @@ Makefile: ../../cpp/car-service.pro ../../../Qt/5.7/gcc_64/mkspecs/features/spec
 ../../../Qt/5.7/gcc_64/mkspecs/features/qt_config.prf:
 ../../../Qt/5.7/gcc_64/mkspecs/linux-g++/qmake.conf:
 ../../../Qt/5.7/gcc_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 ../../../Qt/5.7/gcc_64/mkspecs/features/exclusive_builds.prf:
 ../../../Qt/5.7/gcc_64/mkspecs/features/default_pre.prf:
 ../../../Qt/5.7/gcc_64/mkspecs/features/resolve_config.prf:
@@ -639,8 +646,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../../cpp/geometry.h ../../cpp/ackerman.h ../../cpp/usb.h ../../cpp/work_queue.h ../../cpp/dynamics.h ../../cpp/split.h ../../cpp/car.h ../../cpp/config.h ../../cpp/trim.h ../../cpp/ends_with.h ../../cpp/fake_car.h ../../cpp/menu.h ../../cpp/system.h ../../cpp/car_menu.h ../../cpp/console_menu.h ../../cpp/pi_buttons.h ../../cpp/route.h ../../cpp/string_utils.h ../../cpp/driver.h ../../cpp/car_ui.h ../../cpp/lookup_table.h ../../cpp/run_settings.h ../../cpp/camera.h ../../cpp/tracker.h ../../cpp/file_names.h ../../cpp/frame_grabber.h ../../cpp/logger.h ../../cpp/speedometer.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../cpp/main.cpp ../../cpp/ackerman.cpp ../../cpp/usb.cpp ../../cpp/dynamics.cpp ../../cpp/car.cpp ../../cpp/config.cpp ../../cpp/work_queue.cpp ../../cpp/fake_car.cpp ../../cpp/menu.cpp ../../cpp/system.cpp ../../cpp/car_menu.cpp ../../cpp/console_menu.cpp ../../cpp/geometry.cpp ../../cpp/pi_buttons.cpp ../../cpp/route.cpp ../../cpp/string_utils.cpp ../../cpp/driver.cpp ../../cpp/car_ui.cpp ../../cpp/lookup_table.cpp ../../cpp/run_settings.cpp ../../cpp/camera.cpp ../../cpp/tracker.cpp ../../cpp/file_names.cpp ../../cpp/frame_grabber.cpp ../../cpp/logger.cpp ../../cpp/speedometer.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../cpp/geometry.h ../../cpp/ackerman.h ../../cpp/usb.h ../../cpp/work_queue.h ../../cpp/dynamics.h ../../cpp/split.h ../../cpp/car.h ../../cpp/config.h ../../cpp/trim.h ../../cpp/ends_with.h ../../cpp/fake_car.h ../../cpp/menu.h ../../cpp/system.h ../../cpp/car_menu.h ../../cpp/console_menu.h ../../cpp/pi_buttons.h ../../cpp/route.h ../../cpp/string_utils.h ../../cpp/driver.h ../../cpp/car_ui.h ../../cpp/lookup_table.h ../../cpp/run_settings.h ../../cpp/camera.h ../../cpp/tracker.h ../../cpp/file_names.h ../../cpp/frame_grabber.h ../../cpp/logger.h ../../cpp/speedometer.h ../../cpp/pid.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../cpp/main.cpp ../../cpp/ackerman.cpp ../../cpp/usb.cpp ../../cpp/dynamics.cpp ../../cpp/car.cpp ../../cpp/config.cpp ../../cpp/work_queue.cpp ../../cpp/fake_car.cpp ../../cpp/menu.cpp ../../cpp/system.cpp ../../cpp/car_menu.cpp ../../cpp/console_menu.cpp ../../cpp/geometry.cpp ../../cpp/pi_buttons.cpp ../../cpp/route.cpp ../../cpp/string_utils.cpp ../../cpp/driver.cpp ../../cpp/car_ui.cpp ../../cpp/lookup_table.cpp ../../cpp/run_settings.cpp ../../cpp/camera.cpp ../../cpp/tracker.cpp ../../cpp/file_names.cpp ../../cpp/frame_grabber.cpp ../../cpp/logger.cpp ../../cpp/speedometer.cpp ../../cpp/pid.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -703,6 +710,7 @@ main.o: ../../cpp/main.cpp ../../cpp/ackerman.h \
 		../../cpp/camera.h \
 		../../cpp/frame_grabber.h \
 		../../cpp/tracker.h \
+		../../cpp/pid.h \
 		../../cpp/logger.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../cpp/main.cpp
 
@@ -755,6 +763,7 @@ fake_car.o: ../../cpp/fake_car.cpp ../../cpp/fake_car.h \
 		../../cpp/string_utils.h \
 		../../cpp/trim.h \
 		../../cpp/split.h \
+		../../cpp/logger.h \
 		../../cpp/route.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fake_car.o ../../cpp/fake_car.cpp
 
@@ -828,6 +837,7 @@ driver.o: ../../cpp/driver.cpp ../../cpp/driver.h \
 		../../cpp/route.h \
 		../../cpp/run_settings.h \
 		../../cpp/logger.h \
+		../../cpp/pid.h \
 		../../cpp/fake_car.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o driver.o ../../cpp/driver.cpp
 
@@ -868,6 +878,9 @@ logger.o: ../../cpp/logger.cpp ../../cpp/logger.h \
 
 speedometer.o: ../../cpp/speedometer.cpp ../../cpp/speedometer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o speedometer.o ../../cpp/speedometer.cpp
+
+pid.o: ../../cpp/pid.cpp ../../cpp/pid.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o pid.o ../../cpp/pid.cpp
 
 ####### Install
 

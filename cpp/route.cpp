@@ -7,6 +7,53 @@
 #include <vector>
 
 
+class RouteBuilder {
+public:
+  RouteBuilder(Route & route, double car_length = 1.0) :
+    route(route){
+    this->car_length = car_length;
+  }
+  Route & route;
+  RouteNode & get_head() {
+    return route.nodes.at(route.nodes.size()-1);
+  }
+
+  double car_length = NAN;
+  void add_node(double x, double y){
+    if(route.nodes.size() == 0) {
+      RouteNode zero;
+      zero.secs = 0;
+      zero.front_x = 0;
+      zero.front_y = 0;
+      zero.heading = 0;
+      zero.heading_adjustment = 0;
+      zero.rear_x = -car_length;
+      zero.rear_y = -car_length;
+      route.add_node(zero);
+    }
+    RouteNode n;
+    n.front_x = x;
+    n.front_y = y;
+    RouteNode & head = get_head();
+
+    Angle angle =  angle_to(head.get_front_position(), n.get_front_position());
+    n.heading = angle.degrees();
+    head.heading = angle.degrees();
+    n.heading_adjustment = 0;
+    n.secs = route.nodes.size();
+
+
+    n.rear_x = n.front_x - car_length * cos(angle.radians());
+    n.rear_y = n.front_y - car_length * sin(angle.radians());
+
+    head.rear_x = head.front_x - car_length * cos(angle.radians());
+    head.rear_y = head.front_y - car_length * sin(angle.radians());
+    route.add_node(n);
+
+  }
+};
+
+
 // todo:  make separate object for current location
 
 void Route::add_node(RouteNode node){
@@ -41,20 +88,22 @@ Angle Route::get_total_curvature()
 
 Route get_circle(double r = 1, unsigned steps = 300) {
   Route route;
+  RouteBuilder builder(route);
 
-  for(unsigned i = 0; i < steps; i++) {
+  for(unsigned i = 1; i < steps; i++) {
     Angle theta = Angle::radians(2*M_PI * i / (steps-1));
     double x = r * sin(theta.radians());
     double y = r - r * cos(theta.radians());
-    route.add_node(RouteNode(x,y));
+    builder.add_node(x,y);
   }
   return route;
 }
 
 string Route::to_string() {
   stringstream ss;
+  ss<<RouteNode::csv_header() << endl;
   for(auto node:nodes) {
-    ss << node.to_string() << endl;
+    ss << node.csv_row() << endl;
   }
   return ss.str();
 }
@@ -271,6 +320,27 @@ string RouteNode::to_string()
   return ss.str();
 }
 
+string RouteNode::csv_header() {
+  string header = join({"secs","x","y","rear_x", "rear_y", "reverse", "heading","adj","esc","str","m/s"});
+  return header;
+}
+
+string RouteNode::csv_row(){
+  stringstream ss;
+  ss << secs << ","
+     << front_x << ","
+     << front_y << ","
+     << rear_x << ","
+     << rear_y << ","
+     << reverse << ","
+     << heading << ","
+     << heading_adjustment << ","
+     << esc << ","
+     << str << ","
+     << velocity;
+  return ss.str();
+}
+
 void RouteNode::set_from_standard_file(vector<string> fields) {
   secs = stod(fields[0]);
   front_x = stod(fields[1]);
@@ -475,22 +545,20 @@ void Route::optimize_velocity(double max_velocity, double max_acceleration) {
 }
 
 
+void test_circle(double radius, double max_a, double prune_tolerance = 0.1) {
+  cout << "circle with radius " << radius  << endl;
+  Route r = get_circle(radius);
+  cout << "route distance for circle: " << r.get_length() << endl;
+  cout << "optimized_velocity with max_a = " << max_a << endl;
+  r.optimize_velocity(99999,max_a);
+  cout << "max_v = " << r.get_max_velocity() << endl;
+  cout << "pruned with tolerance " << prune_tolerance  << endl;
+  cout << "max_v = " << r.get_max_velocity() << endl;
+}
 
 void test_circle() {
-  Route r = get_circle(2);
-  cout << "route distance for circle: " << r.get_length() << endl;
-  cout << r.to_string();
-  r.optimize_velocity();
-  cout << "optimized_velocity defaults" << endl;
-  cout << r.to_string();
-
-  r = get_circle(10);
-  cout << "route distance for circle: " << r.get_length() << endl;
-  cout << r.to_string();
-  r.optimize_velocity();
-  cout << "optimized_velocity defaults" << endl;
-  cout << r.to_string();
-
+  test_circle(2,1);
+  test_circle(10,1);
 }
 
 void test_prune() {
@@ -529,7 +597,30 @@ void test_curvature() {
   }
 }
 
+
+void test_optimize_velocity() {
+  Route r;
+  r.add_node(RouteNode(0,0));
+  r.add_node(RouteNode(1,0));
+  r.add_node(RouteNode(2,0));
+  r.add_node(RouteNode(3,0));
+  r.add_node(RouteNode(4,0));
+  r.add_node(RouteNode(5,0));
+  r.add_node(RouteNode(6,0));
+  r.add_node(RouteNode(7,0));
+  r.add_node(RouteNode(7,0));
+  r.add_node(RouteNode(9,0));
+  r.add_node(RouteNode(0,0));
+  r.optimize_velocity();
+  cout << r.to_string();
+  cout << "max velocity: " << r.get_max_velocity() << endl;;
+}
+
+
 void test_route() {
+  test_circle();
+  //test_optimize_velocity();
+  return;
   //test_prune();
   //return;
   //test_curvature();

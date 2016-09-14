@@ -33,6 +33,10 @@ struct RouteNode {
     front_x(_x),front_y(_y),velocity(_velocity),reverse(_reverse) {
   }
   void set_from_standard_file(vector<string> fields);
+
+public:
+  static string csv_header();
+  string csv_row();
 };
 
 class Route {
