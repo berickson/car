@@ -180,6 +180,7 @@ void Driver::drive_route(Route & route) {
 
       if(settings.crash_recovery == true && !recovering_from_crash) {
         if(check_for_crash()) {
+          log_warning("crash detected");
           recovering_from_crash = true;
 
           // repeat max of 3 times
@@ -196,7 +197,7 @@ void Driver::drive_route(Route & route) {
 
       if(recovering_from_crash) {
         // go backward for 1 meters at 1 m/s
-        if(distance(car.get_front_position(),last_crash.position) < 1.0 ) {
+        if(distance(car.get_front_position(),last_crash.position) > 1.0 ) {
           recovering_from_crash = false;
           car.set_esc_and_str(1500,1500);
           log_info("done backing away from crash");
