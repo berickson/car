@@ -39,6 +39,7 @@ bool Driver::check_for_crash() {
     // set last_crash_location to location
     previous_crash = current_crash; // remember the crash location
     current_crash = crash_checkpoint;
+    current_crash.ms = ms;
     return true;
   }
   return false;
