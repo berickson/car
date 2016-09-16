@@ -24,6 +24,11 @@ string Ackerman::to_string() {
   return ss.str() ;
 }
 
+void Ackerman::move_relative_to_heading(Point p) {
+  this->x += cos(heading) * p.x + sin(heading) * p.y;
+  this->y += sin(heading) * p.x + cos(heading) * p.y;
+}
+
   // x is ahead, l is to left, x must be positive
 Ackerman::Arc Ackerman::arc_to_relative_location(double x,double y) {
   Arc arc;

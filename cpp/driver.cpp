@@ -165,6 +165,7 @@ void Driver::set_evasive_actions_for_crash(Route& route)
     }
   }
   log_warning((string) "crashed, changing position by " + correction.to_string() + " meters");
+  car.ackerman.move_relative_to_heading(correction);
   last_crash_correction = correction;
 }
 
