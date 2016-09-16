@@ -36,7 +36,8 @@ bool Driver::check_for_crash() {
   // we've crashed if more than 3 seconds have elapsed since last checkpoint
   if(ms-crash_checkpoint.ms > 3000) {
     // set last_crash_location to location
-    last_crash = crash_checkpoint;
+    previous_crash = current_crash; // remember the crash location
+    current_crash = crash_checkpoint;
     return true;
   }
   return false;
@@ -122,26 +123,49 @@ void Driver::continue_along_route(Route& route, PID& steering_pid)
 
 void Driver::set_evasive_actions_for_crash(Route& route)
 {
-  Angle required_curvature = required_turn_curvature_by_look_ahead(route,0.25);
   Point correction; // meters relative to car update car state
 
-  // when it his a wall obliquely, the car tends to turn toward the wall,
-  // the goal will shift to the opposite side of the car from the wall,
-  // the car is too far to the position opposite the goal, change position accordingly
+  // if this is a repeat crash, try something new
+  bool repeated_crash = previous_crash.valid && distance(current_crash.position-last_crash_correction,previous_crash.position) < 0.1;
+  if( repeated_crash ) {
+    log_warning("detected a repeated crash, trying something else");
+    correction.x = -last_crash_correction.x; // x correction was probably wrong, remove it
+    if(fabs(last_crash_correction.y) <0.1) {
+      correction.y = 1.0;
+    }
+    else if (last_crash_correction.y > 0) {
+      correction.y = - fabs(last_crash_correction.y) - 1.0;
+    }
+    else {
+      // last must be negative
+      correction.y = fabs(last_crash_correction.y) + 1.0;
+    }
 
-  //   if goal is left, wall is right, we are too far to the right (negative y)
-  if(required_curvature.degrees()>5) {
-    correction.y = -1.0;
-  }
-  //   if goal is right, wall is left, we are too far to the left (positive y)
-  else if (required_curvature.degrees()<-5) {
-    correction.y = 1.0;
-  }
-  // not too far left or right, maybe too far forward?
-  else {
-    correction.x = -1.0;
+    correction.x = 1.0;
+  } else {
+    // new crash, try to guess what to do
+    Angle required_curvature = required_turn_curvature_by_look_ahead(route,0.25);
+
+
+    // when it his a wall obliquely, the car tends to turn toward the wall,
+    // the goal will shift to the opposite side of the car from the wall,
+    // the car is too far to the position opposite the goal, change position accordingly
+
+    //   if goal is left, wall is right, we are too far to the right (negative y)
+    if(required_curvature.degrees()>5) {
+      correction.y = -1.0;
+    }
+    //   if goal is right, wall is left, we are too far to the left (positive y)
+    else if (required_curvature.degrees()<-5) {
+      correction.y = 1.0;
+    }
+    // not too far left or right, maybe too far forward?
+    else {
+      correction.x = -1.0;
+    }
   }
   log_warning((string) "crashed, changing position by " + correction.to_string() + " meters");
+  last_crash_correction = correction;
 }
 
 void Driver::drive_route(Route & route) {
@@ -197,11 +221,11 @@ void Driver::drive_route(Route & route) {
 
       if(recovering_from_crash) {
         // go backward for 1 meters at 1 m/s
-        if(distance(car.get_front_position(),last_crash.position) > 1.0 ) {
+        if(distance(car.get_front_position(),current_crash.position) > 1.0 ) {
           recovering_from_crash = false;
           car.set_esc_and_str(1500,1500);
           log_info("done backing away from crash");
-        } else if (d.ms - last_crash.ms > 5000) {
+        } else if (d.ms - current_crash.ms > 5000) {
           recovering_from_crash = false;
           car.set_esc_and_str(1500,1500);
           log_info("timed out trying to back away from crash");

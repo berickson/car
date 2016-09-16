@@ -28,7 +28,8 @@ private:
     Point position;
     unsigned int ms;
     bool valid = false;
-  } crash_checkpoint, last_crash;
+  } crash_checkpoint, current_crash, previous_crash;
+  Point last_crash_correction;
 
   bool rear_slipping();
   int esc_for_max_decel();
