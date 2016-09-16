@@ -387,9 +387,11 @@ void run_car_menu() {
             + format(car.get_reading_count(),6,0)
             + " " + format(car.current_dynamics.battery_voltage,4,1)+"v"; }},
     MenuItem("record",[&car,&ui](){record(car,ui);}),
+    {[](){return (string)"optimize velocity ["+format(run_settings.optimize_velocity)+"]";},&optimize_velocity_menu},
     {[](){return (string)"max_a ["+format(run_settings.max_a)+"]";},&acceleration_menu},
     {[](){return (string)"max_v ["+format(run_settings.max_v)+"]";},&velocity_menu},
 
+    {[](){return (string)"crash recovery ["+format(run_settings.crash_recovery)+"]";},&crash_recovery_menu},
     {[](){return (string)"k_p ["+format(run_settings.steering_k_p)+"]";},&k_p_menu},
     {[](){return (string)"k_i ["+format(run_settings.steering_k_i)+"]";},&k_i_menu},
     {[](){return (string)"k_d ["+format(run_settings.steering_k_d)+"]";},&k_d_menu},
