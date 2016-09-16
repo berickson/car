@@ -144,7 +144,7 @@ void Driver::set_evasive_actions_for_crash(Route& route)
     correction.x = 1.0;
   } else {
     // new crash, try to guess what to do
-    Angle required_curvature = required_turn_curvature_by_look_ahead(route,0.25);
+    Angle error_angle = car.get_heading()-route.get_heading_at_current_position();
 
 
     // when it his a wall obliquely, the car tends to turn toward the wall,
@@ -152,11 +152,11 @@ void Driver::set_evasive_actions_for_crash(Route& route)
     // the car is too far to the position opposite the goal, change position accordingly
 
     //   if goal is left, wall is right, we are too far to the right (negative y)
-    if(required_curvature.degrees()>5) {
+    if(error_angle.degrees()>20) {
       correction.y = -1.0;
     }
     //   if goal is right, wall is left, we are too far to the left (positive y)
-    else if (required_curvature.degrees()<-5) {
+    else if (error_angle.degrees()<-20) {
       correction.y = 1.0;
     }
     // not too far left or right, maybe too far forward?
