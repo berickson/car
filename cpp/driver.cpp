@@ -139,7 +139,7 @@ void Driver::set_evasive_actions_for_crash(Route& route)
   }
   // not too far left or right, maybe too far forward?
   else {
-    correction.x = 1.0;
+    correction.x = -1.0;
   }
   log_warning((string) "crashed, changing position by " + correction.to_string() + " meters");
 }
