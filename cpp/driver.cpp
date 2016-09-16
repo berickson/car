@@ -5,6 +5,7 @@
 #include <unistd.h> // usleep
 #include "logger.h"
 #include "pid.h"
+#include "string_utils.h"
 
 
 Driver::Driver(Car & car, CarUI& ui, RunSettings& settings)
@@ -147,21 +148,20 @@ void Driver::set_evasive_actions_for_crash(Route& route)
     Angle error_angle = car.get_heading()-route.get_heading_at_current_position();
 
 
+    log_warning((string) "angle error at crash " + format(error_angle.degrees(),5,1));
     // when it his a wall obliquely, the car tends to turn toward the wall,
     // the goal will shift to the opposite side of the car from the wall,
     // the car is too far to the position opposite the goal, change position accordingly
-
-    //   if goal is left, wall is right, we are too far to the right (negative y)
-    if(error_angle.degrees()>20) {
+    if(fabs(error_angle.degrees()<20.)) {
+      log_info("looks like a head on collision, assuming position too far forward");
+      correction.x = 1.0;
+    } else if (error_angle.degrees() > 0) {
+      log_info("appeared to glance left, wall must be to right, assuming position too far right");
       correction.y = -1.0;
     }
-    //   if goal is right, wall is left, we are too far to the left (positive y)
-    else if (error_angle.degrees()<-20) {
-      correction.y = 1.0;
-    }
-    // not too far left or right, maybe too far forward?
     else {
-      correction.x = -1.0;
+      log_info("appeared to glance right, wall must be to left, assuming position too far left");
+      correction.y = 1.0;
     }
   }
   log_warning((string) "crashed, changing position by " + correction.to_string() + " meters");
