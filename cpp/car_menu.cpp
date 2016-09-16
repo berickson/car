@@ -142,6 +142,12 @@ double get_slip_slop(){return run_settings.slip_slop;}
 void set_capture_video(double v){run_settings.capture_video = v;}
 double get_capture_video(){return run_settings.capture_video;}
 
+void set_crash_recovery(double v){run_settings.crash_recovery = v;}
+double get_crash_recovery(){return run_settings.crash_recovery;}
+
+void set_optimize_velocity(double v){run_settings.optimize_velocity = v;}
+double get_optimize_velocity(){return run_settings.optimize_velocity;}
+
 
 
 SubMenu pi_menu {
@@ -170,6 +176,8 @@ SubMenu k_smooth_menu{};
 SubMenu t_ahead_menu{};
 SubMenu d_ahead_menu{};
 SubMenu capture_video_menu{};
+SubMenu crash_recovery_menu{};
+SubMenu optimize_velocity_menu{};
 
 
 CarMenu::CarMenu() {
@@ -211,8 +219,13 @@ void go(Car& car, CarUI & ui) {
     ui.clear();
     ui.move(0,0);
     ui.refresh();
-    rte.optimize_velocity(run_settings.max_v, run_settings.max_a);
-    ui.print((string)"max_v calculated at " + format(rte.get_max_velocity()) + "\n\n");
+    if(run_settings.optimize_velocity) {
+      rte.optimize_velocity(run_settings.max_v, run_settings.max_a);
+      ui.print("optimized velocity\n");
+    } else {
+      ui.print("using saved velocities\n");
+    }
+    ui.print((string)"max_v calculated at " + format(rte.get_max_velocity(),4,1) + "\n\n");
     ui.print("[back] [] []  [go]");
     ui.refresh();
     if(ui.wait_key()!='4') {
@@ -326,8 +339,6 @@ string calibration_string(int a) {
   stringstream ss;
    ss << x;
   return ss.str();
-
-
 }
 
 void run_car_menu() {
@@ -356,6 +367,8 @@ void run_car_menu() {
   selection_menu<double>(t_ahead_menu, linspace(0.,1,0.1), get_t_ahead, set_t_ahead );
   selection_menu<double>(d_ahead_menu, linspace(0.,.1,0.01), get_d_ahead, set_d_ahead );
   selection_menu<double>(capture_video_menu, {0,1}, get_capture_video, set_capture_video );
+  selection_menu<double>(crash_recovery_menu, {0,1}, get_crash_recovery, set_crash_recovery );
+  selection_menu<double>(optimize_velocity_menu, {0,1}, get_optimize_velocity, set_optimize_velocity );
 
 
   SubMenu track_selection_menu{};
@@ -365,11 +378,14 @@ void run_car_menu() {
   update_route_selection_menu();
 
   SubMenu route_menu {
-    {[&car](){return (string)" heading: " + format(car.get_heading().degrees(),5,1) + " usb: " + format(car.get_reading_count(),6,0) + " v: "+format(car.current_dynamics.battery_voltage,4,1); }},
-    {[&car](){return (string)" calibration: " + calibration_string(car.current_dynamics.calibration_status); }},
     {[](){return (string)"track ["+run_settings.track_name+"]";},&track_selection_menu},
     {[](){return (string)"route ["+run_settings.route_name+"]";},&route_selection_menu},
     MenuItem("go...",[&car,&ui](){go(car,ui);}),
+    {[&car](){
+        return (string) calibration_string(car.current_dynamics.calibration_status)
+            + " " + format(car.get_heading().degrees(),5,1) + "° "
+            + format(car.get_reading_count(),6,0)
+            + " " + format(car.current_dynamics.battery_voltage,4,1)+"v"; }},
     MenuItem("record",[&car,&ui](){record(car,ui);}),
     {[](){return (string)"max_a ["+format(run_settings.max_a)+"]";},&acceleration_menu},
     {[](){return (string)"max_v ["+format(run_settings.max_v)+"]";},&velocity_menu},

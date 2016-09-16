@@ -32,6 +32,8 @@ struct RunSettings{
 
 
   bool capture_video = false;
+  bool crash_recovery = true;
+  bool optimize_velocity = true;
   void write_to_file(string path);
   void load_from_file(string path);
 };

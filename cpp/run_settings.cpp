@@ -50,7 +50,9 @@ void RunSettings::write_to_file(string path) {
 
        << "prune_max = " << prune_max << endl
        << "prune_tolerance = " << prune_tolerance << endl
-       << "capture_video = " << capture_video << endl;
+       << "capture_video = " << capture_video << endl
+       << "crash_recovery = " << crash_recovery << endl
+       << "optimize_velocity = " << optimize_velocity <<endl;
 
 }
 
@@ -108,6 +110,10 @@ void RunSettings::load_from_file(string path)
       this->k_smooth = stod(value);
     else if (name == "capture_video")
       this->capture_video = stod(value)>0;
+    else if (name == "crash_recovery")
+      this->crash_recovery = stod(value)>0;
+    else if (name == "optimize_velocity")
+      this->optimize_velocity= stod(value)>0;
 
   }
 }
