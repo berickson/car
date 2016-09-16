@@ -126,7 +126,7 @@ void Driver::set_evasive_actions_for_crash(Route& route)
   Point correction; // meters relative to car update car state
 
   // if this is a repeat crash, try something new
-  bool repeated_crash = previous_crash.valid && distance(current_crash.position-last_crash_correction,previous_crash.position) < 0.1;
+  bool repeated_crash = previous_crash.valid && distance(current_crash.position,previous_crash.position) < 0.1;
   if( repeated_crash ) {
     log_warning("detected a repeated crash, trying something else");
     correction.x = -last_crash_correction.x; // x correction was probably wrong, remove it
@@ -165,7 +165,11 @@ void Driver::set_evasive_actions_for_crash(Route& route)
     }
   }
   log_warning((string) "crashed, changing position by " + correction.to_string() + " meters");
+
+  // update car and crash position with correction
   car.ackerman.move_relative_to_heading(correction);
+  current_crash.position = car.ackerman.front_position();
+
   last_crash_correction = correction;
 }
 
