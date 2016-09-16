@@ -12,6 +12,36 @@ Driver::Driver(Car & car, CarUI& ui, RunSettings& settings)
 {
 }
 
+// returns true if crashed
+bool Driver::check_for_crash() {
+  Point position = car.get_front_position();
+  unsigned int ms = car.current_dynamics.ms;
+
+  // if we don't have a checkpoint, get one and return
+  if(crash_checkpoint.valid == false) {
+    crash_checkpoint.ms = car.current_dynamics.ms;
+    crash_checkpoint.position = position;
+    crash_checkpoint.valid = true;
+    return false;
+  }
+
+  // if car has moved more than 0.05 meters, replace checkpoint
+  if(distance(position,crash_checkpoint.position) > 0.05) {
+    crash_checkpoint.ms = ms;
+    crash_checkpoint.position = position;
+    crash_checkpoint.valid = true;
+    return false;
+  }
+
+  // we've crashed if more than 3 seconds have elapsed since last checkpoint
+  if(ms-crash_checkpoint.ms > 3000) {
+    // set last_crash_location to location
+    last_crash = crash_checkpoint;
+    return true;
+  }
+  return false;
+}
+
 
 bool Driver::rear_slipping() {
   double v_front = (car.get_front_left_wheel().get_velocity(), car.get_front_right_wheel().get_velocity()) / 2.0;
@@ -46,6 +76,74 @@ int Driver::esc_for_velocity(double goal_velocity, double goal_accel) {
 
 
 
+void Driver::continue_along_route(Route& route, PID& steering_pid)
+{
+  auto p_front = car.get_front_position();
+  auto p_rear = car.get_rear_position();
+  double v = car.get_velocity();
+  double ahead = settings.d_ahead + v*settings.t_ahead;
+  if(!route.done)
+  route.set_position(p_front, p_rear, v);
+
+  //Angle steering_angle = steering_angle_by_look_ahead(route, ahead);
+  Angle track_curvature = required_turn_curvature_by_look_ahead(route,ahead);
+
+  // calculate derivitive term of the error
+  /*
+  Angle e_heading = car.get_heading() - route.get_heading_at_current_position();
+  double d_error = sin(e_heading.radians())*v;
+  Angle d_adjust = Angle::degrees(clamp(settings.steering_k_d * d_error,-30,30));
+
+
+  Angle p_adjust = Angle::degrees(clamp(-1. * settings.steering_k_p * route.cte  / (v+1),-30,30));
+
+  //
+  */
+  steering_pid.add_reading((double)car.current_dynamics.us / 1E6, -route.cte);
+  Angle pid_adjust = Angle::degrees(clamp(steering_pid.output(),-60,60));
+  Angle curvature = track_curvature + pid_adjust;
+
+
+
+  unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);
+  unsigned esc = route.done? esc_for_max_decel() : esc_for_velocity(route.get_velocity(), route.get_acceleration());
+
+  if(rear_slipping())
+    esc = 1500;
+
+  if(route.done && fabs(car.get_velocity()) == 0.0) {
+    log_info("route completed normally");
+    route_complete = true;
+    esc = 1500;
+    str = 1500;
+  }
+  car.set_esc_and_str(esc, str);
+}
+
+void Driver::set_evasive_actions_for_crash(Route& route)
+{
+  Angle required_curvature = required_turn_curvature_by_look_ahead(route,0.25);
+  Point correction; // meters relative to car update car state
+
+  // when it his a wall obliquely, the car tends to turn toward the wall,
+  // the goal will shift to the opposite side of the car from the wall,
+  // the car is too far to the position opposite the goal, change position accordingly
+
+  //   if goal is left, wall is right, we are too far to the right (negative y)
+  if(required_curvature.degrees()>5) {
+    correction.y = -1.0;
+  }
+  //   if goal is right, wall is left, we are too far to the left (positive y)
+  else if (required_curvature.degrees()<-5) {
+    correction.y = 1.0;
+  }
+  // not too far left or right, maybe too far forward?
+  else {
+    correction.x = 1.0;
+  }
+  log_warning((string) "crashed, changing position by " + correction.to_string() + " meters");
+}
+
 void Driver::drive_route(Route & route) {
   log_info("entering drive_route");
 
@@ -63,12 +161,16 @@ void Driver::drive_route(Route & route) {
     steering_pid.k_p = settings.steering_k_p;
     steering_pid.k_i = settings.steering_k_i;
     steering_pid.k_d = settings.steering_k_d;
-    while(true) {
+    route_complete = false;
+    recovering_from_crash = false;
+    int crash_count = 0;
+    while(!route_complete) {
       if(ui.getkey()!=-1) {
         error_text = "run aborted by user";
         log_info("run aborted by user");
-        break;
+        route_complete = true;
       }
+
 
       Dynamics d;
       if(!queue.try_pop(d,1000)) {
@@ -76,44 +178,39 @@ void Driver::drive_route(Route & route) {
         throw (string) "timed out waiting to read dynamics";
       }
 
-      auto p_front = car.get_front_position();
-      auto p_rear = car.get_rear_position();
-      double v = car.get_velocity();
-      double ahead = settings.d_ahead + v*settings.t_ahead;
-      if(!route.done)
-      route.set_position(p_front, p_rear, v);
+      if(settings.crash_recovery == true && !recovering_from_crash) {
+        if(check_for_crash()) {
+          recovering_from_crash = true;
 
-      //Angle steering_angle = steering_angle_by_look_ahead(route, ahead);
-      Angle track_curvature = curvature_by_look_ahead(route,ahead);
-
-      // calculate derivitive term of the error
-      /*
-      Angle e_heading = car.get_heading() - route.get_heading_at_current_position();
-      double d_error = sin(e_heading.radians())*v;
-      Angle d_adjust = Angle::degrees(clamp(settings.steering_k_d * d_error,-30,30));
-
-
-      Angle p_adjust = Angle::degrees(clamp(-1. * settings.steering_k_p * route.cte  / (v+1),-30,30));
-
-      //
-      */
-      steering_pid.add_reading((double)car.current_dynamics.us / 1E6, -route.cte);
-      Angle pid_adjust = Angle::degrees(clamp(steering_pid.output(),-60,60));
-      Angle curvature = track_curvature + pid_adjust;
-
-
-
-      unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);
-      unsigned esc = route.done? esc_for_max_decel() : esc_for_velocity(route.get_velocity(), route.get_acceleration());
-
-      if(rear_slipping())
-        esc = 1500;
-
-      if(route.done && fabs(car.get_velocity()) == 0.0) {
-        log_info("route completed normally");
-        break;
+          // repeat max of 3 times
+          ++crash_count;
+          if(crash_count >= 3) {
+            route_complete = true;
+            break;
+          }
+          // after a crash, set a plan for crash evasion
+          set_evasive_actions_for_crash(route);
+        }
       }
-      car.set_esc_and_str(esc, str);
+
+
+      if(recovering_from_crash) {
+        // go backward for 1 meters at 1 m/s
+        if(distance(car.get_front_position(),last_crash.position) < 1.0 ) {
+          recovering_from_crash = false;
+          car.set_esc_and_str(1500,1500);
+          log_info("done backing away from crash");
+        } else if (d.ms - last_crash.ms > 5000) {
+          recovering_from_crash = false;
+          car.set_esc_and_str(1500,1500);
+          log_info("timed out trying to back away from crash");
+        }
+        else {
+          car.set_esc_and_str(esc_for_velocity(-1.0,0),1500);
+        }
+      } else {
+        continue_along_route(route, steering_pid);
+      }
     }
   } catch (string s) {
     error_text = s;
@@ -143,7 +240,7 @@ Angle Driver::steering_angle_by_cte(Route &route) {
   return steering_angle;
 }
 
-Angle Driver::curvature_by_look_ahead(Route &route, double look_ahead)
+Angle Driver::required_turn_curvature_by_look_ahead(Route &route, double look_ahead)
 {
   double v = car.get_velocity();
   if(v<0)
@@ -199,7 +296,7 @@ void test_driver() {
              << " (" << n_ahead.front_x
              << " ," << n_ahead.front_y << ")"
              << " curvature: "
-             << driver.curvature_by_look_ahead(route, look_ahead).degrees()
+             << driver.required_turn_curvature_by_look_ahead(route, look_ahead).degrees()
              << endl;
     }
 }

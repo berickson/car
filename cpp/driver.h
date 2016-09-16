@@ -4,7 +4,7 @@
 #include "car_ui.h"
 #include "route.h"
 #include "run_settings.h"
-
+#include "pid.h"
 
 
 
@@ -18,12 +18,23 @@ public:
   RunSettings & settings;
 
   void drive_route(Route & route);
-  Angle curvature_by_look_ahead(Route & route, double ahead);
+  Angle required_turn_curvature_by_look_ahead(Route & route, double ahead);
   Angle steering_angle_by_cte(Route & route);
+  bool check_for_crash();
 private:
+  bool route_complete = false;
+  bool recovering_from_crash = false;
+  struct Checkpoint {
+    Point position;
+    unsigned int ms;
+    bool valid = false;
+  } crash_checkpoint, last_crash;
+
   bool rear_slipping();
   int esc_for_max_decel();
   int esc_for_velocity(double goal_velocity, double goal_accel);
+  void continue_along_route(Route& route, PID &steering_pid);
+  void set_evasive_actions_for_crash(Route& route);
 };
 
 
