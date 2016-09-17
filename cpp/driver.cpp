@@ -237,7 +237,7 @@ void Driver::drive_route(Route & route) {
           log_info("timed out trying to back away from crash");
         }
         else {
-          car.set_esc_and_str(esc_for_velocity(-1.0,0),1500);
+          car.set_esc_and_str(esc_for_velocity(-3.0,0),1500);
         }
       } else {
         continue_along_route(route, steering_pid);
