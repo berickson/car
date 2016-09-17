@@ -213,9 +213,9 @@ void Driver::drive_route(Route & route) {
           log_warning("crash detected");
           recovering_from_crash = true;
 
-          // repeat max of 3 times
+          // repeat max of 20 times
           ++crash_count;
-          if(crash_count >= 3) {
+          if(crash_count >= 20) {
             route_complete = true;
             break;
           }
