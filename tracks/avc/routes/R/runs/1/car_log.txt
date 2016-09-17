@@ -1,0 +1,1179 @@
+2016-09-16 10:31:55,INFO,enter main
+2016-09-16 10:31:55,INFO,reading configuration
+2016-09-16 10:31:55,INFO,all wheels set
+2016-09-16 10:31:55,INFO,begining usb monitor thread
+2016-09-16 10:32:35,INFO,entering go menu command
+2016-09-16 10:32:51,INFO,entering go menu command
+2016-09-16 10:32:51,INFO,entering drive_route
+2016-09-16 10:32:56,WARNING,crash detected
+2016-09-16 10:32:56,WARNING,crashed, changing position by (0,1) meters
+2016-09-16 10:32:57,INFO,done backing away from crash
+2016-09-16 10:33:04,WARNING,crash detected
+2016-09-16 10:33:04,WARNING,crashed, changing position by (0,1) meters
+2016-09-16 10:33:06,INFO,done backing away from crash
+2016-09-16 10:33:12,WARNING,crash detected
+2016-09-16 10:33:12,INFO,exiting drive_route
+2016-09-16 10:33:12,INFO,back from drive_route
+2016-09-16 10:33:12,INFO,making path
+2016-09-16 10:33:12,INFO,entering write_path_from_recording_file
+2016-09-16 10:33:12,INFO,reading configuration
+2016-09-16 10:33:12,INFO,all wheels set
+2016-09-16 10:33:12,INFO,stepping through recording to create path
+2016-09-16 10:33:12,INFO,entering write_path_from_recording_file
+2016-09-16 10:47:50,INFO,exiting go menu command
+2016-09-16 10:49:14,INFO,enter main
+2016-09-16 10:49:14,INFO,reading configuration
+2016-09-16 10:49:14,INFO,all wheels set
+2016-09-16 10:49:14,INFO,begining usb monitor thread
+2016-09-16 10:49:36,INFO,entering go menu command
+2016-09-16 10:49:50,INFO,entering drive_route
+2016-09-16 10:49:54,WARNING,crash detected
+2016-09-16 10:49:54,WARNING,crashed, changing position by (0,1) meters
+2016-09-16 10:49:55,INFO,done backing away from crash
+2016-09-16 10:49:58,WARNING,crash detected
+2016-09-16 10:49:58,WARNING,crashed, changing position by (-1,0) meters
+2016-09-16 10:49:58,INFO,done backing away from crash
+2016-09-16 10:50:02,WARNING,crash detected
+2016-09-16 10:50:02,INFO,exiting drive_route
+2016-09-16 10:50:02,INFO,back from drive_route
+2016-09-16 10:50:02,INFO,making path
+2016-09-16 10:50:02,INFO,entering write_path_from_recording_file
+2016-09-16 10:50:02,INFO,reading configuration
+2016-09-16 10:50:02,INFO,all wheels set
+2016-09-16 10:50:02,INFO,stepping through recording to create path
+2016-09-16 10:50:02,INFO,entering write_path_from_recording_file
+2016-09-16 10:55:33,INFO,enter main
+2016-09-16 10:55:33,INFO,reading configuration
+2016-09-16 10:55:33,INFO,all wheels set
+2016-09-16 10:55:33,INFO,begining usb monitor thread
+2016-09-16 10:55:52,INFO,entering go menu command
+2016-09-16 10:55:57,INFO,entering drive_route
+2016-09-16 10:56:01,WARNING,crash detected
+2016-09-16 10:56:01,WARNING,crashed, changing position by (0,1) meters
+2016-09-16 10:56:03,ERROR,timed out reading dynamics in drive_route
+2016-09-16 10:56:03,ERROR,timed out waiting to read dynamics
+2016-09-16 10:56:03,INFO,making path
+2016-09-16 10:56:03,INFO,entering write_path_from_recording_file
+2016-09-16 10:56:03,INFO,reading configuration
+2016-09-16 10:56:03,INFO,all wheels set
+2016-09-16 10:56:03,INFO,stepping through recording to create path
+2016-09-16 10:56:03,INFO,entering write_path_from_recording_file
+2016-09-16 10:56:03,ERROR,Error during play route: timed out waiting to read dynamics
+2016-09-16 10:56:08,INFO,exiting go menu command
+2016-09-16 10:56:23,INFO,entering go menu command
+2016-09-16 10:56:24,INFO,entering drive_route
+2016-09-16 10:56:28,WARNING,crash detected
+2016-09-16 10:56:28,WARNING,crashed, changing position by (0,1) meters
+2016-09-16 10:56:29,INFO,done backing away from crash
+2016-09-16 10:56:37,WARNING,crash detected
+2016-09-16 10:56:37,WARNING,detected a repeated crash, trying something else
+2016-09-16 10:56:37,WARNING,crashed, changing position by (1,-2) meters
+2016-09-16 10:56:38,INFO,done backing away from crash
+2016-09-16 10:56:43,WARNING,crash detected
+2016-09-16 10:56:43,INFO,exiting drive_route
+2016-09-16 10:56:43,INFO,back from drive_route
+2016-09-16 10:56:43,INFO,making path
+2016-09-16 10:56:43,INFO,entering write_path_from_recording_file
+2016-09-16 10:56:43,INFO,reading configuration
+2016-09-16 10:56:43,INFO,all wheels set
+2016-09-16 10:56:43,INFO,stepping through recording to create path
+2016-09-16 10:56:43,INFO,entering write_path_from_recording_file
+2016-09-16 10:57:06,INFO,exiting go menu command
+2016-09-16 10:57:22,INFO,entering go menu command
+2016-09-16 10:57:23,INFO,entering drive_route
+2016-09-16 10:57:30,INFO,route completed normally
+2016-09-16 10:57:30,INFO,exiting drive_route
+2016-09-16 10:57:30,INFO,back from drive_route
+2016-09-16 10:57:30,INFO,making path
+2016-09-16 10:57:30,INFO,entering write_path_from_recording_file
+2016-09-16 10:57:30,INFO,reading configuration
+2016-09-16 10:57:30,INFO,all wheels set
+2016-09-16 10:57:30,INFO,stepping through recording to create path
+2016-09-16 10:57:31,INFO,entering write_path_from_recording_file
+2016-09-16 10:57:46,INFO,exiting go menu command
+2016-09-16 10:58:00,INFO,entering go menu command
+2016-09-16 10:58:01,INFO,entering drive_route
+2016-09-16 10:58:04,WARNING,crash detected
+2016-09-16 10:58:04,WARNING,crashed, changing position by (0,1) meters
+2016-09-16 10:58:05,INFO,done backing away from crash
+2016-09-16 10:58:19,WARNING,crash detected
+2016-09-16 10:58:19,WARNING,crashed, changing position by (-1,0) meters
+2016-09-16 10:58:21,INFO,timed out trying to back away from crash
+2016-09-16 10:58:24,WARNING,crash detected
+2016-09-16 10:58:24,INFO,exiting drive_route
+2016-09-16 10:58:24,INFO,back from drive_route
+2016-09-16 10:58:24,INFO,making path
+2016-09-16 10:58:24,INFO,entering write_path_from_recording_file
+2016-09-16 10:58:24,INFO,reading configuration
+2016-09-16 10:58:24,INFO,all wheels set
+2016-09-16 10:58:24,INFO,stepping through recording to create path
+2016-09-16 10:58:25,INFO,entering write_path_from_recording_file
+2016-09-16 11:05:30,INFO,exiting go menu command
+2016-09-16 11:06:10,INFO,enter main
+2016-09-16 11:06:10,INFO,reading configuration
+2016-09-16 11:06:10,INFO,all wheels set
+2016-09-16 11:06:10,INFO,begining usb monitor thread
+2016-09-16 11:06:30,INFO,entering go menu command
+2016-09-16 11:06:31,INFO,entering drive_route
+2016-09-16 11:06:36,WARNING,crash detected
+2016-09-16 11:06:36,WARNING,crashed, changing position by (0,1) meters
+2016-09-16 11:06:37,INFO,done backing away from crash
+2016-09-16 11:06:44,WARNING,crash detected
+2016-09-16 11:06:44,WARNING,crashed, changing position by (0,1) meters
+2016-09-16 11:06:45,INFO,done backing away from crash
+2016-09-16 11:06:49,WARNING,crash detected
+2016-09-16 11:06:49,INFO,exiting drive_route
+2016-09-16 11:06:49,INFO,back from drive_route
+2016-09-16 11:06:49,INFO,making path
+2016-09-16 11:06:49,INFO,entering write_path_from_recording_file
+2016-09-16 11:06:49,INFO,reading configuration
+2016-09-16 11:06:49,INFO,all wheels set
+2016-09-16 11:06:49,INFO,stepping through recording to create path
+2016-09-16 11:06:50,INFO,entering write_path_from_recording_file
+2016-09-16 11:08:45,INFO,exiting go menu command
+2016-09-16 11:08:54,INFO,entering go menu command
+2016-09-16 11:08:55,INFO,entering drive_route
+2016-09-16 11:09:03,INFO,route completed normally
+2016-09-16 11:09:03,INFO,exiting drive_route
+2016-09-16 11:09:03,INFO,back from drive_route
+2016-09-16 11:09:03,INFO,making path
+2016-09-16 11:09:03,INFO,entering write_path_from_recording_file
+2016-09-16 11:09:03,INFO,reading configuration
+2016-09-16 11:09:03,INFO,all wheels set
+2016-09-16 11:09:03,INFO,stepping through recording to create path
+2016-09-16 11:09:03,INFO,entering write_path_from_recording_file
+2016-09-16 11:09:11,INFO,exiting go menu command
+2016-09-16 11:09:16,INFO,entering go menu command
+2016-09-16 11:09:18,INFO,entering drive_route
+2016-09-16 11:09:22,WARNING,crash detected
+2016-09-16 11:09:22,WARNING,crashed, changing position by (0,1) meters
+2016-09-16 11:09:23,INFO,done backing away from crash
+2016-09-16 11:09:30,WARNING,crash detected
+2016-09-16 11:09:30,WARNING,detected a repeated crash, trying something else
+2016-09-16 11:09:30,WARNING,crashed, changing position by (1,-2) meters
+2016-09-16 11:09:32,INFO,done backing away from crash
+2016-09-16 11:09:37,WARNING,crash detected
+2016-09-16 11:09:37,INFO,exiting drive_route
+2016-09-16 11:09:37,INFO,back from drive_route
+2016-09-16 11:09:37,INFO,making path
+2016-09-16 11:09:37,INFO,entering write_path_from_recording_file
+2016-09-16 11:09:37,INFO,reading configuration
+2016-09-16 11:09:37,INFO,all wheels set
+2016-09-16 11:09:37,INFO,stepping through recording to create path
+2016-09-16 11:09:37,INFO,entering write_path_from_recording_file
+2016-09-16 11:22:02,INFO,enter main
+2016-09-16 11:22:02,INFO,reading configuration
+2016-09-16 11:22:02,INFO,all wheels set
+2016-09-16 11:22:02,INFO,begining usb monitor thread
+2016-09-16 11:22:45,INFO,entering go menu command
+2016-09-16 11:22:46,INFO,entering drive_route
+2016-09-16 11:22:50,WARNING,crash detected
+2016-09-16 11:22:50,WARNING,angle error at crash -360.8
+2016-09-16 11:22:50,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 11:22:50,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 11:22:52,INFO,done backing away from crash
+2016-09-16 11:22:52,WARNING,crash detected
+2016-09-16 11:22:52,WARNING,angle error at crash -360.7
+2016-09-16 11:22:52,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 11:22:52,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 11:22:52,INFO,timed out trying to back away from crash
+2016-09-16 11:22:57,WARNING,crash detected
+2016-09-16 11:22:57,INFO,exiting drive_route
+2016-09-16 11:22:57,INFO,back from drive_route
+2016-09-16 11:22:57,INFO,making path
+2016-09-16 11:22:57,INFO,entering write_path_from_recording_file
+2016-09-16 11:22:57,INFO,reading configuration
+2016-09-16 11:22:57,INFO,all wheels set
+2016-09-16 11:22:57,INFO,stepping through recording to create path
+2016-09-16 11:22:57,INFO,entering write_path_from_recording_file
+2016-09-16 11:28:36,INFO,enter main
+2016-09-16 11:28:36,INFO,reading configuration
+2016-09-16 11:28:36,INFO,all wheels set
+2016-09-16 11:28:36,INFO,begining usb monitor thread
+2016-09-16 11:28:47,INFO,entering go menu command
+2016-09-16 11:28:49,INFO,entering drive_route
+2016-09-16 11:28:57,WARNING,crash detected
+2016-09-16 11:28:57,WARNING,angle error at crash -363.7
+2016-09-16 11:28:57,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 11:28:57,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 11:29:02,INFO,timed out trying to back away from crash
+2016-09-16 11:29:04,INFO,route completed normally
+2016-09-16 11:29:04,INFO,exiting drive_route
+2016-09-16 11:29:04,INFO,back from drive_route
+2016-09-16 11:29:04,INFO,making path
+2016-09-16 11:29:04,INFO,entering write_path_from_recording_file
+2016-09-16 11:29:04,INFO,reading configuration
+2016-09-16 11:29:04,INFO,all wheels set
+2016-09-16 11:29:04,INFO,stepping through recording to create path
+2016-09-16 11:29:04,INFO,entering write_path_from_recording_file
+2016-09-16 11:29:46,INFO,exiting go menu command
+2016-09-16 11:29:55,INFO,entering go menu command
+2016-09-16 11:29:58,INFO,entering drive_route
+2016-09-16 11:30:01,WARNING,crash detected
+2016-09-16 11:30:01,WARNING,angle error at crash -384.8
+2016-09-16 11:30:01,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 11:30:01,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 11:30:02,INFO,done backing away from crash
+2016-09-16 11:30:08,WARNING,crash detected
+2016-09-16 11:30:08,WARNING,angle error at crash -399.2
+2016-09-16 11:30:08,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 11:30:08,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 11:30:13,INFO,timed out trying to back away from crash
+2016-09-16 11:30:18,WARNING,crash detected
+2016-09-16 11:30:18,INFO,exiting drive_route
+2016-09-16 11:30:18,INFO,back from drive_route
+2016-09-16 11:30:18,INFO,making path
+2016-09-16 11:30:18,INFO,entering write_path_from_recording_file
+2016-09-16 11:30:18,INFO,reading configuration
+2016-09-16 11:30:18,INFO,all wheels set
+2016-09-16 11:30:18,INFO,stepping through recording to create path
+2016-09-16 11:30:18,INFO,entering write_path_from_recording_file
+2016-09-16 11:31:53,INFO,exiting go menu command
+2016-09-16 11:32:15,INFO,entering write_path_from_recording_file
+2016-09-16 11:32:15,INFO,reading configuration
+2016-09-16 11:32:15,INFO,all wheels set
+2016-09-16 11:32:15,INFO,stepping through recording to create path
+2016-09-16 11:32:15,INFO,entering write_path_from_recording_file
+2016-09-16 11:32:24,INFO,entering go menu command
+2016-09-16 11:32:24,INFO,entering drive_route
+2016-09-16 11:32:32,WARNING,crash detected
+2016-09-16 11:32:32,WARNING,angle error at crash -377.6
+2016-09-16 11:32:32,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 11:32:32,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 11:32:33,INFO,done backing away from crash
+2016-09-16 11:32:33,WARNING,crash detected
+2016-09-16 11:32:33,WARNING,angle error at crash -378.1
+2016-09-16 11:32:33,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 11:32:33,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 11:32:38,INFO,timed out trying to back away from crash
+2016-09-16 11:32:43,INFO,route completed normally
+2016-09-16 11:32:43,INFO,exiting drive_route
+2016-09-16 11:32:43,INFO,back from drive_route
+2016-09-16 11:32:43,INFO,making path
+2016-09-16 11:32:43,INFO,entering write_path_from_recording_file
+2016-09-16 11:32:43,INFO,reading configuration
+2016-09-16 11:32:43,INFO,all wheels set
+2016-09-16 11:32:43,INFO,stepping through recording to create path
+2016-09-16 11:32:44,INFO,entering write_path_from_recording_file
+2016-09-16 11:34:39,INFO,exiting go menu command
+2016-09-16 11:34:41,INFO,entering go menu command
+2016-09-16 11:34:42,INFO,entering drive_route
+2016-09-16 11:34:45,WARNING,crash detected
+2016-09-16 11:34:45,WARNING,angle error at crash -469.7
+2016-09-16 11:34:45,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 11:34:45,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 11:34:47,INFO,done backing away from crash
+2016-09-16 11:34:57,WARNING,crash detected
+2016-09-16 11:34:57,WARNING,angle error at crash -295.1
+2016-09-16 11:34:57,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 11:34:57,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 11:35:02,INFO,timed out trying to back away from crash
+2016-09-16 11:35:07,WARNING,crash detected
+2016-09-16 11:35:07,INFO,exiting drive_route
+2016-09-16 11:35:07,INFO,back from drive_route
+2016-09-16 11:35:07,INFO,making path
+2016-09-16 11:35:07,INFO,entering write_path_from_recording_file
+2016-09-16 11:35:07,INFO,reading configuration
+2016-09-16 11:35:07,INFO,all wheels set
+2016-09-16 11:35:07,INFO,stepping through recording to create path
+2016-09-16 11:35:08,INFO,entering write_path_from_recording_file
+2016-09-16 11:37:04,INFO,exiting go menu command
+2016-09-16 11:41:56,INFO,enter main
+2016-09-16 11:41:56,INFO,reading configuration
+2016-09-16 11:41:56,INFO,all wheels set
+2016-09-16 11:41:56,INFO,begining usb monitor thread
+2016-09-16 11:43:08,INFO,entering write_path_from_recording_file
+2016-09-16 11:43:08,INFO,reading configuration
+2016-09-16 11:43:08,INFO,all wheels set
+2016-09-16 11:43:08,INFO,stepping through recording to create path
+2016-09-16 11:43:09,INFO,entering write_path_from_recording_file
+2016-09-16 11:43:16,INFO,entering go menu command
+2016-09-16 11:43:18,INFO,entering drive_route
+2016-09-16 11:43:47,INFO,route completed normally
+2016-09-16 11:43:47,INFO,exiting drive_route
+2016-09-16 11:43:47,INFO,back from drive_route
+2016-09-16 11:43:47,INFO,making path
+2016-09-16 11:43:47,INFO,entering write_path_from_recording_file
+2016-09-16 11:43:47,INFO,reading configuration
+2016-09-16 11:43:47,INFO,all wheels set
+2016-09-16 11:43:47,INFO,stepping through recording to create path
+2016-09-16 11:43:48,INFO,entering write_path_from_recording_file
+2016-09-16 11:44:19,INFO,exiting go menu command
+2016-09-16 11:44:43,INFO,entering write_path_from_recording_file
+2016-09-16 11:44:43,INFO,reading configuration
+2016-09-16 11:44:43,INFO,all wheels set
+2016-09-16 11:44:43,INFO,stepping through recording to create path
+2016-09-16 11:44:44,INFO,entering write_path_from_recording_file
+2016-09-16 11:45:15,INFO,entering go menu command
+2016-09-16 11:45:15,INFO,entering drive_route
+2016-09-16 11:45:35,INFO,route completed normally
+2016-09-16 11:45:35,INFO,exiting drive_route
+2016-09-16 11:45:35,INFO,back from drive_route
+2016-09-16 11:45:35,INFO,making path
+2016-09-16 11:45:35,INFO,entering write_path_from_recording_file
+2016-09-16 11:45:35,INFO,reading configuration
+2016-09-16 11:45:35,INFO,all wheels set
+2016-09-16 11:45:35,INFO,stepping through recording to create path
+2016-09-16 11:45:35,INFO,entering write_path_from_recording_file
+2016-09-16 11:45:43,INFO,exiting go menu command
+2016-09-16 11:46:02,INFO,entering go menu command
+2016-09-16 11:46:05,INFO,entering drive_route
+2016-09-16 11:46:13,WARNING,crash detected
+2016-09-16 11:46:13,WARNING,angle error at crash  29.7
+2016-09-16 11:46:13,INFO,appeared to glance left, wall must be to right, assuming position too far right
+2016-09-16 11:46:13,WARNING,crashed, changing position by (0,-1) meters
+2016-09-16 11:46:18,INFO,run aborted by user
+2016-09-16 11:46:18,ERROR,run aborted by user
+2016-09-16 11:46:18,INFO,making path
+2016-09-16 11:46:18,INFO,entering write_path_from_recording_file
+2016-09-16 11:46:18,INFO,reading configuration
+2016-09-16 11:46:18,INFO,all wheels set
+2016-09-16 11:46:18,INFO,stepping through recording to create path
+2016-09-16 11:46:18,INFO,entering write_path_from_recording_file
+2016-09-16 11:46:18,ERROR,Error during play route: run aborted by user
+2016-09-16 11:46:22,INFO,exiting go menu command
+2016-09-16 11:47:49,INFO,entering write_path_from_recording_file
+2016-09-16 11:47:49,INFO,reading configuration
+2016-09-16 11:47:49,INFO,all wheels set
+2016-09-16 11:47:49,INFO,stepping through recording to create path
+2016-09-16 11:47:49,INFO,entering write_path_from_recording_file
+2016-09-16 11:47:57,INFO,entering go menu command
+2016-09-16 11:47:59,INFO,entering drive_route
+2016-09-16 11:48:16,INFO,route completed normally
+2016-09-16 11:48:16,INFO,exiting drive_route
+2016-09-16 11:48:16,INFO,back from drive_route
+2016-09-16 11:48:16,INFO,making path
+2016-09-16 11:48:16,INFO,entering write_path_from_recording_file
+2016-09-16 11:48:16,INFO,reading configuration
+2016-09-16 11:48:16,INFO,all wheels set
+2016-09-16 11:48:16,INFO,stepping through recording to create path
+2016-09-16 11:48:16,INFO,entering write_path_from_recording_file
+2016-09-16 11:49:08,INFO,exiting go menu command
+2016-09-16 11:49:29,INFO,entering write_path_from_recording_file
+2016-09-16 11:49:29,INFO,reading configuration
+2016-09-16 11:49:29,INFO,all wheels set
+2016-09-16 11:49:29,INFO,stepping through recording to create path
+2016-09-16 11:49:30,INFO,entering write_path_from_recording_file
+2016-09-16 11:49:41,INFO,entering go menu command
+2016-09-16 11:49:42,INFO,entering drive_route
+2016-09-16 11:50:05,INFO,route completed normally
+2016-09-16 11:50:05,INFO,exiting drive_route
+2016-09-16 11:50:05,INFO,back from drive_route
+2016-09-16 11:50:05,INFO,making path
+2016-09-16 11:50:05,INFO,entering write_path_from_recording_file
+2016-09-16 11:50:05,INFO,reading configuration
+2016-09-16 11:50:05,INFO,all wheels set
+2016-09-16 11:50:05,INFO,stepping through recording to create path
+2016-09-16 11:50:05,INFO,entering write_path_from_recording_file
+2016-09-16 11:50:09,INFO,exiting go menu command
+2016-09-16 11:50:11,INFO,entering go menu command
+2016-09-16 11:50:17,INFO,entering drive_route
+2016-09-16 11:50:23,WARNING,crash detected
+2016-09-16 11:50:23,WARNING,angle error at crash  -0.8
+2016-09-16 11:50:23,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 11:50:23,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 11:50:24,INFO,done backing away from crash
+2016-09-16 11:50:24,WARNING,crash detected
+2016-09-16 11:50:24,WARNING,angle error at crash  -5.5
+2016-09-16 11:50:24,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 11:50:24,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 11:50:25,INFO,done backing away from crash
+2016-09-16 11:50:25,WARNING,crash detected
+2016-09-16 11:50:25,INFO,exiting drive_route
+2016-09-16 11:50:25,INFO,back from drive_route
+2016-09-16 11:50:25,INFO,making path
+2016-09-16 11:50:25,INFO,entering write_path_from_recording_file
+2016-09-16 11:50:25,INFO,reading configuration
+2016-09-16 11:50:25,INFO,all wheels set
+2016-09-16 11:50:25,INFO,stepping through recording to create path
+2016-09-16 11:50:25,INFO,entering write_path_from_recording_file
+2016-09-16 11:50:40,INFO,exiting go menu command
+2016-09-16 11:55:03,INFO,entering write_path_from_recording_file
+2016-09-16 11:55:03,INFO,reading configuration
+2016-09-16 11:55:03,INFO,all wheels set
+2016-09-16 11:55:03,INFO,stepping through recording to create path
+2016-09-16 11:55:04,INFO,entering write_path_from_recording_file
+2016-09-16 11:55:32,INFO,entering go menu command
+2016-09-16 11:55:33,INFO,entering drive_route
+2016-09-16 11:55:48,WARNING,crash detected
+2016-09-16 11:55:48,WARNING,angle error at crash -40.2
+2016-09-16 11:55:48,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 11:55:48,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 11:55:53,INFO,timed out trying to back away from crash
+2016-09-16 11:55:56,WARNING,crash detected
+2016-09-16 11:55:56,WARNING,detected a repeated crash, trying something else
+2016-09-16 11:55:56,WARNING,crashed, changing position by (1,1) meters
+2016-09-16 11:56:01,INFO,timed out trying to back away from crash
+2016-09-16 11:56:04,WARNING,crash detected
+2016-09-16 11:56:04,INFO,exiting drive_route
+2016-09-16 11:56:04,INFO,back from drive_route
+2016-09-16 11:56:04,INFO,making path
+2016-09-16 11:56:04,INFO,entering write_path_from_recording_file
+2016-09-16 11:56:04,INFO,reading configuration
+2016-09-16 11:56:04,INFO,all wheels set
+2016-09-16 11:56:04,INFO,stepping through recording to create path
+2016-09-16 11:56:05,INFO,entering write_path_from_recording_file
+2016-09-16 11:56:07,INFO,exiting go menu command
+2016-09-16 11:56:49,INFO,entering go menu command
+2016-09-16 11:56:51,INFO,entering drive_route
+2016-09-16 11:57:09,WARNING,crash detected
+2016-09-16 11:57:09,WARNING,angle error at crash -75.5
+2016-09-16 11:57:09,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 11:57:09,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 11:57:14,INFO,timed out trying to back away from crash
+2016-09-16 11:57:16,INFO,run aborted by user
+2016-09-16 11:57:16,ERROR,run aborted by user
+2016-09-16 11:57:16,INFO,making path
+2016-09-16 11:57:16,INFO,entering write_path_from_recording_file
+2016-09-16 11:57:16,INFO,reading configuration
+2016-09-16 11:57:16,INFO,all wheels set
+2016-09-16 11:57:16,INFO,stepping through recording to create path
+2016-09-16 11:57:16,INFO,entering write_path_from_recording_file
+2016-09-16 11:57:16,ERROR,Error during play route: run aborted by user
+2016-09-16 11:57:33,INFO,exiting go menu command
+2016-09-16 11:58:20,INFO,entering write_path_from_recording_file
+2016-09-16 11:58:20,INFO,reading configuration
+2016-09-16 11:58:20,INFO,all wheels set
+2016-09-16 11:58:20,INFO,stepping through recording to create path
+2016-09-16 11:58:21,INFO,entering write_path_from_recording_file
+2016-09-16 11:58:32,INFO,entering go menu command
+2016-09-16 11:58:34,INFO,entering drive_route
+2016-09-16 11:58:52,WARNING,crash detected
+2016-09-16 11:58:52,WARNING,angle error at crash  -4.6
+2016-09-16 11:58:52,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 11:58:52,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 11:58:53,INFO,done backing away from crash
+2016-09-16 11:58:59,WARNING,crash detected
+2016-09-16 11:58:59,WARNING,angle error at crash -35.1
+2016-09-16 11:58:59,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 11:58:59,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 11:59:04,INFO,timed out trying to back away from crash
+2016-09-16 11:59:07,WARNING,crash detected
+2016-09-16 11:59:07,INFO,exiting drive_route
+2016-09-16 11:59:07,INFO,back from drive_route
+2016-09-16 11:59:07,INFO,making path
+2016-09-16 11:59:07,INFO,entering write_path_from_recording_file
+2016-09-16 11:59:07,INFO,reading configuration
+2016-09-16 11:59:07,INFO,all wheels set
+2016-09-16 11:59:07,INFO,stepping through recording to create path
+2016-09-16 11:59:08,INFO,entering write_path_from_recording_file
+2016-09-16 11:59:12,INFO,exiting go menu command
+2016-09-16 11:59:46,INFO,entering go menu command
+2016-09-16 11:59:47,INFO,entering drive_route
+2016-09-16 12:00:03,WARNING,crash detected
+2016-09-16 12:00:03,WARNING,angle error at crash  -1.3
+2016-09-16 12:00:03,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 12:00:03,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 12:00:08,INFO,timed out trying to back away from crash
+2016-09-16 12:01:02,WARNING,crash detected
+2016-09-16 12:01:02,WARNING,angle error at crash -16.3
+2016-09-16 12:01:02,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 12:01:02,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 12:01:07,INFO,timed out trying to back away from crash
+2016-09-16 12:01:12,WARNING,crash detected
+2016-09-16 12:01:12,INFO,exiting drive_route
+2016-09-16 12:01:12,INFO,back from drive_route
+2016-09-16 12:01:12,INFO,making path
+2016-09-16 12:01:12,INFO,entering write_path_from_recording_file
+2016-09-16 12:01:12,INFO,reading configuration
+2016-09-16 12:01:12,INFO,all wheels set
+2016-09-16 12:01:12,INFO,stepping through recording to create path
+2016-09-16 12:01:14,INFO,entering write_path_from_recording_file
+2016-09-16 12:01:17,INFO,exiting go menu command
+2016-09-16 12:01:51,INFO,entering write_path_from_recording_file
+2016-09-16 12:01:51,INFO,reading configuration
+2016-09-16 12:01:51,INFO,all wheels set
+2016-09-16 12:01:51,INFO,stepping through recording to create path
+2016-09-16 12:01:51,INFO,entering write_path_from_recording_file
+2016-09-16 12:03:52,INFO,entering write_path_from_recording_file
+2016-09-16 12:03:52,INFO,reading configuration
+2016-09-16 12:03:52,INFO,all wheels set
+2016-09-16 12:03:52,INFO,stepping through recording to create path
+2016-09-16 12:03:54,INFO,entering write_path_from_recording_file
+2016-09-16 12:04:07,INFO,entering go menu command
+2016-09-16 12:04:09,INFO,entering drive_route
+2016-09-16 12:04:19,WARNING,crash detected
+2016-09-16 12:04:19,WARNING,angle error at crash -374.5
+2016-09-16 12:04:19,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 12:04:19,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 12:04:24,INFO,timed out trying to back away from crash
+2016-09-16 12:04:33,WARNING,crash detected
+2016-09-16 12:04:33,WARNING,angle error at crash -88.1
+2016-09-16 12:04:33,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 12:04:33,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 12:04:38,INFO,timed out trying to back away from crash
+2016-09-16 12:04:41,WARNING,crash detected
+2016-09-16 12:04:41,INFO,exiting drive_route
+2016-09-16 12:04:41,INFO,back from drive_route
+2016-09-16 12:04:41,INFO,making path
+2016-09-16 12:04:41,INFO,entering write_path_from_recording_file
+2016-09-16 12:04:41,INFO,reading configuration
+2016-09-16 12:04:41,INFO,all wheels set
+2016-09-16 12:04:41,INFO,stepping through recording to create path
+2016-09-16 12:04:41,INFO,entering write_path_from_recording_file
+2016-09-16 12:05:42,INFO,exiting go menu command
+2016-09-16 12:07:53,INFO,entering write_path_from_recording_file
+2016-09-16 12:07:53,INFO,reading configuration
+2016-09-16 12:07:53,INFO,all wheels set
+2016-09-16 12:07:53,INFO,stepping through recording to create path
+2016-09-16 12:07:55,INFO,entering write_path_from_recording_file
+2016-09-16 12:08:36,INFO,entering go menu command
+2016-09-16 12:08:38,INFO,entering drive_route
+2016-09-16 12:08:53,WARNING,crash detected
+2016-09-16 12:08:53,WARNING,angle error at crash  -0.7
+2016-09-16 12:08:53,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 12:08:53,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 12:08:58,INFO,timed out trying to back away from crash
+2016-09-16 12:09:01,WARNING,crash detected
+2016-09-16 12:09:01,WARNING,detected a repeated crash, trying something else
+2016-09-16 12:09:01,WARNING,crashed, changing position by (1,1) meters
+2016-09-16 12:09:06,INFO,timed out trying to back away from crash
+2016-09-16 12:09:09,WARNING,crash detected
+2016-09-16 12:09:09,INFO,exiting drive_route
+2016-09-16 12:09:09,INFO,back from drive_route
+2016-09-16 12:09:09,INFO,making path
+2016-09-16 12:09:09,INFO,entering write_path_from_recording_file
+2016-09-16 12:09:09,INFO,reading configuration
+2016-09-16 12:09:09,INFO,all wheels set
+2016-09-16 12:09:09,INFO,stepping through recording to create path
+2016-09-16 12:09:10,INFO,entering write_path_from_recording_file
+2016-09-16 12:09:30,INFO,exiting go menu command
+2016-09-16 12:13:53,INFO,entering go menu command
+2016-09-16 12:14:00,INFO,entering drive_route
+2016-09-16 12:14:16,WARNING,crash detected
+2016-09-16 12:14:16,WARNING,angle error at crash -140.7
+2016-09-16 12:14:16,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 12:14:16,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 12:14:19,INFO,run aborted by user
+2016-09-16 12:14:19,ERROR,run aborted by user
+2016-09-16 12:14:19,INFO,making path
+2016-09-16 12:14:19,INFO,entering write_path_from_recording_file
+2016-09-16 12:14:19,INFO,reading configuration
+2016-09-16 12:14:19,INFO,all wheels set
+2016-09-16 12:14:19,INFO,stepping through recording to create path
+2016-09-16 12:14:19,INFO,entering write_path_from_recording_file
+2016-09-16 12:14:19,ERROR,Error during play route: run aborted by user
+2016-09-16 12:14:24,INFO,exiting go menu command
+2016-09-16 12:15:34,INFO,entering write_path_from_recording_file
+2016-09-16 12:15:34,INFO,reading configuration
+2016-09-16 12:15:34,INFO,all wheels set
+2016-09-16 12:15:34,INFO,stepping through recording to create path
+2016-09-16 12:15:35,INFO,entering write_path_from_recording_file
+2016-09-16 12:16:23,INFO,entering go menu command
+2016-09-16 12:16:25,INFO,entering drive_route
+2016-09-16 12:16:48,INFO,run aborted by user
+2016-09-16 12:16:48,ERROR,run aborted by user
+2016-09-16 12:16:48,INFO,making path
+2016-09-16 12:16:48,INFO,entering write_path_from_recording_file
+2016-09-16 12:16:48,INFO,reading configuration
+2016-09-16 12:16:48,INFO,all wheels set
+2016-09-16 12:16:48,INFO,stepping through recording to create path
+2016-09-16 12:16:49,INFO,entering write_path_from_recording_file
+2016-09-16 12:16:49,ERROR,Error during play route: run aborted by user
+2016-09-16 12:16:50,INFO,exiting go menu command
+2016-09-16 12:17:11,INFO,entering go menu command
+2016-09-16 12:17:11,INFO,entering drive_route
+2016-09-16 12:17:28,WARNING,crash detected
+2016-09-16 12:17:28,WARNING,angle error at crash  32.4
+2016-09-16 12:17:28,INFO,appeared to glance left, wall must be to right, assuming position too far right
+2016-09-16 12:17:28,WARNING,crashed, changing position by (0,-1) meters
+2016-09-16 12:17:28,INFO,run aborted by user
+2016-09-16 12:17:28,ERROR,run aborted by user
+2016-09-16 12:17:28,INFO,making path
+2016-09-16 12:17:28,INFO,entering write_path_from_recording_file
+2016-09-16 12:17:28,INFO,reading configuration
+2016-09-16 12:17:28,INFO,all wheels set
+2016-09-16 12:17:28,INFO,stepping through recording to create path
+2016-09-16 12:17:28,INFO,entering write_path_from_recording_file
+2016-09-16 12:17:28,ERROR,Error during play route: run aborted by user
+2016-09-16 12:17:32,INFO,exiting go menu command
+2016-09-16 12:17:50,INFO,entering go menu command
+2016-09-16 12:17:50,INFO,entering drive_route
+2016-09-16 12:18:03,WARNING,crash detected
+2016-09-16 12:18:03,WARNING,angle error at crash   5.5
+2016-09-16 12:18:03,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 12:18:03,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 12:18:07,INFO,run aborted by user
+2016-09-16 12:18:07,ERROR,run aborted by user
+2016-09-16 12:18:07,INFO,making path
+2016-09-16 12:18:07,INFO,entering write_path_from_recording_file
+2016-09-16 12:18:07,INFO,reading configuration
+2016-09-16 12:18:07,INFO,all wheels set
+2016-09-16 12:18:07,INFO,stepping through recording to create path
+2016-09-16 12:18:07,INFO,entering write_path_from_recording_file
+2016-09-16 12:18:07,ERROR,Error during play route: run aborted by user
+2016-09-16 12:18:12,INFO,exiting go menu command
+2016-09-16 12:18:18,INFO,entering go menu command
+2016-09-16 12:18:18,INFO,entering drive_route
+2016-09-16 12:18:36,INFO,run aborted by user
+2016-09-16 12:18:36,ERROR,run aborted by user
+2016-09-16 12:18:36,INFO,making path
+2016-09-16 12:18:36,INFO,entering write_path_from_recording_file
+2016-09-16 12:18:36,INFO,reading configuration
+2016-09-16 12:18:36,INFO,all wheels set
+2016-09-16 12:18:36,INFO,stepping through recording to create path
+2016-09-16 12:18:36,INFO,entering write_path_from_recording_file
+2016-09-16 12:18:36,ERROR,Error during play route: run aborted by user
+2016-09-16 12:18:38,INFO,exiting go menu command
+2016-09-16 12:19:00,INFO,entering write_path_from_recording_file
+2016-09-16 12:19:00,INFO,reading configuration
+2016-09-16 12:19:00,INFO,all wheels set
+2016-09-16 12:19:00,INFO,stepping through recording to create path
+2016-09-16 12:19:00,INFO,entering write_path_from_recording_file
+2016-09-16 12:19:07,INFO,entering go menu command
+2016-09-16 12:19:15,INFO,entering drive_route
+2016-09-16 12:19:32,WARNING,crash detected
+2016-09-16 12:19:32,WARNING,angle error at crash  -0.6
+2016-09-16 12:19:32,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 12:19:32,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 12:19:35,INFO,run aborted by user
+2016-09-16 12:19:35,ERROR,run aborted by user
+2016-09-16 12:19:35,INFO,making path
+2016-09-16 12:19:35,INFO,entering write_path_from_recording_file
+2016-09-16 12:19:35,INFO,reading configuration
+2016-09-16 12:19:35,INFO,all wheels set
+2016-09-16 12:19:35,INFO,stepping through recording to create path
+2016-09-16 12:19:35,INFO,entering write_path_from_recording_file
+2016-09-16 12:19:35,ERROR,Error during play route: run aborted by user
+2016-09-16 12:19:55,INFO,exiting go menu command
+2016-09-16 12:17:06,INFO,enter main
+2016-09-16 12:17:06,INFO,reading configuration
+2016-09-16 12:17:06,INFO,all wheels set
+2016-09-16 12:17:06,INFO,begining usb monitor thread
+2016-09-16 12:18:00,INFO,entering write_path_from_recording_file
+2016-09-16 12:18:00,INFO,reading configuration
+2016-09-16 12:18:00,INFO,all wheels set
+2016-09-16 12:18:00,INFO,stepping through recording to create path
+2016-09-16 12:18:00,INFO,entering write_path_from_recording_file
+2016-09-16 12:20:28,INFO,entering write_path_from_recording_file
+2016-09-16 12:20:28,INFO,reading configuration
+2016-09-16 12:20:28,INFO,all wheels set
+2016-09-16 12:20:28,INFO,stepping through recording to create path
+2016-09-16 12:20:29,INFO,entering write_path_from_recording_file
+2016-09-16 12:20:59,INFO,entering go menu command
+2016-09-16 12:21:01,INFO,entering drive_route
+2016-09-16 12:21:24,INFO,run aborted by user
+2016-09-16 12:21:24,ERROR,run aborted by user
+2016-09-16 12:21:24,INFO,making path
+2016-09-16 12:21:24,INFO,entering write_path_from_recording_file
+2016-09-16 12:21:24,INFO,reading configuration
+2016-09-16 12:21:24,INFO,all wheels set
+2016-09-16 12:21:24,INFO,stepping through recording to create path
+2016-09-16 12:21:25,INFO,entering write_path_from_recording_file
+2016-09-16 12:21:25,ERROR,Error during play route: run aborted by user
+2016-09-16 12:21:27,INFO,exiting go menu command
+2016-09-16 12:21:51,INFO,entering write_path_from_recording_file
+2016-09-16 12:21:51,INFO,reading configuration
+2016-09-16 12:21:51,INFO,all wheels set
+2016-09-16 12:21:51,INFO,stepping through recording to create path
+2016-09-16 12:21:52,INFO,entering write_path_from_recording_file
+2016-09-16 12:21:58,INFO,entering go menu command
+2016-09-16 12:21:59,INFO,entering drive_route
+2016-09-16 12:22:22,INFO,route completed normally
+2016-09-16 12:22:22,INFO,exiting drive_route
+2016-09-16 12:22:22,INFO,back from drive_route
+2016-09-16 12:22:22,INFO,making path
+2016-09-16 12:22:22,INFO,entering write_path_from_recording_file
+2016-09-16 12:22:22,INFO,reading configuration
+2016-09-16 12:22:22,INFO,all wheels set
+2016-09-16 12:22:22,INFO,stepping through recording to create path
+2016-09-16 12:22:23,INFO,entering write_path_from_recording_file
+2016-09-16 12:22:25,INFO,exiting go menu command
+2016-09-16 12:25:27,INFO,entering write_path_from_recording_file
+2016-09-16 12:25:27,INFO,reading configuration
+2016-09-16 12:25:27,INFO,all wheels set
+2016-09-16 12:25:27,INFO,stepping through recording to create path
+2016-09-16 12:25:29,INFO,entering write_path_from_recording_file
+2016-09-16 12:26:17,INFO,entering go menu command
+2016-09-16 12:26:18,INFO,entering drive_route
+2016-09-16 12:26:53,WARNING,crash detected
+2016-09-16 12:26:53,WARNING,angle error at crash  28.3
+2016-09-16 12:26:53,INFO,appeared to glance left, wall must be to right, assuming position too far right
+2016-09-16 12:26:53,WARNING,crashed, changing position by (0,-1) meters
+2016-09-16 12:26:55,INFO,done backing away from crash
+2016-09-16 12:27:09,WARNING,crash detected
+2016-09-16 12:27:09,WARNING,angle error at crash   3.6
+2016-09-16 12:27:09,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 12:27:09,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 12:27:10,INFO,done backing away from crash
+2016-09-16 12:27:10,WARNING,crash detected
+2016-09-16 12:27:10,INFO,exiting drive_route
+2016-09-16 12:27:10,INFO,back from drive_route
+2016-09-16 12:27:10,INFO,making path
+2016-09-16 12:27:10,INFO,entering write_path_from_recording_file
+2016-09-16 12:27:10,INFO,reading configuration
+2016-09-16 12:27:10,INFO,all wheels set
+2016-09-16 12:27:10,INFO,stepping through recording to create path
+2016-09-16 12:27:11,INFO,entering write_path_from_recording_file
+2016-09-16 12:27:25,INFO,exiting go menu command
+2016-09-16 12:28:24,INFO,entering go menu command
+2016-09-16 12:28:26,INFO,entering drive_route
+2016-09-16 12:28:48,WARNING,crash detected
+2016-09-16 12:28:48,WARNING,angle error at crash -177.8
+2016-09-16 12:28:48,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 12:28:48,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 12:28:53,INFO,timed out trying to back away from crash
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         2016-09-16 12:17:08,INFO,enter main
+2016-09-16 12:17:08,INFO,reading configuration
+2016-09-16 12:17:08,INFO,all wheels set
+2016-09-16 12:17:08,INFO,begining usb monitor thread
+2016-09-16 12:17:07,INFO,enter main
+2016-09-16 12:17:07,INFO,reading configuration
+2016-09-16 12:17:07,INFO,all wheels set
+2016-09-16 12:17:07,INFO,begining usb monitor thread
+2016-09-16 12:20:15,INFO,entering go menu command
+2016-09-16 12:21:17,INFO,entering go menu command
+2016-09-16 12:21:18,INFO,entering drive_route
+2016-09-16 12:21:55,WARNING,crash detected
+2016-09-16 12:21:55,WARNING,angle error at crash -218.3
+2016-09-16 12:21:55,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 12:21:55,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 12:21:57,INFO,run aborted by user
+2016-09-16 12:21:57,ERROR,run aborted by user
+2016-09-16 12:21:57,INFO,making path
+2016-09-16 12:21:57,INFO,entering write_path_from_recording_file
+2016-09-16 12:21:57,INFO,reading configuration
+2016-09-16 12:21:57,INFO,all wheels set
+2016-09-16 12:21:57,INFO,stepping through recording to create path
+2016-09-16 12:21:58,INFO,entering write_path_from_recording_file
+2016-09-16 12:21:58,ERROR,Error during play route: run aborted by user
+2016-09-16 12:22:07,INFO,exiting go menu command
+2016-09-16 12:24:15,INFO,entering write_path_from_recording_file
+2016-09-16 12:24:15,INFO,reading configuration
+2016-09-16 12:24:15,INFO,all wheels set
+2016-09-16 12:24:15,INFO,stepping through recording to create path
+2016-09-16 12:24:18,INFO,entering write_path_from_recording_file
+2016-09-16 12:24:31,INFO,entering go menu command
+2016-09-16 12:24:32,INFO,entering drive_route
+2016-09-16 12:26:01,INFO,run aborted by user
+2016-09-16 12:26:01,ERROR,run aborted by user
+2016-09-16 12:26:01,INFO,making path
+2016-09-16 12:26:01,INFO,entering write_path_from_recording_file
+2016-09-16 12:26:01,INFO,reading configuration
+2016-09-16 12:26:01,INFO,all wheels set
+2016-09-16 12:26:01,INFO,stepping through recording to create path
+2016-09-16 12:26:03,INFO,entering write_path_from_recording_file
+2016-09-16 12:26:03,ERROR,Error during play route: run aborted by user
+2016-09-16 12:26:35,INFO,exiting go menu command
+2016-09-16 12:27:17,INFO,entering go menu command
+2016-09-16 12:27:19,INFO,entering drive_route
+2016-09-16 12:28:05,WARNING,crash detected
+2016-09-16 12:28:05,WARNING,angle error at crash  23.7
+2016-09-16 12:28:05,INFO,appeared to glance left, wall must be to right, assuming position too far right
+2016-09-16 12:28:05,WARNING,crashed, changing position by (0,-1) meters
+2016-09-16 12:28:06,INFO,done backing away from crash
+2016-09-16 12:28:14,WARNING,crash detected
+2016-09-16 12:28:14,WARNING,angle error at crash  13.3
+2016-09-16 12:28:14,INFO,looks like a head on collision, assuming position too far forward
+2016-09-16 12:28:14,WARNING,crashed, changing position by (1,0) meters
+2016-09-16 12:28:19,INFO,timed out trying to back away from crash
+2016-09-16 12:28:22,WARNING,crash detected
+2016-09-16 12:28:22,INFO,exiting drive_route
+2016-09-16 12:28:22,INFO,back from drive_route
+2016-09-16 12:28:22,INFO,making path
+2016-09-16 12:28:22,INFO,entering write_path_from_recording_file
+2016-09-16 12:28:22,INFO,reading configuration
+2016-09-16 12:28:22,INFO,all wheels set
+2016-09-16 12:28:22,INFO,stepping through recording to create path
+2016-09-16 12:28:24,INFO,entering write_path_from_recording_file
+2016-09-16 12:28:26,INFO,exiting go menu command
+2016-09-16 12:28:36,INFO,entering go menu command
+2016-09-16 12:37:06,INFO,entering go menu command
+2016-09-16 12:37:06,ERROR,go caught error:wrong number of columns in line 244 expected 11 was 12
+2016-09-16 12:37:08,INFO,exiting go menu command
+2016-09-16 12:37:22,INFO,entering write_path_from_recording_file
+2016-09-16 12:37:22,INFO,reading configuration
+2016-09-16 12:37:22,INFO,all wheels set
+2016-09-16 12:37:22,INFO,stepping through recording to create path
+2016-09-16 12:37:22,INFO,entering write_path_from_recording_file
+2016-09-16 12:46:30,INFO,entering write_path_from_recording_file
+2016-09-16 12:46:30,INFO,reading configuration
+2016-09-16 12:46:30,INFO,all wheels set
+2016-09-16 12:46:30,INFO,stepping through recording to create path
+2016-09-16 12:46:30,INFO,entering write_path_from_recording_file
+2016-09-16 12:46:44,INFO,enter main
+2016-09-16 12:46:44,INFO,reading configuration
+2016-09-16 12:46:44,INFO,all wheels set
+2016-09-16 12:46:44,INFO,begining usb monitor thread
+2016-09-16 12:46:57,INFO,enter main
+2016-09-16 12:46:57,INFO,reading configuration
+2016-09-16 12:46:57,INFO,all wheels set
+2016-09-16 12:46:57,INFO,begining usb monitor thread
+2016-09-16 20:14:57,INFO,enter main
+2016-09-16 20:14:57,INFO,reading configuration
+2016-09-16 20:14:57,INFO,all wheels set
+2016-09-16 20:14:57,INFO,begining usb monitor thread
+2016-09-16 20:40:10,INFO,enter main
+2016-09-16 20:40:10,INFO,reading configuration
+2016-09-16 20:40:10,INFO,all wheels set
+2016-09-16 20:40:10,INFO,begining usb monitor thread
+2016-09-16 20:42:38,INFO,entering write_path_from_recording_file
+2016-09-16 20:42:38,INFO,reading configuration
+2016-09-16 20:42:38,INFO,all wheels set
+2016-09-16 20:42:38,INFO,stepping through recording to create path
+2016-09-16 20:42:38,INFO,entering write_path_from_recording_file
+2016-09-16 20:42:54,INFO,entering go menu command
+2016-09-16 20:42:57,INFO,entering drive_route
+2016-09-16 20:43:04,INFO,route completed normally
+2016-09-16 20:43:04,INFO,exiting drive_route
+2016-09-16 20:43:04,INFO,back from drive_route
+2016-09-16 20:43:04,INFO,making path
+2016-09-16 20:43:04,INFO,entering write_path_from_recording_file
+2016-09-16 20:43:04,INFO,reading configuration
+2016-09-16 20:43:04,INFO,all wheels set
+2016-09-16 20:43:04,INFO,stepping through recording to create path
+2016-09-16 20:43:04,INFO,entering write_path_from_recording_file
+2016-09-16 20:43:12,INFO,exiting go menu command
+2016-09-16 20:43:53,INFO,entering go menu command
+2016-09-16 20:43:54,INFO,entering drive_route
+2016-09-16 20:43:59,INFO,route completed normally
+2016-09-16 20:43:59,INFO,exiting drive_route
+2016-09-16 20:43:59,INFO,back from drive_route
+2016-09-16 20:43:59,INFO,making path
+2016-09-16 20:43:59,INFO,entering write_path_from_recording_file
+2016-09-16 20:43:59,INFO,reading configuration
+2016-09-16 20:43:59,INFO,all wheels set
+2016-09-16 20:43:59,INFO,stepping through recording to create path
+2016-09-16 20:43:59,INFO,entering write_path_from_recording_file
+2016-09-16 20:44:10,INFO,exiting go menu command
+2016-09-16 20:44:26,INFO,entering go menu command
+2016-09-16 20:44:27,INFO,entering drive_route
+2016-09-16 20:44:30,INFO,route completed normally
+2016-09-16 20:44:30,INFO,exiting drive_route
+2016-09-16 20:44:30,INFO,back from drive_route
+2016-09-16 20:44:30,INFO,making path
+2016-09-16 20:44:30,INFO,entering write_path_from_recording_file
+2016-09-16 20:44:30,INFO,reading configuration
+2016-09-16 20:44:30,INFO,all wheels set
+2016-09-16 20:44:30,INFO,stepping through recording to create path
+2016-09-16 20:44:30,INFO,entering write_path_from_recording_file
+2016-09-16 20:44:38,INFO,exiting go menu command
+2016-09-16 20:45:18,INFO,entering go menu command
+2016-09-16 20:45:19,INFO,entering drive_route
+2016-09-16 20:45:21,INFO,route completed normally
+2016-09-16 20:45:21,INFO,exiting drive_route
+2016-09-16 20:45:21,INFO,back from drive_route
+2016-09-16 20:45:21,INFO,making path
+2016-09-16 20:45:21,INFO,entering write_path_from_recording_file
+2016-09-16 20:45:21,INFO,reading configuration
+2016-09-16 20:45:21,INFO,all wheels set
+2016-09-16 20:45:21,INFO,stepping through recording to create path
+2016-09-16 20:45:21,INFO,entering write_path_from_recording_file
+2016-09-16 20:45:29,INFO,exiting go menu command
+2016-09-16 20:45:41,INFO,enter main
+2016-09-16 20:45:41,INFO,reading configuration
+2016-09-16 20:45:41,INFO,all wheels set
+2016-09-16 20:45:41,INFO,begining usb monitor thread
+2016-09-16 20:48:38,INFO,enter main
+2016-09-16 20:48:38,INFO,reading configuration
+2016-09-16 20:48:38,INFO,all wheels set
+2016-09-16 20:48:38,INFO,begining usb monitor thread
+2016-09-17 04:52:46,INFO,enter main
+2016-09-17 04:52:46,INFO,reading configuration
+2016-09-17 04:52:46,INFO,all wheels set
+2016-09-17 04:52:46,INFO,begining usb monitor thread
+2016-09-17 04:58:12,INFO,entering go menu command
+2016-09-17 04:58:14,INFO,entering drive_route
+2016-09-17 04:58:17,WARNING,crash detected
+2016-09-17 04:58:17,WARNING,angle error at crash -252.8
+2016-09-17 04:58:17,INFO,looks like a head on collision, assuming position too far forward
+2016-09-17 04:58:17,WARNING,crashed, changing position by (1,0) meters
+2016-09-17 04:58:17,INFO,run aborted by user
+2016-09-17 04:58:17,ERROR,run aborted by user
+2016-09-17 04:58:17,INFO,making path
+2016-09-17 04:58:17,INFO,entering write_path_from_recording_file
+2016-09-17 04:58:17,INFO,reading configuration
+2016-09-17 04:58:17,INFO,all wheels set
+2016-09-17 04:58:17,INFO,stepping through recording to create path
+2016-09-17 04:58:18,INFO,entering write_path_from_recording_file
+2016-09-17 04:58:18,ERROR,Error during play route: run aborted by user
+2016-09-17 04:58:19,INFO,exiting go menu command
+2016-09-17 04:58:27,INFO,entering go menu command
+2016-09-17 04:58:28,INFO,entering drive_route
+2016-09-17 04:58:31,WARNING,crash detected
+2016-09-17 04:58:31,WARNING,angle error at crash -308.2
+2016-09-17 04:58:31,INFO,looks like a head on collision, assuming position too far forward
+2016-09-17 04:58:31,WARNING,crashed, changing position by (1,0) meters
+2016-09-17 04:58:36,INFO,timed out trying to back away from crash
+2016-09-17 04:58:38,INFO,run aborted by user
+2016-09-17 04:58:38,ERROR,run aborted by user
+2016-09-17 04:58:38,INFO,making path
+2016-09-17 04:58:38,INFO,entering write_path_from_recording_file
+2016-09-17 04:58:38,INFO,reading configuration
+2016-09-17 04:58:38,INFO,all wheels set
+2016-09-17 04:58:38,INFO,stepping through recording to create path
+2016-09-17 04:58:39,INFO,entering write_path_from_recording_file
+2016-09-17 04:58:39,ERROR,Error during play route: run aborted by user
+2016-09-17 04:58:40,INFO,exiting go menu command
+2016-09-17 05:20:32,INFO,entering go menu command
+2016-09-17 05:20:33,INFO,entering drive_route
+2016-09-17 05:20:42,WARNING,crash detected
+2016-09-17 05:20:42,WARNING,angle error at crash -356.2
+2016-09-17 05:20:42,INFO,looks like a head on collision, assuming position too far forward
+2016-09-17 05:20:42,WARNING,crashed, changing position by (1,0) meters
+2016-09-17 05:20:47,INFO,timed out trying to back away from crash
+2016-09-17 05:20:50,WARNING,crash detected
+2016-09-17 05:20:50,WARNING,detected a repeated crash, trying something else
+2016-09-17 05:20:50,WARNING,crashed, changing position by (1,1) meters
+2016-09-17 05:20:55,INFO,timed out trying to back away from crash
+2016-09-17 05:21:09,INFO,run aborted by user
+2016-09-17 05:21:09,ERROR,run aborted by user
+2016-09-17 05:21:09,INFO,making path
+2016-09-17 05:21:09,INFO,entering write_path_from_recording_file
+2016-09-17 05:21:09,INFO,reading configuration
+2016-09-17 05:21:09,INFO,all wheels set
+2016-09-17 05:21:09,INFO,stepping through recording to create path
+2016-09-17 05:21:09,INFO,entering write_path_from_recording_file
+2016-09-17 05:21:09,ERROR,Error during play route: run aborted by user
+2016-09-17 05:21:10,INFO,exiting go menu command
+2016-09-17 05:21:40,INFO,entering write_path_from_recording_file
+2016-09-17 05:21:40,INFO,reading configuration
+2016-09-17 05:21:40,INFO,all wheels set
+2016-09-17 05:21:40,INFO,stepping through recording to create path
+2016-09-17 05:21:40,INFO,entering write_path_from_recording_file
+2016-09-17 05:21:52,INFO,entering go menu command
+2016-09-17 05:21:54,INFO,entering drive_route
+2016-09-17 05:22:22,INFO,run aborted by user
+2016-09-17 05:22:22,ERROR,run aborted by user
+2016-09-17 05:22:22,INFO,making path
+2016-09-17 05:22:22,INFO,entering write_path_from_recording_file
+2016-09-17 05:22:22,INFO,reading configuration
+2016-09-17 05:22:22,INFO,all wheels set
+2016-09-17 05:22:22,INFO,stepping through recording to create path
+2016-09-17 05:22:23,INFO,entering write_path_from_recording_file
+2016-09-17 05:22:23,ERROR,Error during play route: run aborted by user
+2016-09-17 05:22:24,INFO,exiting go menu command
+2016-09-17 05:22:47,INFO,entering go menu command
+2016-09-17 05:22:47,INFO,entering drive_route
+2016-09-17 05:23:04,INFO,run aborted by user
+2016-09-17 05:23:04,ERROR,run aborted by user
+2016-09-17 05:23:04,INFO,making path
+2016-09-17 05:23:04,INFO,entering write_path_from_recording_file
+2016-09-17 05:23:04,INFO,reading configuration
+2016-09-17 05:23:04,INFO,all wheels set
+2016-09-17 05:23:04,INFO,stepping through recording to create path
+2016-09-17 05:23:04,INFO,entering write_path_from_recording_file
+2016-09-17 05:23:04,ERROR,Error during play route: run aborted by user
+2016-09-17 05:23:05,INFO,exiting go menu command
+2016-09-17 05:23:31,INFO,entering go menu command
+2016-09-17 05:23:32,INFO,entering drive_route
+2016-09-17 05:23:51,INFO,route completed normally
+2016-09-17 05:23:51,INFO,exiting drive_route
+2016-09-17 05:23:51,INFO,back from drive_route
+2016-09-17 05:23:51,INFO,making path
+2016-09-17 05:23:51,INFO,entering write_path_from_recording_file
+2016-09-17 05:23:51,INFO,reading configuration
+2016-09-17 05:23:51,INFO,all wheels set
+2016-09-17 05:23:51,INFO,stepping through recording to create path
+2016-09-17 05:23:51,INFO,entering write_path_from_recording_file
+2016-09-17 05:23:53,INFO,exiting go menu command
+2016-09-17 05:24:10,INFO,entering go menu command
+2016-09-17 05:24:10,INFO,entering drive_route
+2016-09-17 05:24:23,WARNING,crash detected
+2016-09-17 05:24:23,WARNING,angle error at crash -184.4
+2016-09-17 05:24:23,INFO,looks like a head on collision, assuming position too far forward
+2016-09-17 05:24:23,WARNING,crashed, changing position by (1,0) meters
+2016-09-17 05:24:25,INFO,run aborted by user
+2016-09-17 05:24:25,ERROR,run aborted by user
+2016-09-17 05:24:25,INFO,making path
+2016-09-17 05:24:25,INFO,entering write_path_from_recording_file
+2016-09-17 05:24:25,INFO,reading configuration
+2016-09-17 05:24:25,INFO,all wheels set
+2016-09-17 05:24:25,INFO,stepping through recording to create path
+2016-09-17 05:24:25,INFO,entering write_path_from_recording_file
+2016-09-17 05:24:25,ERROR,Error during play route: run aborted by user
+2016-09-17 05:24:58,INFO,exiting go menu command
+2016-09-17 05:26:47,INFO,entering go menu command
+2016-09-17 05:26:48,INFO,entering drive_route
+2016-09-17 05:26:56,INFO,run aborted by user
+2016-09-17 05:26:56,ERROR,run aborted by user
+2016-09-17 05:26:56,INFO,making path
+2016-09-17 05:26:56,INFO,entering write_path_from_recording_file
+2016-09-17 05:26:56,INFO,reading configuration
+2016-09-17 05:26:56,INFO,all wheels set
+2016-09-17 05:26:56,INFO,stepping through recording to create path
+2016-09-17 05:26:57,INFO,entering write_path_from_recording_file
+2016-09-17 05:26:57,ERROR,Error during play route: run aborted by user
+2016-09-17 05:27:11,INFO,exiting go menu command
+2016-09-17 05:28:35,INFO,entering write_path_from_recording_file
+2016-09-17 05:28:35,INFO,reading configuration
+2016-09-17 05:28:35,INFO,all wheels set
+2016-09-17 05:28:35,INFO,stepping through recording to create path
+2016-09-17 05:28:36,INFO,entering write_path_from_recording_file
+2016-09-17 05:29:00,INFO,entering go menu command
+2016-09-17 05:29:01,INFO,entering drive_route
+2016-09-17 05:29:35,WARNING,crash detected
+2016-09-17 05:29:35,WARNING,angle error at crash   6.3
+2016-09-17 05:29:35,INFO,looks like a head on collision, assuming position too far forward
+2016-09-17 05:29:35,WARNING,crashed, changing position by (1,0) meters
+2016-09-17 05:29:36,INFO,run aborted by user
+2016-09-17 05:29:36,ERROR,run aborted by user
+2016-09-17 05:29:36,INFO,making path
+2016-09-17 05:29:36,INFO,entering write_path_from_recording_file
+2016-09-17 05:29:36,INFO,reading configuration
+2016-09-17 05:29:36,INFO,all wheels set
+2016-09-17 05:29:36,INFO,stepping through recording to create path
+2016-09-17 05:29:37,INFO,entering write_path_from_recording_file
+2016-09-17 05:29:37,ERROR,Error during play route: run aborted by user
+2016-09-17 05:30:53,INFO,exiting go menu command
+2016-09-17 05:33:58,INFO,enter main
+2016-09-17 05:33:58,INFO,reading configuration
+2016-09-17 05:33:58,INFO,all wheels set
+2016-09-17 05:33:58,INFO,begining usb monitor thread
+2016-09-17 05:34:23,INFO,entering go menu command
+2016-09-17 05:34:24,INFO,entering drive_route
+2016-09-17 05:34:51,INFO,run aborted by user
+2016-09-17 05:34:51,ERROR,run aborted by user
+2016-09-17 05:34:51,INFO,making path
+2016-09-17 05:34:51,INFO,entering write_path_from_recording_file
+2016-09-17 05:34:51,INFO,reading configuration
+2016-09-17 05:34:51,INFO,all wheels set
+2016-09-17 05:34:51,INFO,stepping through recording to create path
+2016-09-17 05:34:52,INFO,entering write_path_from_recording_file
+2016-09-17 05:34:52,ERROR,Error during play route: run aborted by user
+2016-09-17 05:34:56,INFO,exiting go menu command
+2016-09-17 05:35:13,INFO,entering go menu command
+2016-09-17 05:35:16,INFO,entering drive_route
+2016-09-17 05:35:22,WARNING,crash detected
+2016-09-17 05:35:22,WARNING,angle error at crash -14.9
+2016-09-17 05:35:22,INFO,looks like a head on collision, assuming position too far forward
+2016-09-17 05:35:22,WARNING,crashed, changing position by (1,0) meters
+2016-09-17 05:35:27,INFO,timed out trying to back away from crash
+2016-09-17 05:35:30,INFO,run aborted by user
+2016-09-17 05:35:30,ERROR,run aborted by user
+2016-09-17 05:35:30,INFO,making path
+2016-09-17 05:35:30,INFO,entering write_path_from_recording_file
+2016-09-17 05:35:30,INFO,reading configuration
+2016-09-17 05:35:30,INFO,all wheels set
+2016-09-17 05:35:30,INFO,stepping through recording to create path
+2016-09-17 05:35:30,INFO,entering write_path_from_recording_file
+2016-09-17 05:35:30,ERROR,Error during play route: run aborted by user
+2016-09-17 05:35:32,INFO,exiting go menu command
+2016-09-17 05:36:07,INFO,entering write_path_from_recording_file
+2016-09-17 05:36:07,INFO,reading configuration
+2016-09-17 05:36:07,INFO,all wheels set
+2016-09-17 05:36:07,INFO,stepping through recording to create path
+2016-09-17 05:36:08,INFO,entering write_path_from_recording_file
+2016-09-17 05:36:18,INFO,entering go menu command
+2016-09-17 05:36:19,INFO,entering drive_route
+2016-09-17 05:37:16,INFO,route completed normally
+2016-09-17 05:37:16,INFO,exiting drive_route
+2016-09-17 05:37:16,INFO,back from drive_route
+2016-09-17 05:37:16,INFO,making path
+2016-09-17 05:37:16,INFO,entering write_path_from_recording_file
+2016-09-17 05:37:16,INFO,reading configuration
+2016-09-17 05:37:16,INFO,all wheels set
+2016-09-17 05:37:16,INFO,stepping through recording to create path
+2016-09-17 05:37:17,INFO,entering write_path_from_recording_file
+2016-09-17 05:37:27,INFO,exiting go menu command
+2016-09-17 05:38:23,INFO,entering go menu command
+2016-09-17 05:38:24,INFO,entering drive_route
+2016-09-17 05:39:02,INFO,run aborted by user
+2016-09-17 05:39:02,ERROR,run aborted by user
+2016-09-17 05:39:02,INFO,making path
+2016-09-17 05:39:02,INFO,entering write_path_from_recording_file
+2016-09-17 05:39:02,INFO,reading configuration
+2016-09-17 05:39:02,INFO,all wheels set
+2016-09-17 05:39:02,INFO,stepping through recording to create path
+2016-09-17 05:39:03,INFO,entering write_path_from_recording_file
+2016-09-17 05:39:03,ERROR,Error during play route: run aborted by user
+2016-09-17 05:39:04,INFO,exiting go menu command
+2016-09-17 05:39:37,INFO,entering go menu command
+2016-09-17 05:39:38,INFO,entering drive_route
+2016-09-17 05:40:01,WARNING,crash detected
+2016-09-17 05:40:01,WARNING,angle error at crash -256.7
+2016-09-17 05:40:01,INFO,looks like a head on collision, assuming position too far forward
+2016-09-17 05:40:01,WARNING,crashed, changing position by (1,0) meters
+2016-09-17 05:40:06,INFO,timed out trying to back away from crash
+2016-09-17 05:40:08,INFO,run aborted by user
+2016-09-17 05:40:08,ERROR,run aborted by user
+2016-09-17 05:40:08,INFO,making path
+2016-09-17 05:40:08,INFO,entering write_path_from_recording_file
+2016-09-17 05:40:08,INFO,reading configuration
+2016-09-17 05:40:08,INFO,all wheels set
+2016-09-17 05:40:08,INFO,stepping through recording to create path
+2016-09-17 05:40:09,INFO,entering write_path_from_recording_file
+2016-09-17 05:40:09,ERROR,Error during play route: run aborted by user
+2016-09-17 05:40:11,INFO,exiting go menu command
+2016-09-17 05:41:10,INFO,entering go menu command
+2016-09-17 05:41:13,INFO,entering drive_route
+2016-09-17 05:41:26,INFO,route completed normally
+2016-09-17 05:41:26,INFO,exiting drive_route
+2016-09-17 05:41:26,INFO,back from drive_route
+2016-09-17 05:41:26,INFO,making path
+2016-09-17 05:41:26,INFO,entering write_path_from_recording_file
+2016-09-17 05:41:26,INFO,reading configuration
+2016-09-17 05:41:26,INFO,all wheels set
+2016-09-17 05:41:26,INFO,stepping through recording to create path
+2016-09-17 05:41:26,INFO,entering write_path_from_recording_file
+2016-09-17 05:41:49,INFO,exiting go menu command
+2016-09-17 05:42:15,INFO,entering go menu command
+2016-09-17 05:42:17,INFO,entering drive_route
+2016-09-17 05:42:29,INFO,route completed normally
+2016-09-17 05:42:29,INFO,exiting drive_route
+2016-09-17 05:42:29,INFO,back from drive_route
+2016-09-17 05:42:29,INFO,making path
+2016-09-17 05:42:29,INFO,entering write_path_from_recording_file
+2016-09-17 05:42:29,INFO,reading configuration
+2016-09-17 05:42:29,INFO,all wheels set
+2016-09-17 05:42:29,INFO,stepping through recording to create path
+2016-09-17 05:42:29,INFO,entering write_path_from_recording_file
+2016-09-17 05:43:39,INFO,exiting go menu command
+2016-09-17 05:43:43,INFO,entering go menu command
+2016-09-17 05:43:43,INFO,entering drive_route
+2016-09-17 05:43:50,ERROR,timed out reading dynamics in drive_route
+2016-09-17 05:43:50,ERROR,timed out waiting to read dynamics
+2016-09-17 05:43:50,INFO,making path
+2016-09-17 05:43:50,INFO,entering write_path_from_recording_file
+2016-09-17 05:43:50,INFO,reading configuration
+2016-09-17 05:43:50,INFO,all wheels set
+2016-09-17 05:43:50,INFO,stepping through recording to create path
+2016-09-17 05:43:50,INFO,entering write_path_from_recording_file
+2016-09-17 05:43:50,ERROR,Error during play route: timed out waiting to read dynamics
+2016-09-17 05:44:09,INFO,exiting go menu command
+2016-09-17 05:44:40,INFO,entering go menu command
+2016-09-17 05:44:43,INFO,entering drive_route
+2016-09-17 05:44:56,INFO,route completed normally
+2016-09-17 05:44:56,INFO,exiting drive_route
+2016-09-17 05:44:56,INFO,back from drive_route
+2016-09-17 05:44:56,INFO,making path
+2016-09-17 05:44:56,INFO,entering write_path_from_recording_file
+2016-09-17 05:44:56,INFO,reading configuration
+2016-09-17 05:44:56,INFO,all wheels set
+2016-09-17 05:44:56,INFO,stepping through recording to create path
+2016-09-17 05:44:56,INFO,entering write_path_from_recording_file
+2016-09-17 05:46:15,INFO,exiting go menu command
+2016-09-17 05:48:17,INFO,enter main
+2016-09-17 05:48:17,INFO,reading configuration
+2016-09-17 05:48:17,INFO,all wheels set
+2016-09-17 05:48:17,INFO,begining usb monitor thread
+2016-09-17 05:52:35,INFO,entering go menu command
+2016-09-17 05:52:36,INFO,entering drive_route
+2016-09-17 05:52:53,WARNING,crash detected
+2016-09-17 05:52:53,WARNING,angle error at crash  -0.4
+2016-09-17 05:52:53,INFO,looks like a head on collision, assuming position too far forward
+2016-09-17 05:52:53,WARNING,crashed, changing position by (1,0) meters
+2016-09-17 05:52:54,INFO,done backing away from crash
+2016-09-17 05:52:54,WARNING,crash detected
+2016-09-17 05:52:54,WARNING,angle error at crash   4.6
+2016-09-17 05:52:54,INFO,looks like a head on collision, assuming position too far forward
+2016-09-17 05:52:54,WARNING,crashed, changing position by (1,0) meters
+2016-09-17 05:52:55,INFO,done backing away from crash
+2016-09-17 05:53:04,WARNING,crash detected
+2016-09-17 05:53:04,INFO,exiting drive_route
+2016-09-17 05:53:04,INFO,back from drive_route
+2016-09-17 05:53:04,INFO,making path
+2016-09-17 05:53:04,INFO,entering write_path_from_recording_file
+2016-09-17 05:53:04,INFO,reading configuration
+2016-09-17 05:53:04,INFO,all wheels set
+2016-09-17 05:53:04,INFO,stepping through recording to create path
+2016-09-17 05:53:04,INFO,entering write_path_from_recording_file
+2016-09-17 06:01:38,INFO,exiting go menu command
+2016-09-17 06:01:55,INFO,enter main
+2016-09-17 06:01:55,INFO,reading configuration
+2016-09-17 06:01:55,INFO,all wheels set
+2016-09-17 06:01:55,INFO,begining usb monitor thread
+2016-09-17 09:14:34,INFO,enter main
+2016-09-17 09:14:34,INFO,reading configuration
+2016-09-17 09:14:34,INFO,all wheels set
+2016-09-17 09:14:34,INFO,begining usb monitor thread
