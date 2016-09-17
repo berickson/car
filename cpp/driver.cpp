@@ -47,7 +47,7 @@ bool Driver::check_for_crash() {
 
 
 bool Driver::rear_slipping() {
-  double v_front = (car.get_front_left_wheel().get_velocity(), car.get_front_right_wheel().get_velocity()) / 2.0;
+  double v_front = car.get_velocity();
   double v_back = (car.get_back_left_wheel().get_velocity(), car.get_back_right_wheel().get_velocity()) / 2.0;
 
   bool spinning = fabs(v_front - v_back) > (settings.slip_slop + (settings.slip_rate * v_front));
@@ -57,7 +57,7 @@ bool Driver::rear_slipping() {
 
 int Driver::esc_for_max_decel() {
   int esc = 1500;
-  double v_front = (car.get_front_left_wheel().get_velocity(), car.get_front_right_wheel().get_velocity()) / 2.0;
+  double v_front = car.get_velocity();
   double v_back = (car.get_back_left_wheel().get_velocity(), car.get_back_right_wheel().get_velocity()) / 2.0;
   if(v_front >= 0.1 && v_back >= v_front * (1.0-settings.slip_rate)) {
     esc = 1100;

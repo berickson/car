@@ -111,7 +111,7 @@ public:
   };
 
   inline double get_velocity() {
-    return (front_right_wheel.velocity + front_left_wheel.velocity) / 2.;
+    return front_right_wheel.velocity;
   }
 
   inline int get_usb_error_count() {
