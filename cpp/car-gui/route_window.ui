@@ -20,7 +20,11 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Race Analysis</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../resources.qrc">
+    <normaloff>:/root/car-gui/anaranjado_icon.svg</normaloff>:/root/car-gui/anaranjado_icon.svg</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -28,7 +32,7 @@
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <widget class="QSplitter" name="splitter">
+     <widget class="QSplitter" name="selection_splitter">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -45,9 +49,15 @@
        <enum>Qt::Horizontal</enum>
       </property>
       <widget class="QWidget" name="layoutWidget">
-       <layout class="QVBoxLayout" name="route_column">
+       <layout class="QVBoxLayout" name="track_column">
         <item>
          <widget class="QLabel" name="track_label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>Track</string>
           </property>
@@ -56,25 +66,28 @@
         <item>
          <widget class="QListWidget" name="track_list">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+           <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>100</height>
-           </size>
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustToContents</enum>
           </property>
          </widget>
         </item>
        </layout>
       </widget>
       <widget class="QWidget" name="layoutWidget_2">
-       <layout class="QVBoxLayout" name="track_column_4">
+       <layout class="QVBoxLayout" name="route_column">
         <item>
          <widget class="QLabel" name="route_label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>Route</string>
           </property>
@@ -83,10 +96,13 @@
         <item>
          <widget class="QListWidget" name="route_list">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+           <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustToContents</enum>
           </property>
          </widget>
         </item>
@@ -193,6 +209,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

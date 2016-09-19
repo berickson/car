@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/root">
+        <file>car-gui/anaranjado_icon.svg</file>
+    </qresource>
+</RCC>

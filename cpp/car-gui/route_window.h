@@ -67,6 +67,7 @@ private:
 
   void hide_run_data();
   void remove_line_chart();
+  void set_run_position(int selected_row);
 };
 
 #endif // ROUTE_WINDOW_H

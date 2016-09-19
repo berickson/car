@@ -43,6 +43,7 @@ RouteWindow::RouteWindow(QWidget *parent) :
   }
   if(ui->track_list->count() > 0)
     ui->track_list->item(0)->setSelected(true);
+  ui->track_list->adjustSize();
 
 }
 
@@ -63,6 +64,7 @@ void RouteWindow::on_track_list_itemSelectionChanged()
     }
     if(ui->route_list->count() > 0)
       ui->route_list->item(0)->setSelected(true);
+    ui->route_list->adjustSize();
 }
 
 void RouteWindow::on_route_list_itemSelectionChanged()
@@ -137,6 +139,7 @@ void RouteWindow::on_route_list_itemSelectionChanged()
   if(ui->run_list->rowCount() > 0) {
     ui->run_list->selectRow(0);
   }
+  //ui->run_list->adjustSize();
 
 }
 
@@ -236,9 +239,9 @@ void RouteWindow::add_chart(Route & run)
   chart_view = new QChartView(line_chart);
 
   QPen car_pen;
-  car_pen.setColor(Qt::black);
+  car_pen.setColor(Qt::red);
   car_pen.setCosmetic(true);
-  car_pen.setWidth(5);
+  car_pen.setWidth(2);
   chart_marker = chart_view->scene()->addEllipse(0,0,10,10,car_pen);
 
 
@@ -335,7 +338,6 @@ void RouteWindow::remove_line_chart() {
 
 void RouteWindow::show_run_data(Route &run)
 {
-  add_chart(run);
 
   QTableWidget &t = *(ui->run_data);
   t.clear();
@@ -373,6 +375,13 @@ void RouteWindow::show_run_data(Route &run)
   }
   t.resizeColumnsToContents();
 
+  add_chart(run);
+
+  if(run.nodes.size() > 0) {
+    t.clearSelection();
+    t.selectRow(0);
+  }
+
 }
 
 void RouteWindow::on_run_data_itemSelectionChanged()
@@ -380,39 +389,50 @@ void RouteWindow::on_run_data_itemSelectionChanged()
   QModelIndexList selected_list = ui->run_data->selectionModel()->selectedRows();
   if(selected_list.size()==1) {
     int selected_row = selected_list.at(0).row();
-    ui->run_position_slider->setValue(selected_row);
-
-    QPen car_pen;
-    car_pen.setColor(Qt::black);
-    car_pen.setCosmetic(true);
-    car_pen.setWidth(2);
-
-    RouteNode & node = current_run->nodes[selected_row];
-
-
-    if(car_graphic){
-      scene.removeItem(car_graphic);
-    }
-    double car_width = .5;
-    car_graphic = (QGraphicsItem*) scene.addEllipse(
-          node.front_x-car_width/2,
-          -node.front_y-car_width/2,car_width,car_width,car_pen);
-
+    set_run_position(selected_row);
   }
 
 }
 
-void RouteWindow::on_run_position_slider_valueChanged(int value)
-{
-  ui->run_data->selectRow(value);
-
-
-
-
-  QPointF pos = line_chart->mapToPosition(run_series->at(value));
+void RouteWindow::set_run_position(int selected_row) {
+  QPen car_pen;
+  car_pen.setColor(Qt::red);
+  car_pen.setCosmetic(true);
+  car_pen.setWidth(2);
+  if(chart_marker) {
+    chart_view->scene()->removeItem(chart_marker);
+  }
+  chart_marker = chart_view->scene()->addEllipse(0,0,10,10,car_pen);
+  QPointF pos = line_chart->mapToPosition(run_series->at(selected_row));
   auto x =3;
   pos.setX(pos.x()-chart_marker->boundingRect().width()/2+x);
   pos.setY(pos.y()-chart_marker->boundingRect().height()/2+x);
 
   chart_marker->setPos(pos);
+  ui->run_position_slider->setValue(selected_row);
+
+
+  RouteNode & node = current_run->nodes[selected_row];
+
+
+  if(car_graphic){
+    scene.removeItem(car_graphic);
+    car_graphic = NULL;
+  }
+
+  QGraphicsView * v = scene.views().at(0);
+  QPointF p1 = v->mapToScene(QPoint(0,0));
+  QPointF p2 = v->mapToScene(QPoint(1,1));
+  double scale = p2.x()-p1.x();
+
+  double car_width = 10 * scale;
+
+  car_graphic = (QGraphicsItem*) scene.addEllipse(
+        node.front_x-car_width/2,
+        -node.front_y-car_width/2,car_width,car_width,car_pen);
+}
+
+void RouteWindow::on_run_position_slider_valueChanged(int value)
+{
+  set_run_position(value);
 }
