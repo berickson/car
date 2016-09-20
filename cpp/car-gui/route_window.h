@@ -27,6 +27,8 @@ public:
   explicit RouteWindow(QWidget *parent = 0);
   ~RouteWindow();
 
+  void show_track_names();
+
 private slots:
   void on_track_list_itemSelectionChanged();
   void on_route_list_itemSelectionChanged();
@@ -40,6 +42,8 @@ private slots:
   void on_run_data_itemSelectionChanged();
 
   void on_run_position_slider_valueChanged(int value);
+
+  void on_folder_picker_button_clicked();
 
 private:
   QPen original_route_pen,planned_route_pen,run_pen;
