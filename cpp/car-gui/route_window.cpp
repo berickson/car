@@ -1,10 +1,11 @@
-#include "route_window.h"
+﻿#include "route_window.h"
 #include "ui_route_window.h"
 #include <QListView>
 #include <QStandardItemModel>
 
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
+#include <QFileDialog>
 
 #include "../run_settings.h"
 
@@ -16,6 +17,18 @@
 
 using namespace std;
 QT_CHARTS_USE_NAMESPACE
+void RouteWindow::show_track_names()
+{
+  ui->track_list->clear();
+  auto track_names =  file_names.get_track_names();
+  for(string track_name:track_names) {
+    ui->track_list->addItem(track_name.c_str());
+  }
+  if(ui->track_list->count() > 0)
+    ui->track_list->item(0)->setSelected(true);
+  ui->track_list->adjustSize();
+}
+
 RouteWindow::RouteWindow(QWidget *parent) :
   QDialog(parent),
   ui(new Ui::RouteWindow)
@@ -37,13 +50,7 @@ RouteWindow::RouteWindow(QWidget *parent) :
   scene.addText("Hello, world!");
 
 
-  auto track_names =  file_names.get_track_names();
-  for(string track_name:track_names) {
-    ui->track_list->addItem(track_name.c_str());
-  }
-  if(ui->track_list->count() > 0)
-    ui->track_list->item(0)->setSelected(true);
-  ui->track_list->adjustSize();
+  show_track_names();
 
 }
 
@@ -396,6 +403,7 @@ void RouteWindow::on_run_data_itemSelectionChanged()
 
 void RouteWindow::set_run_position(int selected_row) {
   QPen car_pen;
+  ui->run_data->selectRow(selected_row);
   car_pen.setColor(Qt::red);
   car_pen.setCosmetic(true);
   car_pen.setWidth(2);
@@ -435,4 +443,17 @@ void RouteWindow::set_run_position(int selected_row) {
 void RouteWindow::on_run_position_slider_valueChanged(int value)
 {
   set_run_position(value);
+}
+
+void RouteWindow::on_folder_picker_button_clicked()
+{
+  QFileDialog dialog;
+  dialog.setFileMode(QFileDialog::Directory);
+  dialog.setOption(QFileDialog::ShowDirsOnly);
+  if(dialog.exec() && dialog.selectedFiles().length()==1) {
+    QString s;
+    file_names.tracks_folder = dialog.selectedFiles().at(0).toStdString();
+    show_track_names();
+
+  }
 }
