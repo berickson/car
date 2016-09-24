@@ -9,9 +9,10 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-
+#include <geometry.h>
 
 using namespace std;
+
 
 class Ackerman {
 public:
@@ -66,5 +67,7 @@ void arc_to_relative_location_tests();
 void move_left_wheel_tests();
 
 void test_ackerman();
+void test_ackerman2();
+void test_pose();
 
 #endif // ACKERMAN_H

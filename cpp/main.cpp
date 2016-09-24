@@ -37,9 +37,11 @@ using namespace std;
 int main(int, char *[]) {
   try {
     log_info("enter main");
-    run_car_menu();
+    //run_car_menu();
+
 
     //test_ackerman();
+    test_ackerman2();
     //test_camera();
     //test_dynamics();
     //test_car();
@@ -53,6 +55,7 @@ int main(int, char *[]) {
     //test_menu();
     //test_pi_buttons();
     //test_pid();
+    test_pose();
     //test_route();
     //test_split();
     //test_stereo_camera();

@@ -98,6 +98,7 @@ void Ackerman::move_right_wheel(Angle outside_wheel_angle, double wheel_distance
   heading = isnan(new_heading) ? standardized_radians(heading + turn_angle) : new_heading;
 }
 
+#include "string_utils.h"
 
 // calculates an arc where the front wheel will travel to
 // point x ahead and point y t left
@@ -165,4 +166,102 @@ void arc_to_relative_location_tests() {
 void test_ackerman() {
   move_right_wheel_tests();
   //arc_to_relative_location_tests();
+}
+
+
+struct Pose {
+
+  // returns pose x ahead, y to left with incremental angle theta
+  Pose relative_pose(double forward, double left, Angle dtheta) const {
+    Pose after;
+    double h = heading.radians();
+    after.x = x + cos(h)*forward - sin(h)*left;
+    after.y = y + sin(h)*forward + cos(h)*left;
+    after.heading = heading + dtheta;
+    after.heading.standardize();
+    return after;
+  }
+
+  double x = 0;
+  double y = 0;
+  Angle heading = Angle::degrees(0);
+  std::string to_string() const {
+    stringstream ss;
+    ss <<  "(" << format(x,3,2) << "," << format(y,3,2) << "," << heading.degrees() << "°)";
+    return ss.str();
+  }
+};
+
+class Ackerman2 {
+public:
+  double w = 1.0; // width of front wheelbase
+  double l = 1.0; // from front to back wheels
+  const int fl_meters_per_tick = 1;
+  const int fr_meters_per_tick = 1;
+  const int bl_meters_per_tick = 1;
+  const int br_meters_per_tick = 1;
+
+  Pose move_rear_wheels(const Pose before, double d_bl, double d_br) const {
+    // special case if both wheels travelled the same distance
+    Pose after;
+    if(d_bl == d_br) {
+      after = before.relative_pose(d_bl,0.,Angle::radians(0));
+      return after;
+    }
+    if(fabs(d_bl) > fabs(d_br)) {
+      // different distances, assume going in a big circle (to right for now)
+      double r = ((w * d_br) /  (d_br - d_bl)) + (w/2);
+      Angle theta = Angle::radians((d_br-d_bl) / w);
+      double forward = r*sin(-theta.radians());
+      double left = r*(cos(-theta.radians()) - 1);
+      after = before.relative_pose(forward,left,theta);
+      return after;
+    } else {
+      // different distances, assume going in a big circle (to left for now)
+      double r = ((w * d_bl) /  (d_bl - d_br)) + (w/2);
+      Angle theta = Angle::radians((d_br-d_bl) / w);
+      double forward = r*sin(theta.radians());
+      double left = r*(1-cos(theta.radians()));
+      after = before.relative_pose(forward,left,theta);
+      return after;
+    }
+  }
+};
+
+
+Pose test_move_rear_wheels(Ackerman2 car, Pose before, double bl, double br) {
+  cout << before.to_string() << " + " << "move_rear_wheels(" << format(bl,3,2) << "," << format(br,3,2) << ")" ;
+  Pose after = car.move_rear_wheels(before, bl,br);
+  cout << " ->  " << after.to_string() << endl;
+  return after;
+}
+
+void test_ackerman2() {
+  Ackerman2 car;
+  Pose pose;
+  //pose = test_move_rear_wheels(car, pose,1,1);
+  pose = test_move_rear_wheels(car, pose,Angle::degrees(90).radians(),0);
+  pose = test_move_rear_wheels(car, pose,Angle::degrees(90).radians(),0);
+  pose = test_move_rear_wheels(car, pose,Angle::degrees(90).radians(),0);
+  pose = test_move_rear_wheels(car, pose,Angle::degrees(90).radians(),0);
+  cout << endl;
+  pose = test_move_rear_wheels(car, pose,0,Angle::degrees(90).radians());
+  pose = test_move_rear_wheels(car, pose,0,Angle::degrees(90).radians());
+  pose = test_move_rear_wheels(car, pose,0,Angle::degrees(90).radians());
+  pose = test_move_rear_wheels(car, pose,0,Angle::degrees(90).radians());
+  cout << endl;
+  pose = test_move_rear_wheels(car, pose,0,Angle::degrees(-90).radians());
+  pose = test_move_rear_wheels(car, pose,0,Angle::degrees(-90).radians());
+  pose = test_move_rear_wheels(car, pose,0,Angle::degrees(-90).radians());
+  pose = test_move_rear_wheels(car, pose,0,Angle::degrees(-90).radians());
+  //pose = test_move_rear_wheels(car, pose,Angle::degrees(90).radians(),0);
+}
+
+void test_pose() {
+  for(int i =0 ; i < 4; i++) {
+    Pose pose;
+    pose.heading = Angle::degrees(90*i);
+    pose = pose.relative_pose(1,0,Angle::degrees(0));
+    cout << "angle " << pose.heading.degrees() << " relative x:" << format(pose.x,3,1) << " y:" << format(pose.y,3,1) << endl;
+  }
 }
