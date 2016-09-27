@@ -55,7 +55,7 @@ void Angle::set_radians(double theta_)
 }
 
 void Angle::standardize() {
-  theta = fmod(theta + M_PI , 2.*M_PI) - M_PI;
+  theta = fmod(theta + 99*M_PI , 2.*M_PI) - M_PI;
 }
 
 const string Angle::to_string() {
