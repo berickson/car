@@ -34,6 +34,7 @@ struct Angle {
   const string to_string();
 
   bool operator == (Angle& rhs);
+  operator double() { return theta; }
   Angle & operator /= (double d);
   Angle operator / (double d) const;
   Angle operator * (double d) const;

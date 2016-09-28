@@ -10,12 +10,12 @@
 
 using namespace std;
 
-Ackerman::Ackerman(double front_wheelbase_width, double wheelbase_length, double x_, double y_, double radians) {
+Ackerman::Ackerman(double front_wheelbase_width, double wheelbase_length, Point front_position, Angle _heading) {
   w = front_wheelbase_width;
   l = wheelbase_length;
-  x = x_;
-  y = y_;
-  heading = radians;
+  x = front_position.x - l*cos(heading);
+  y = front_position.y - l*sin(heading);
+  heading = _heading;
 }
 
 string Ackerman::to_string() {
@@ -103,7 +103,7 @@ void Ackerman::move_right_wheel(Angle outside_wheel_angle, double wheel_distance
 // calculates an arc where the front wheel will travel to
 // point x ahead and point y t left
 void test_arc_to_relative_location(double l, double x, double y){
-  auto car = Ackerman(0, l, -l, 0, 0); // zero width makes like a bicycle, -l puts front wheel at (0,0)
+  auto car = Ackerman(0, l, Point(0,0)); // zero width makes like a bicycle, -l puts front wheel at (0,0)
   cout << "beginning car fl position:" << car.front_left_position().to_string();
 
   auto arc = car.arc_to_relative_location(x,y);
@@ -122,7 +122,7 @@ void test_arc_to_relative_location(double l, double x, double y){
 
 
 void test_move_right_wheel(double l, Angle outside_wheel_angle, double distance) {
-  auto car = Ackerman(0, l, -l, 0, 0); // zero width makes like a bicycle, -l puts front wheel at (0,0)
+  auto car = Ackerman(0, l, Point(0, 0)); // zero width makes like a bicycle
   cout << "start fl:" << car.front_left_position().to_string()
     << " l: " << l
     << " outside_wheel_angle: " << outside_wheel_angle.degrees() << " degrees"

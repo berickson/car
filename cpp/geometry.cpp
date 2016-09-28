@@ -258,7 +258,7 @@ void test_geometry() {
   cout << "a: " << a.to_string() << endl;
   cout << "a.degrees(): " << a.degrees() << endl;
   cout << "a.radians(): " << a.radians() << endl;
-  cout << " a * 2" << (a * 2).to_string();
+  cout << " a * 2" << (a * 2.).to_string();
   a+=Angle::degrees(360);
   cout << "adding 360 degrees" << endl;
   cout << "a.degrees(): " << a.degrees() << endl;

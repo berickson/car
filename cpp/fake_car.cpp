@@ -109,7 +109,7 @@ void write_path_from_recording_file(string recording_path, string outpath) {
 #include "route.h"
 void test_fake_car() {
 
-  string recording_path = "../../cpp/test_data/2/recording.csv";
+  string recording_path = "/home/brian/Desktop/Dropbox/car/tracks/avc/routes/S/recording.csv";
   string route_path =     "../../cpp/test_data/2/test_route.csv";
   cout << "writing path " << route_path << " from recording " << recording_path << endl;
   write_path_from_recording_file(recording_path, route_path);

@@ -41,7 +41,7 @@ int main(int, char *[]) {
 
 
     //test_ackerman();
-    test_ackerman2();
+    //test_ackerman2();
     //test_camera();
     //test_dynamics();
     //test_car();
@@ -49,13 +49,13 @@ int main(int, char *[]) {
     //test_console_menu();
     //test_driver();
     //test_dynamics();
-    //test_fake_car();
+    test_fake_car();
     //test_geometry();
     //test_lookup_table();
     //test_menu();
     //test_pi_buttons();
     //test_pid();
-    test_pose();
+    //test_pose();
     //test_route();
     //test_split();
     //test_stereo_camera();
