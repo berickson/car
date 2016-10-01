@@ -40,7 +40,8 @@ SOURCES += main.cpp\
     ../frame_grabber.cpp \
     ../logger.cpp \
     ../speedometer.cpp \
-    ../pid.cpp
+    ../pid.cpp \
+    stereo_window.cpp
 
 HEADERS  += main_window.h \
     ../ackerman.h \
@@ -56,14 +57,16 @@ HEADERS  += main_window.h \
     ../work_queue.h \
     route_window.h \
     ../frame_grabber.h \
-    ../speedometer.h
+    ../speedometer.h \
+    stereo_window.h
 
 images.path    = $${DESTDIR}/
 
 QT += charts
 
 FORMS    += main_window.ui \
-    route_window.ui
+    route_window.ui \
+    stereo_window.ui
 
 unix|win32: LIBS += -L/usr/local/lib -lncurses -lwiringPi -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d
 
