@@ -427,6 +427,7 @@ void run_car_menu() {
     {[&car](){return "heading: " + format(car.get_heading().degrees());}},
     {[&car](){return "heading_adj: " + format(car.get_heading_adjustment().degrees());}},
     {[&car](){return "rear: " + to_string(car.get_rear_position());}},
+    {[&car](){return "spur: " + format(car.get_spur_odo());}},
     {[&car](){return "fl: " + wheel_display_string(car.get_front_left_wheel());}},
     {[&car](){return "fr: " + wheel_display_string(car.get_front_right_wheel());}},
     {[&car](){return "bl: " + wheel_display_string(car.get_back_left_wheel());}},

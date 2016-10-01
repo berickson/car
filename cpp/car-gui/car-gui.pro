@@ -60,8 +60,6 @@ HEADERS  += main_window.h \
 
 images.path    = $${DESTDIR}/
 
-images.files   += ./anaranjado_icon.svg
-INSTALLS       += images
 QT += charts
 
 FORMS    += main_window.ui \

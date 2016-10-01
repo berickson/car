@@ -102,6 +102,10 @@ public:
     return current_dynamics.battery_voltage;
   };
 
+  int get_spur_odo() {
+    return current_dynamics.spur_odo;
+  }
+
   inline Point get_front_position(){
     return ackerman.front_position();
   };

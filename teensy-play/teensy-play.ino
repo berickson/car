@@ -6,5 +6,5 @@ void setup(){
 }
 
 void loop() {
-  digitalWrite(pin_led,millis()%1000==0);
+  digitalWrite(pin_led,micros()%1000000<100);
 }
