@@ -28,6 +28,8 @@ private slots:
   void on_frame_slider_valueChanged(int value);
   void on_show_features_checkbox_toggled(bool);
 
+  void on_match_features_checkbox_toggled(bool checked);
+
 private:
   void show_frame(int number);
   int get_frame_number();

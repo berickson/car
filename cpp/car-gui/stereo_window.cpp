@@ -51,21 +51,25 @@ void StereoWindow::show_frame(int number)
     camera->grab_frame(number);
   }
 
-  cv::BFMatcher matcher;
-  std::vector<cv::DMatch> matches;
-  matcher.match(left_camera.descriptors, right_camera.descriptors, matches);
+  if(ui->match_features_checkbox->isChecked()) {
+    cv::BFMatcher matcher;
+    std::vector<cv::DMatch> matches;
+    matcher.match(left_camera.descriptors, right_camera.descriptors, matches);
 
-  // sort the mathes by distance
-  sort(matches.begin(), matches.end(),
-      [](const cv::DMatch & a, const cv::DMatch& b) -> bool
-  {
-      return a.distance < b.distance;
-  });
 
-  for(int i = 0; i < matches.size() / 5; i++ ) {
-    cv::DMatch match = matches.at(i);
-    left_camera.show_match(match.queryIdx);
-    right_camera.show_match(match.trainIdx);
+    // sort the mathes by distance
+    sort(matches.begin(), matches.end(),
+        [](const cv::DMatch & a, const cv::DMatch& b) -> bool
+    {
+        return a.distance < b.distance;
+    });
+
+
+    for(unsigned int i = 0; i < matches.size() / 5; i++ ) {
+      cv::DMatch match = matches.at(i);
+      left_camera.show_match(match.queryIdx);
+      right_camera.show_match(match.trainIdx);
+    }
   }
 
   left_camera.show();
@@ -88,7 +92,6 @@ void StereoWindow::CameraUnit::grab_frame(int frame_number) {
   cap.set(cv::CAP_PROP_POS_FRAMES, frame_number);
   cap.read(frame);
   auto detector = cv::xfeatures2d::SURF::create();
-  //vector<cv::KeyPoint> previous_keypoints(keypoints);
   cvtColor( frame, gray, CV_RGB2GRAY );
   cv::blur( gray, gray, cv::Size(5,5));
   detector->detect(gray,keypoints);
@@ -114,4 +117,8 @@ void StereoWindow::CameraUnit::show_match(int feature_index) {
   cv::KeyPoint keypoint = keypoints.at(feature_index);
   cv::circle(frame, keypoint.pt, 3, cv::Scalar(0, 0, 255));
 
+}
+
+void StereoWindow::on_match_features_checkbox_toggled(bool ) {
+  show_frame(get_frame_number());
 }

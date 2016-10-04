@@ -118,11 +118,28 @@
     <bool>true</bool>
    </property>
   </widget>
+  <widget class="QCheckBox" name="match_features_checkbox">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>550</y>
+     <width>121</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Match Features</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
   <zorder>layoutWidget</zorder>
   <zorder>frame_count_label</zorder>
   <zorder>frame_count</zorder>
   <zorder>frame_slider</zorder>
   <zorder>show_features_checkbox</zorder>
+  <zorder>match_features_checkbox</zorder>
  </widget>
  <resources/>
  <connections/>
