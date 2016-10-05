@@ -58,7 +58,7 @@
     <enum>Qt::Horizontal</enum>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>60</x>
@@ -102,12 +102,44 @@
     </item>
    </layout>
   </widget>
-  <zorder>left_image</zorder>
-  <zorder>right_image</zorder>
-  <zorder>left_image</zorder>
+  <widget class="QCheckBox" name="show_features_checkbox">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>550</y>
+     <width>121</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Show Features</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="match_features_checkbox">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>550</y>
+     <width>121</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Match Features</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <zorder>layoutWidget</zorder>
   <zorder>frame_count_label</zorder>
   <zorder>frame_count</zorder>
   <zorder>frame_slider</zorder>
+  <zorder>show_features_checkbox</zorder>
+  <zorder>match_features_checkbox</zorder>
  </widget>
  <resources/>
  <connections/>
