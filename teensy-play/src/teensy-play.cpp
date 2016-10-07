@@ -8,17 +8,33 @@
 const uint8_t pin_led = 13;
 Mpu9150 mpu9150;
 void setup(){
-  Serial.begin(9600);
+  Serial.begin(250000);
+  Wire.begin();
+  TRACE_MPU = false;
+  delay(10);
   Serial.println("inside setup");
   pinMode(pin_led, OUTPUT);
+  Serial.println("inside setup");
   digitalWrite(pin_led,1);
-  //mpu9150.setup();
+  delay(10);
+  Serial.println("inside setup");
+  mpu9150.setup();
 }
 
+int loop_count = 0;
 void loop() {
-  //mpu9150.execute();
-  Serial.print(mpu9150.yaw);
-  Serial.println('a');
+  ++loop_count;
+  //Serial.println("inside loop");
+  //
+  mpu9150.execute();
+  if(loop_count%1000 == 0) {
+    mpu9150.log_status();
+    Serial.println(loop_count);
+    Serial.println(mpu9150.heading());
+  }
+  //
   digitalWrite(pin_led,micros()%1000000<50000);
   //delay(1000);
+
+  //delay(100);
 }

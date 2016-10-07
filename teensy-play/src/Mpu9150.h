@@ -10,8 +10,8 @@
 //#include "vector_math.h"
 #include "Logger.h"
 
-#define INTERRUPT_PIN 33
-#define INTERRUPT_NUMBER 33
+#define INTERRUPT_PIN 20
+#define INTERRUPT_NUMBER 20
 
 
 class Mpu9150 {

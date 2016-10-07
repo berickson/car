@@ -20,30 +20,32 @@ void dmpDataReady() {
 }
 
 void Mpu9150::setup() {
-  Wire.begin();
-  //Serial.begin(115200);
 
   // initialize device
-  Serial.println(F("Initializing I2C MPU devices..."));
+  log(TRACE_MPU,"Initializing I2C MPU devices...");
   mpu.initialize();
+  log(TRACE_MPU,"Done Initializing I2C MPU devices...");
 
   // verify connection
-  Serial.println(F("Testing device connections..."));
-  Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
+  if(mpu.testConnection()) {
+    log(TRACE_MPU, "MPU9150 connection successful")
+  } else {
+    log(LOG_ERROR, "MPU9150 connection successful")
+  }
 
 
   // load and configure the DMP
-  Serial.println(F("Initializing DMP..."));
+  log(TRACE_MPU,F("Initializing DMP..."));
   devStatus = mpu.dmpInitialize();
 
   // make sure it worked (returns 0 if so)
   if (devStatus == 0) {
     // turn on the DMP, now that it's ready
-    Serial.println(F("Enabling DMP..."));
+    log(TRACE_MPU,F("Enabling DMP..."));
     mpu.setDMPEnabled(true);
 
     // enable Arduino interrupt detection
-    Serial.print(F("Enabling interrupt detection (Arduino external interrupt ")); Serial.println(INTERRUPT_NUMBER);
+    log(TRACE_MPU,F("Enabling interrupt detection (Arduino external interrupt ")); Serial.println(INTERRUPT_NUMBER);
     pinMode(INTERRUPT_PIN, INPUT);
     attachInterrupt(INTERRUPT_NUMBER,dmpDataReady, RISING);
     mpuIntStatus = mpu.getIntStatus();
@@ -54,14 +56,15 @@ void Mpu9150::setup() {
 
     // get expected DMP packet size for later comparison
     packetSize = mpu.dmpGetFIFOPacketSize();
+    log(TRACE_MPU,(String) "packet size: "+packetSize);
   } else {
     // ERROR!
     // 1 = initial memory load failed
     // 2 = DMP configuration updates failed
     // (if it's going to break, usually the code will be 1)
-    Serial.print(F("DMP Initialization failed (code "));
-    Serial.print(devStatus);
-    Serial.println(F(")"));
+    log(LOG_ERROR,F("DMP Initialization failed (code "));
+    log(LOG_ERROR,devStatus);
+    log(LOG_ERROR,F(")"));
   }
 
 }
@@ -86,16 +89,17 @@ void Mpu9150::log_status() {
 }
 
 void Mpu9150::execute(){
+  log(TRACE_MPU,(String) "reading fifo");
+  fifoCount = mpu.getFIFOCount();
   // wait for MPU interrupt or extra packet(s) available
-  if (!mpuInterrupt && fifoCount < packetSize)
+  log(TRACE_MPU,(String) "fifo count " + fifoCount);
+
+  if (fifoCount < packetSize)
   return;
 
   // reset interrupt flag and get INT_STATUS byte
   mpuInterrupt = false;
   mpuIntStatus = mpu.getIntStatus();
-
-  // get current FIFO count
-  fifoCount = mpu.getFIFOCount();
 
   // check for overflow (this should never happen unless our code is too inefficient)
   if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
@@ -104,10 +108,9 @@ void Mpu9150::execute(){
     Serial.println(F("FIFO overflow!"));
 
     // otherwise, check for DMP data ready interrupt (this should happen frequently)
-  } else if (mpuIntStatus & 0x01) {
+  } else { //if (mpuIntStatus & 0x01) {
     // wait for correct available data length, should be a VERY short wait
-    while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
-
+    log(TRACE_MPU,"reading mpu");
     // read a packet from FIFO
     mpu.getFIFOBytes(fifoBuffer, packetSize);
 
