@@ -18,6 +18,7 @@
 #include "Fsm.h"
 
 #include "BNO055.h"
+#include "Mpu9150.h"
 
 #define count_of(a) (sizeof(a)/sizeof(a[0]))
 
@@ -218,7 +219,7 @@ void help() {
 }
 
 
-//Mpu9150 mpu9150;
+Mpu9150 mpu9150;
 BNO055 mpu_bno;
 
 
@@ -344,7 +345,7 @@ void setup() {
   last_report_ms = millis();
 
   log(LOG_INFO, "car_control begun");
-//  mpu9150.setup();
+  mpu9150.setup();
 
   delay(1000);
   mpu_bno.setTempSource(true);
@@ -352,8 +353,8 @@ void setup() {
   mpu_bno.loadCalib();
 
   delay(1000);
-//  mpu9150.zero();
-//  circle_mode.init(&mpu9150);
+  mpu9150.zero();
+  //circle_mode.init(&mpu9150);
   beeper.beep_nbc();
   modes.begin();
 }
@@ -387,6 +388,7 @@ void loop() {
   // get common execution times
   bool every_second = every_n_ms(last_loop_time_ms, loop_time_ms, 1000);
   bool every_10_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 10);
+  bool every_1_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 1);
 
 
   // get commands from usb
@@ -394,7 +396,7 @@ void loop() {
 
 
   ping.execute();
-//  mpu9150.execute();
+  mpu9150.execute();
   blinker.execute();
   beeper.execute();
 
@@ -449,8 +451,8 @@ void loop() {
     log(TD,
        "str," + steering.readMicroseconds()
        + ",esc," + speed.readMicroseconds()
-       //+ ",aa,"+ ftos(mpu9150.ax) + "," + ftos(mpu9150.ay)+","+ ftos(mpu9150.az)
-       + ",aa,"+ ftos(acceleration.ax) + "," + ftos(acceleration.ay)+","+ ftos(acceleration.az)
+       + ",aa,"+ ftos(mpu9150.ax) + "," + ftos(mpu9150.ay)+","+ ftos(mpu9150.az)
+       //+ ",aa,"+ ftos(acceleration.ax) + "," + ftos(acceleration.ay)+","+ ftos(acceleration.az)
        +",spur_us,"+   microseconds_between_spur_pulse_count + "," + last_spur_pulse_us
        +",spur_odo," + spur_pulse_count
        +",ping_mm,"+ping.millimeters()
@@ -460,8 +462,8 @@ void loop() {
        +",odo_br,"+odometer_back_right.odometer+"," +  odometer_back_right.last_odometer_change_us
        +",ms,"+millis()
        +",us,"+micros()
-       +",ypr,"+ ftos(-eulers.yaw) + "," + ftos(eulers.pitch) + "," + ftos(eulers.roll)
-       //+",ypr,"+ ftos(-mpu9150.yaw* 180. / M_PI) + "," + ftos(-mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
+       //+",ypr,"+ ftos(-eulers.yaw) + "," + ftos(eulers.pitch) + "," + ftos(eulers.roll)
+       +",ypr,"+ ftos(-mpu9150.yaw* 180. / M_PI) + "," + ftos(-mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
        +",vbat,"+ftos(battery_voltage)
        +",cal,"+mpu_bno.getCalibration()
        );
