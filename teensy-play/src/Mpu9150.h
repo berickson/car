@@ -1,13 +1,18 @@
 #pragma once
+/*
+Usage:
 
-//#include "i2c_t3.h"
+Requires following in platformion.ini
+lib_deps =
+  I2Cdevlib-Core
+  I2Cdevlib-MPU9150
+*/
+
 #include <stdint.h>
 #include <math.h>
 #include "helper_3dmath.h"
 #define MPU9150_INCLUDE_DMP_MOTIONAPPS41
 #include <MPU9150.h>
-//#include <I2Cdev.h>
-//#include "vector_math.h"
 #include "Logger.h"
 
 #define INTERRUPT_PIN 20
@@ -17,6 +22,7 @@
 class Mpu9150 {
 public:
   MPU9150 mpu;
+  void set_zero_orientation(Quaternion zeo);
 
   // MPU control/status vars
   bool dmpReady = false;  // set true if DMP init was successful
@@ -29,12 +35,13 @@ public:
   unsigned long readingCount;
 
   // orientation/motion vars
-  Quaternion q;           // [w, x, y, z]         quaternion container
-  VectorInt16 araw;
+  Quaternion q,qraw;           // [w, x, y, z]         quaternion container
+  Quaternion zero_adjust = Quaternion(1,0,0,0);
+  VectorInt16 a, araw;
+  VectorFloat gravity, graw;
   float ax,ay,az;
   VectorInt16 a0;
   VectorInt16 mag;
-  VectorFloat gravity;    // [x, y, z]            gravity vector
   float yaw_pitch_roll[3];
   float &yaw = yaw_pitch_roll[0];
   float &pitch = yaw_pitch_roll[1];

@@ -19,9 +19,16 @@ void dmpDataReady() {
   mpuInterrupt = true;
 }
 
+void Mpu9150::set_zero_orientation(Quaternion zero)
+{
+  Serial.println("Mpu9150::set_zero_orientation");
+  zero_adjust = zero;
+}
+
 void Mpu9150::setup() {
 
   // initialize device
+  Serial.println("9150 setup");
   log(TRACE_MPU,"Initializing I2C MPU devices...");
   mpu.initialize();
   log(TRACE_MPU,"Done Initializing I2C MPU devices...");
@@ -51,7 +58,7 @@ void Mpu9150::setup() {
     mpuIntStatus = mpu.getIntStatus();
 
     // set our DMP Ready flag so the main loop() function knows it's okay to use it
-    Serial.println(F("DMP ready! Waiting for first interrupt..."));
+    Serial.println(F("DMP ready!"));
     dmpReady = true;
 
     // get expected DMP packet size for later comparison
@@ -101,9 +108,7 @@ void Mpu9150::execute(){
   mpuInterrupt = false;
   mpuIntStatus = mpu.getIntStatus();
 
-  // check for overflow (this should never happen unless our code is too inefficient)
-  if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
-    // reset so we can continue cleanly
+  if (fifoCount >= 1024) {
     mpu.resetFIFO();
     Serial.println(F("FIFO overflow!"));
 
@@ -113,35 +118,25 @@ void Mpu9150::execute(){
     log(TRACE_MPU,"reading mpu");
     // read a packet from FIFO
     mpu.getFIFOBytes(fifoBuffer, packetSize);
-
-    // track FIFO count here in case there is > 1 packet available
-    // (this lets us immediately read more without waiting for an interrupt)
     fifoCount -= packetSize;
     
-    mpu.dmpGetQuaternion(&q, fifoBuffer);
-
-    // the following adjusts for the orientation of the mpu mounted in the car
-    // while sitting flat on the ground
-    // original measurement was (0.674316,-0.0788574,-0.731384,0.0640259)
-    // below is the conjugate which will set it to unity
-    Quaternion adjust = Quaternion(0.674316,0.0788574,0.731384,-0.0640259);
-    
-
-    q = q.getProduct(adjust);
-
-    mpu.dmpGetGravity(&gravity, &q);
-    
-    //mpu.dmpGetMag(&mag, fifoBuffer);
+    mpu.dmpGetQuaternion(&qraw, fifoBuffer);
+    mpu.dmpGetGravity(&graw, &qraw);
     mpu.dmpGetAccel(&araw, fifoBuffer);
+    VectorInt16 alinraw;
+    mpu.dmpGetLinearAccel(&alinraw, &araw, &graw);
+    a = alinraw.getRotated(&zero_adjust);
 
-    const float g =  9.80665;
+    ax = a.x;
+    ay = a.y;
+    az = a.z;
 
-    ax = g*(araw.x * 0.0000144756 + araw.y * -0.0000070556+ araw.z* 0.0001214348 - 0.043 + gravity.x);
-    ay = g*(araw.x * -0.0000203849+ araw.y * -0.0001212882+ araw.z* 0.0000038742 -0.032  + gravity.y);
-    az = g*(araw.x * -0.0001197524+ araw.y *0.0000187399 + araw.z*0.0000192036 + -0.053  + gravity.z);
-    
+    q = qraw.getProduct(zero_adjust.getConjugate());
+    gravity= graw.getRotated(&zero_adjust);
+
     mpu.dmpGetYawPitchRoll(yaw_pitch_roll, &q, &gravity);
-    
+
+
     readingCount++;
 
     // get initial quaternion and gravity
