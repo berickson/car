@@ -18,10 +18,17 @@ lib_deps =
 #define INTERRUPT_PIN 20
 #define INTERRUPT_NUMBER 20
 
+#include "Statistics.h"
+
 
 class Mpu9150 {
 public:
   MPU9150 mpu;
+
+  void calibrate_as_horizontal();
+  void calibrate_nose_up();
+  void start_calibrate_at_rest(double pause_seconds, double test_seconds);
+
   void set_zero_orientation(Quaternion zeo);
 
   // MPU control/status vars
@@ -34,12 +41,24 @@ public:
   uint8_t fifoBuffer[64]; // FIFO storage buffer
   unsigned long readingCount;
 
+  // variables for at rest calibration
+  bool at_rest_calibrating = false;
+  uint32_t at_rest_calibration_start_millis = 0;
+  uint32_t at_rest_calibration_end_millis = 0;
+  double yaw_slope_rads_per_ms;
+  double yaw_adjust_start_ms;
+
+
+
   // orientation/motion vars
   Quaternion q,qraw;           // [w, x, y, z]         quaternion container
+  Quaternion down_adjust = Quaternion(1,0,0,0);
   Quaternion zero_adjust = Quaternion(1,0,0,0);
   VectorInt16 a, araw;
   VectorFloat gravity, graw;
   float ax,ay,az;
+  float ax_bias,ay_bias,az_bias,rest_a_mag;
+
   VectorInt16 a0;
   VectorInt16 mag;
   float yaw_pitch_roll[3];
@@ -47,6 +66,7 @@ public:
   float &pitch = yaw_pitch_roll[1];
   float &roll = yaw_pitch_roll[2];
 
+  Statistics ax_stats, ay_stats, az_stats,yaw_stats;
   void setup();
   float heading();
   void log_status();

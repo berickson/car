@@ -48,53 +48,21 @@ struct LoopTracker {
 } loop_tracker;
 
 
-// based on http://stackoverflow.com/a/4436915/383967, modified
-Quaternion quaternion_from_axis_angle(const double &xx, const double &yy, const double &zz, const double &a)
-{
-    // Here we calculate the sin( theta / 2) once for optimization
-    double factor = sin( a / 2.0 );
-
-    // Calculate the x, y and z of the quaternion
-    double x = xx * factor;
-    double y = yy * factor;
-    double z = zz * factor;
-
-    // Calcualte the w value by cos( theta / 2 )
-    double w = cos( a / 2.0 );
-    Quaternion q = Quaternion(w, x, y, z);
-    q.normalize();
-
-    return q;
-}
-
 void loop() {
   int command = 0;
   while(Serial.available()) {
     command = Serial.read();
     if(command) {
       switch (command) {
-      case 'g': {
-        Serial.println("this will calibrate rest position based on gravity alone");
-        mpu9150.set_zero_orientation(mpu9150.qraw);
-      }
-      break;
-      case 't': {
-        Serial.println("this will calibrate forward based on tilt and gravity");
-        Serial.print("Based on gravity, the offset should be ");
-        double dx = mpu9150.gravity.x;
-        double dy = mpu9150.gravity.y;
-        double theta = atan2(dy,dx);
-        Serial.print("dx: ");
-        Serial.print(dx);
-        Serial.print(" dy: ");
-        Serial.print(dy);
-        Serial.print(" atan: ");
-        Serial.print(theta * 180. / PI);
-        Serial.println();
+      case 'g':
+        mpu9150.calibrate_as_horizontal();
+        break;
+      case 't':
+        mpu9150.calibrate_nose_up();
+        break;
 
-        Quaternion q = quaternion_from_axis_angle(0,0,1,-theta );
-        mpu9150.zero_adjust = q.getProduct(mpu9150.zero_adjust);
-      }
+      case 'r':
+        mpu9150.start_calibrate_at_rest(1,120);
         break;
       default: {
         break;
@@ -104,12 +72,12 @@ void loop() {
   }
   loop_tracker.execute();
 
-  //Serial.println("inside loop");
-  //
   mpu9150.execute();
   if(loop_tracker.every_n_ms(1000)) {
     Serial.print((String) (millis()/1000.) +  " YPR[" + mpu9150.heading() + "," + mpu9150.pitch * 180./PI + "," + mpu9150.roll * 180./PI + "]");
+    Serial.print((String) " zero[" + mpu9150.zero_adjust.w+ "," + mpu9150.zero_adjust.x+ ","+ mpu9150.zero_adjust.y+ ","+ mpu9150.zero_adjust.z + "]");
     Serial.print((String) " qraw[" + mpu9150.qraw.w+ "," + mpu9150.qraw.x+ ","+ mpu9150.qraw.y+ ","+ mpu9150.qraw.z + "]");
+    Serial.print((String) " araw[" + mpu9150.araw.x+ "," + mpu9150.araw.y+ ","+ mpu9150.araw.z + "]");
     Serial.print((String) " q[" + mpu9150.q.w+ "," + mpu9150.q.x+ ","+ mpu9150.q.y+ ","+ mpu9150.q.z + "]");
     Serial.print((String) " g[" + mpu9150.gravity.x+ ", " + mpu9150.gravity.y+ ", "+ mpu9150.gravity.z + "]");
     Serial.println((String) " a[" + mpu9150.ax+ ", " + mpu9150.ay+ ", "+ mpu9150.az + "]");
@@ -117,7 +85,4 @@ void loop() {
   }
   //
   digitalWrite(pin_led,micros()%1000000<50000);
-  //delay(1000);
-
-  //delay(100);
 }

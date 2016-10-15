@@ -19,13 +19,67 @@ void dmpDataReady() {
   mpuInterrupt = true;
 }
 
-void Mpu9150::set_zero_orientation(Quaternion zero)
+// this will calibrate rest position based on gravity alone
+void Mpu9150::calibrate_as_horizontal() {
+  set_zero_orientation(qraw);
+}
+
+
+// based on http://stackoverflow.com/a/4436915/383967, modified
+Quaternion quaternion_from_axis_angle(const double &xx, const double &yy, const double &zz, const double &a)
 {
-  Serial.println("Mpu9150::set_zero_orientation");
+    // Here we calculate the sin( theta / 2) once for optimization
+    double factor = sin( a / 2.0 );
+
+    // Calculate the x, y and z of the quaternion
+    double x = xx * factor;
+    double y = yy * factor;
+    double z = zz * factor;
+
+    // Calcualte the w value by cos( theta / 2 )
+    double w = cos( a / 2.0 );
+    Quaternion q = Quaternion(w, x, y, z);
+    q.normalize();
+
+    return q;
+}
+
+// this will calibrate forward based on titl and gravity
+// use this to have pitch and yaw read correctly
+// to calibrate:
+// 1. Calibrate horizontal using calibrate_as_horizontal()
+// lift front of vehicle off the ground, say 30 degrees or so
+// then call this function.  The front of the vehicle will be calibrated
+// based on the gravity vector.
+void Mpu9150::calibrate_nose_up() {
+  double theta = atan2(gravity.x, gravity.y);
+  Quaternion q = quaternion_from_axis_angle(0,0,1,theta + 3*PI/2);
+  zero_adjust = q.getProduct(zero_adjust);
+}
+
+void Mpu9150::start_calibrate_at_rest(double pause_seconds, double test_seconds)
+{
+  Serial.println((String) "performing rest calibration.  Keep still for " + test_seconds + " seconds");
+  at_rest_calibrating = true;
+  at_rest_calibration_start_millis = millis() + 1000 * pause_seconds;
+  at_rest_calibration_end_millis = at_rest_calibration_start_millis + 1000 * test_seconds;
+
+  ax_stats.reset();
+  ay_stats.reset();
+  az_stats.reset();
+  yaw_stats.reset();
+}
+
+void Mpu9150::set_zero_orientation(Quaternion zero) {
   zero_adjust = zero;
 }
 
 void Mpu9150::setup() {
+  rest_a_mag = 7645.45;
+  zero_adjust = Quaternion(-0.69, 0.000,0.73,-0.00);
+  ax_bias = 0.0;
+  ay_bias = 0.0;
+  az_bias = 0.0;
 
   // initialize device
   Serial.println("9150 setup");
@@ -76,12 +130,16 @@ void Mpu9150::setup() {
 
 }
 
-
 // returns an inverted yaw value so rotation follows
 // standard of ccw being positive
 float Mpu9150::heading() {
   if(!initialReading) return 0.0;
-  return -rads2degrees(yaw_pitch_roll[0]);
+
+  // cancel out the yaw drift
+  // todo: is there a better place to do this?
+  float yaw = yaw_pitch_roll[0];
+  yaw -=   yaw_slope_rads_per_ms * (millis() - yaw_adjust_start_ms);
+  return -rads2degrees(yaw);
 }
 
 void Mpu9150::log_status() {
@@ -112,7 +170,6 @@ void Mpu9150::execute(){
     mpu.resetFIFO();
     Serial.println(F("FIFO overflow!"));
 
-    // otherwise, check for DMP data ready interrupt (this should happen frequently)
   } else { //if (mpuIntStatus & 0x01) {
     // wait for correct available data length, should be a VERY short wait
     log(TRACE_MPU,"reading mpu");
@@ -123,17 +180,17 @@ void Mpu9150::execute(){
     mpu.dmpGetQuaternion(&qraw, fifoBuffer);
     mpu.dmpGetGravity(&graw, &qraw);
     mpu.dmpGetAccel(&araw, fifoBuffer);
-    VectorInt16 alinraw;
-    mpu.dmpGetLinearAccel(&alinraw, &araw, &graw);
+    a = araw.getRotated(&zero_adjust);
 
-    a = alinraw.getRotated(&zero_adjust);
 
-    ax = a.x;
-    ay = a.y;
-    az = a.z;
 
     q = qraw.getProduct(zero_adjust.getConjugate());
     gravity= graw.getRotated(&zero_adjust);
+
+    ax = 9.8*(a.x/rest_a_mag - gravity.x);
+    ay = 9.8*(a.y/rest_a_mag - gravity.y);
+    az = 9.8*(a.z/rest_a_mag - gravity.z);
+
 
     mpu.dmpGetYawPitchRoll(yaw_pitch_roll, &q, &gravity);
 
@@ -144,6 +201,45 @@ void Mpu9150::execute(){
     if(!initialReading) {
       zero();
       initialReading = true;
+    }
+    if(at_rest_calibrating) {
+      auto ms = millis();
+      if(ms >= at_rest_calibration_start_millis && ms < at_rest_calibration_end_millis) {
+        ax_stats.add(ms,araw.x);
+        ay_stats.add(ms,araw.y);
+        az_stats.add(ms,araw.z);
+        yaw_stats.add(ms,yaw); // todo: make sure this doesn't roll over in the middle of calibrating
+      } else if (ms >= at_rest_calibration_end_millis ) {
+        ax_bias = ax_stats.meany();
+        ay_bias = ay_stats.meany();
+        az_bias = az_stats.meany();
+        rest_a_mag = sqrt(ax_bias*ax_bias + ay_bias * ay_bias + az_bias*az_bias);
+        yaw_slope_rads_per_ms = yaw_stats.slope();
+        yaw_adjust_start_ms = millis();
+
+        Serial.println();
+        Serial.print("stats collection completed, ");
+        Serial.print(ax_stats.count);
+        Serial.print(" samples ");
+        Serial.print(" ax_bias: ");
+        Serial.print(ax_bias);
+        Serial.print(" ay_bias: ");
+        Serial.print(ay_bias);
+        Serial.print(" az_bias: ");
+        Serial.print(az_bias);
+        Serial.print(" rest_a_mag: ");
+        Serial.print(rest_a_mag);
+        Serial.print("degrees/hr drift: ");
+        Serial.print(yaw_slope_rads_per_ms*1000*60*60*180/PI);
+
+        Serial.println();
+
+
+        // reset all the state variables
+        at_rest_calibrating = false;
+        at_rest_calibration_end_millis = 0;
+        at_rest_calibration_start_millis = 0;
+      }
     }
   }
 }
