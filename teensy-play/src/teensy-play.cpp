@@ -92,7 +92,7 @@ void loop() {
         Serial.print(theta * 180. / PI);
         Serial.println();
 
-        Quaternion q = quaternion_from_axis_angle(0,0,1,PI-theta );
+        Quaternion q = quaternion_from_axis_angle(0,0,1,-theta );
         mpu9150.zero_adjust = q.getProduct(mpu9150.zero_adjust);
       }
         break;

@@ -125,6 +125,7 @@ void Mpu9150::execute(){
     mpu.dmpGetAccel(&araw, fifoBuffer);
     VectorInt16 alinraw;
     mpu.dmpGetLinearAccel(&alinraw, &araw, &graw);
+
     a = alinraw.getRotated(&zero_adjust);
 
     ax = a.x;
