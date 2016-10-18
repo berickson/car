@@ -159,12 +159,16 @@ string time_string(std::chrono::system_clock::time_point &tp)
 
 chrono::system_clock::time_point time_from_string(string s) {
 
-  std::tm tm = {};
-  string s_without_ms = s.substr(0,19);
+  string s_without_ms = s.substr(0,19)+"Z";
   string s_ms = s.substr(20,3);
-  std::stringstream ss(s_without_ms)  ;
-  ss >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%S");
-  auto tp = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+
+  std::tm tm = {};
+  tzset();
+  strptime(s_without_ms.c_str(), "%Y-%m-%dT%H:%M:%S%z", &tm);
+  time_t tt = timegm(&tm);
+
+
+  auto tp = std::chrono::system_clock::from_time_t (tt);
   chrono::milliseconds ms(atoi(s_ms.c_str()));
   tp += ms;
   return tp;
