@@ -40,6 +40,20 @@ bool FakeCar::step() {
   return got_td;
 }
 
+void write_dynamics_csv_from_recording_file(string recording_path, string outpath ){
+  fstream infile(recording_path);
+  fstream csv;
+  csv.open(outpath, ios_base::out);
+  csv << Dynamics::csv_field_headers();
+  string line;
+  while(getline(infile, line)) {
+    Dynamics d;
+    if(Dynamics::from_log_string(d,line)) {
+      csv << d.csv_fields() << endl;
+    }
+  }
+}
+
 void write_path_from_recording_file(string recording_path, string outpath) {
   log_info("entering write_path_from_recording_file");
 

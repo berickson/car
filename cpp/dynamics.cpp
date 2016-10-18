@@ -1,7 +1,7 @@
 #include "dynamics.h"
 #include <string.h> // for memset of all things
 #include <iostream>
-
+#include "system.h"
 #include "split.h"
 
 Dynamics::Dynamics() {
@@ -47,6 +47,70 @@ string Dynamics::to_string() {
   return ss.str();
 }
 
+std::string Dynamics::csv_field_headers() {
+  return
+     "timestamp,ms,us,"
+     "str,esc,battery_voltage,"
+     "odo_fl,odo_fl_us,"
+     "odo_fr,odo_fr_us,"
+     "odo_bl,odo_bl_us,"
+     "odo_br,odo_br_us,"
+     "odo_spur,odo_spur_us,"
+     "yaw,pitch,roll,"
+     "ax,ay,az,"
+     "imu_calib";
+}
+
+std::string Dynamics::csv_fields() {
+  stringstream ss;
+
+  // "timestamp,ms,us,"
+  ss << time_string(this->datetime) << ",";
+  ss << ms << ",";
+  ss << us << ",";
+
+  // "str,esc,battery_voltage,"
+  ss << str << ",";
+  ss << esc << ",";
+  ss << battery_voltage << ",";
+
+  // "odo_fl,odo_fl_us,"
+  ss << odometer_front_left << ",";
+  ss << odometer_front_left_last_us << ",";
+
+  // "odo_fr,odo_fr_us,"
+  ss << odometer_front_right << ",";
+  ss << odometer_front_right_last_us << ",";
+
+  // "odo_bl,odo_bl_us,"
+  ss << odometer_back_left << ",";
+  ss << odometer_back_left_last_us << ",";
+
+  // "odo_br,odo_br_us,"
+  ss << odometer_back_right << ",";
+  ss << odometer_back_right_last_us << ",";
+
+  // "odo_spur,odo_spur_us,"
+  ss << spur_odo << ",";
+  ss << spur_last_us << ",";
+
+  // "yaw,pitch,roll,"
+  ss << yaw.degrees() << ",";
+  ss << pitch.degrees() << ",";
+  ss << roll.degrees() << ",";
+
+  // "ax,ay,az,"
+  ss << ax << ",";
+  ss << ay << ",";
+  ss << az << ",";
+
+  // "imu_calib";
+  ss << calibration_status;
+
+  return ss.str();
+}
+
+
 bool Dynamics::from_log_string(Dynamics & d, string &s) {
   auto fields = split(s,',');
   if(fields.size() <2) {
@@ -62,6 +126,7 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
 //    self.datetime = dateutil.parser.parse(fields[0])
 
   try {
+    d.datetime = time_from_string(fields[0]);
     d.str = stoi(fields[3]);
     d.esc = stoi(fields[5]);
 

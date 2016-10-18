@@ -38,6 +38,7 @@ std::string time_string(std::chrono::system_clock::time_point &tp);
 
 // returns a formatted time string for now
 string time_string();
+chrono::system_clock::time_point time_from_string(string s);
 
 void test_system();
 

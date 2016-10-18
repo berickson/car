@@ -17,6 +17,7 @@
 #include <ctime>
 #include <chrono>
 #include <sstream>
+#include "string_utils.h"
 
 
 using namespace std;
@@ -156,9 +157,22 @@ string time_string(std::chrono::system_clock::time_point &tp)
   return ss.str();
 }
 
+chrono::system_clock::time_point time_from_string(string s) {
+
+  std::tm tm = {};
+  string s_without_ms = s.substr(0,19);
+  string s_ms = s.substr(20,3);
+  std::stringstream ss(s_without_ms)  ;
+  ss >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%S");
+  auto tp = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+  chrono::milliseconds ms(atoi(s_ms.c_str()));
+  tp += ms;
+  return tp;
+}
+
+
 string time_string() {
   std::chrono::system_clock::time_point t = std::chrono::system_clock::now();
-
   return time_string(t);
 }
 
@@ -167,7 +181,10 @@ void test_system() {
   test_get_ip_addresses();
   cout << "home folder: " << get_home_folder() << endl;
   for(int i = 0; i < 2000; i++) {
-    cout << "time_string(): " << time_string() << endl;
+    string s = time_string();
+    cout << "time_string(): " << s;
+    auto tp  = time_from_string(s);
+    cout << " -> round trip(): " << time_string(tp) << endl;
     usleep(1000);
   }
 }
