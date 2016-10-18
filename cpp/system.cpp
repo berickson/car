@@ -1,9 +1,10 @@
 #include "system.h"
+#include <unistd.h> // usleep
 #include <list>
 #include <string>
 #include <iostream>
 #include <algorithm>
-
+#include <iomanip> // put_time
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -15,6 +16,7 @@
 
 #include <ctime>
 #include <chrono>
+#include <sstream>
 
 
 using namespace std;
@@ -135,25 +137,34 @@ std::vector<std::string> glob(const string& pat){
 }
 
 
-void test_system() {
-    test_get_ip_addresses();
-    cout << "home folder: " << get_home_folder() << endl;
-}
 
+// Returns an ISO 8601 datetime in UTC to milliseconds resolution
 string time_string(std::chrono::system_clock::time_point &tp)
 {
-  auto ttime_t = std::chrono::system_clock::to_time_t(tp);
+  time_t tt = std::chrono::system_clock::to_time_t(tp);
+  chrono::system_clock::duration d = tp.time_since_epoch();
+  auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(d);
 
-  std::tm * ttm = localtime(&ttime_t);
-  char date_time_format[] = "%Y-%m-%d %H:%M:%S";
-  char time_str[100];
-  strftime(time_str, 99, date_time_format, ttm);
 
-  return time_str;
+  std::stringstream ss;
+  ss << std::put_time(std::gmtime(&tt), "%Y-%m-%dT%X");
+  ss << "." << setw(3) << setfill('0') << ms.count() % 1000;
+  ss << "Z";
+  return ss.str();
 }
 
 string time_string() {
   std::chrono::system_clock::time_point t = std::chrono::system_clock::now();
 
   return time_string(t);
+}
+
+
+void test_system() {
+  test_get_ip_addresses();
+  cout << "home folder: " << get_home_folder() << endl;
+  for(int i = 0; i < 2000; i++) {
+    cout << "time_string(): " << time_string() << endl;
+    usleep(1000);
+  }
 }

@@ -54,7 +54,7 @@ Quaternion quaternion_from_axis_angle(const double &xx, const double &yy, const 
 void Mpu9150::calibrate_nose_up() {
   double theta = atan2(gravity.x, gravity.y);
   Quaternion q = quaternion_from_axis_angle(0,0,1,theta + 3*PI/2);
-  zero_adjust = q.getProduct(zero_adjust);
+  set_zero_orientation(q.getProduct(zero_adjust));
 }
 
 void Mpu9150::start_calibrate_at_rest(double pause_seconds, double test_seconds)
@@ -71,12 +71,13 @@ void Mpu9150::start_calibrate_at_rest(double pause_seconds, double test_seconds)
 }
 
 void Mpu9150::set_zero_orientation(Quaternion zero) {
+  Serial.println("re-oriented zero on MPU");
   zero_adjust = zero;
 }
 
 void Mpu9150::setup() {
   rest_a_mag = 7645.45;
-  zero_adjust = Quaternion(-0.69, 0.000,0.73,-0.00);
+  set_zero_orientation( Quaternion(-0.69, 0.000,0.73,-0.00) );
   ax_bias = 0.0;
   ay_bias = 0.0;
   az_bias = 0.0;
@@ -143,7 +144,7 @@ float Mpu9150::heading() {
 }
 
 void Mpu9150::log_status() {
-  log(TRACE_MPU, (String)readingCount + 
+  log(TRACE_MPU, (String) ((int)readingCount) +
     ",heading,"+heading() +
     ",quat,"+ftos(q.w)+"," +ftos(q.x)+"," +ftos(q.y)+"," +ftos(q.z)+
     ",gravity,"+ftos(gravity.x)+","+ftos(gravity.y)+","+ftos(gravity.z)+

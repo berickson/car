@@ -12,6 +12,7 @@ public:
   void reset();
   void add(double x, double y);
   double slope();
+  double meany();
   double stdx();
   double stdy();
   double predicty(double x);

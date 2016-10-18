@@ -31,6 +31,10 @@ double Statistics::slope() {
   return (sumxy - (sumx * sumy / count)) 
           / (sumxx - (sumx * sumx / count));
 }
+
+double Statistics::meany() {
+  return sumy / count + biasy;
+}
       
 double Statistics::stdx() {
   return sqrt(sumxx/count - (sumx/count)*(sumx/count));
