@@ -328,6 +328,7 @@ void record(Car& car, CarUI & ui) {
 
   string path_file_path = f.path_file_path(track_name, route_name);
   write_path_from_recording_file(recording_path, path_file_path);
+  write_dynamics_csv_from_recording_file(recording_path, f.dynamics_file_path(track_name, route_name));
 
   run_settings.route_name = route_name;
   update_route_selection_menu();

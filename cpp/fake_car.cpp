@@ -44,7 +44,7 @@ void write_dynamics_csv_from_recording_file(string recording_path, string outpat
   fstream infile(recording_path);
   fstream csv;
   csv.open(outpath, ios_base::out);
-  csv << Dynamics::csv_field_headers();
+  csv << Dynamics::csv_field_headers() << endl;
   string line;
   while(getline(infile, line)) {
     Dynamics d;

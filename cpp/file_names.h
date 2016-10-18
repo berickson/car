@@ -46,7 +46,7 @@ public:
   string next_run_name(string track_name, string route_name);
 
   string planned_path_file_path(string track_name, string route_name, string run_name);
-  string dynamics_file_path(string track_name, string route_name, string run_name);
+  string dynamics_file_path(string track_name, string route_name, string run_name = "");
 private:
   string get_folder( string track_name, string route_name, string run_name = "");
 };
