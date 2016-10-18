@@ -59,7 +59,7 @@ int main(int, char *[]) {
     //test_route();
     //test_split();
     //test_stereo_camera();
-    // test_system();
+    //test_system();
     //test_tracker();
     //test_usb();
     //test_work_queue();

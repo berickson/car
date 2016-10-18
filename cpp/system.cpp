@@ -141,13 +141,16 @@ std::vector<std::string> glob(const string& pat){
 // Returns an ISO 8601 datetime in UTC to milliseconds resolution
 string time_string(std::chrono::system_clock::time_point &tp)
 {
-  time_t tt = std::chrono::system_clock::to_time_t(tp);
+  time_t tt = chrono::system_clock::to_time_t (tp);
   chrono::system_clock::duration d = tp.time_since_epoch();
   auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(d);
 
 
   std::stringstream ss;
-  ss << std::put_time(std::gmtime(&tt), "%Y-%m-%dT%X");
+  char ts[80];
+  tm* t_tm = std::gmtime(&tt);
+  strftime(ts,sizeof(ts)-1,"%Y-%m-%dT%H:%M:%S",t_tm);
+  ss << ts;
   ss << "." << setw(3) << setfill('0') << ms.count() % 1000;
   ss << "Z";
   return ss.str();
