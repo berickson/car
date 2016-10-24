@@ -15,16 +15,29 @@ sudo apt-get install build-essential
 sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
 sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev python2.7-dev
 cd ~
-sudo rm -rf opencv
-sudo rm -rf opencv_contrib
-git clone https://github.com/Itseez/opencv.git
-git clone https://github.com/Itseez/opencv_contrib.git
 
+if [ ! -d ~/opencv ] 
+then
+  git clone https://github.com/Itseez/opencv.git
+fi
+
+
+if [ ! -d ~/opencv_contrib ] 
+then
+  git clone https://github.com/Itseez/opencv_contrib.git
+fi
+
+cd ~/opencv_contrib
+git pull
+git checkout HEAD
 cd ~/opencv
+git pull
+git checkout HEAD
 mkdir build
 cd build
-
-cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules ..
+CC=/usr/bin/gcc-5 
+CXX=/usr/bin/g++-5
+cmake  -D ENABLE_PRECOMPILED_HEADERS=OFF  -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local cmake -D CMAKE_BUILD_TYPE=Release -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules ..
 
 make -j7 # runs 7 jobs in parallel
 
