@@ -99,9 +99,10 @@ void Car::begin_recording_input(string path) {
 }
 
 void Car::end_recording_input() {
-  if(input_recording_file.is_open())
+  if(input_recording_file.is_open()) {
     input_recording_file.flush();
     input_recording_file.close();
+  }
 }
 
 void Car::apply_dynamics(Dynamics & d) {
