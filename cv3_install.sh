@@ -35,10 +35,10 @@ git pull
 git checkout HEAD
 mkdir build
 cd build
-CC=/usr/bin/gcc-5 
-CXX=/usr/bin/g++-5
+#CC=/usr/bin/gcc-5 
+#CXX=/usr/bin/g++-5
 cmake  -D ENABLE_PRECOMPILED_HEADERS=OFF  -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local cmake -D CMAKE_BUILD_TYPE=Release -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules ..
-
+make clean
 make -j7 # runs 7 jobs in parallel
 
 sudo make install

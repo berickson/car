@@ -4,21 +4,23 @@
 #include <MPU9150_9Axis_MotionApps41.h>
 
 #include "Mpu9150.h"
+#include "Logger.h"
 
 
 const uint8_t pin_led = 13;
 Mpu9150 mpu9150;
-
 void setup(){
+  TRACE_MPU = false;
   Serial.begin(250000);
   delay(1000);
+  Serial.println("teensy-play.cpp::setup");
+  delay(1000);
   Wire.begin();
-  TRACE_MPU = false;
   delay(10);
   pinMode(pin_led, OUTPUT);
   digitalWrite(pin_led,1);
   //delay(10);
-  Serial.println("setting orientatino");
+  Serial.println("setting orientation");
   //[0.70, -0.18, -0.67, -0.17]
   //Quaternion zero(0.674316,-0.0788574,-0.731384,0.0640259);
   Quaternion zero(0.72, -0.00, -0.70,  0.01);
@@ -53,6 +55,10 @@ double delta_yaw = 0.0;
 double last_yaw = 0.0;
 bool verbose_logging = false;
 
+void print_tuning_parameters() {
+}
+
+
 void print_mpu_status() {
   Serial.print((String) (millis()/1000) +  " ypr[" + mpu9150.heading() + "," + mpu9150.pitch * 180./PI + "," + mpu9150.roll * 180./PI + "]");
   Serial.print((String) " a[" + mpu9150.ax+ "," + mpu9150.ay+ ","+ mpu9150.az + "]");
@@ -77,6 +83,7 @@ void print_help() {
   Serial.println("v - toggle verbose logging");
   Serial.println("l - manually log single reading");
   Serial.println("c - begin / end circle calibration mode");
+  Serial.println("p - print calibration parameters");
 }
 
 void begin_circle_calibration() {
@@ -95,8 +102,29 @@ void toggle_verbose_logging() {
   Serial.println( verbose_logging ? "ON" : "OFF");
 }
 
-void dump_calibration_constants() {
-
+void print_calibration_parameters() {
+  Serial.print("ax_bias: ");
+  Serial.print(String(mpu9150.ax_bias,6));
+  Serial.println();
+  Serial.print("ay_bias: ");
+  Serial.print(mpu9150.ay_bias);
+  Serial.println();
+  Serial.print("az_bias: ");
+  Serial.print(mpu9150.az_bias);
+  Serial.println();
+  Serial.print("zero_adjust(w,x,y,z): (");
+  Serial.print(mpu9150.zero_adjust.w);
+  Serial.print(", ");
+  Serial.print(mpu9150.zero_adjust.x);
+  Serial.print(", ");
+  Serial.print(mpu9150.zero_adjust.y);
+  Serial.print(", ");
+  Serial.print(mpu9150.zero_adjust.z);
+  Serial.print(")");
+  Serial.println();
+  Serial.print("yaw_slope_degrees_per_hour: ");
+  Serial.print(mpu9150.yaw_slope_rads_per_ms * 1000 * 60 * 60 * 180 / PI,6);
+  Serial.println();
 }
 
 
@@ -109,10 +137,6 @@ void loop() {
       switch (command) {
       case '?':
         print_help();
-        break;
-
-      case 'd':
-        dump_calibration_constants();
         break;
 
       case 'g':
@@ -145,12 +169,17 @@ void loop() {
         mpu_reporting_ms = 0;
         print_mpu_status();
         break;
+
       case 'c':
         if(calibrating_circle) {
           end_circle_calibration();
         } else {
           begin_circle_calibration();
         }
+        break;
+
+      case 'p':
+        print_calibration_parameters();
         break;
 
       default:
