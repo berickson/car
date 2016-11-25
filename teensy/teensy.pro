@@ -123,9 +123,11 @@ DEFINES += "TEENSYDUINO=130"
 OTHER_FILES += platformio.ini
 
 SOURCES += platformio.ini \
-    Mpu9150.cpp
+    Mpu9150.cpp \
+    Logger.cpp
 HEADERS += Car.h \
-    Mpu9150.h
+    Mpu9150.h \
+    Logger.h
 SOURCES += EventQueue.cpp
 HEADERS += Pid.h
 HEADERS += ManualMode.h
@@ -144,11 +146,11 @@ SOURCES += Fsm.cpp
 SOURCES += Untitled File
 HEADERS += Beeper.h
 SOURCES += Untitled File(1)
-SOURCES += Logger.cpp
+SOURCES +=
 HEADERS += Task.h
 SOURCES += Pid.cpp
 HEADERS += Pins.h
-HEADERS += Logger.h
+HEADERS +=
 SOURCES += Blinker.cpp
 SOURCES += Sequence.cpp
 HEADERS += CircleMode.h

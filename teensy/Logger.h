@@ -23,4 +23,4 @@ if(__flag) { \
 
 
 // returns float as string to overcome bug in Arduino casting
-String ftos(float f);
+String ftos(float f, int n = 2);

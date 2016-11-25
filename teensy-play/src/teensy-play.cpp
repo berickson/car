@@ -1,7 +1,12 @@
 #include "Arduino.h"
 #include "helper_3dmath.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wunused-value"
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #include <MPU9150_9Axis_MotionApps41.h>
+#pragma GCC diagnostic pop
 
 #include "Mpu9150.h"
 #include "Logger.h"

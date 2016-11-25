@@ -4,7 +4,6 @@
 #include "QuadratureEncoder.h"
 #include "Logger.h"
 #include "Blinker.h"
-//#include "Mpu9150.h"
 #include "Car.h"
 #include "EventQueue.h"
 #include "PwmInput.h"
@@ -17,7 +16,18 @@
 #include "RemoteMode.h"
 #include "Fsm.h"
 
-#include "BNO055.h"
+//#include "BNO055.h"
+
+// all these ugly pushes are becaues the 9150 has a lot of warnings
+// the .h file must be included in one time in a source file
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wunused-value"
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#include <MPU9150_9Axis_MotionApps41.h>
+#pragma GCC diagnostic pop
+
+
 #include "Mpu9150.h"
 
 #define count_of(a) (sizeof(a)/sizeof(a[0]))
@@ -63,6 +73,7 @@ unsigned long loop_time_ms = 0;
 unsigned long last_loop_time_ms = 0;
 unsigned long last_report_ms = 0;
 unsigned long last_report_loop_count = 0;
+
 
 
 enum {
@@ -220,7 +231,7 @@ void help() {
 
 
 Mpu9150 mpu9150;
-BNO055 mpu_bno;
+//BNO055 mpu_bno;
 
 
 //CircleMode circle_mode;
@@ -282,10 +293,19 @@ void odometer_back_right_sensor_b_changed() {
 
 
 void setup() {
-  Serial.begin(9600);
+  LOG_INFO = true;
+  TRACE_MPU = false;
+  trace_dynamics_on();
+  Serial.begin(250000);
+  Wire.begin();
 
   interpreter.init(commands,count_of(commands));
-  log(LOG_INFO, "setup begun");
+  for(int i = 0; i < 5; i++) {
+    delay(1000);
+    log(LOG_INFO, "setup begun");
+    Serial.println((String)i);
+  }
+
 
 //  circle_mode.name = "circle";
   manual_mode.name = "manual";
@@ -345,15 +365,34 @@ void setup() {
   last_report_ms = millis();
 
   log(LOG_INFO, "car_control begun");
+
+
+  delay(1000);
+  /*
+    ax_bias: 7724.524414
+    ay_bias: -1458.47
+    az_bias: 715.62
+    zero_adjust(w,x,y,z): (-0.07, 0.67, -0.07, 0.73)
+    yaw_slope_degrees_per_hour: -13.823402
+  */
+  mpu9150.enable_interrupts(PIN_MPU_INTERRUPT);
+  log(LOG_INFO, "Interrupts enabled for mpu9150");
   mpu9150.setup();
+  log(LOG_INFO, "MPU9150 setup complete");
+  mpu9150.ax_bias = 7724.52;
+  mpu9150.ay_bias = -1458.47;
+  mpu9150.az_bias = 715.62;
+  mpu9150.rest_a_mag = 7893.51;
+  mpu9150.zero_adjust = Quaternion(-0.07, 0.67, -0.07, 0.73);
+  mpu9150.yaw_slope_rads_per_ms  = (-13.823402 / (1000 * 60 * 60)) * PI/180;
+
+
+  //mpu_bno.setTempSource(true);
+  //mpu_bno.begin(POWER_MODE::NORMAL, OPERATION_MODE::FUSION_NDOF_NORMAL, PLACEMENT::P4);
+  //mpu_bno.loadCalib();
 
   delay(1000);
-  mpu_bno.setTempSource(true);
-  mpu_bno.begin(POWER_MODE::NORMAL, OPERATION_MODE::FUSION_NDOF_NORMAL, PLACEMENT::P4);
-  mpu_bno.loadCalib();
-
-  delay(1000);
-  mpu9150.zero();
+  //mpu9150.zero();
   //circle_mode.init(&mpu9150);
   beeper.beep_nbc();
   modes.begin();
@@ -388,7 +427,7 @@ void loop() {
   // get common execution times
   bool every_second = every_n_ms(last_loop_time_ms, loop_time_ms, 1000);
   bool every_10_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 10);
-  bool every_1_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 1);
+  //bool every_1_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 1);
 
 
   // get commands from usb
@@ -441,11 +480,12 @@ void loop() {
   if(every_10_ms && TD) {
     // constants below based on 220k and 1M resistor, 1023 steps and 3.3 reference voltage
     float battery_voltage = analogRead(PIN_BATTERY_VOLTAGE_DIVIDER) * ((3.3/1023.) / 220.)*(220.+1000.);
-    Eulers eulers;
-    Acceleration acceleration;
+    //Eulers eulers;
+    //Acceleration acceleration;
+
  
-    mpu_bno.getEuler((float *)&eulers);
-    mpu_bno.getAccel((float *)&acceleration);
+    // mpu_bno.getEuler((float *)&eulers);
+    // mpu_bno.getAccel((float *)&acceleration);
     
     
     log(TD,
@@ -463,9 +503,9 @@ void loop() {
        +",ms,"+millis()
        +",us,"+micros()
        //+",ypr,"+ ftos(-eulers.yaw) + "," + ftos(eulers.pitch) + "," + ftos(eulers.roll)
-       +",ypr,"+ ftos(-mpu9150.yaw* 180. / M_PI) + "," + ftos(-mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
+       +",ypr,"+ ftos(mpu9150.yaw* 180. / M_PI) + "," + ftos(mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
        +",vbat,"+ftos(battery_voltage)
-       +",cal,"+mpu_bno.getCalibration()
+       +",cal,"+ 0 // mpu_bno.getCalibration()
        );
   }
 
