@@ -11,7 +11,7 @@ void CommandInterpreter::execute() {
     char c = Serial.read();
     if( c==-1) break;
     if( c==0) break;
-    if( c == '\n') {
+    if( c == '\n' || c =='\r') {
       process_command(String(buffer));
       buffer[0] = 0;
       buf_size = 0;

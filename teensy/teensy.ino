@@ -295,7 +295,8 @@ void odometer_back_right_sensor_b_changed() {
 void setup() {
   LOG_INFO = true;
   TRACE_MPU = false;
-  trace_dynamics_on();
+  //trace_dynamics_on();
+  LOG_ERROR = true;
   Serial.begin(250000);
   Wire.begin();
 
