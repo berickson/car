@@ -113,7 +113,7 @@ void Car::apply_dynamics(Dynamics & d) {
   current_dynamics = d;
   if(reading_count == 1) {
     original_dynamics = d;
-    ackerman = Ackerman(front_wheelbase_width, wheelbase_length, get_front_position(), get_heading()); // ackerman needs first heading reading
+    ackerman = Ackerman(front_wheelbase_width, wheelbase_length, Point(0,0), get_heading()); // ackerman needs first heading reading
     return;
   }
 
