@@ -32,26 +32,9 @@ public:
 
   Ackerman(double front_wheelbase_width = 1.0, double wheelbase_length = 1.0, Point front_position=Point(0,0), Angle heading = Angle::radians(0));
 
-  inline Point front_left_position() {
-    Point p;
-    p.x = x + l * cos(heading) - sin(heading) * w/2;
-    p.y = y + l * sin(heading) - cos(heading) * w/2;
-    return p;
-  }
-
-  inline Point front_position() {
-    Point p;
-    p.x = x + l * cos(heading);
-    p.y = y + l * sin(heading) ;
-    return p;
-  }
-
-  inline Point rear_position() {
-    Point p;
-    p.x = x;
-    p.y = y;
-    return p;
-  }
+  Point front_left_position();
+  Point front_position();
+  Point rear_position();
 
 
   void move_right_wheel(Angle outside_wheel_angle, double wheel_distance, double new_heading = NAN);

@@ -18,6 +18,27 @@ Ackerman::Ackerman(double front_wheelbase_width, double wheelbase_length, Point 
   heading = _heading;
 }
 
+Point Ackerman::front_left_position() {
+  Point p;
+  p.x = x + l * cos(heading) - sin(heading) * w/2;
+  p.y = y + l * sin(heading) - cos(heading) * w/2;
+  return p;
+}
+
+Point Ackerman::front_position() {
+  Point p;
+  p.x = x + l * cos(heading);
+  p.y = y + l * sin(heading) ;
+  return p;
+}
+
+Point Ackerman::rear_position() {
+  Point p;
+  p.x = x;
+  p.y = y;
+  return p;
+}
+
 string Ackerman::to_string() {
   stringstream ss;
   ss <<  "Ackerman x:" << x << " y:" << y << " heading: " << heading;
@@ -164,6 +185,10 @@ void arc_to_relative_location_tests() {
 }
 
 void test_ackerman() {
+  Ackerman ackerman;
+  cout << "front: " << ackerman.front_position().to_string();
+  cout << "rear: " << ackerman.rear_position().to_string();
+
   move_right_wheel_tests();
   //arc_to_relative_location_tests();
 }
