@@ -177,7 +177,7 @@ void Car::reset_odometry() {
 
   ackerman = Ackerman(
     front_wheelbase_width,
-    wheelbase_length,Point(0,0),get_heading());
+    wheelbase_length,Point(0,0),Angle::degrees(0));
 }
 
 void Car::set_zero_heading() {
