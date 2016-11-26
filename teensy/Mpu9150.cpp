@@ -220,7 +220,7 @@ void Mpu9150::execute(){
             ax_stats.add(ms,araw.x);
             ay_stats.add(ms,araw.y);
             az_stats.add(ms,araw.z);
-            yaw_stats.add(ms,yaw); // todo: make sure this doesn't roll over in the middle of calibrating
+            yaw_stats.add(ms,yaw_pitch_roll[0]); // todo: make sure this doesn't roll over in the middle of calibrating
         } else if (ms >= at_rest_calibration_end_millis ) {
             ax_bias = ax_stats.meany();
             ay_bias = ay_stats.meany();
