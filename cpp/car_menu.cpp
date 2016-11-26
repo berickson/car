@@ -427,7 +427,7 @@ void run_car_menu() {
     {[&car](){return "usb errors: " + format(car .get_usb_error_count());}},
     {[&car](){return "reset odo ";}, [&car]() {car.reset_odometry();}},
     {[&car](){return "heading: " + format(car.get_heading().degrees());}},
-    {[&car](){return "heading_adj: " + format(car.get_heading_adjustment().degrees());}},
+    {[&car](){return "heading_adj: " + format(car.get_zero_heading().degrees());}},
     {[&car](){return "rear: " + to_string(car.get_rear_position());}},
     {[&car](){return "spur: " + format(car.get_spur_odo());}},
     {[&car](){return "fl: " + wheel_display_string(car.get_front_left_wheel());}},

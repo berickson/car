@@ -39,6 +39,7 @@ public:
 
   Speedometer front_right_wheel, front_left_wheel, back_left_wheel, back_right_wheel;
   Angle heading_adjustment;
+  Angle zero_heading_angle;
 
 
   // calibrated measurements
@@ -54,7 +55,8 @@ public:
   double wheelbase_length;
 
   // accessors
-  Angle get_heading_adjustment();
+  void set_zero_heading();
+  Angle get_zero_heading();
   Angle get_heading();
 
   const Speedometer & get_back_left_wheel() const {

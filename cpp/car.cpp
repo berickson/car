@@ -173,19 +173,23 @@ void Car::reset_odometry() {
   //dynamics = Dynamics();
   original_dynamics = current_dynamics;
 
-  heading_adjustment = Angle::degrees(0.);
+  set_zero_heading();
 
   ackerman = Ackerman(
     front_wheelbase_width,
     wheelbase_length,Point(0,0),get_heading());
 }
 
-Angle Car::get_heading_adjustment() {
-  return Angle::degrees(0.0);//heading_adjustment;
+void Car::set_zero_heading() {
+  zero_heading_angle = current_dynamics.yaw;
+}
+
+Angle Car::get_zero_heading() {
+  return zero_heading_angle;
 }
 
 Angle Car::get_heading() {
-  Angle a = (current_dynamics.yaw);
+  Angle a = current_dynamics.yaw - zero_heading_angle;
   a.standardize();
   return a;
 }
