@@ -85,6 +85,9 @@ void Mpu9150::setup() {
     ay_bias = 0.0;
     az_bias = 0.0;
 
+    yaw_adjust_start_ms = millis();
+    yaw_raw_total = 0;
+
     // initialize device
     Serial.println("9150 setup");
     log(TRACE_MPU,"Initializing I2C MPU devices...");
@@ -125,11 +128,25 @@ void Mpu9150::setup() {
 
 }
 
-// returns an inverted yaw value so rotation follows
+void Mpu9150::zero_heading() {
+  this->yaw_raw_total = 0;
+  this->yaw_adjust_start_ms = millis();
+}
+
+
+double standardized_degrees(double theta) {
+  theta = fmod(theta, 360.0);
+  if(theta < -180.)
+      theta += 360.0;
+    return theta;
+}
+
+
+// returns an inverted and corrected yaw value so rotation follows
 // standard of ccw being positive
 float Mpu9150::heading() {
-    float yaw = yaw_pitch_roll[0];
-    return -rads2degrees(yaw);
+    float yaw = (yaw_raw_total + (yaw_adjust_start_ms - millis() ) * yaw_slope_rads_per_ms) * yaw_actual_per_raw;
+    return standardized_degrees(-rads2degrees(yaw));
 }
 
 void Mpu9150::log_status() {
@@ -141,6 +158,18 @@ void Mpu9150::log_status() {
         ",aa,"+ftos(ax)+","+ftos(ay)+","+ftos(az)+
         ",mag,"+mag.x+","+mag.y+","+mag.z+
         ",ypr,"+ftos(rads2degrees(yaw))+","+ftos(rads2degrees(pitch))+","+ftos(rads2degrees(roll)) );
+}
+
+// returns radians from a1 to a2, considering wrap around
+// (a2 - a1)
+float radians_diff(float a2, float a1) {
+  float d = a2-a1;
+  if(d > M_PI)
+    d -= 2 * M_PI;
+  if(d < -M_PI)
+    d += 2 * M_PI;
+
+  return d;
 }
 
 void Mpu9150::execute(){
@@ -182,6 +211,7 @@ void Mpu9150::execute(){
     az = g * (a.z/rest_a_mag - gravity.z);
 
 
+    float last_yaw = yaw;
     mpu.dmpGetYawPitchRoll(yaw_pitch_roll, &q, &gravity);
 
     if(at_rest_calibrating) {
@@ -223,7 +253,10 @@ void Mpu9150::execute(){
             at_rest_calibration_start_millis = 0;
         }
     }
+    float yaw_diff = radians_diff(yaw, last_yaw);
+    yaw_raw_total += yaw_diff;
     // cancel out the yaw drift
     yaw_pitch_roll[0] -=   yaw_slope_rads_per_ms * (millis() - yaw_adjust_start_ms);
+
 }
 

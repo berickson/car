@@ -386,6 +386,9 @@ void setup() {
   mpu9150.rest_a_mag = 7893.51;
   mpu9150.zero_adjust = Quaternion(-0.07, 0.67, -0.07, 0.73);
   mpu9150.yaw_slope_rads_per_ms  = (-13.823402 / (1000 * 60 * 60)) * PI/180;
+  mpu9150.yaw_actual_per_raw = 1.004826221;
+
+  mpu9150.zero_heading();
 
 
   //mpu_bno.setTempSource(true);

@@ -62,6 +62,7 @@ public:
   Quaternion zero_adjust = Quaternion(1,0,0,0);
   float yaw_slope_rads_per_ms;
   float yaw_actual_per_raw; // how many actual degrees of yaw change you get per reported degrees of yaw change
+  float yaw_raw_total = 0.0;
 
   VectorInt16 a0;
   VectorInt16 mag;
@@ -69,9 +70,11 @@ public:
   float &yaw = yaw_pitch_roll[0];
   float &pitch = yaw_pitch_roll[1];
   float &roll = yaw_pitch_roll[2];
+  float actual_per_measured_yaw = 1.0f;
 
   Statistics ax_stats, ay_stats, az_stats,yaw_stats;
   void setup();
+  void zero_heading();// sets the current heading to zero
   float heading();
   void log_status();
 
