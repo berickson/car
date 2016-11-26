@@ -145,7 +145,7 @@ double standardized_degrees(double theta) {
 // returns an inverted and corrected yaw value so rotation follows
 // standard of ccw being positive
 float Mpu9150::heading() {
-    float yaw = (yaw_raw_total + (yaw_adjust_start_ms - millis() ) * yaw_slope_rads_per_ms) * yaw_actual_per_raw;
+    float yaw = (yaw_raw_total + (millis()-yaw_adjust_start_ms) * yaw_slope_rads_per_ms) * yaw_actual_per_raw;
     return standardized_degrees(-rads2degrees(yaw));
 }
 
@@ -157,7 +157,7 @@ void Mpu9150::log_status() {
         ",araw,"+araw.x+","+araw.y+","+araw.z+
         ",aa,"+ftos(ax)+","+ftos(ay)+","+ftos(az)+
         ",mag,"+mag.x+","+mag.y+","+mag.z+
-        ",ypr,"+ftos(rads2degrees(yaw))+","+ftos(rads2degrees(pitch))+","+ftos(rads2degrees(roll)) );
+        ",ypr,"+heading()+","+ftos(rads2degrees(pitch))+","+ftos(rads2degrees(roll)) );
 }
 
 // returns radians from a1 to a2, considering wrap around
@@ -211,7 +211,7 @@ void Mpu9150::execute(){
     az = g * (a.z/rest_a_mag - gravity.z);
 
 
-    float last_yaw = yaw;
+    float last_yaw = yaw_pitch_roll[0];
     mpu.dmpGetYawPitchRoll(yaw_pitch_roll, &q, &gravity);
 
     if(at_rest_calibrating) {
@@ -253,10 +253,10 @@ void Mpu9150::execute(){
             at_rest_calibration_start_millis = 0;
         }
     }
-    float yaw_diff = radians_diff(yaw, last_yaw);
+    float yaw_diff = radians_diff(yaw_pitch_roll[0], last_yaw);
     yaw_raw_total += yaw_diff;
     // cancel out the yaw drift
-    yaw_pitch_roll[0] -=   yaw_slope_rads_per_ms * (millis() - yaw_adjust_start_ms);
+    //yaw_pitch_roll[0] -=   yaw_slope_rads_per_ms * (millis() - yaw_adjust_start_ms);
 
 }
 

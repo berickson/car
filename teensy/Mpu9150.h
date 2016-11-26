@@ -67,7 +67,6 @@ public:
   VectorInt16 a0;
   VectorInt16 mag;
   float yaw_pitch_roll[3];
-  float &yaw = yaw_pitch_roll[0];
   float &pitch = yaw_pitch_roll[1];
   float &roll = yaw_pitch_roll[2];
   float actual_per_measured_yaw = 1.0f;
