@@ -507,7 +507,7 @@ void loop() {
        +",ms,"+millis()
        +",us,"+micros()
        //+",ypr,"+ ftos(-eulers.yaw) + "," + ftos(eulers.pitch) + "," + ftos(eulers.roll)
-       +",ypr,"+ ftos(-mpu9150.yaw* 180. / M_PI) + "," + ftos(mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
+       +",ypr,"+ mpu9150.heading() + "," + ftos(mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
        +",vbat,"+ftos(battery_voltage)
        +",cal,"+ 0 // mpu_bno.getCalibration()
        );
