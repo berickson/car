@@ -13,9 +13,9 @@ using namespace std;
 Ackerman::Ackerman(double front_wheelbase_width, double wheelbase_length, Point front_position, Angle _heading) {
   w = front_wheelbase_width;
   l = wheelbase_length;
+  heading = _heading;
   x = front_position.x - l*cos(heading);
   y = front_position.y - l*sin(heading);
-  heading = _heading;
 }
 
 Point Ackerman::front_left_position() {
