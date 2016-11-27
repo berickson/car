@@ -73,7 +73,7 @@ int Driver::esc_for_velocity(double goal_velocity, double goal_accel) {
   if(fabs(v) > 1.2 * fabs(goal_velocity) && fabs(v) > 0.5) {
     return esc_for_max_decel();
   }
-  double velocity_output = goal_velocity + settings.v_k_p * (goal_velocity - v) * settings.v_k_d * goal_accel;
+  double velocity_output = goal_velocity + settings.v_k_p * (goal_velocity - v) + settings.v_k_d * goal_accel;
   return car.esc_for_velocity(velocity_output);
 }
 
