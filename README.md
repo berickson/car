@@ -17,8 +17,8 @@ This is my personal project to add autonomous capabilities to an RC Car. "On-Uh-
 
 The code is primarily in C++.  I originally tried doing the high level logic in Python, but found C++ was a better fit.
 
-UI, image processing, path recording and following are handled by the Rasberry PI. You can find the Raspbery Pi code in the `cpp` folder.
+UI, image processing, path recording and following are handled by the Rasberry PI. You can find the Raspbery Pi code in the [cpp](cpp) folder.
 
-The Teensy microcontroller communicates with the ESC, servo, IMU and quadrature encoders.  The microcontroller code is in the `teensy` folder.
+The Teensy microcontroller communicates with the ESC, servo, IMU and quadrature encoders.  The microcontroller code is in the [teensy](teensy) folder.
 
-Desktop software for offline analysis and visualization use QT and is in the `cpp/car-gui` folder.
+Desktop software for offline analysis and visualization use QT and is in the [cpp/car-gui](cpp/car-gui) folder.
