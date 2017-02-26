@@ -12,7 +12,7 @@ Point::Point(double x, double y) :
 
 string Point::to_string() const {
   stringstream ss;
-  ss << "(" << x << "," << y << ")";
+  ss << std::fixed << "(" << std::setprecision(2) << x << "," << std::setprecision(2) << y << ")";
   return ss.str();
 }
 
