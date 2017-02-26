@@ -4,7 +4,7 @@
 Speedometer::Speedometer()  {
 }
 
-unsigned int Speedometer::get_ticks() const {
+int Speedometer::get_ticks() const {
   return last_ticks;
 }
 

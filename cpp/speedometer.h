@@ -14,7 +14,7 @@ public:
   double velocity = 0.0;
   double meters_travelled = 0.0;
 
-  unsigned int get_ticks() const;
+  int get_ticks() const;
   double get_velocity() const;
 
   double get_meters_travelled() const;
