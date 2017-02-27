@@ -1,6 +1,6 @@
 #include "geometry.h"
 #include "iostream"
-
+#include <iomanip>
 
 double interpolate(double x, double x1, double y1, double x2, double y2){
   double m = (y2 - y1)/( x2 - x1 );
@@ -12,7 +12,7 @@ Point::Point(double x, double y) :
 
 string Point::to_string() const {
   stringstream ss;
-  ss << std::fixed << "(" << std::setprecision(2) << x << "," << std::setprecision(2) << y << ")";
+  ss << std::fixed << std::setprecision(2) << "(" << x << "," << std::setprecision(2) << y << ")";
   return ss.str();
 }
 
