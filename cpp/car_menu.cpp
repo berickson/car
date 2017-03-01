@@ -16,7 +16,7 @@
 #include "camera.h"
 #include "logger.h"
 
-#include <ncurses.h> // sudo apt-get install libncurses5-dev
+#include <ncurses/ncurses.h> // sudo apt-get install libncurses5-dev
 
 
 
