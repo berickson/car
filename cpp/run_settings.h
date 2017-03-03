@@ -31,8 +31,8 @@ struct RunSettings{
   double prune_tolerance = 0.02;
 
 
-  bool capture_video = false;
-  bool crash_recovery = true;
+  bool capture_video = true;
+  bool crash_recovery = false;
   bool optimize_velocity = true;
   void write_to_file(string path);
   void load_from_file(string path);

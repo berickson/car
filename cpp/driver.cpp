@@ -70,9 +70,9 @@ int Driver::esc_for_max_decel() {
 
 int Driver::esc_for_velocity(double goal_velocity, double goal_accel) {
   double v = car.get_velocity();
-  if(fabs(v) > 1.2 * fabs(goal_velocity) && fabs(v) > 0.5) {
-    return esc_for_max_decel();
-  }
+  //if(fabs(v) > 1.2 * fabs(goal_velocity) && fabs(v) > 0.5) {
+  //  return esc_for_max_decel();
+  //}
   double velocity_output = goal_velocity + settings.v_k_p * (goal_velocity - v) + settings.v_k_d * goal_accel;
   return car.esc_for_velocity(velocity_output);
 }
@@ -114,7 +114,7 @@ void Driver::continue_along_route(Route& route, PID& steering_pid)
   if(rear_slipping())
     esc = 1500;
 
-  if(route.done && fabs(car.get_velocity()) == 0.0) {
+  if(route.done && fabs(car.get_velocity()) < 0.01) {
     log_info("route completed normally");
     route_complete = true;
     esc = 1500;
