@@ -7,8 +7,8 @@ void PID::add_reading(double t, double error) {
     double dt = t - last_t;
     if(!isnan(last_e) && dt > 0)
       slope_e = (error-last_e) / dt;
+    sum_e += error * dt;
   }
-  sum_e += error;
 
   last_e = error;
   last_t = t;
