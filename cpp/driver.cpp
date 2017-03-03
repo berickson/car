@@ -68,18 +68,22 @@ int Driver::esc_for_max_decel() {
   return esc;
 }
 
-int Driver::esc_for_velocity(double goal_velocity, double goal_accel) {
+int Driver::esc_for_velocity(PID & velocity_pid, double goal_velocity, double goal_accel) {
   double v = car.get_velocity();
+  double t = (double)car.current_dynamics.us / 1E6;
   //if(fabs(v) > 1.2 * fabs(goal_velocity) && fabs(v) > 0.5) {
   //  return esc_for_max_decel();
   //}
-  double velocity_output = goal_velocity + settings.v_k_p * (goal_velocity - v) + settings.v_k_d * goal_accel;
+  float v_error = goal_velocity - v;
+  velocity_pid.add_reading(t, v_error);
+  velocity_pid.output();
+  double velocity_output = velocity_pid.output() + settings.v_k_d * goal_accel;
   return car.esc_for_velocity(velocity_output);
 }
 
 
 
-void Driver::continue_along_route(Route& route, PID& steering_pid)
+void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity_pid)
 {
   auto p_front = car.get_front_position();
   auto p_rear = car.get_rear_position();
@@ -109,7 +113,7 @@ void Driver::continue_along_route(Route& route, PID& steering_pid)
 
 
   unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);
-  unsigned esc = route.done? esc_for_max_decel() : esc_for_velocity(route.get_velocity(), route.get_acceleration());
+  unsigned esc = route.done? esc_for_max_decel() : esc_for_velocity(velocity_pid, route.get_velocity(), route.get_acceleration());
 
   if(rear_slipping())
     esc = 1500;
@@ -191,6 +195,12 @@ void Driver::drive_route(Route & route) {
     steering_pid.k_p = settings.steering_k_p;
     steering_pid.k_i = settings.steering_k_i;
     steering_pid.k_d = settings.steering_k_d;
+
+    PID velocity_pid;
+    velocity_pid.k_p = settings.v_k_p;
+    velocity_pid.k_i = settings.v_k_i;
+    velocity_pid.k_d = settings.v_k_d;
+
     route_complete = false;
     recovering_from_crash = false;
     int crash_count = 0;
@@ -237,10 +247,10 @@ void Driver::drive_route(Route & route) {
           log_info("timed out trying to back away from crash");
         }
         else {
-          car.set_esc_and_str(esc_for_velocity(-3.0,0),1500);
+          car.set_esc_and_str(esc_for_velocity(velocity_pid, -3.0,0),1500);
         }
       } else {
-        continue_along_route(route, steering_pid);
+        continue_along_route(route, steering_pid, velocity_pid);
       }
     }
   } catch (string s) {
