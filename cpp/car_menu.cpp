@@ -16,7 +16,7 @@
 #include "camera.h"
 #include "logger.h"
 
-#include <ncurses/ncurses.h> // sudo apt-get install libncurses5-dev
+#include <ncurses.h> // sudo apt-get install libncurses5-dev
 
 
 
@@ -25,7 +25,7 @@ RunSettings run_settings;
 
 string wheel_display_string(const Speedometer & wheel){
   return format(wheel.get_meters_travelled(),7,2)+"m "
-         + format(wheel.get_velocity(),4,1)+"m/s "
+         + format(wheel.get_smooth_velocity(),4,1)+"m/s "
          + format(wheel.get_ticks()) + "t";
 }
 

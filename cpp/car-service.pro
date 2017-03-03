@@ -30,7 +30,8 @@ SOURCES += main.cpp \
     frame_grabber.cpp \
     logger.cpp \
     speedometer.cpp \
-    pid.cpp
+    pid.cpp \
+    kalman.cpp
 
 HEADERS += \
     geometry.h \
@@ -61,7 +62,8 @@ HEADERS += \
     frame_grabber.h \
     logger.h \
     speedometer.h \
-    pid.h
+    pid.h \
+    kalman.h
 
 
 
@@ -70,3 +72,4 @@ unix|win32: LIBS += -L/usr/local/lib -lncurses -lwiringPi -lopencv_core -lopencv
 
 DISTFILES += \
     README.md
+

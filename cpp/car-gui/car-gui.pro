@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = car-gui
 TEMPLATE = app
 
+CONFIG += c++14
 
 SOURCES += main.cpp\
         main_window.cpp \
@@ -41,7 +42,8 @@ SOURCES += main.cpp\
     ../logger.cpp \
     ../speedometer.cpp \
     ../pid.cpp \
-    stereo_window.cpp
+    stereo_window.cpp \
+    ../kalman.cpp
 
 HEADERS  += main_window.h \
     ../ackerman.h \
@@ -68,9 +70,7 @@ FORMS    += main_window.ui \
     route_window.ui \
     stereo_window.ui
 
-unix|win32: LIBS += -L/usr/local/lib -lncurses -lwiringPi -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d
+unix|win32: LIBS += -L/usr/local/lib -lwiringPi -lncurses -lopencv_imgcodecs -lopencv_core -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d -lopencv_flann
 
 RESOURCES += \
     ../resources.qrc
-
-

@@ -2,6 +2,7 @@
 #define SPEEDOMETER_H
 
 #include "math.h"
+#include "kalman.h"
 
 class Speedometer
 {
@@ -16,12 +17,15 @@ public:
 
   int get_ticks() const;
   double get_velocity() const;
+  double get_smooth_velocity() const;
 
   double get_meters_travelled() const;
 
 
   // updates internal state and returns meters just moved
-  double update_from_sensor(unsigned int clock_us, unsigned int tick_us, int ticks);
+  double update_from_sensor(unsigned int clock_us, unsigned int tick_us, int ticks, float ax=0);
+
+  KalmanFilter kalman_v;
 };
 
 #endif // SPEEDOMETER_H

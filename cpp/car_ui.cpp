@@ -1,5 +1,5 @@
 #include "car_ui.h"
-#include "ncurses/ncurses.h"
+#include "ncurses.h"
 #include <unistd.h> // usleep
 
 PiButtons CarUI::global_buttons;
