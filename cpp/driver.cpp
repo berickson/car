@@ -77,7 +77,7 @@ int Driver::esc_for_velocity(PID & velocity_pid, double goal_velocity, double go
   float v_error = goal_velocity - v;
   velocity_pid.add_reading(t, v_error);
   velocity_pid.output();
-  double velocity_output = velocity_pid.output() + settings.v_k_d * goal_accel;
+  double velocity_output = goal_velocity + velocity_pid.output() + settings.v_k_d * goal_accel;
   return car.esc_for_velocity(velocity_output);
 }
 
