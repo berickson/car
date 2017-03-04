@@ -16,9 +16,9 @@ class QuadratureEncoder {
   void sensor_a_changed() {
     last_odometer_change_us=micros();
     if(digitalRead(pin_sensor_a)==digitalRead(pin_sensor_b)){
-      odometer-=2;
+      --odometer;
     } else {
-      odometer+=2;
+      ++odometer;
     }
   }
   
