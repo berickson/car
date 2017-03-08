@@ -2,16 +2,6 @@
 Ackerman steering
 
 https://pdfs.semanticscholar.org/5849/770f946e7880000056b5a378d2b7ac89124d.pdf
-
-delta: angle wheel is being steered
-v : velocity of center of rear wheels
-theta : angle car is making with the x axis
-
-x_dot = v * cos(theta)
-y_dot = v * sin(theta)
-theta_dot = (v / L) * tan(delta)
-
-
 '''
 
 import math
@@ -82,7 +72,6 @@ class Ackerman:
                 # Now we can find the steering angle rho
                 rho = math.asin(self.wheelbase_length/r_rear)
 
-#todo: consider negative movement
             if (d_theta < 0) != (distance < 0):
                 rho = -rho
                 r_rear = - r_rear
