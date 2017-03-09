@@ -75,10 +75,11 @@ class AckermanTests(unittest.TestCase):
 
     def test_move_offset(self):
         car1 = ackerman.Ackerman(wheelbase_length=0)
-        car1.move_front_wheel(-0.5, .5, 10 * math.pi / 180)
+        car1.move_front_wheel(0.5, .5, 10 * math.pi / 180)
         print('left wheel moved', car1.pose)
         car2 = ackerman.Ackerman(wheelbase_length=0)
-        car2.move_front_wheel(0.5, .5, 10 * math.pi / 180)
+        car2.move_front_wheel(-0.5, .5, 10 * math.pi / 180)
+        self.assertGreater(car1.pose.x, car2.pose.x)
         print('right wheel moved', car2.pose)
 
 
