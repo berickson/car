@@ -1,4 +1,4 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 '''
 Ackerman steering
 
@@ -14,8 +14,8 @@ class Pose2d:
         self.y = float(y)
         self.theta = float(theta)
 
-    def __repr__(self):
-        return '({}, {}, {}°)'.format(self.x, self.y, self.theta * 180/math.pi)
+    def __str__(self):
+        return str('({:.2f}, {:.2f}, {:.1f} deg)'.format(self.x, self.y, self.theta * 180/math.pi))
 
     def rotate_around_point(self, x, y, theta):
         ''' rotates self around point x,y at angle theta '''
