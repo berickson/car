@@ -73,6 +73,14 @@ class AckermanTests(unittest.TestCase):
         self.assertAlmostEqual(car.pose.y, 0)
         self.assertAlmostEqual(car.pose.theta, 0)
 
+    def test_move_offset(self):
+        car1 = ackerman.Ackerman(wheelbase_length=0)
+        car1.move_front_wheel(-0.5, .5, 10 * math.pi / 180)
+        print('left wheel moved', car1.pose)
+        car2 = ackerman.Ackerman(wheelbase_length=0)
+        car2.move_front_wheel(0.5, .5, 10 * math.pi / 180)
+        print('right wheel moved', car2.pose)
+
 
 if __name__ == '__main__':
     unittest.main()
