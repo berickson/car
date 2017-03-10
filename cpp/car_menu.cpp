@@ -244,6 +244,9 @@ void go(Car& car, CarUI & ui) {
 
     string recording_file_path = f.recording_file_path(track_name, route_name, run_name);
     car.begin_recording_input(recording_file_path);
+
+    string state_file_path = f.state_log_path(track_name, route_name, run_name);
+    car.begin_recording_state(state_file_path);
     std::string error_text = "";
     try {
       Driver d(car,ui,run_settings);
@@ -319,6 +322,7 @@ void record(Car& car, CarUI & ui) {
   ui.wait_key();
 
   car.end_recording_input();
+  car.end_recording_state();
 
   if(run_settings.capture_video){
     camera.end_recording();
