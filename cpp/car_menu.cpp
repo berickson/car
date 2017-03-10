@@ -20,6 +20,8 @@
 
 
 
+string run_settings_path = "run_settings.txt";
+
 RunSettings run_settings;
 
 
@@ -179,10 +181,6 @@ SubMenu capture_video_menu{};
 SubMenu crash_recovery_menu{};
 SubMenu optimize_velocity_menu{};
 
-
-CarMenu::CarMenu() {
-}
-
 void go(Car& car, CarUI & ui) {
   log_info("entering go menu command");
   try {
@@ -195,6 +193,7 @@ void go(Car& car, CarUI & ui) {
     mkdir(runs_folder);
     mkdir(run_folder);
     run_settings.write_to_file(f.config_file_path(track_name, route_name, run_name));
+    run_settings.write_to_file(run_settings_path);
     car.reset_odometry();
     string input_path = f.path_file_path(track_name,route_name);
     Route rte;
@@ -264,6 +263,7 @@ void go(Car& car, CarUI & ui) {
     write_path_from_recording_file(recording_file_path, path_file_path);
     write_dynamics_csv_from_recording_file(recording_file_path, f.dynamics_file_path(track_name,route_name,run_name));
     rte.write_to_file(f.planned_path_file_path(track_name, route_name, run_name));
+    run_settings.write_to_file(run_settings_path);
 
     if(error_text.size()) {
       ui.clear();
@@ -332,6 +332,7 @@ void record(Car& car, CarUI & ui) {
 
   run_settings.route_name = route_name;
   update_route_selection_menu();
+  run_settings.write_to_file(run_settings_path);
   return;
 }
 
@@ -350,6 +351,10 @@ void run_car_menu() {
   FakeCar car;
 #endif
   CarUI ui;
+
+  if(file_exists(run_settings_path)) {
+      run_settings.load_from_file(run_settings_path);
+  }
 
   selection_menu<double>(acceleration_menu, linspace(0.25,10,0.25), get_max_a, set_max_a );
   selection_menu<double>(velocity_menu, linspace(0.5,20,0.5), get_max_v, set_max_v );
