@@ -3,7 +3,7 @@
 !/.gitignore
 
 test/test
-
+build-*
 #output folders
 output/
 
