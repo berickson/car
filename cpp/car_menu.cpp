@@ -80,6 +80,8 @@ void set_route_name(string s) {
 void update_route_selection_menu() {
   route_selection_menu.items.clear();
   vector<string> route_names = FileNames().get_route_names(run_settings.track_name);
+  string max_name = *max_element(route_names.begin(),route_names.end());
+  set_route_name(max_name);
   selection_menu<string>(route_selection_menu, route_names, get_route_name, set_route_name);
 }
 
