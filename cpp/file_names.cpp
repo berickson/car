@@ -56,6 +56,10 @@ string FileNames::dynamics_file_path(string track_name, string route_name, strin
   return path_join(get_folder(track_name, route_name, run_name),"td.csv");
 }
 
+string FileNames::state_log_path(string track_name, string route_name, string run_name) {
+  return path_join(get_folder(track_name, route_name, run_name),"state.csv");
+}
+
 string FileNames::commands_file_path(string track_name, string route_name, string run_name){
   return path_join(get_folder(track_name, route_name, run_name),"commands.csv");
 }

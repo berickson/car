@@ -93,6 +93,31 @@ void Car::set_esc_and_str(unsigned esc, unsigned str)
 }
 
 
+void Car::begin_recording_state(string path) {
+  end_recording_state();
+  state_recording_file.open(path, ios_base::out);
+  state_recording_file << Dynamics::csv_field_headers();
+  state_recording_file << "v_smooth,vfl_smooth,vfr_smooth,vbl_smooth,vbr_smooth" << endl;
+}
+
+void Car::write_state() {
+  if(state_recording_file.is_open()) {
+    state_recording_file << current_dynamics.csv_fields() << ","
+        << get_velocity() << ","
+        << front_left_wheel.get_smooth_velocity() << ","
+        << front_right_wheel.get_smooth_velocity() << ","
+        << back_left_wheel.get_smooth_velocity() << ","
+        << back_right_wheel.get_smooth_velocity() << endl;
+  }
+}
+
+void Car::end_recording_state() {
+  if(state_recording_file.is_open()) {
+    state_recording_file.flush();
+    state_recording_file.close();
+  }
+}
+
 void Car::begin_recording_input(string path) {
   end_recording_input();
   input_recording_file.open(path, ios_base::out);
@@ -134,8 +159,7 @@ void Car::apply_dynamics(Dynamics & d) {
     Angle outside_wheel_angle = angle_for_steering(previous.str);
     ackerman.move_right_wheel(outside_wheel_angle, wheel_distance_meters, get_heading().radians());
   }
-
-
+  write_state();
 }
 
 void Car::add_listener(WorkQueue<Dynamics>* listener) {

@@ -140,6 +140,11 @@ public:
   void begin_recording_input(string path);
   void end_recording_input();
 
+  // logging
+  void begin_recording_state(string path);
+  void end_recording_state();
+  void write_state();
+
 
   // infrastructure
   bool process_line_from_log(string s);
@@ -147,6 +152,7 @@ public:
   Usb usb;
 private:
   fstream input_recording_file;
+  fstream state_recording_file;
 
   void usb_thread_start();
   WorkQueue<string> usb_queue;
