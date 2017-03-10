@@ -76,7 +76,6 @@ int Driver::esc_for_velocity(PID & velocity_pid, double goal_velocity, double go
   //}
   float v_error = goal_velocity - v;
   velocity_pid.add_reading(t, v_error);
-  velocity_pid.output();
   double velocity_output = goal_velocity + velocity_pid.output() + settings.v_k_d * goal_accel;
   return car.esc_for_velocity(velocity_output);
 }
@@ -116,7 +115,7 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
   unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);
   unsigned esc = route.done? esc_for_max_decel() : esc_for_velocity(velocity_pid, route.get_velocity(), route.get_acceleration());
 
-  if(rear_slipping())
+  if(rear_slipping() && 0)
     esc = 1500;
 
   if(route.done && fabs(car.get_velocity()) < 0.01) {
