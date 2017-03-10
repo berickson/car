@@ -6,9 +6,9 @@
 int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
-  //RouteWindow w;
+  RouteWindow w;
   //MainWindow w;
-  StereoWindow w;
+  //StereoWindow w;
   w.show();
 
   return a.exec();

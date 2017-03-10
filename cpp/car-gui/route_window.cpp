@@ -450,6 +450,7 @@ void RouteWindow::on_folder_picker_button_clicked()
   QFileDialog dialog;
   dialog.setFileMode(QFileDialog::Directory);
   dialog.setOption(QFileDialog::ShowDirsOnly);
+  dialog.setDirectory(QString::fromStdString(file_names.tracks_folder));
   if(dialog.exec() && dialog.selectedFiles().length()==1) {
     QString s;
     file_names.tracks_folder = dialog.selectedFiles().at(0).toStdString();

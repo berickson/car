@@ -10,7 +10,7 @@
 class FileNames {
 public:
   string tracks_folder;
-  FileNames(string tracks_folder = "/home/pi/car/tracks");
+  FileNames(string tracks_folder = string(getenv("HOME")) + "/car/tracks");
 
   string get_track_folder(string track_name);
 
