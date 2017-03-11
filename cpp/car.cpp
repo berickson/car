@@ -90,6 +90,8 @@ void Car::set_manual_mode() {
 void Car::set_esc_and_str(unsigned esc, unsigned str)
 {
   send_command((string)"pse "+to_string(str)+","+to_string(esc));
+  commanded_esc = esc;
+  commanded_str = str;
 }
 
 
@@ -97,7 +99,7 @@ void Car::begin_recording_state(string path) {
   end_recording_state();
   state_recording_file.open(path, ios_base::out);
   state_recording_file << Dynamics::csv_field_headers();
-  state_recording_file << "v_smooth,vfl_smooth,vfr_smooth,vbl_smooth,vbr_smooth" << endl;
+  state_recording_file << ",v_smooth,v_fl_smooth,v_fr_smooth,v_bl_smooth,v_br_smooth,commanded_esc,commanded_str" << endl;
 }
 
 void Car::write_state() {
@@ -107,7 +109,9 @@ void Car::write_state() {
         << front_left_wheel.get_smooth_velocity() << ","
         << front_right_wheel.get_smooth_velocity() << ","
         << back_left_wheel.get_smooth_velocity() << ","
-        << back_right_wheel.get_smooth_velocity() << endl;
+        << back_right_wheel.get_smooth_velocity() << ","
+        << commanded_esc << ","
+        << commanded_str << endl;
   }
 }
 

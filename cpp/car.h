@@ -140,10 +140,15 @@ public:
   void begin_recording_input(string path);
   void end_recording_input();
 
-  // logging
   void begin_recording_state(string path);
   void end_recording_state();
   void write_state();
+
+
+  // misc state
+  int commanded_esc;
+  int commanded_str;
+
 
 
   // infrastructure

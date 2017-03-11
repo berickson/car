@@ -244,6 +244,7 @@ void go(Car& car, CarUI & ui) {
 
     string recording_file_path = f.recording_file_path(track_name, route_name, run_name);
     car.begin_recording_input(recording_file_path);
+    car.begin_recording_state(f.state_log_path(track_name, route_name, run_name));
 
     string state_file_path = f.state_log_path(track_name, route_name, run_name);
     car.begin_recording_state(state_file_path);
@@ -260,6 +261,7 @@ void go(Car& car, CarUI & ui) {
       camera.end_recording();
     }
     car.end_recording_input();
+    car.end_recording_state();
     ui.clear();
     ui.print("making path");
     log_info("making path");
@@ -314,6 +316,7 @@ void record(Car& car, CarUI & ui) {
 
   string recording_path = f.recording_file_path(track_name,route_name);
   car.begin_recording_input(recording_path);
+  car.begin_recording_state(f.state_log_path(track_name,route_name));
 
   ui.clear();
   ui.move(0,0);
