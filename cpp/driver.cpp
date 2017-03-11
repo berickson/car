@@ -113,7 +113,7 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
 
 
   unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);
-  unsigned esc = route.done? esc_for_max_decel() : esc_for_velocity(velocity_pid, route.get_velocity(), route.get_acceleration());
+  unsigned esc = route.done? esc_for_velocity(velocity_pid, 0, 0) : esc_for_velocity(velocity_pid, route.get_velocity(), route.get_acceleration());
 
   if(rear_slipping() && 0)
     esc = 1500;
