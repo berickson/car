@@ -202,7 +202,7 @@ void Route::set_position(Point front, Point rear, double velocity)
       progress = 1.1;
     } else {
       progress = (drx * dx + dry * dy)/(dx * dx + dy * dy);
-      cte = (dry * dx - drx * dy) / l;
+      cte = (drx * dy - dry * dx ) / l;
     }
 
     if (progress < 1.0 || done)

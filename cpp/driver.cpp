@@ -92,27 +92,21 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
   if(!route.done)
   route.set_position(p_front, p_rear, v);
 
-  //Angle steering_angle = steering_angle_by_look_ahead(route, ahead);
-  Angle track_curvature = required_turn_curvature_by_look_ahead(route,ahead);
+  // Angle steering_angle = steering_angle_by_look_ahead(route, ahead);
+  Angle e_heading = route.get_heading_at_current_position() - car.get_heading();
+  double d_error = sin(e_heading.radians()) * v;
 
-  // calculate derivitive term of the error
-  /*
-  Angle e_heading = car.get_heading() - route.get_heading_at_current_position();
-  double d_error = sin(e_heading.radians())*v;
-  Angle d_adjust = Angle::degrees(clamp(settings.steering_k_d * d_error,-30,30));
+  Angle d_adjust = Angle::degrees(clamp(settings.steering_k_d * d_error / (v+1),-20,20));
+  Angle p_adjust = Angle::degrees(clamp(settings.steering_k_p * route.cte  / (v+1),-20,20));
+  //Angle i_adjust = Angle::degrees(clamp(settings.steering_k_p * route.cte  / (v+1),-20,20));
 
-
-  Angle p_adjust = Angle::degrees(clamp(-1. * settings.steering_k_p * route.cte  / (v+1),-30,30));
-
-  //
-  */
-  steering_pid.add_reading((double)car.current_dynamics.us / 1E6, -route.cte);
-  Angle pid_adjust = Angle::degrees(clamp(steering_pid.output(),-60,60));
-  Angle curvature = track_curvature + pid_adjust;
+  //steering_pid.add_reading((double)car.current_dynamics.us / 1E6, -route.cte);
+  //Angle pid_adjust = Angle::degrees(clamp(steering_pid.output(),-60,60));
+  Angle curvature = route.get_curvature_at_current_position();
 
 
 
-  unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);
+  unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature) + p_adjust + d_adjust;
   unsigned esc = route.done? esc_for_velocity(velocity_pid, 0, 0) : esc_for_velocity(velocity_pid, route.get_velocity(), route.get_acceleration());
 
   if(rear_slipping() && 0)
@@ -271,7 +265,7 @@ Angle Driver::steering_angle_by_cte(Route &route) {
   Angle segment_heading = route.heading();
   Angle car_heading = car.get_heading();
   Angle heading_fix = segment_heading - car_heading;
-  double cte_fix = -80 * cte;
+  double cte_fix = 80 * cte;
   if(car.get_velocity() < 0) {
     heading_fix = -heading_fix;
     cte_fix = -2*cte_fix;
