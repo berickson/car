@@ -94,9 +94,9 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
 
   // Angle steering_angle = steering_angle_by_look_ahead(route, ahead);
   Angle e_heading = route.get_heading_at_current_position() - car.get_heading();
-  double d_error = sin(e_heading.radians()) * v;
+  double d_error = sin(e_heading.radians());
 
-  Angle d_adjust = Angle::degrees(clamp(settings.steering_k_d * d_error / (v+1),-20,20));
+  Angle d_adjust = Angle::degrees(clamp(settings.steering_k_d * d_error,-20,20));
   Angle p_adjust = Angle::degrees(clamp(settings.steering_k_p * route.cte  / (v+1),-20,20));
   //Angle i_adjust = Angle::degrees(clamp(settings.steering_k_p * route.cte  / (v+1),-20,20));
 
