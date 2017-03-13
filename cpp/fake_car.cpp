@@ -107,7 +107,7 @@ void write_path_from_recording_file(string recording_path, string outpath) {
             << rear_p.y << ","
             << next_reverse << ","
             << car.get_heading().degrees() << ","
-            << car.heading_adjustment.degrees() << ","
+            <<  " 0.0," // was heading adjustment, but we don't use that any more
             << current.esc << ","
             << current.str << ","
             << wheel_meters_per_second << endl;
@@ -115,7 +115,7 @@ void write_path_from_recording_file(string recording_path, string outpath) {
   }
   outfile.flush();
   outfile.close();
-  log_info("entering write_path_from_recording_file");
+  log_info("exiting write_path_from_recording_file");
 }
 
 
