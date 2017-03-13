@@ -102,11 +102,11 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
 
   //steering_pid.add_reading((double)car.current_dynamics.us / 1E6, -route.cte);
   //Angle pid_adjust = Angle::degrees(clamp(steering_pid.output(),-60,60));
-  Angle curvature = route.get_curvature_at_current_position();
+  Angle curvature = required_turn_curvature_by_look_ahead(route, ahead);
 
 
 
-  unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature);// + p_adjust + d_adjust;
+  unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature) + p_adjust + d_adjust;
   unsigned esc = route.done? esc_for_velocity(velocity_pid, 0, 0) : esc_for_velocity(velocity_pid, route.get_velocity(), route.get_acceleration());
 
   if(rear_slipping() && 0)
