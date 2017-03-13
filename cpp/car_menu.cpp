@@ -371,7 +371,7 @@ void run_car_menu() {
   selection_menu<double>(k_i_menu, linspace(0.,30,0.5), get_k_i, set_k_i );
   selection_menu<double>(k_d_menu, linspace(0.,300,5), get_k_d, set_k_d );
 
-  selection_menu<double>(v_k_p_menu, linspace(0.,3,0.25), get_v_k_p, set_v_k_p );
+  selection_menu<double>(v_k_p_menu, linspace(0.,15,0.5), get_v_k_p, set_v_k_p );
   selection_menu<double>(v_k_i_menu, linspace(0.,30,1.), get_v_k_i, set_v_k_i );
   selection_menu<double>(v_k_d_menu, linspace(0.,3,0.25), get_v_k_d, set_v_k_d );
 

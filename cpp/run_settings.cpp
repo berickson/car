@@ -97,11 +97,11 @@ void RunSettings::load_from_file(string path)
       this->steering_k_d = stod(value);
 
     else if (name == "v_k_p")
-      this->steering_k_d = stod(value);
+      this->v_k_p = stod(value);
     else if (name == "v_k_i")
-      this->steering_k_i = stod(value);
+      this->v_k_i = stod(value);
     else if (name == "v_k_d")
-      this->steering_k_d = stod(value);
+      this->v_k_d = stod(value);
     else if (name == "prune_max")
       this->prune_max = stod(value);
     else if (name == "prune_tolerance")
