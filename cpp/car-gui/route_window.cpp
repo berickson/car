@@ -458,3 +458,10 @@ void RouteWindow::on_folder_picker_button_clicked()
 
   }
 }
+
+void RouteWindow::on_synch_folder_button_clicked()
+{
+  system(string(file_names.tracks_folder+"/synchronize").c_str());
+  show_track_names();
+
+}

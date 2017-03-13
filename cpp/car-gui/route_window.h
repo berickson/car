@@ -45,6 +45,8 @@ private slots:
 
   void on_folder_picker_button_clicked();
 
+  void on_synch_folder_button_clicked();
+
 private:
   QPen original_route_pen,planned_route_pen,run_pen;
 
