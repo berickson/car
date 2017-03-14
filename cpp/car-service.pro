@@ -73,3 +73,10 @@ unix|win32: LIBS += -L/usr/local/lib -lncurses -lwiringPi -lopencv_core -lopencv
 DISTFILES += \
     README.md
 
+#TEMPLATE = subdirs
+
+SUBDIRS += src
+
+CONFIG(debug, debug|release) {
+    SUBDIRS += tests
+}
