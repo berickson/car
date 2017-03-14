@@ -155,10 +155,11 @@ void Car::apply_dynamics(Dynamics & d) {
   //heading_adjustment += Angle::radians(d_theta.radians() * gyro_adjustment_factor);
 
   // if wheels have moved, update ackerman
-  back_left_wheel.update_from_sensor(current.us, current.odometer_back_left_last_us, current.odometer_back_left, current.ax);
-  back_right_wheel.update_from_sensor(current.us, current.odometer_back_right_last_us, current.odometer_back_right, current.ax);
-  front_left_wheel.update_from_sensor(current.us, current.odometer_front_left_last_us, current.odometer_front_left, current.ax);
-  double wheel_distance_meters = front_right_wheel.update_from_sensor(current.us, current.odometer_front_right_last_us, current.odometer_front_right, current.ax);
+  back_left_wheel.update_from_sensor(current.us, current.odometer_back_left_a, current.odometer_back_left_a_us, current.odometer_back_left_b, current.odometer_back_left_b_us, current.odometer_back_left_ab_us, current.ax);
+  back_right_wheel.update_from_sensor(current.us, current.odometer_back_right_a, current.odometer_back_right_a_us, current.odometer_back_right_b, current.odometer_back_right_b_us, current.odometer_back_right_ab_us, current.ax);
+  front_left_wheel.update_from_sensor(current.us, current.odometer_front_left_a, current.odometer_front_left_a_us, current.odometer_front_left_b, current.odometer_front_left_b_us, current.odometer_front_left_ab_us, current.ax);
+  double wheel_distance_meters = front_right_wheel.update_from_sensor(current.us, current.odometer_front_right_a, current.odometer_front_right_a_us, current.odometer_front_right_b, current.odometer_front_right_b_us, current.odometer_front_right_ab_us, current.ax);
+
   if (reading_count > 2 && fabs(wheel_distance_meters) > 0.) { // adding 2 keeps out the big jump after a reset
     Angle outside_wheel_angle = angle_for_steering(previous.str);
     ackerman.move_right_wheel(outside_wheel_angle, wheel_distance_meters, get_heading().radians());

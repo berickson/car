@@ -24,17 +24,29 @@ string Dynamics::to_string() {
 
      << "ping_millimeters:" << ping_millimeters << endl
 
-     << "odometer_front_left:" << odometer_front_left << endl
-     << "odometer_front_left_last_us:" << odometer_front_left_last_us << endl
+     << "odometer_front_left_a:" << odometer_front_left_a << endl
+     << "odometer_front_left_a_us:" << odometer_front_left_a_us << endl
+     << "odometer_front_left_b:" << odometer_front_left_b << endl
+     << "odometer_front_left_b_us:" << odometer_front_left_b_us << endl
+     << "odometer_front_left_ab_us:" << odometer_front_left_ab_us << endl
 
-     << "odometer_front_right:" << odometer_front_right << endl
-     << "odometer_front_right_last_us:" << odometer_front_right_last_us << endl
+     << "odometer_front_right_a:" << odometer_front_right_a << endl
+     << "odometer_front_right_a_us:" << odometer_front_right_a_us << endl
+     << "odometer_front_right_b:" << odometer_front_right_b << endl
+     << "odometer_front_right_b_us:" << odometer_front_right_b_us << endl
+     << "odometer_front_right_ab_us:" << odometer_front_right_ab_us << endl
 
-     << "odometer_back_left:" << odometer_back_left << endl
-     << "odometer_back_left_last_us:" << odometer_back_left_last_us << endl
+     << "odometer_back_left_a:" << odometer_back_left_a << endl
+     << "odometer_back_left_a_us:" << odometer_back_left_a_us << endl
+     << "odometer_back_left_b:" << odometer_back_left_b << endl
+     << "odometer_back_left_b_us:" << odometer_back_left_b_us << endl
+     << "odometer_back_left_ab_us:" << odometer_back_left_ab_us << endl
 
-     << "odometer_back_right:" << odometer_back_right << endl
-     << "odometer_back_right_last_us:" << odometer_back_right_last_us <<endl
+     << "odometer_back_right_a:" << odometer_back_right_a << endl
+     << "odometer_back_right_a_us:" << odometer_back_right_a_us << endl
+     << "odometer_back_right_b:" << odometer_back_right_b << endl
+     << "odometer_back_right_b_us:" << odometer_back_right_b_us << endl
+     << "odometer_back_right_ab_us:" << odometer_back_right_ab_us << endl
 
      << "ms:" << ms << endl
      << "us:" << us << endl
@@ -51,10 +63,10 @@ std::string Dynamics::csv_field_headers() {
   return
      "timestamp,ms,us,"
      "str,esc,battery_voltage,"
-     "odo_fl,odo_fl_us,"
-     "odo_fr,odo_fr_us,"
-     "odo_bl,odo_bl_us,"
-     "odo_br,odo_br_us,"
+     "odo_fl_a,odo_fl_a_us,odo_fl_b,odo_fl_b_us,odo_fl_ab_us"
+     "odo_fr_a,odo_fr_a_us,odo_fr_b,odo_fr_b_us,odo_fr_ab_us"
+     "odo_bl_a,odo_bl_a_us,odo_bl_b,odo_bl_b_us,odo_bl_ab_us"
+     "odo_br_a,odo_br_a_us,odo_br_b,odo_br_b_us,odo_br_ab_us"
      "odo_spur,odo_spur_us,"
      "yaw,pitch,roll,"
      "ax,ay,az,"
@@ -75,20 +87,33 @@ std::string Dynamics::csv_fields() {
   ss << battery_voltage << ",";
 
   // "odo_fl,odo_fl_us,"
-  ss << odometer_front_left << ",";
-  ss << odometer_front_left_last_us << ",";
+  ss << odometer_front_left_a << ",";
+  ss << odometer_front_left_a_us << ",";
+  ss << odometer_front_left_b << ",";
+  ss << odometer_front_left_b_us << ",";
+  ss << odometer_front_left_ab_us << ",";
 
   // "odo_fr,odo_fr_us,"
-  ss << odometer_front_right << ",";
-  ss << odometer_front_right_last_us << ",";
+  ss << odometer_front_right_a << ",";
+  ss << odometer_front_right_a_us << ",";
+  ss << odometer_front_right_b << ",";
+  ss << odometer_front_right_b_us << ",";
+  ss << odometer_front_right_ab_us << ",";
 
-  // "odo_bl,odo_bl_us,"
-  ss << odometer_back_left << ",";
-  ss << odometer_back_left_last_us << ",";
+  // "odo_fl,odo_fl_us,"
+  ss << odometer_back_left_a << ",";
+  ss << odometer_back_left_a_us << ",";
+  ss << odometer_back_left_b << ",";
+  ss << odometer_back_left_b_us << ",";
+  ss << odometer_back_left_ab_us << ",";
 
-  // "odo_br,odo_br_us,"
-  ss << odometer_back_right << ",";
-  ss << odometer_back_right_last_us << ",";
+  // "odo_fr,odo_fr_us,"
+  ss << odometer_back_right_a << ",";
+  ss << odometer_back_right_a_us << ",";
+  ss << odometer_back_right_b << ",";
+  ss << odometer_back_right_b_us << ",";
+  ss << odometer_back_right_ab_us << ",";
+
 
   // "odo_spur,odo_spur_us,"
   ss << spur_odo << ",";
@@ -138,21 +163,41 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
     d.spur_last_us = stoul(fields[12]);
     d.spur_odo = stoi(fields[14]);
     d.ping_millimeters = stoi(fields[16]);
-    d.odometer_front_left =  stoi(fields[18]);
-    d.odometer_front_left_last_us =  stoul(fields[19]);
-    d.odometer_front_right = stoi(fields[21]);
-    d.odometer_front_right_last_us = stoul(fields[22]);
-    d.odometer_back_left = stoi(fields[24]);
-    d.odometer_back_left_last_us = stoul(fields[25]);
-    d.odometer_back_right = stoi(fields[27]);
-    d.odometer_back_right_last_us = stoul(fields[28]);
-    d.ms = stoul(fields[30]);
-    d.us = stoul(fields[32]);
-    d.yaw = Angle::degrees(stod(fields[34]));
-    d.pitch = Angle::degrees(stod(fields[35]));
-    d.roll = Angle::degrees(stod(fields[36]));
-    d.battery_voltage = stod(fields[38]);
-    d.calibration_status = stoi(fields[40]);
+
+    d.odometer_front_left_a =  stoi(fields[18]);
+    d.odometer_front_left_a_us =  stoul(fields[19]);
+    d.odometer_front_left_b =  stoi(fields[20]);
+    d.odometer_front_left_b_us =  stoul(fields[21]);
+    d.odometer_front_left_ab_us =  stoul(fields[22]);
+
+    d.odometer_front_right_a =  stoi(fields[24]);
+    d.odometer_front_right_a_us =  stoul(fields[25]);
+    d.odometer_front_right_b =  stoi(fields[26]);
+    d.odometer_front_right_b_us =  stoul(fields[27]);
+    d.odometer_front_right_ab_us =  stoul(fields[28]);
+
+    d.odometer_back_left_a =  stoi(fields[30]);
+    d.odometer_back_left_a_us =  stoul(fields[31]);
+    d.odometer_back_left_b =  stoi(fields[32]);
+    d.odometer_back_left_b_us =  stoul(fields[33]);
+    d.odometer_back_left_ab_us =  stoul(fields[34]);
+
+    d.odometer_back_right_a =  stoi(fields[36]);
+    d.odometer_back_right_a_us =  stoul(fields[37]);
+    d.odometer_back_right_b =  stoi(fields[38]);
+    d.odometer_back_right_b_us =  stoul(fields[39]);
+    d.odometer_back_right_ab_us =  stoul(fields[40]);
+
+    d.ms = stoul(fields[42]);
+
+    d.us = stoul(fields[44]);
+
+    d.yaw = Angle::degrees(stod(fields[46]));
+    d.pitch = Angle::degrees(stod(fields[47]));
+    d.roll = Angle::degrees(stod(fields[48]));
+
+    d.battery_voltage = stod(fields[50]);
+
   } catch (...)
   {
     return false;

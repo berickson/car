@@ -32,17 +32,30 @@ public:
   int spur_odo;
   int ping_millimeters;
 
-  int odometer_front_left;
-  unsigned int odometer_front_left_last_us;
-  int odometer_front_right;
-  unsigned int odometer_front_right_last_us;
+  int odometer_front_left_a;
+  unsigned int odometer_front_left_a_us;
+  int odometer_front_left_b;
+  unsigned int odometer_front_left_b_us;
+  int odometer_front_left_ab_us;
 
+  int odometer_front_right_a;
+  unsigned int odometer_front_right_a_us;
+  int odometer_front_right_b;
+  unsigned int odometer_front_right_b_us;
+  int odometer_front_right_ab_us;
 
+  int odometer_back_left_a;
+  unsigned int odometer_back_left_a_us;
+  int odometer_back_left_b;
+  unsigned int odometer_back_left_b_us;
+  int odometer_back_left_ab_us;
 
-  int odometer_back_left;
-  unsigned int odometer_back_left_last_us;
-  int odometer_back_right;
-  unsigned int odometer_back_right_last_us;
+  int odometer_back_right_a;
+  unsigned int odometer_back_right_a_us;
+  int odometer_back_right_b;
+  unsigned int odometer_back_right_b_us;
+  int odometer_back_right_ab_us;
+
   unsigned int ms;
   unsigned int us;
   Angle yaw;

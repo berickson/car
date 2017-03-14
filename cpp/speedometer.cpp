@@ -1,6 +1,6 @@
 #include "speedometer.h"
 #include "kalman.h"
-
+#include <algorithm>
 
 Speedometer::Speedometer()  {
 }
@@ -22,7 +22,9 @@ double Speedometer::get_meters_travelled() const {
   return meters_travelled;
 }
 
-double Speedometer::update_from_sensor(unsigned int clock_us, unsigned int tick_us, int ticks, float ax) {
+double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigned int a_us, int odo_b, unsigned int b_us, int ab_us, float ax) {
+  unsigned tick_us = std::max(a_us,b_us);
+  unsigned ticks = odo_a + odo_b;
   double meters_moved = 0.0;
   double elapsed_seconds = (tick_us - last_tick_us) / 1000000.;
   if (elapsed_seconds > 0) {

@@ -75,6 +75,7 @@ public:
     return front_right_wheel;
   }
 
+  /*
   int get_odometer_front_left() {
     return current_dynamics.odometer_front_left;
   }
@@ -88,6 +89,7 @@ public:
 
     return current_dynamics.odometer_back_right;
   }
+*/
   int get_reading_count() {
     return reading_count;
   }

@@ -484,32 +484,23 @@ void loop() {
   if(every_10_ms && TD) {
     // constants below based on 220k and 1M resistor, 1023 steps and 3.3 reference voltage
     float battery_voltage = analogRead(PIN_BATTERY_VOLTAGE_DIVIDER) * ((3.3/1023.) / 220.)*(220.+1000.);
-    //Eulers eulers;
-    //Acceleration acceleration;
-
- 
-    // mpu_bno.getEuler((float *)&eulers);
-    // mpu_bno.getAccel((float *)&acceleration);
     
     
     log(TD,
        "str," + steering.readMicroseconds()
        + ",esc," + speed.readMicroseconds()
        + ",aa,"+ ftos(mpu9150.ax) + "," + ftos(mpu9150.ay)+","+ ftos(mpu9150.az)
-       //+ ",aa,"+ ftos(acceleration.ax) + "," + ftos(acceleration.ay)+","+ ftos(acceleration.az)
        +",spur_us,"+   microseconds_between_spur_pulse_count + "," + last_spur_pulse_us
        +",spur_odo," + spur_pulse_count
        +",ping_mm,"+ping.millimeters()
-       +",odo_fl,"+odometer_front_left.odometer +"," +  odometer_front_left.last_odometer_change_us 
-       +",odo_fr,"+odometer_front_right.odometer +"," +  odometer_front_right.last_odometer_change_us
-       +",odo_bl,"+odometer_back_left.odometer +"," +  odometer_back_left.last_odometer_change_us
-       +",odo_br,"+odometer_back_right.odometer+"," +  odometer_back_right.last_odometer_change_us
+       +",odo_fl,"+odometer_front_left.odometer_a +"," +  odometer_front_left.last_odometer_a_us + "," + odometer_front_left.odometer_b +"," + odometer_front_left.last_odometer_b_us + "," + odometer_front_left.odometer_ab_us
+       +",odo_fr,"+odometer_front_right.odometer_a +"," +  odometer_front_right.last_odometer_a_us + "," + odometer_front_right.odometer_b +"," + odometer_front_right.last_odometer_b_us + "," +  odometer_front_right.odometer_ab_us
+       +",odo_bl,"+odometer_back_left.odometer_a +"," +  odometer_back_left.last_odometer_a_us + "," + odometer_back_left.odometer_b +"," + odometer_back_left.last_odometer_b_us + "," + odometer_back_left.odometer_ab_us
+       +",odo_br,"+odometer_back_right.odometer_a +"," +  odometer_back_right.last_odometer_a_us + "," + odometer_back_right.odometer_b +"," + odometer_back_right.last_odometer_b_us + "," + odometer_back_right.odometer_ab_us
        +",ms,"+millis()
        +",us,"+micros()
-       //+",ypr,"+ ftos(-eulers.yaw) + "," + ftos(eulers.pitch) + "," + ftos(eulers.roll)
        +",ypr,"+ mpu9150.heading() + "," + ftos(mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
        +",vbat,"+ftos(battery_voltage)
-       +",cal,"+ 0 // mpu_bno.getCalibration()
        );
   }
 
