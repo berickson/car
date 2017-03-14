@@ -143,7 +143,7 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
   }
   if(fields[1] != "TD")
     return false;
-  if(fields.size() != 50) {
+  if(fields.size() != 51) {
     cerr << "field size was " << fields.size() << endl;
     //usb_error_count++;
     return false;
