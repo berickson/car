@@ -477,29 +477,29 @@ void loop() {
     float battery_voltage = analogRead(PIN_BATTERY_VOLTAGE_DIVIDER) * ((3.3/1023.) / 220.)*(220.+1000.);
     
     noInterrupts();
-    var fl_odo_a = odometer_front_left.odometer_a;
-    var fl_odo_a_us = odometer_front_left.last_odometer_a_us;
-    var fl_odo_b = odometer_front_left.odometer_b;
-    var fl_odo_b_us = last_odometer_b_us;
-    var fl_odo_ab_us = odometer_front_left.odometer_ab_us;
+    auto fl_odo_a = odometer_front_left.odometer_a;
+    auto fl_odo_a_us = odometer_front_left.last_odometer_a_us;
+    auto fl_odo_b = odometer_front_left.odometer_b;
+    auto fl_odo_b_us = odometer_front_left.last_odometer_b_us;
+    auto fl_odo_ab_us = odometer_front_left.odometer_ab_us;
 
-    var fr_odo_a = odometer_front_right.odometer_a;
-    var fr_odo_a_us = odometer_front_right.last_odometer_a_us;
-    var fr_odo_b = odometer_front_right.odometer_b;
-    var fr_odo_b_us = odometer_front_right.last_odometer_b_us;
-    var fr_odo_ab_us = odometer_front_right.odometer_ab_us;
+    auto fr_odo_a = odometer_front_right.odometer_a;
+    auto fr_odo_a_us = odometer_front_right.last_odometer_a_us;
+    auto fr_odo_b = odometer_front_right.odometer_b;
+    auto fr_odo_b_us = odometer_front_right.last_odometer_b_us;
+    auto fr_odo_ab_us = odometer_front_right.odometer_ab_us;
     
-    var bl_odo_a = odometer_back_left.odometer_a;
-    var bl_odo_a_us = odometer_back_left.last_odometer_a_us;
-    var bl_odo_b = odometer_back_left.odometer_b;
-    var bl_odo_b_us = odometer_back_left.last_odometer_b_us;
-    var bl_odo_ab_us = odometer_back_left.odometer_ab_us;
+    auto bl_odo_a = odometer_back_left.odometer_a;
+    auto bl_odo_a_us = odometer_back_left.last_odometer_a_us;
+    auto bl_odo_b = odometer_back_left.odometer_b;
+    auto bl_odo_b_us = odometer_back_left.last_odometer_b_us;
+    auto bl_odo_ab_us = odometer_back_left.odometer_ab_us;
     
-    var br_odo_a = odometer_back_right.odometer_a;
-    var br_odo_a_us = odometer_back_right.last_odometer_a_us;
-    var br_odo_b = odometer_back_right.odometer_b;
-    var br_odo_b_us = odometer_back_right.last_odometer_b_us;
-    var br_odo_ab_us = odometer_back_right.odometer_ab_us;
+    auto br_odo_a = odometer_back_right.odometer_a;
+    auto br_odo_a_us = odometer_back_right.last_odometer_a_us;
+    auto br_odo_b = odometer_back_right.odometer_b;
+    auto br_odo_b_us = odometer_back_right.last_odometer_b_us;
+    auto br_odo_ab_us = odometer_back_right.odometer_ab_us;
     interrupts();
     
     log(TD,
