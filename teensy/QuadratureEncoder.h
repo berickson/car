@@ -5,12 +5,12 @@ class QuadratureEncoder {
   const int pin_sensor_a; // sensor that triggers first for forward
   const int pin_sensor_b; 
 
-  unsigned long last_odometer_a_us = 0;
-  unsigned long last_odometer_b_us = 0;
-  long odometer_ab_us = 0;
+  volatile unsigned long last_odometer_a_us = 0;
+  volatile unsigned long last_odometer_b_us = 0;
+  volatile long odometer_ab_us = 0;
 
-  long odometer_a = 0;
-  long odometer_b = 0;
+  volatile long odometer_a = 0;
+  volatile long odometer_b = 0;
 
   
   QuadratureEncoder(int _pin_sensor_a, int _pin_sensor_b):

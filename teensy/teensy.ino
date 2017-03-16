@@ -472,19 +472,35 @@ void loop() {
     modes.execute();
   }
 
-
-
-  // state tracing
-  if (0) {
-    rx_steer.trace();
-    Serial.print(",");
-    rx_speed.trace();
-    Serial.println();
-  }
   if(every_10_ms && TD) {
     // constants below based on 220k and 1M resistor, 1023 steps and 3.3 reference voltage
     float battery_voltage = analogRead(PIN_BATTERY_VOLTAGE_DIVIDER) * ((3.3/1023.) / 220.)*(220.+1000.);
     
+    noInterrupts();
+    auto fl_odo_a = odometer_front_left.odometer_a;
+    auto fl_odo_a_us = odometer_front_left.last_odometer_a_us;
+    auto fl_odo_b = odometer_front_left.odometer_b;
+    auto fl_odo_b_us = odometer_front_left.last_odometer_b_us;
+    auto fl_odo_ab_us = odometer_front_left.odometer_ab_us;
+
+    auto fr_odo_a = odometer_front_right.odometer_a;
+    auto fr_odo_a_us = odometer_front_right.last_odometer_a_us;
+    auto fr_odo_b = odometer_front_right.odometer_b;
+    auto fr_odo_b_us = odometer_front_right.last_odometer_b_us;
+    auto fr_odo_ab_us = odometer_front_right.odometer_ab_us;
+    
+    auto bl_odo_a = odometer_back_left.odometer_a;
+    auto bl_odo_a_us = odometer_back_left.last_odometer_a_us;
+    auto bl_odo_b = odometer_back_left.odometer_b;
+    auto bl_odo_b_us = odometer_back_left.last_odometer_b_us;
+    auto bl_odo_ab_us = odometer_back_left.odometer_ab_us;
+    
+    auto br_odo_a = odometer_back_right.odometer_a;
+    auto br_odo_a_us = odometer_back_right.last_odometer_a_us;
+    auto br_odo_b = odometer_back_right.odometer_b;
+    auto br_odo_b_us = odometer_back_right.last_odometer_b_us;
+    auto br_odo_ab_us = odometer_back_right.odometer_ab_us;
+    interrupts();
     
     log(TD,
        "str," + steering.readMicroseconds()
@@ -493,10 +509,10 @@ void loop() {
        +",spur_us,"+   microseconds_between_spur_pulse_count + "," + last_spur_pulse_us
        +",spur_odo," + spur_pulse_count
        +",ping_mm,"+ping.millimeters()
-       +",odo_fl,"+odometer_front_left.odometer_a +"," +  odometer_front_left.last_odometer_a_us + "," + odometer_front_left.odometer_b +"," + odometer_front_left.last_odometer_b_us + "," + odometer_front_left.odometer_ab_us
-       +",odo_fr,"+odometer_front_right.odometer_a +"," +  odometer_front_right.last_odometer_a_us + "," + odometer_front_right.odometer_b +"," + odometer_front_right.last_odometer_b_us + "," +  odometer_front_right.odometer_ab_us
-       +",odo_bl,"+odometer_back_left.odometer_a +"," +  odometer_back_left.last_odometer_a_us + "," + odometer_back_left.odometer_b +"," + odometer_back_left.last_odometer_b_us + "," + odometer_back_left.odometer_ab_us
-       +",odo_br,"+odometer_back_right.odometer_a +"," +  odometer_back_right.last_odometer_a_us + "," + odometer_back_right.odometer_b +"," + odometer_back_right.last_odometer_b_us + "," + odometer_back_right.odometer_ab_us
+       +",odo_fl,"+ fl_odo_a +"," +  fl_odo_a_us + "," + fl_odo_b +"," + fl_odo_b_us + "," + fl_odo_ab_us
+       +",odo_fr,"+ fr_odo_a +"," +  fr_odo_a_us + "," + fr_odo_b +"," + fr_odo_b_us + "," + fr_odo_ab_us
+       +",odo_bl,"+ bl_odo_a +"," +  bl_odo_a_us + "," + bl_odo_b +"," + bl_odo_b_us + "," + bl_odo_ab_us
+       +",odo_br,"+ br_odo_a +"," +  br_odo_a_us + "," + br_odo_b +"," + br_odo_b_us + "," + br_odo_ab_us
        +",ms,"+millis()
        +",us,"+micros()
        +",ypr,"+ mpu9150.heading() + "," + ftos(mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
@@ -504,11 +520,6 @@ void loop() {
        );
   }
 
-//  if(every_second && TRACE_MPU ) {
- 
-    
-//    mpu9150.log_status();
-//  }
 
   // loop speed reporting
   //  12,300 loops per second as of 8/18 9:30
