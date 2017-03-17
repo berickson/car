@@ -81,6 +81,32 @@ int Driver::esc_for_velocity(PID & velocity_pid, double goal_velocity, double go
 }
 
 
+class VelocityTracker {
+public:
+  double v_sp = 0;
+  double k_v = 1.0;
+  double k_a = 1.0;
+  double last_t = 0;
+
+  void reset() {
+    v_sp = 0;
+    last_t = 0;
+  }
+
+  int get_esc(Route &  route, Car & car) {
+    double t = car.get_time_in_seconds();
+    if (last_t != 0) {
+      double dt = t - last_t;
+      double v_error = route.get_velocity() - car.get_velocity();
+      double a_error = route.get_acceleration() - car.get_acceleration();
+      v_sp += (k_v * v_error + k_a * a_error) * dt;
+    }
+   last_t = t;
+   return car.esc_for_velocity(v_sp);
+  }
+};
+
+VelocityTracker velocity_tracker;
 
 void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity_pid)
 {
@@ -107,7 +133,8 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
 
 
   unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature) + p_adjust + d_adjust;
-  unsigned esc = route.done? esc_for_velocity(velocity_pid, 0, 0) : esc_for_velocity(velocity_pid, route.get_velocity(), route.get_acceleration());
+  //unsigned esc = route.done? esc_for_velocity(velocity_pid, 0, 0) : esc_for_velocity(velocity_pid, route.get_velocity(), route.get_acceleration());
+  unsigned esc = route.done? esc_for_velocity(velocity_pid, 0, 0) : velocity_tracker.get_esc(route, car);
 
   if(rear_slipping() && 0)
     esc = 1500;
@@ -194,6 +221,8 @@ void Driver::drive_route(Route & route) {
     velocity_pid.k_p = settings.v_k_p;
     velocity_pid.k_i = settings.v_k_i;
     velocity_pid.k_d = settings.v_k_d;
+
+    velocity_tracker.reset();
 
     route_complete = false;
     recovering_from_crash = false;

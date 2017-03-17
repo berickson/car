@@ -222,6 +222,16 @@ Angle Car::get_heading() {
   return a;
 }
 
+double Car::get_acceleration()
+{
+  return current_dynamics.ax;
+}
+
+double Car::get_time_in_seconds()
+{
+  return current_dynamics.ms * 1.0E-3 + (current_dynamics.us % 1000)* 1.0E-6;
+}
+
 
 int Car::steering_for_curvature(Angle theta_per_meter) {
   static const LookupTable t(

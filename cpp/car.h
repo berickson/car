@@ -122,6 +122,10 @@ public:
       return front_left_wheel.get_smooth_velocity();
   }
 
+  double get_acceleration();
+
+  double get_time_in_seconds();
+
   inline int get_usb_error_count() {
     return usb_error_count;
   }
