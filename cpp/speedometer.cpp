@@ -44,7 +44,7 @@ double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigne
 
   unsigned tick_us = std::max(a_us,b_us);
   unsigned last_tick_us = std::max(last_a_us, last_b_us);
-  double meters_moved = (odo_a - last_odo_a) + (odo_b - last_odo_b);
+  double meters_moved = ((odo_a - last_odo_a) + (odo_b - last_odo_b))*meters_per_tick;
   double elapsed_seconds = (tick_us - last_tick_us) / 1000000.;
   if (elapsed_seconds == 0) {
     // no tick this time, how long has it been?
