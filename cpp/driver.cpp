@@ -100,7 +100,7 @@ public:
     if (last_t != 0) {
       double dt = t - last_t;
       double v_error = route.get_velocity() - car.get_rear_velocity();
-      double a_error = route.get_acceleration() - car.get_acceleration();
+      double a_error = route.get_acceleration() - car.get_smooth_acceleration();
       v_sp += (k_v * v_error + k_a * a_error) * dt;
       v_sp = clamp(v_sp, min_v_sp, max_v_sp);
 

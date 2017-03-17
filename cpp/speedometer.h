@@ -17,10 +17,12 @@ public:
   int last_ab_us = 0;
   double velocity = 0.0;
   double meters_travelled = 0.0;
+  double smooth_a = 0.0;
 
   int get_ticks() const;
   double get_velocity() const;
   double get_smooth_velocity() const;
+  double get_smooth_acceleration() const;
 
   double get_meters_travelled() const;
 

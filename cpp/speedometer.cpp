@@ -13,9 +13,12 @@ double Speedometer::get_velocity() const {
   return velocity;
 }
 
-double Speedometer::get_smooth_velocity() const
-{
+double Speedometer::get_smooth_velocity() const {
   return kalman_v.mean;
+}
+
+double Speedometer::get_smooth_acceleration() const {
+  return this->smooth_a;
 }
 
 double Speedometer::get_meters_travelled() const {
@@ -64,9 +67,13 @@ double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigne
       }
     }
   }
+  double last_v = kalman_v.mean;
   meters_travelled += meters_moved;
   kalman_v.update(elapsed_seconds*ax,elapsed_seconds*elapsed_seconds);
   kalman_v.measure(velocity,0.01);
+  if(elapsed_seconds > 0) {
+    smooth_a = kalman_v.mean - last_v / elapsed_seconds;
+  }
 
   last_odo_a = odo_a;
   last_odo_b = odo_b;

@@ -99,17 +99,17 @@ void Car::begin_recording_state(string path) {
   end_recording_state();
   state_recording_file.open(path, ios_base::out);
   state_recording_file << Dynamics::csv_field_headers();
-  state_recording_file << ",v_smooth,v_fl_smooth,v_fr_smooth,v_bl_smooth,v_br_smooth,commanded_esc,commanded_str" << endl;
+  state_recording_file << ",v_smooth,a_smooth,v_fl_smooth,a_fl_smooth,v_fr_smooth,a_fr_smooth,v_bl_smooth,a_bl_smooth,v_br_smooth,a_br_smooth,commanded_esc,commanded_str" << endl;
 }
 
 void Car::write_state() {
   if(state_recording_file.is_open()) {
     state_recording_file << current_dynamics.csv_fields() << ","
-        << get_velocity() << ","
-        << front_left_wheel.get_smooth_velocity() << ","
-        << front_right_wheel.get_smooth_velocity() << ","
-        << back_left_wheel.get_smooth_velocity() << ","
-        << back_right_wheel.get_smooth_velocity() << ","
+        << get_velocity() << "," << get_smooth_acceleration() << ","
+        << front_left_wheel.get_smooth_velocity() << "," << front_left_wheel.get_smooth_acceleration() << ","
+        << front_right_wheel.get_smooth_velocity() << "," << front_right_wheel.get_smooth_acceleration() << ","
+        << back_left_wheel.get_smooth_velocity() << "," << back_left_wheel.get_smooth_acceleration() << ","
+        << back_right_wheel.get_smooth_velocity() << "," << front_right_wheel.get_smooth_acceleration() << ","
         << commanded_esc << ","
         << commanded_str << endl;
   }
@@ -225,6 +225,10 @@ Angle Car::get_heading() {
 double Car::get_acceleration()
 {
   return current_dynamics.ax;
+}
+
+double Car::get_smooth_acceleration() {
+  return get_front_left_wheel().get_smooth_acceleration() + get_front_right_wheel().get_smooth_acceleration() / 2.0;
 }
 
 double Car::get_time_in_seconds()
