@@ -84,9 +84,11 @@ int Driver::esc_for_velocity(PID & velocity_pid, double goal_velocity, double go
 class VelocityTracker {
 public:
   double v_sp = 0;
-  double k_v = 1.0;
-  double k_a = 1.0;
+  double k_v = 10.0;
+  double k_a = 10.0;
   double last_t = 0;
+  double max_v_sp = 10;
+  double min_v_sp = -10;
 
   void reset() {
     v_sp = 0;
@@ -100,8 +102,13 @@ public:
       double v_error = route.get_velocity() - car.get_velocity();
       double a_error = route.get_acceleration() - car.get_acceleration();
       v_sp += (k_v * v_error + k_a * a_error) * dt;
+      v_sp = clamp(v_sp, min_v_sp, max_v_sp);
+
     }
    last_t = t;
+   int esc = car.esc_for_velocity(v_sp);
+
+
    return car.esc_for_velocity(v_sp);
   }
 };
