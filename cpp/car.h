@@ -127,6 +127,7 @@ public:
   }
 
   double get_acceleration();
+  double get_smooth_acceleration();
 
   double get_time_in_seconds();
 
