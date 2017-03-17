@@ -67,5 +67,12 @@ double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigne
   meters_travelled += meters_moved;
   kalman_v.update(elapsed_seconds*ax,elapsed_seconds*elapsed_seconds);
   kalman_v.measure(velocity,0.01);
+
+  last_odo_a = odo_a;
+  last_odo_b = odo_b;
+  last_a_us  = a_us;
+  last_b_us  = b_us;
+  last_ab_us = ab_us;
+
   return meters_moved;
 }
