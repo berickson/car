@@ -72,7 +72,7 @@ double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigne
   kalman_v.update(elapsed_seconds*ax,elapsed_seconds*elapsed_seconds);
   kalman_v.measure(velocity,0.01);
   if(elapsed_seconds > 0) {
-    smooth_a = kalman_v.mean - last_v / elapsed_seconds;
+    smooth_a = (kalman_v.mean - last_v) / elapsed_seconds;
   }
 
   last_odo_a = odo_a;
