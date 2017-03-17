@@ -99,16 +99,13 @@ public:
     double t = car.get_time_in_seconds();
     if (last_t != 0) {
       double dt = t - last_t;
-      double v_error = route.get_velocity() - car.get_velocity();
+      double v_error = route.get_velocity() - car.get_rear_velocity();
       double a_error = route.get_acceleration() - car.get_acceleration();
       v_sp += (k_v * v_error + k_a * a_error) * dt;
       v_sp = clamp(v_sp, min_v_sp, max_v_sp);
 
     }
    last_t = t;
-   int esc = car.esc_for_velocity(v_sp);
-
-
    return car.esc_for_velocity(v_sp);
   }
 };
