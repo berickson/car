@@ -85,7 +85,7 @@ class VelocityTracker {
 public:
   double v_sp = 0;
   double k_v = 10.0;
-  double k_a = 10.0;
+  double k_a = 5.0;
   double last_t = 0;
   double max_v_sp = 10;
   double min_v_sp = -10;
