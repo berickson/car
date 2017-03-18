@@ -30,16 +30,17 @@ double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigne
 
 
 
-  if (odo_a != last_odo_a) {
-    v_a =  (odo_a-last_odo_a)*meters_per_tick / (a_us - last_a_us) *1E6;
+  if (a_us > last_a_us) {
+    v_a =  (odo_a-last_odo_a)*2*meters_per_tick / (a_us - last_a_us) *1E6;
   } if(odo_b != last_odo_b) {
-    v_b =  (odo_b-last_odo_b)*meters_per_tick / (b_us - last_b_us) *1E6;
+    v_b =  (odo_b-last_odo_b)*2*meters_per_tick / (b_us - last_b_us) *1E6;
   }
   velocity = (v_a + v_b) / 2.;
 
+
 #if 0
   // calculate velocity based int ab time in hall sensor (1mm gap)
-  // this is more accurate that using distance measure below for velocity
+  // this is more accuratel that using distance measure below for velocity
   auto dt = ab_us - last_ab_us;
   auto ds = 0;
 
