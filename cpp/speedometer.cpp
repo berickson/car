@@ -26,12 +26,18 @@ double Speedometer::get_meters_travelled() const {
 }
 
 double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigned int a_us, int odo_b, unsigned int b_us, int ab_us, float ax) {
-  auto dt = ab_us - last_ab_us;
-  auto ds = 0;
 
 
+
+  double v_a =  (odo_a-last_odo_a)*meters_per_tick / (a_us - last_a_us) *1E6;
+  double v_b =  (odo_b-last_odo_b)*meters_per_tick / (b_us - last_b_us) *1E6;
+  velocity = (v_a + v_b) / 2.;
+
+#if 0
   // calculate velocity based int ab time in hall sensor (1mm gap)
   // this is more accurate that using distance measure below for velocity
+  auto dt = ab_us - last_ab_us;
+  auto ds = 0;
 
   // if forward use a to be time, reverse use b to a time
   if (odo_b > last_odo_b) {
@@ -44,7 +50,7 @@ double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigne
   if (ds != 0 ) {
     velocity = float(ds)/dt*1600;  // 1,000,000 nanos / sec * 1m  /1000 mm * 1.6 wheel ratioinner / outer wheel ratio
   }
-
+#endif
   unsigned tick_us = std::max(a_us,b_us);
   unsigned last_tick_us = std::max(last_a_us, last_b_us);
   double meters_moved = ((odo_a - last_odo_a) + (odo_b - last_odo_b))*meters_per_tick;
@@ -69,7 +75,10 @@ double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigne
   }
   double last_v = kalman_v.mean;
   meters_travelled += meters_moved;
-  kalman_v.update(elapsed_seconds*ax,elapsed_seconds*elapsed_seconds);
+  if(last_clock_us > 0) {
+    auto dt = (clock_us - last_clock_us) * 1E-6;
+    kalman_v.update(dt*ax,dt*dt);
+  }
   kalman_v.measure(velocity,0.01);
   if(elapsed_seconds > 0) {
     smooth_a = (kalman_v.mean - last_v) / elapsed_seconds;
@@ -80,6 +89,7 @@ double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigne
   last_a_us  = a_us;
   last_b_us  = b_us;
   last_ab_us = ab_us;
+  last_clock_us = clock_us;
 
   return meters_moved;
 }

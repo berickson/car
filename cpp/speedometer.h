@@ -15,6 +15,8 @@ public:
   int last_a_us = 0;
   int last_b_us = 0;
   int last_ab_us = 0;
+  int last_clock_us = 0;
+
   double velocity = 0.0;
   double meters_travelled = 0.0;
   double smooth_a = 0.0;
