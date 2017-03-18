@@ -20,6 +20,8 @@ public:
   double velocity = 0.0;
   double meters_travelled = 0.0;
   double smooth_a = 0.0;
+  double v_a = 0.0;
+  double v_b = 0.0;
 
   int get_ticks() const;
   double get_velocity() const;
