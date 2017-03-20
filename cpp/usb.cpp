@@ -82,7 +82,7 @@ void Usb::process_data(string data) {
 
 void Usb::write_line(string text) {
   std::unique_lock<std::mutex> l(usb_mutex);
-  pending_write += text + "\n";
+  string_pending_write += text + "\n";
 }
 
 
@@ -136,9 +136,10 @@ void Usb::monitor_incoming_data() {
     int us_waited = 0;
     while(fd != fd_error && ! quit) {
 
-      if(fd!=fd_error && !quit && pending_write.size() > 0) {
-        if(write(fd,pending_write.c_str(),pending_write.size()) != fd_error) {
-          pending_write = "";
+      if(fd!=fd_error && !quit && string_pending_write.size() > 0) {
+        std::unique_lock<std::mutex> l(usb_mutex); // lock while we use string_pending_write
+        if(write(fd,string_pending_write.c_str(),string_pending_write.size()) != fd_error) {
+          string_pending_write = "";
         } else {
           close(fd);
           fd = fd_error;

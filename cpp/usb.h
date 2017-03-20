@@ -17,7 +17,7 @@ public:
   void write_on_connect(string s);
 private:
   string _write_on_connect = "\ntd+\n";
-  string pending_write;
+  string string_pending_write;
   std::mutex usb_mutex;
   bool running = false;
   bool quit = false;

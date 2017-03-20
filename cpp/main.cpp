@@ -62,7 +62,6 @@ int main(int, char *[]) {
     //test_system();
     //test_tracker();
     //test_usb();
-    //test_work_queue();
 
   } catch (string & s) {
     log_error(s);

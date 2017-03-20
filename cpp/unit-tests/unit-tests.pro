@@ -1,3 +1,5 @@
+CONFIG += c++11 c++14
+
 GOOGLETEST_DIR = /home/brian/googletest
 
 !isEmpty(GOOGLETEST_DIR): {
@@ -46,7 +48,8 @@ SOURCES += \
     ../logger.cpp \
     ../lookup_table.cpp \
     ../pi_buttons.cpp \
-    ackerman_test.cpp
+    ackerman_test.cpp \
+    work_queue_test.cpp
 
 
 LIBS += -L/usr/local/lib -lncurses -lwiringPi -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d
@@ -59,3 +62,5 @@ CONFIG -= qt
 
 
 SOURCES +=     main.cpp
+
+HEADERS +=

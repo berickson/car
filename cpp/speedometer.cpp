@@ -82,13 +82,13 @@ double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigne
   meters_travelled += meters_moved;
   if(last_clock_us > 0) {
     auto dt = (clock_us - last_clock_us) * 1E-6;
-    kalman_v.update(dt*ax,dt*dt);
-    kalman_a.update(0,3.0*dt*dt);
+    kalman_v.predict(dt*ax,dt*dt);
+    kalman_a.predict(0,3.0*dt*dt);
   }
-  kalman_v.measure(velocity,0.01);
+  kalman_v.update(velocity,0.01);
   if(elapsed_seconds > 0) {
     auto a = (kalman_v.mean - last_v) / elapsed_seconds;
-    kalman_a.measure(a,1.0*1.0);
+    kalman_a.update(a,1.0*1.0);
   }
 
   last_odo_a = odo_a;
