@@ -121,7 +121,15 @@ void RouteWindow::on_route_list_itemSelectionChanged()
       } catch (...) {}
       int i=0;
 
-      ui->run_list->setItem(row,i++,new QTableWidgetItem(run_name.c_str()));
+      try {
+        int run_number = stoi(run_name);
+        auto item = new QTableWidgetItem();
+        item->setData(Qt::DisplayRole,run_number);
+        ui->run_list->setItem(row,i++,item);
+      } catch (std::invalid_argument) {
+        ui->run_list->setItem(row,i++,new QTableWidgetItem(run_name.c_str()));
+      }
+
       ui->run_list->setItem(row,i++,new QTableWidgetItem(QString::number(run_settings.max_a)));
       ui->run_list->setItem(row,i++,new QTableWidgetItem(QString::number(run_settings.max_v)));
 
@@ -146,6 +154,7 @@ void RouteWindow::on_route_list_itemSelectionChanged()
   if(ui->run_list->rowCount() > 0) {
     ui->run_list->selectRow(0);
   }
+  ui->run_list->sortByColumn(0);
   //ui->run_list->adjustSize();
 
 }
