@@ -10,6 +10,7 @@
 #include <thread>
 #include <vector>
 
+// from http://stackoverflow.com/a/21127776
 struct async_buf
     : std::streambuf
 {
