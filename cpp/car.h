@@ -10,6 +10,7 @@
 #include "work_queue.h"
 #include "usb.h"
 #include "speedometer.h"
+#include "async_buf.h"
 
 using namespace std;
 
@@ -40,6 +41,10 @@ public:
   Speedometer front_right_wheel, front_left_wheel, back_left_wheel, back_right_wheel;
   Angle heading_adjustment;
   Angle zero_heading_angle;
+
+  // async file buffers
+  unique_ptr<async_buf> state_buf;
+  unique_ptr<ostream> state_recording_file;
 
 
   // calibrated measurements
@@ -168,7 +173,7 @@ public:
   Usb usb;
 private:
   fstream input_recording_file;
-  fstream state_recording_file;
+  //fstream state_recording_file;
 
   void usb_thread_start();
   WorkQueue<string> usb_queue;

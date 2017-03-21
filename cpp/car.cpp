@@ -111,15 +111,17 @@ void Car::set_esc_and_str(unsigned esc, unsigned str)
 
 void Car::begin_recording_state(string path) {
   end_recording_state();
-  state_recording_file.open(path, ios_base::out);
-  state_recording_file << Dynamics::csv_field_headers();
-  state_recording_file << ",v_smooth,a_smooth,v_fl_smooth,a_fl_smooth,v_fr_smooth,a_fr_smooth,v_bl_smooth,a_bl_smooth,v_br_smooth,a_br_smooth,commanded_esc,commanded_str" << endl;
+  this->state_buf.reset(new async_buf(path));
+  state_recording_file.reset(new ostream(state_buf.get()));
+
+  *state_recording_file << Dynamics::csv_field_headers();
+  *state_recording_file << ",v_smooth,a_smooth,v_fl_smooth,a_fl_smooth,v_fr_smooth,a_fr_smooth,v_bl_smooth,a_bl_smooth,v_br_smooth,a_br_smooth,commanded_esc,commanded_str" << endl;
 }
 
 void Car::write_state() {
   log_warning_if_duration_exceeded w("write_state", 10ms);
-  if(state_recording_file.is_open()) {
-    state_recording_file << current_dynamics.csv_fields() << ","
+  if(state_recording_file) {
+    *state_recording_file << current_dynamics.csv_fields() << ","
         << get_velocity() << "," << get_smooth_acceleration() << ","
         << front_left_wheel.get_smooth_velocity() << "," << front_left_wheel.get_smooth_acceleration() << ","
         << front_right_wheel.get_smooth_velocity() << "," << front_right_wheel.get_smooth_acceleration() << ","
@@ -131,10 +133,8 @@ void Car::write_state() {
 }
 
 void Car::end_recording_state() {
-  if(state_recording_file.is_open()) {
-    state_recording_file.flush();
-    state_recording_file.close();
-  }
+  state_recording_file.reset(nullptr);
+  state_buf.reset(nullptr); // causes flush
 }
 
 void Car::begin_recording_input(string path) {
