@@ -130,7 +130,7 @@ void RouteWindow::on_route_list_itemSelectionChanged()
         ui->run_list->setItem(row,i++,new QTableWidgetItem(run_name.c_str()));
       }
 
-      ui->run_list->setItem(row,i++,new QTableWidgetItem(QString::number(run_settings.max_a)));
+      ui->run_list->setItem(row,i++,new QTableWidgetItem(QString::number(run_settings.max_accel_lat)));
       ui->run_list->setItem(row,i++,new QTableWidgetItem(QString::number(run_settings.max_v)));
 
       ui->run_list->setItem(row,i++,new QTableWidgetItem(QString::number(run_settings.prune_max)));

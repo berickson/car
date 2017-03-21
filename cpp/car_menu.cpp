@@ -96,8 +96,14 @@ void set_track_name(string s) {
 
 
 // getters / setters for config
-void set_max_a(double v){run_settings.max_a = v;}
-double get_max_a(){return run_settings.max_a;}
+void set_max_accel_lat(double v){run_settings.max_accel_lat = v;}
+double get_max_accel_lat(){return run_settings.max_accel_lat;}
+
+void set_max_accel(double v){run_settings.max_accel = v;}
+double get_max_accel(){return run_settings.max_accel;}
+
+void set_max_decel(double v){run_settings.max_decel = v;}
+double get_max_decel(){return run_settings.max_decel;}
 
 void set_max_v(double v){run_settings.max_v = v;}
 double get_max_v(){return run_settings.max_v;}
@@ -162,8 +168,10 @@ SubMenu pi_menu {
 };
 
 
-SubMenu acceleration_menu{};
-SubMenu velocity_menu{};
+SubMenu max_accel_lat_menu{};
+SubMenu max_accel_menu{};
+SubMenu max_decel_menu{};
+SubMenu max_v_menu{};
 
 SubMenu k_p_menu{};
 SubMenu k_i_menu{};
@@ -221,7 +229,7 @@ void go(Car& car, CarUI & ui) {
     ui.move(0,0);
     ui.refresh();
     if(run_settings.optimize_velocity) {
-      rte.optimize_velocity(run_settings.max_v, run_settings.max_a);
+      rte.optimize_velocity(run_settings.max_v, run_settings.max_accel_lat, run_settings.max_accel, run_settings.max_decel);
       ui.print("optimized velocity\n");
     } else {
       ui.print("using saved velocities\n");
@@ -365,8 +373,10 @@ void run_car_menu() {
       run_settings.load_from_file(run_settings_path);
   }
 
-  selection_menu<double>(acceleration_menu, linspace(0.25,10,0.25), get_max_a, set_max_a );
-  selection_menu<double>(velocity_menu, linspace(0.5,20,0.5), get_max_v, set_max_v );
+  selection_menu<double>(max_accel_lat_menu, linspace(0.25,10,0.25), get_max_accel_lat, set_max_accel_lat );
+  selection_menu<double>(max_accel_menu, linspace(0.25,10,0.25), get_max_accel, set_max_accel );
+  selection_menu<double>(max_decel_menu, linspace(0.25,10,0.25), get_max_decel, set_max_decel );
+  selection_menu<double>(max_v_menu, linspace(0.5,20,0.5), get_max_v, set_max_v );
   selection_menu<double>(k_p_menu, linspace(0.,300,10), get_k_p, set_k_p );
   selection_menu<double>(k_i_menu, linspace(0.,30,0.5), get_k_i, set_k_i );
   selection_menu<double>(k_d_menu, linspace(0.,300,5), get_k_d, set_k_d );
@@ -404,8 +414,10 @@ void run_car_menu() {
             + " " + format(car.current_dynamics.battery_voltage,4,1)+"v"; }},
     MenuItem("record",[&car,&ui](){record(car,ui);}),
     {[](){return (string)"optimize velocity ["+format(run_settings.optimize_velocity)+"]";},&optimize_velocity_menu},
-    {[](){return (string)"max_a ["+format(run_settings.max_a)+"]";},&acceleration_menu},
-    {[](){return (string)"max_v ["+format(run_settings.max_v)+"]";},&velocity_menu},
+    {[](){return (string)"max_accel_lat ["+format(run_settings.max_accel_lat)+"]";},&max_accel_lat_menu},
+    {[](){return (string)"max_accel ["+format(run_settings.max_accel)+"]";},&max_accel_menu},
+    {[](){return (string)"max_decel ["+format(run_settings.max_decel)+"]";},&max_decel_menu},
+    {[](){return (string)"max_v ["+format(run_settings.max_v)+"]";},&max_v_menu},
 
     {[](){return (string)"crash recovery ["+format(run_settings.crash_recovery)+"]";},&crash_recovery_menu},
     {[](){return (string)"k_p ["+format(run_settings.steering_k_p)+"]";},&k_p_menu},

@@ -10,7 +10,9 @@ struct RunSettings{
 
   string track_name = "";
   string route_name;// = FileNames().get_route_names(track_name)[0];
-  double max_a = 0.25;
+  double max_accel_lat = 0.25;
+  double max_accel = 0.25;
+  double max_decel = 0.25;
   double max_v = 1.0;
   double t_ahead = 0.3;
   double d_ahead = 0.05;

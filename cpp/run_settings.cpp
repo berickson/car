@@ -31,7 +31,9 @@ void RunSettings::write_to_file(string path) {
   }
   file << "track_name = " << track_name << endl
        << "route_name = " << route_name << endl
-       << "max_a = " << max_a << endl
+       << "max_accel_lat = " << max_accel_lat << endl
+       << "max_accel = " << max_accel << endl
+       << "max_decel = " << max_decel << endl
        << "max_v = " << max_v << endl
        << "steering_k_p = " << steering_k_p << endl
        << "steering_k_i = " << steering_k_i << endl
@@ -77,8 +79,12 @@ void RunSettings::load_from_file(string path)
       this->track_name = value;
     else if (name == "route_name")
       this->route_name = value;
-    else if (name == "max_a")
-      this->max_a = stod(value);
+    else if (name == "max_accel_lat")
+      this->max_accel_lat = stod(value);
+    else if (name == "max_accel")
+      this->max_accel = stod(value);
+    else if (name == "max_decel")
+      this->max_decel = stod(value);
     else if (name == "max_v")
       this->max_v = stod(value);
     else if (name == "d_ahead")
