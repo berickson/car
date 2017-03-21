@@ -117,7 +117,6 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
   auto p_front = car.get_front_position();
   auto p_rear = car.get_rear_position();
   double v = car.get_velocity();
-  log_info("velocity: "+format(v,4,2));
   double ahead = settings.d_ahead + v*settings.t_ahead;
   if(!route.done)
   route.set_position(p_front, p_rear, v);
