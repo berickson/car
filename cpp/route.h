@@ -52,7 +52,7 @@ public:
   void smooth(double k_smooth);
   void prune(double max_segment_length, double tolerance);
 
-  void optimize_velocity(double max_velocity = 1, double max_acceleration = 0.1);
+  void optimize_velocity(double max_velocity = 1, double max_lateral_acceleration = 0.1, double max_acceleration = NAN, double max_deceleration = NAN);
   double get_max_velocity();
 
   void add_node(RouteNode node);

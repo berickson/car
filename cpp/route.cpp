@@ -7,53 +7,6 @@
 #include <vector>
 
 
-class RouteBuilder {
-public:
-  RouteBuilder(Route & route, double car_length = 1.0) :
-    route(route){
-    this->car_length = car_length;
-  }
-  Route & route;
-  RouteNode & get_head() {
-    return route.nodes.at(route.nodes.size()-1);
-  }
-
-  double car_length = NAN;
-  void add_node(double x, double y){
-    if(route.nodes.size() == 0) {
-      RouteNode zero;
-      zero.secs = 0;
-      zero.front_x = 0;
-      zero.front_y = 0;
-      zero.heading = 0;
-      zero.heading_adjustment = 0;
-      zero.rear_x = -car_length;
-      zero.rear_y = -car_length;
-      route.add_node(zero);
-    }
-    RouteNode n;
-    n.front_x = x;
-    n.front_y = y;
-    RouteNode & head = get_head();
-
-    Angle angle =  angle_to(head.get_front_position(), n.get_front_position());
-    n.heading = angle.degrees();
-    head.heading = angle.degrees();
-    n.heading_adjustment = 0;
-    n.secs = route.nodes.size();
-
-
-    n.rear_x = n.front_x - car_length * cos(angle.radians());
-    n.rear_y = n.front_y - car_length * sin(angle.radians());
-
-    head.rear_x = head.front_x - car_length * cos(angle.radians());
-    head.rear_y = head.front_y - car_length * sin(angle.radians());
-    route.add_node(n);
-
-  }
-};
-
-
 // todo:  make separate object for current location
 
 void Route::add_node(RouteNode node){
@@ -84,19 +37,6 @@ Angle Route::get_total_curvature()
   }
   return Angle::radians(radians);
 
-}
-
-Route get_circle(double r = 1, unsigned steps = 300) {
-  Route route;
-  RouteBuilder builder(route);
-
-  for(unsigned i = 1; i < steps; i++) {
-    Angle theta = Angle::radians(2*M_PI * i / (steps-1));
-    double x = r * sin(theta.radians());
-    double y = r - r * cos(theta.radians());
-    builder.add_node(x,y);
-  }
-  return route;
 }
 
 string Route::to_string() {
@@ -509,7 +449,13 @@ void Route::write_to_file(string path) {
   }
 }
 
-void Route::optimize_velocity(double max_velocity, double max_acceleration) {
+void Route::optimize_velocity(double max_velocity, double max_lateral_acceleration, double max_acceleration, double max_deceleration) {
+  if(isnan(max_acceleration)) {
+    max_acceleration = max_lateral_acceleration;
+  }
+  if(isnan(max_deceleration)) {
+    max_deceleration = max_acceleration;
+  }
   // must have at least one node to optimize
   if(nodes.size() == 0)
     return;
@@ -544,7 +490,7 @@ void Route::optimize_velocity(double max_velocity, double max_acceleration) {
     Angle theta = angle_between(v1,v2);
     if(fabs(theta.radians())>0) {
       double r=fabs(length(v2.x,v2.y)/theta.radians());
-      double v_circle_max = sqrt(max_acceleration * r);
+      double v_circle_max = sqrt(max_lateral_acceleration * r);
       p1.velocity = min(p1.velocity, v_circle_max);
     }
   }
@@ -557,120 +503,17 @@ void Route::optimize_velocity(double max_velocity, double max_acceleration) {
     RouteNode & p0 = nodes[i];
     RouteNode & p1 = nodes[i+1];
     double ds = ::distance(p0.front_x,p0.front_y,p1.front_x,p1.front_y);
-    p0.velocity = min(p0.velocity, velocity_at_position(ds,max_acceleration,p1.velocity));
+    p0.velocity = min(p0.velocity, velocity_at_position(ds,max_deceleration,p1.velocity));
   }
-}
 
-
-void test_circle(double radius, double max_a, double prune_tolerance = 0.1) {
-  cout << "circle with radius " << radius  << endl;
-  Route r = get_circle(radius);
-  cout << "route distance for circle: " << r.get_length() << endl;
-  cout << "optimized_velocity with max_a = " << max_a << endl;
-  r.optimize_velocity(99999,max_a);
-  cout << "max_v = " << r.get_max_velocity() << endl;
-  cout << "pruned with tolerance " << prune_tolerance  << endl;
-  cout << "max_v = " << r.get_max_velocity() << endl;
-}
-
-void test_circle() {
-  test_circle(2,1);
-  test_circle(10,1);
-}
-
-void test_prune() {
-  Route r;
-  r.add_node(RouteNode(0,0));
-  r.add_node(RouteNode(1,0));
-  r.add_node(RouteNode(2,.1));
-  r.add_node(RouteNode(3,0));
-  r.add_node(RouteNode(4,0));
-  r.add_node(RouteNode(5,0));
-  r.add_node(RouteNode(6,0));
-  r.add_node(RouteNode(7,0));
-  r.add_node(RouteNode(8,0));
-  cout << r.to_string() << endl;
-  r.prune(3,0.1);
-  cout << r.to_string() << endl;
-
-}
-
-void test_curvature() {
-  Route r;
-  r.add_node(RouteNode(0,0));
-  r.add_node(RouteNode(1,0));
-  r.add_node(RouteNode(2,.1));
-  r.add_node(RouteNode(3,0));
-  r.add_node(RouteNode(4,0));
-  r.add_node(RouteNode(5,0));
-  r.add_node(RouteNode(6,0));
-  for(double d = 0; d < 8.; d+=0.1) {
-    r.set_position(Point(d,0),Point(d-1,0),1.0);
-    cout << "d: " << d
-         << " c: "<< r.get_curvature_at_current_position().degrees()
-         << "heading:  " << r.get_heading_at_current_position().degrees()
-         << endl;
-
+  // starting velocity must be zero
+  // apply speed up / acceleration
+  // from start to end
+  nodes[0].velocity = 0;
+  for(int i=0; i < (int)nodes.size()-2; i++) {
+    RouteNode & p0 = nodes[i];
+    RouteNode & p1 = nodes[i+1];
+    double ds = ::distance(p0.front_x,p0.front_y,p1.front_x,p1.front_y);
+    p1.velocity = min(p1.velocity, velocity_at_position(ds,max_acceleration,p0.velocity));
   }
-}
-
-
-void test_optimize_velocity() {
-  Route r;
-  r.add_node(RouteNode(0,0));
-  r.add_node(RouteNode(1,0));
-  r.add_node(RouteNode(2,0));
-  r.add_node(RouteNode(3,0));
-  r.add_node(RouteNode(4,0));
-  r.add_node(RouteNode(5,0));
-  r.add_node(RouteNode(6,0));
-  r.add_node(RouteNode(7,0));
-  r.add_node(RouteNode(7,0));
-  r.add_node(RouteNode(9,0));
-  r.add_node(RouteNode(0,0));
-  r.optimize_velocity();
-  cout << r.to_string();
-  cout << "max velocity: " << r.get_max_velocity() << endl;;
-}
-
-
-void test_route() {
-  test_circle();
-  //test_optimize_velocity();
-  return;
-  //test_prune();
-  //return;
-  //test_curvature();
-  //return;
-  // test_circle();
-  double max_a = 8.;
-  double max_v = 10000;
-  Route r;
-  r.load_from_file("/home/brian/car/tracks/2016-09-12 prisk/routes/F/path.csv");
-  cout << "original distance: " << r.get_length() << endl;
-  cout << "original curvature: " << r.get_total_curvature().degrees() << " degrees" << endl;
-  cout << "original max velocity" << r.get_max_velocity() << endl;
-  r.optimize_velocity(max_v, max_a);
-  cout << "optimized max velocity " << r.get_max_velocity() << endl;
-  r.smooth(0.25);
-  r.optimize_velocity(max_v, max_a);
-
-  cout << "smoothing " << endl;
-  cout << "distance after smooth: " << r.get_length() << endl;
-  cout << "curvature after smooth: " << r.get_total_curvature().degrees() << " degrees" << endl;
-  cout << "point ahead 0.2 " << r.get_position_ahead(0.2).to_string() << endl;
-  cout << "point ahead 100 " << r.get_position_ahead(100).to_string() << endl;
-  r.optimize_velocity(max_v, max_a);
-  //cout << r.to_string() << endl;
-  cout << "max velocity after smooth " << r.get_max_velocity() << endl;
-  cout << "node count " << r.nodes.size() << endl;
-  r.prune(5.0, 0.02);
-  r.optimize_velocity(max_v, max_a);
-  cout << "max velocity after prune " << r.get_max_velocity() << endl;
-  cout << "node count after prune " << r.nodes.size() << endl;
-  cout << "curvature after prune: " << r.get_total_curvature().degrees() << " degrees" << endl;
-  cout << "point ahead 0.2 " << r.get_position_ahead(0.2).to_string() << endl;
-  cout << "point ahead 100 " << r.get_position_ahead(100).to_string() << endl;
-  //cout << r.to_string() << endl;
-
 }
