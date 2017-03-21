@@ -63,9 +63,9 @@ void Car::usb_thread_start() {
 
 // returns true if the line is a valid TD
 bool Car::process_line_from_log(string line) {
-  if(input_recording_file.is_open()) {
+  if(input_recording_file) {
     log_warning_if_duration_exceeded w("write input_recording_file",2ms);
-    input_recording_file << line << '\n'; //todo: make non-blocking
+    *input_recording_file << line << '\n'; //todo: make non-blocking
   }
   if(split(line)[1]!="TD") {
     return false;
@@ -139,14 +139,13 @@ void Car::end_recording_state() {
 
 void Car::begin_recording_input(string path) {
   end_recording_input();
-  input_recording_file.open(path, ios_base::out);
+  this->input_recording_buf.reset(new async_buf(path));
+  input_recording_file.reset(new ostream(input_recording_buf.get()));
 }
 
 void Car::end_recording_input() {
-  if(input_recording_file.is_open()) {
-    input_recording_file.flush();
-    input_recording_file.close();
-  }
+  input_recording_file.reset(nullptr);
+  input_recording_buf.reset(nullptr); // causes flush
 }
 
 void Car::apply_dynamics(Dynamics & d) {

@@ -42,11 +42,6 @@ public:
   Angle heading_adjustment;
   Angle zero_heading_angle;
 
-  // async file buffers
-  unique_ptr<async_buf> state_buf;
-  unique_ptr<ostream> state_recording_file;
-
-
   // calibrated measurements
   double meters_per_odometer_tick;
   double rear_meters_per_odometer_tick;
@@ -172,8 +167,11 @@ public:
   void apply_dynamics(Dynamics & d);
   Usb usb;
 private:
-  fstream input_recording_file;
-  //fstream state_recording_file;
+  unique_ptr<async_buf> input_recording_buf;
+  unique_ptr<ostream> input_recording_file;
+
+  unique_ptr<async_buf> state_buf;
+  unique_ptr<ostream> state_recording_file;
 
   void usb_thread_start();
   WorkQueue<string> usb_queue;
