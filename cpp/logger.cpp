@@ -1,6 +1,7 @@
 #include "logger.h"
 #include <fstream>
 #include "system.h"
+#include <sstream>
 
 using namespace std;
 
@@ -35,3 +36,23 @@ void log_trace(string message)
   static string severity = "TRACE";
   log(severity, message);
 }
+
+log_warning_if_duration_exceeded::log_warning_if_duration_exceeded(string label, chrono::duration<double> max_time)
+{
+  start_time = std::chrono::high_resolution_clock::now();
+  this->label = label;
+  this->max_time = max_time;
+}
+
+log_warning_if_duration_exceeded::~log_warning_if_duration_exceeded()
+{
+  std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - start_time;
+  if(duration > max_time) {
+    stringstream ss;
+    ss << "time exceeded for " << label
+       << ". expected less than " << max_time.count()
+       << ", was " << duration.count();
+    log_warning(ss.str());
+  }
+}
+

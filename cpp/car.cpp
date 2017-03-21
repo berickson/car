@@ -47,15 +47,8 @@ void Car::usb_thread_start() {
     try {
       string line;
       if(usb_queue.try_pop(line,1)) {
-        auto start = std::chrono::high_resolution_clock::now();
+        log_warning_if_duration_exceeded("processing usb line", 10ms);
         process_line_from_log(line);
-        auto end = std::chrono::high_resolution_clock::now();
-        duration<double> elapsed = end-start;
-        if( elapsed.count() > .01) {
-          stringstream ss;
-          ss << "processing log line took longer than 10ms, elapsed:" << elapsed.count();
-          log_warning(ss.str());
-        }
       }
     }
     catch (string error_string) {
@@ -70,6 +63,7 @@ void Car::usb_thread_start() {
 // returns true if the line is a valid TD
 bool Car::process_line_from_log(string line) {
   if(input_recording_file.is_open()) {
+    log_warning_if_duration_exceeded("write input_recording_file",2ms);
     input_recording_file << line << endl; //todo: make non-blocking
   }
   if(split(line)[1]!="TD") {
@@ -122,6 +116,7 @@ void Car::begin_recording_state(string path) {
 }
 
 void Car::write_state() {
+  log_warning_if_duration_exceeded("write_state", 10ms);
   if(state_recording_file.is_open()) {
     state_recording_file << current_dynamics.csv_fields() << ","
         << get_velocity() << "," << get_smooth_acceleration() << ","
@@ -154,6 +149,7 @@ void Car::end_recording_input() {
 }
 
 void Car::apply_dynamics(Dynamics & d) {
+  log_warning_if_duration_exceeded("apply_dynamics", 10ms);
   // set all the dynamics variables
   reading_count++;
 
