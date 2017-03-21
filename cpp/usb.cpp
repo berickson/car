@@ -193,6 +193,19 @@ void Usb::stop(){
 }
 
 
+void write_to_usb(Usb* usb, float seconds_between) {
+  int i = 0;
+  while(true) {
+    usb->write_line("pse 1500,1500");
+    usleep(seconds_between*1E6);
+    i++;
+    if(i%1000 == 0) {
+      cout << "wrote " << i << " commands" << endl;
+    }
+  }
+}
+
+#include <thread>
 void test_usb() {
   cout << "test usb" << endl;
   Usb usb;
@@ -209,11 +222,14 @@ void test_usb() {
   usb.write_line("td+");
   usb.write_line("td+");
   cout << "entering loop for usb" << endl;
-  while(q.try_pop(s, 15000)) {
+  thread write_thread(write_to_usb,&usb,0.001);
+  while(q.try_pop(s, 100)) {
+
     auto d = high_resolution_clock::now()-t_start;
     duration<double> secs = duration_cast<duration<double>>(d);
-    cout << secs.count() << "got item " << s << endl;
-    cout << flush;
+    if(i%100 == 0) {
+      cout << "time: " << secs.count() << " received " << i << " lines" << endl;
+    }
     i++;
   }
   usb.stop();

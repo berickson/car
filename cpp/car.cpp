@@ -5,8 +5,11 @@
 #include "lookup_table.h"
 #include "split.h"
 #include "logger.h"
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
+using namespace std::chrono_literals;
 
 
 
@@ -41,9 +44,25 @@ void Car::usb_thread_start() {
   usb.write_on_connect("\ntd+\n");
   usb.run();
   while(!quit) {
-    string line;
-    if(usb_queue.try_pop(line,1)) {
-      process_line_from_log(line);
+    try {
+      string line;
+      if(usb_queue.try_pop(line,1)) {
+        auto start = std::chrono::high_resolution_clock::now();
+        process_line_from_log(line);
+        auto end = std::chrono::high_resolution_clock::now();
+        duration<double> elapsed = end-start;
+        if( elapsed.count() > .01) {
+          stringstream ss;
+          ss << "processing log line took longer than 10ms, elapsed:" << elapsed.count();
+          log_warning(ss.str());
+        }
+      }
+    }
+    catch (string error_string) {
+      log_error("error caught in usb_thread_start"+error_string);
+    }
+    catch (...) {
+      log_error("error caught in usb_thread_start");
     }
   }
 }
