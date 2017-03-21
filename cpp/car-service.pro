@@ -63,7 +63,8 @@ HEADERS += \
     logger.h \
     speedometer.h \
     pid.h \
-    kalman.h
+    kalman.h \
+    async_buf.h
 
 
 
