@@ -6,6 +6,7 @@
 #include "split.h"
 #include "logger.h"
 #include <chrono>
+#include "../async_buf.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -64,7 +65,7 @@ void Car::usb_thread_start() {
 bool Car::process_line_from_log(string line) {
   if(input_recording_file.is_open()) {
     log_warning_if_duration_exceeded w("write input_recording_file",2ms);
-    input_recording_file << line << endl; //todo: make non-blocking
+    input_recording_file << line << '\n'; //todo: make non-blocking
   }
   if(split(line)[1]!="TD") {
     return false;
@@ -125,7 +126,7 @@ void Car::write_state() {
         << back_left_wheel.get_smooth_velocity() << "," << back_left_wheel.get_smooth_acceleration() << ","
         << back_right_wheel.get_smooth_velocity() << "," << front_right_wheel.get_smooth_acceleration() << ","
         << commanded_esc << ","
-        << commanded_str << endl;
+        << commanded_str << '\n';
   }
 }
 
