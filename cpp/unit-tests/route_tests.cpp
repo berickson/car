@@ -137,9 +137,10 @@ TEST(route, straight_line_velocity) {
   r.add_node(RouteNode(8,0));
   r.add_node(RouteNode(9,0));
   r.optimize_velocity(1000, 0.1, 0.01, 0.01);
-  cout << "front_x,front_y,velocity" << endl;
-  for(auto n : r.nodes) {
-    cout << n.front_x << ", " << n.front_y << ", " <<  n.velocity << endl;
+  cout << "front_x,front_y,velocity,calc_velocity,calc_acceration" << endl;
+  for(RouteNode & n : r.nodes) {
+    r.set_position(Point(n.front_x,n.front_y),Point(n.rear_x,n.rear_y),0);
+    cout << n.front_x << ", " << n.front_y << ", " <<  n.velocity <<  "," << r.get_velocity() << ", " << r.get_acceleration() << endl;
   }
 
 }

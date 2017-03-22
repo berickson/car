@@ -51,7 +51,8 @@ SOURCES += \
     ackerman_test.cpp \
     work_queue_test.cpp \
     async_buf_tests.cpp \
-    route_tests.cpp
+    route_tests.cpp \
+    geometry_tests.cpp
 
 
 LIBS += -L/usr/local/lib -lncurses -lwiringPi -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d
