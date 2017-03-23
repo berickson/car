@@ -5,20 +5,18 @@
 </head>
 <body>
     <input type="text" ng-model="name">
-    {% raw %}
-        <h2> Hello {{name}}!</h2>
-        <h3> Car Status: {{car_status}} </h3>
-    {% endraw %}
-    {{time}}
-    <div><b> This should have several lines </b></div>
-    {% for line in lines %}
-        <div style='font-family:monospace'>{{ line }}</div>
-    {% endfor %}        
+    <h2> Hello {{name}}!</h2>
+    <h3> Car Status: {{car_status}} </h3>
+    <h2> PS output </h2>
+    <div ng-repeat="line in ps_output">
+      <div style="display:inline-block,font-family:monospace">{{line}}</div>
+    </div>
+
 </body>
 <script>
 var app = angular.module("car", []);
 
-app.controller("carController", function($scope, $http) {
+app.controller("carController", function($scope, $http, $timeout) {
   $http.get('car/status').
     success(function(data, status, headers, config) {
       $scope.car_status = data;
@@ -26,6 +24,18 @@ app.controller("carController", function($scope, $http) {
     error(function(data, status, headers, config) {
       // log error
     });
+    var get_ps = function() {
+        $http.get('ps').
+            success(function(data, status, headers, config) {
+            $scope.ps_output = data;
+            }).
+            error(function(data, status, headers, config) {
+            // log error
+            });
+            window.setTimeout(get_ps,250)
+    }
+    get_ps();
+
 });    
 </script>    
 

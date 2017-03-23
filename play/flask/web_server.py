@@ -4,14 +4,20 @@ started from tutorial at https://www.tutorialspoint.com/flask/flask_application.
 '''
 import subprocess
 import time
-from flask import Flask, request, send_from_directory, render_template
+from flask import Flask, request, send_from_directory, render_template, jsonify
 
 app = Flask(__name__)
 
 @app.route('/')
-def hello_world():
-    o = subprocess.getoutput("ps").split('\n')
-    return render_template('index.html', lines=o, time=str(time.time()))
+def index():
+    return send_from_directory('templates', 'index.html')
+
+@app.route('/ps')
+def ps():
+    ps_lines = subprocess.getoutput("ps -eo pid,pmem,pcpu,start,time,comm --sort -c").split('\n')[:30]
+    return jsonify(ps_lines)
+
+
 
 
 def csv_val(s):
