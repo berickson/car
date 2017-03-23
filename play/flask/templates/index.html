@@ -1,0 +1,32 @@
+<!doctype html>
+<html ng-app="car" ng-controller="carController">
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+</head>
+<body>
+    <input type="text" ng-model="name">
+    {% raw %}
+        <h2> Hello {{name}}!</h2>
+        <h3> Car Status: {{car_status}} </h3>
+    {% endraw %}
+    {{time}}
+    <div><b> This should have several lines </b></div>
+    {% for line in lines %}
+        <div style='font-family:monospace'>{{ line }}</div>
+    {% endfor %}        
+</body>
+<script>
+var app = angular.module("car", []);
+
+app.controller("carController", function($scope, $http) {
+  $http.get('car/status').
+    success(function(data, status, headers, config) {
+      $scope.car_status = data;
+    }).
+    error(function(data, status, headers, config) {
+      // log error
+    });
+});    
+</script>    
+
+</html>
