@@ -14,7 +14,8 @@ def index():
 
 @app.route('/ps')
 def ps():
-    ps_lines = subprocess.getoutput("ps -eo pid,pmem,pcpu,start,time,comm --sort -c").split('\n')[:30]
+    cmd = "ps -eo pid,pmem,pcpu,start,time,comm --sort -c"
+    ps_lines = subprocess.getoutput(cmd).split('\n')[:30]
     return jsonify(ps_lines)
 
 
