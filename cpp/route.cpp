@@ -450,10 +450,10 @@ void Route::write_to_file(string path) {
 }
 
 void Route::optimize_velocity(double max_velocity, double max_lateral_acceleration, double max_acceleration, double max_deceleration) {
-  if(isnan(max_acceleration)) {
+  if(is_nan(max_acceleration)) {
     max_acceleration = max_lateral_acceleration;
   }
-  if(isnan(max_deceleration)) {
+  if(is_nan(max_deceleration)) {
     max_deceleration = max_acceleration;
   }
   // must have at least one node to optimize

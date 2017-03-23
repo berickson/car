@@ -3,15 +3,21 @@
 started from tutorial at https://www.tutorialspoint.com/flask/flask_application.htm
 '''
 import subprocess
-from flask import Flask, request, send_from_directory, render_template
+import time
+from flask import Flask, request, send_from_directory, render_template, jsonify
 
 app = Flask(__name__)
 
 @app.route('/')
-def hello_world():
-    o = subprocess.getoutput("ps")
-    render_template("index.html",context = {'body':o})
-    return 
+def index():
+    return send_from_directory('templates', 'index.html')
+
+@app.route('/ps')
+def ps():
+    ps_lines = subprocess.getoutput("ps -eo pid,pmem,pcpu,start,time,comm --sort -c").split('\n')[:30]
+    return jsonify(ps_lines)
+
+
 
 
 def csv_val(s):
@@ -60,6 +66,4 @@ def send_js(path):
     return 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
-
-
+    app.run(host='0.0.0.0', port=5000)
