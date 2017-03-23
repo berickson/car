@@ -3,13 +3,15 @@
 started from tutorial at https://www.tutorialspoint.com/flask/flask_application.htm
 '''
 import subprocess
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_from_directory, render_template
 
 app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    return subprocess.getoutput("ps")
+    o = subprocess.getoutput("ps")
+    render_template("index.html",context = {'body':o})
+    return 
 
 
 def csv_val(s):
@@ -55,9 +57,9 @@ def car_status():
 
 @app.route('/<path>')
 def send_js(path):
-    return send_from_directory('content', path)
+    return 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
 
 
