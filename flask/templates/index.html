@@ -4,19 +4,44 @@
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
 </head>
 <body>
-    <input type="text" ng-model="name">
-    <h2> Hello {{name}}!</h2>
+  <form>
+    select a track:
+    <select name='2' ng-model="selected_track" id="2" ng-options="track_name for track_name in track_names"></select>
+    <input type="text" ng-model="name"></input>
+    select a route: <select name='1' ng-model="selected_route" id="1" ng-options="route_name for route_name in route_names"></select>
+  </form>
+    <h2> Selected track: {{selected_track}}!</h2>
+    <h2> Selected route: {{selected_route}}!</h2>
     <h3> Car Status: {{car_status}} </h3>
-    <h2> PS output </h2>
-    <div ng-repeat="line in ps_output">
-      <div style="display:inline-block;font-family:monospace">{{line}}</div>
-    </div>
+    
 
 </body>
 <script>
 var app = angular.module("car", []);
 
 app.controller("carController", function($scope, $http, $timeout) {
+
+  $scope.$watch("selected_track", function(newValue, oldValue) {
+    if ($scope.selected_track.length > 0) {
+      $http.get('/tracks/'+$scope.selected_track+"/routes").
+        success(function(data, status, headers, config) {
+          $scope.route_names = data;
+        }).error(function(data, status, headers, config) {
+          $scope.route_names = ['n/a'];
+        // log error
+      });
+    }
+  });
+
+  $http.get('/tracks').
+    success(function(data, status, headers, config) {
+      $scope.track_names = data;
+      $scope.route_names = ['data'];
+    }).
+    error(function(data, status, headers, config) {
+      // log error
+    });
+
   $http.get('car/status').
     success(function(data, status, headers, config) {
       $scope.car_status = data;
@@ -24,17 +49,7 @@ app.controller("carController", function($scope, $http, $timeout) {
     error(function(data, status, headers, config) {
       // log error
     });
-    var get_ps = function() {
-        $http.get('ps').
-            success(function(data, status, headers, config) {
-            $scope.ps_output = data;
-            }).
-            error(function(data, status, headers, config) {
-            // log error
-            });
-            window.setTimeout(get_ps,250)
-    }
-    get_ps();
+
 
 });    
 </script>    
