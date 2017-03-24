@@ -1,0 +1,3 @@
+
+#!/usr/bin/env bash
+sudo -E env "PATH=$PATH" python web_server.py
