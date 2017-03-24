@@ -5,12 +5,43 @@ started from tutorial at https://www.tutorialspoint.com/flask/flask_application.
 import subprocess
 import time
 from flask import Flask, request, send_from_directory, render_template, jsonify
+import tracks
+import pandas as pd
+
+TRACK_STORAGE = tracks.TrackStorage()
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
     return send_from_directory('templates', 'index.html')
+
+@app.route('/tracks')
+def get_tracks():
+    tracks = TRACK_STORAGE.get_tracks()
+    return jsonify([t.get_name() for t in tracks])
+
+@app.route('/tracks/<track_name>')
+def get_track_options(track_name):
+    return jsonify(['routes'])
+
+@app.route('/tracks/<track_name>/routes')
+def get_routes(track_name):
+    routes = TRACK_STORAGE.get_track(track_name).get_routes()
+    return jsonify([route.get_name() for route in routes])
+
+@app.route('/tracks/<track_name>/routes/<route_name>')
+def get_route(track_name, route_name):
+    route = TRACK_STORAGE.get_track(track_name).get_route(route_name)
+    return jsonify(['runs'])
+
+@app.route('/tracks/<track_name>/routes/<route_name>/path')
+def get_path(track_name, route_name):
+    # allowed value are {‘split’,’records’,’index’,’columns’,’values’}
+    orient = request.args.get('orient', 'records')
+    route = TRACK_STORAGE.get_track(track_name).get_route(route_name)
+    path = route.folder+"/path.csv"
+    return pd.read_csv(path).to_json(orient=orient)
 
 @app.route('/ps')
 def ps():
