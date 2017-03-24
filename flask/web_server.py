@@ -14,6 +14,10 @@ app = Flask(__name__)
 def index():
     return send_from_directory('templates', 'index.html')
 
+@app.route('/d3')
+def get_d3():
+    return send_from_directory('templates', 'd3.html')
+
 @app.route('/tracks')
 def get_tracks():
     tracks = TRACK_STORAGE.get_tracks()
@@ -21,7 +25,7 @@ def get_tracks():
 
 @app.route('/tracks/<track_name>')
 def get_track_options(track_name):
-    return jsonify(['routes'])
+    return jsonify({'name', track_name})
 
 @app.route('/tracks/<track_name>/routes')
 def get_routes(track_name):
@@ -38,9 +42,10 @@ def get_path(track_name, route_name):
     # allowed value are {‘split’,’records’,’index’,’columns’,’values’}
     orient = request.args.get('orient', 'records')
     route = TRACK_STORAGE.get_track(track_name).get_route(route_name)
-    path = route.folder+"/path.csv"
-    df = pd.read_csv(path)
-    return df.to_json(orient=orient)
+    path_path = route.folder+"/path.csv"
+    df = pd.read_csv(path_path)
+    s = df.to_json(orient=orient)
+    return s
 
 
 @app.route('/car/status')

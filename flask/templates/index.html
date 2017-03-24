@@ -14,7 +14,14 @@
     <h2> Selected route: {{selected_route.name}}!</h2>
     <h3> Car Status: </h3>
     <div ng-repeat="(key,value) in car_status">{{key}} = {{value}}</div>
-    <div ng-repeat="path_node in route_path">{{path_node.secs}} </div>
+    <table>
+    <tr><td>secs</td><td>x</td><td>y</td></tr>
+    <tr ng-repeat="path_node in route_path">
+        <td>{{path_node.secs}}</td>
+        <td>{{path_node.secs}}</td>
+        <td>{{path_node.secs}}</td>
+    </tr>
+    </table>
 </body>
 <script>
 var app = angular.module("car", []);
