@@ -4,17 +4,17 @@
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
 </head>
 <body>
+  <h1>Anaranjado!</h1>
   <form>
     select a track:
-    <select name='2' ng-model="selected_track" id="2" ng-options="track_name for track_name in track_names"></select>
-    <input type="text" ng-model="name"></input>
-    select a route: <select name='1' ng-model="selected_route" id="1" ng-options="route_name for route_name in route_names"></select>
+    <select name='2' ng-model="selected_track" id="2" ng-options="track.name for track in tracks"></select>
+    select a route: <select name='1' ng-model="selected_route" id="1" ng-options="route.name for route in routes"></select>
   </form>
-    <h2> Selected track: {{selected_track}}!</h2>
-    <h2> Selected route: {{selected_route}}!</h2>
-    <h3> Car Status: {{car_status}} </h3>
-    
-
+    <h2> Selected track: {{selected_track.name}}!</h2>
+    <h2> Selected route: {{selected_route.name}}!</h2>
+    <h3> Car Status: </h3>
+    <div ng-repeat="(key,value) in car_status">{{key}} = {{value}}</div>
+    <div ng-repeat="path_node in route_path">{{path_node.secs}} </div>
 </body>
 <script>
 var app = angular.module("car", []);
@@ -22,10 +22,10 @@ var app = angular.module("car", []);
 app.controller("carController", function($scope, $http, $timeout) {
 
   $scope.$watch("selected_track", function(newValue, oldValue) {
-    if ($scope.selected_track.length > 0) {
-      $http.get('/tracks/'+$scope.selected_track+"/routes").
-        success(function(data, status, headers, config) {
-          $scope.route_names = data;
+    if ($scope.selected_track.name.length > 0) {
+      $http.get('/tracks/'+$scope.selected_track.name+"/routes").
+        success(function(routes, status, headers, config) {
+          $scope.routes = routes;
         }).error(function(data, status, headers, config) {
           $scope.route_names = ['n/a'];
         // log error
@@ -33,9 +33,22 @@ app.controller("carController", function($scope, $http, $timeout) {
     }
   });
 
+  $scope.$watch("selected_route", function(newValue, oldValue) {
+    if ($scope.selected_route.name.length > 0) {
+      $http.get('/tracks/'+$scope.selected_track.name+"/routes/"+$scope.selected_route.name+"/path").
+        success(function(route_path, status, headers, config) {
+          $scope.route_path = route_path;
+        }).error(function(data, status, headers, config) {
+          $scope.route_names = ['n/a'];
+        // log error
+      });
+    }
+  });
+
+
   $http.get('/tracks').
-    success(function(data, status, headers, config) {
-      $scope.track_names = data;
+    success(function(tracks, status, headers, config) {
+      $scope.tracks = tracks;
       $scope.route_names = ['data'];
     }).
     error(function(data, status, headers, config) {
