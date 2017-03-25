@@ -2,8 +2,8 @@
 '''
 started from tutorial at https://www.tutorialspoint.com/flask/flask_application.htm
 '''
+import pandas as pd # must import BEFORE flask or high CPU on PI
 from flask import Flask, request, send_from_directory, jsonify
-import pandas as pd
 import tracks
 
 TRACK_STORAGE = tracks.TrackStorage()
@@ -61,5 +61,4 @@ def car_status():
 
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+if __name__ == '__main__    app.run(host='0.0.0.0', port=5000)
