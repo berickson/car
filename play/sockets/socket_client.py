@@ -6,7 +6,6 @@ import socket_common as c
 
 def run(args):
     ''' run client '''
-    print('len(args)', len(args))
     per_second = 50
     total_to_send = 1000
     if len(args) >= 2:
@@ -19,7 +18,6 @@ def run(args):
     sleep_time = 1. / per_second
     while count < total_to_send:
         count += 1
-        #print("sending "+str(count))
         connection.send((str(count)+"\n").encode())
         time.sleep(sleep_time)
     connection.close()
