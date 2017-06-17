@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <QMainWindow>
+#include <QDialog>
 #include <QTimer>
 
 #include <opencv2/core/core.hpp>
@@ -21,7 +22,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
+class MainWindow : public QDialog
 {
   Q_OBJECT
 
@@ -48,7 +49,7 @@ private slots:
 
   void on_saturation_slider_valueChanged(int value);
 
-  void on_resolutions_combo_box_currentIndexChanged();
+  void on_resolutions_combo_box_currentIndexChanged(int index);
 
 private:
 

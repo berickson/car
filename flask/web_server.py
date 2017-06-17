@@ -14,6 +14,30 @@ app = Flask(__name__)
 def index():
     return send_from_directory('templates', 'index.html')
 
+
+class CommandError(Exception):
+    status_code = 400
+
+    def __init__(self, message, status_code=None, payload=None):
+        Exception.__init__(self)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
+
+
+@app.route('/command/go', methods=['PUT'])
+def command_go():
+    response = jsonify({"message":"sorry dave, I can't let you do that"})
+    response.status_code = 400
+    return response
+
+
 @app.route('/d3')
 def get_d3():
     return send_from_directory('templates', 'd3.html')

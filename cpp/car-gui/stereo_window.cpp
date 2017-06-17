@@ -18,8 +18,8 @@ StereoWindow::StereoWindow(QWidget *parent) :
   ui(new Ui::StereoWIndow)
 {
   ui->setupUi(this);
-  left_camera.cap.open("/home/brian/Desktop/tracks/desk/routes/X/runs/2/video_left.avi");
-  right_camera.cap.open("/home/brian/Desktop//tracks/desk/routes/X/runs/2/video_right.avi");
+  left_camera.cap.open("/home/brian/car/tracks/avc/routes/R/runs/3/video_left.avi");
+  right_camera.cap.open("/home/brian/car/tracks/avc/routes/R/runs/3/video_right.avi");
   left_camera.bound_label = ui->left_image;
   left_camera.parent = this;
   right_camera.bound_label = ui->right_image;

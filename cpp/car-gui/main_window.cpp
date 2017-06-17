@@ -58,7 +58,7 @@ ioctl: VIDIOC_ENUM_FMT
 */
 
 MainWindow::MainWindow(QWidget *parent) :
-  QMainWindow(parent),
+  QDialog(parent),
   ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
@@ -81,18 +81,18 @@ MainWindow::MainWindow(QWidget *parent) :
   //cap.set(cv::CAP_PROP_SATURATION, .66);
   //cap.set(cv::CAP_PROP_FOURCC, CV_FOURCC('M','J','P','G'));
   //cap.set(cv::CAP_PROP_FPS,120.001);
-  cap.set(cv::CAP_PROP_FRAME_WIDTH,640);
-  cap.set(cv::CAP_PROP_FRAME_HEIGHT,480);
+  //cap.set(cv::CAP_PROP_FRAME_WIDTH,640);
+  //cap.set(cv::CAP_PROP_FRAME_HEIGHT,480);
 
   ui->brightness_slider->setValue(cap.get(cv::CAP_PROP_BRIGHTNESS)*100);
   ui->contrast_slider->setValue(cap.get(cv::CAP_PROP_CONTRAST)*100);
   ui->saturation_slider->setValue(cap.get(cv::CAP_PROP_SATURATION)*100);
-  ui->hue_slider->setValue(cap.get(cv::CAP_PROP_HUE)*100);
+  //ui->hue_slider->setValue(cap.get(cv::CAP_PROP_HUE)*100);
 
   frame_grabber.begin_grabbing(&cap);
 
   timer.setSingleShot(false);
-  timer.setInterval(100);
+  timer.setInterval(10);
   connect(&timer, SIGNAL(timeout()), this, SLOT(process_one_frame()));
   connect(ui->frames_per_second_slider, SIGNAL(valueChanged(int)), this, SLOT(fps_changed(int)));
   timer.start();
@@ -117,7 +117,7 @@ void MainWindow::process_one_frame()
   ui->cam_frame_count_text->setText(QString::number(frame_grabber.get_frame_count_grabbed()));
   if(!frame_grabber.get_latest_frame(frame))
     return;
-  cv::flip(frame,frame,-1);
+  cv::flip(frame,frame,1);
 
   tracker.process_image(frame);
 
@@ -260,12 +260,13 @@ void MainWindow::on_saturation_slider_valueChanged(int value)
   cap.set(cv::CAP_PROP_SATURATION,value/100.);
 }
 
-void MainWindow::on_resolutions_combo_box_currentIndexChanged()
+
+void MainWindow::on_resolutions_combo_box_currentIndexChanged(int )
 {
-  QSize resolution = supported_resolutions[ui->resolutions_combo_box->currentIndex()];
-  cap.set(cv::CAP_PROP_FRAME_WIDTH, resolution.width());
-  cap.set(cv::CAP_PROP_FRAME_HEIGHT, resolution.height());
-  ui->scroll_area_contents->setFixedSize(resolution);
-  ui->display_image->setFixedSize(resolution);
+    QSize resolution = supported_resolutions[ui->resolutions_combo_box->currentIndex()];
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, resolution.width());
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, resolution.height());
+    ui->scroll_area_contents->setFixedSize(resolution);
+    ui->display_image->setFixedSize(resolution);
 
 }

@@ -59,7 +59,9 @@ void Angle::standardize() {
 }
 
 const string Angle::to_string() {
-  return std::to_string(degrees())+"°";
+    stringstream s;
+    s << degrees() << "°";
+    return s.str();
 }
 
 bool Angle::operator ==(Angle &rhs)   {
@@ -234,5 +236,3 @@ double time_at_position(double x, double a, double v0, double x0){
   }
   return min(t[0],t[1]);
 }
-
-

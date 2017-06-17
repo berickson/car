@@ -127,8 +127,10 @@ void Usb::monitor_incoming_data() {
       fd = open(usb_path.c_str(), O_RDWR | O_NONBLOCK | O_SYNC | O_APPEND | O_NOCTTY);
       if(fd != fd_error) {
         make_raw(fd);
-				write_line(_write_on_connect);        
-				break;
+        if(_write_on_connect.size() > 0) {
+            write_line(_write_on_connect);
+        }
+        break;
       }
     }
 

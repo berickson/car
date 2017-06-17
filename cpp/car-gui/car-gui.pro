@@ -43,7 +43,9 @@ SOURCES += main.cpp\
     ../speedometer.cpp \
     ../pid.cpp \
     stereo_window.cpp \
-    ../kalman.cpp
+    ../kalman.cpp \
+    picker_window.cpp \
+    lidar_window.cpp
 
 HEADERS  += main_window.h \
     ../ackerman.h \
@@ -60,7 +62,9 @@ HEADERS  += main_window.h \
     route_window.h \
     ../frame_grabber.h \
     ../speedometer.h \
-    stereo_window.h
+    stereo_window.h \
+    picker_window.h \
+    lidar_window.h
 
 images.path    = $${DESTDIR}/
 
@@ -68,7 +72,9 @@ QT += charts
 
 FORMS    += main_window.ui \
     route_window.ui \
-    stereo_window.ui
+    stereo_window.ui \
+    picker_window.ui \
+    lidar_window.ui
 
 unix|win32: LIBS += -L/usr/local/lib -lwiringPi -lncurses -lopencv_imgcodecs -lopencv_core -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d -lopencv_flann
 
