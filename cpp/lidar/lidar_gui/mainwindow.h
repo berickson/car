@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include "QGraphicsScene"
 #include "../lidar.h"
 
 namespace Ui {
@@ -18,6 +19,7 @@ public:
     QTimer timer;
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    QGraphicsScene scene;
 
 private slots:
     void process_lidar();
