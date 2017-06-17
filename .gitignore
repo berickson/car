@@ -6,6 +6,9 @@ test/test
 build-*
 #output folders
 output/
+Debug/
+Release/
+build/
 
 **/*.user
 **/*.user*
