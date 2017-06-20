@@ -27,12 +27,16 @@ MainWindow::~MainWindow()
 }
 
 
-QPointF world_to_screen(QPointF w) {
-    float scale = 100;
-    float offset = 50;
-    QPointF s(w.x() * scale, offset - w.y() * scale);
-    return s;
+#include <eigen3/Eigen/Dense>
+QPointF world_to_screen(Eigen::Vector2d w) {
+    Eigen::Transform<double, 2, Eigen::Affine> t;
+    t = t.Identity();
+    t.scale(Eigen::Vector2d(-50,50));
+    t.translate(Eigen::Vector2d(25,0));
+    t.rotate(M_PI/2.);
 
+    Eigen::Vector2d s = t * w;
+    return QPointF(s[0], s[1]);
 }
 
 void MainWindow::process_lidar()
@@ -42,14 +46,18 @@ void MainWindow::process_lidar()
         ui->lidar_output->setText(QString(lidar.current_scan.display_string().c_str()));
         scene.clear();
         QPen blue;
+        QPen light_gray;
         blue.setColor(QColor(0,0,255,50));
+        light_gray.setColor(QColor(230,230,230));
+        // draw 1m to 5m circles
+        for(int i=1; i <=5; ++i) {
+          scene.addEllipse(QRectF(world_to_screen({-i,-i}),world_to_screen({i,i})),
+                           light_gray);
+        }
         for(LidarMeasurement & m : lidar.current_scan.measurements) {
             if(m.status == LidarMeasurement::measure_status::ok) {
-                QPointF wp;
-                wp.setX(cos(m.angle - Angle::degrees(90)) * m.distance_meters);
-                wp.setY(sin(m.angle - Angle::degrees(90)) * m.distance_meters);
-                QPointF sp = world_to_screen(wp);
-                QPointF world_origin(0,0);
+                QPointF sp = world_to_screen(m.get_point());
+                Eigen::Vector2d world_origin(0,0);
                 QPointF screen_origin=world_to_screen(world_origin);
                 float r = 3;
                 QRectF rect;

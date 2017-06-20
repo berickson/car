@@ -4,7 +4,6 @@
 #include <unistd.h> // for file operations, usleep
 #include <iostream>
 #include <termios.h> // for make_raw
-//#include <fstream>
 #include <string>
 #include <thread>
 #include "ends_with.h"
@@ -95,8 +94,8 @@ void echo_off(string tty) {
 void make_raw(int fd) {
   struct termios settings;
   tcgetattr(fd, &settings);
-	cfmakeraw(&settings);
-	tcsetattr(fd, TCSANOW, &settings);
+  cfmakeraw(&settings);
+  tcsetattr(fd, TCSANOW, &settings);
 }
 
 void Usb::monitor_incoming_data_thread() {
@@ -114,7 +113,7 @@ void Usb::monitor_incoming_data_thread() {
 void Usb::monitor_incoming_data() {
   const int buf_size = 200;
   char buf[buf_size];
-  const int poll_us = 1000;    
+  const int poll_us = 1000;
   const int max_wait_us = 2E6; // two second
 
   //fstream usb;
@@ -128,7 +127,7 @@ void Usb::monitor_incoming_data() {
       if(fd != fd_error) {
         make_raw(fd);
         if(_write_on_connect.size() > 0) {
-            write_line(_write_on_connect);
+          write_line(_write_on_connect);
         }
         break;
       }
@@ -188,7 +187,18 @@ void Usb::run(){
   run_thread = thread(&Usb::monitor_incoming_data_thread,this);
 }
 
+void Usb::flush()
+{
+  for(int i = 0; i < 1000; i++) {
+    if(this->string_pending_write.size() == 0)
+      break;
+    this_thread::sleep_for(chrono::milliseconds(1));
+  }
+}
+
 void Usb::stop(){
+  flush();
+  // kill processing thread
   quit = true;
   if(run_thread.joinable())
     run_thread.join();

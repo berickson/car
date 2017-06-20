@@ -15,6 +15,8 @@ public:
   void add_line_listener(WorkQueue<string>*);
   void remove_line_listener(WorkQueue<string>*);
   void write_on_connect(string s);
+  void flush();
+  
 private:
   string _write_on_connect = "\ntd+\n";
   string string_pending_write;

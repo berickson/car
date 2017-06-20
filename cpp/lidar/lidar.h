@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <vector>
 #include <queue>
+#include <eigen3/Eigen/Dense>
 
 using namespace std;
 
@@ -17,6 +18,10 @@ struct LidarMeasurement {
     double distance_meters = NAN;
     double signal_strength = NAN;
     enum measure_status {ok, crc_error, invalid_data, low_signal, uninitialized} status = measure_status::uninitialized;
+    Eigen::Vector2d get_point() {
+      return Eigen::Vector2d(distance_meters * cos(angle.radians()),
+                             distance_meters * sin(angle.radians()));
+    }
 
     string display_string();
 };

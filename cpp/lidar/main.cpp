@@ -8,8 +8,6 @@ int main() {
             lidar.get_scan();
             cout << lidar.current_scan.display_string() << endl;
             cout << "completed scans: " << lidar.completed_scan_count << endl;
-
-
         }
     } catch (string s) {
         cout << "Exception: " << s << endl;
