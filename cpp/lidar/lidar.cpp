@@ -1,6 +1,7 @@
 #include "lidar.h"
 #include <thread>
 #include <chrono>
+#include <sstream>
 
 std::__cxx11::string LidarMeasurement::display_string() {
   stringstream s;
@@ -58,6 +59,23 @@ bool LidarUnit::try_get_scan(int ms_to_wait = 5000)
     }
   }
   return false;
+}
+
+string LidarUnit::get_scan_csv_header()
+{
+  std::stringstream s;
+  s << "scan_number,degrees,distance_meters,signal_strength" << endl;
+  return s.str();
+}
+
+string LidarUnit::get_scan_csv()
+{
+  stringstream s;
+  for(int i = 0; i < 360; ++i) {
+    LidarMeasurement & m = current_scan.measurements[i];
+    s << completed_scan_count << "," << m.angle.degrees() << "," << m.distance_meters << "," << m.signal_strength << endl;
+  }
+  return s.str();
 }
 
 bool LidarUnit::get_scan() {

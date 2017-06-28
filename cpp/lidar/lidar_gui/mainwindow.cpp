@@ -3,6 +3,7 @@
 #include "../lidar.h"
 #include "QGraphicsView"
 #include "QGraphicsScene"
+#include "QFileDialog"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -44,6 +45,9 @@ void MainWindow::process_lidar()
     if(lidar.try_get_scan(1)) {
         ui->scan_count_label->setText(QString::number(lidar.completed_scan_count));
         ui->lidar_output->setText(QString(lidar.current_scan.display_string().c_str()));
+        if(is_recording) {
+          out_file << lidar.get_scan_csv();
+        }
         scene.clear();
         QPen blue;
         QPen light_gray;
@@ -72,4 +76,31 @@ void MainWindow::process_lidar()
             }
         }
     }
+}
+
+void MainWindow::on_record_button_clicked()
+{
+  if(is_recording) {
+    out_file.close();
+    ui->record_button->setText("record");
+    is_recording = false;
+
+  } else {
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.selectFile("recording.csv");
+    dialog.show();
+    if(dialog.exec()) {
+      if(dialog.selectedFiles().length() == 1) {
+        std::string filename = dialog.selectedFiles()[0].toStdString();
+        out_file.open(filename, fstream::out);
+        if(out_file.is_open()) {
+          ui->record_button->setText("stop");
+          is_recording = true;
+          out_file << lidar.get_scan_csv_header();
+        }
+      }
+    }
+  }
 }

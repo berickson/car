@@ -5,6 +5,7 @@
 #include <QTimer>
 #include "QGraphicsScene"
 #include "../lidar.h"
+#include <fstream>
 
 namespace Ui {
 class MainWindow;
@@ -24,7 +25,12 @@ public:
 private slots:
     void process_lidar();
 
+    void on_record_button_clicked();
+
 private:
+    std::fstream out_file;
+
+    bool is_recording = false;
     Ui::MainWindow *ui;
 };
 

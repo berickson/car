@@ -45,6 +45,8 @@ public:
     WorkQueue<string> usb_queue;
     int completed_scan_count = 0;
 
+    string get_scan_csv_header();
+    string get_scan_csv();
     bool get_scan();
 
     void run();
