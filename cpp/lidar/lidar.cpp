@@ -2,6 +2,8 @@
 #include <thread>
 #include <chrono>
 #include <sstream>
+#include <vector>
+#include <eigen3/Eigen/Dense>
 
 std::__cxx11::string LidarMeasurement::display_string() {
   stringstream s;
@@ -22,6 +24,79 @@ std::__cxx11::string LidarScan::display_string() {
     s <<  m.display_string() << endl;
   }
   return s.str();
+}
+
+
+Eigen::Vector3f normalized(const Eigen::Vector3f & v) {
+  Eigen::Vector3f rv;
+  rv << v[0]/v[2],v[1]/v[2],1;
+  return rv;
+}
+
+double distance_point_to_line(const Eigen::Vector3f & p, const Eigen::Vector3f & l) {
+
+  return fabs(normalized(l).dot(normalized(p)));
+}
+
+template <typename Derived>
+bool is_line(const Eigen::MatrixBase<Derived> & points, double tolerance) {
+  if(points.hasNaN()){
+    return false;
+  }
+  Eigen::Vector3f p1 = points.row(0);
+  Eigen::Vector3f p2 = points.row(points.rows()-1);
+
+  auto line = p1.cross(p2);
+  for(int i = 0; i < points.rows(); i++) {
+    Eigen::Vector3f p = points.row(i);
+    double d = distance_point_to_line(p, line);
+    if(d>tolerance)
+      return false;
+  }
+  return true;
+}
+
+vector<LidarScan::ScanSegment> LidarScan::find_lines(double tolerance) {
+  vector<ScanSegment> found_lines;
+  Eigen::Matrix<float,360,3> points;
+
+  // get all measurment locations as homogeneous 2d points
+  for(int i=0; i < 360; ++i) {
+    LidarMeasurement & m = measurements[i];
+    // null yields null
+    if(m.status == LidarMeasurement::measure_status::ok) {
+      points(i, 0) = m.distance_meters * cos(m.angle.radians());
+      points(i, 1) = m.distance_meters * sin(m.angle.radians());
+      points(i, 2) = 1;
+    } else {
+      points(i, 0) = NAN;
+      points(i, 1) = NAN;
+      points(i, 2) = NAN;
+    }
+  }
+
+  uint16_t start = 0;
+  uint16_t line_end = 0;
+  while (start < measurements.size()) {
+    line_end = start;
+    for(uint16_t end = start+5; end < 360; end++) {
+      if(is_line(points.block(start,0,end-start+1,3), tolerance)){
+        line_end = end;
+      } else {
+        break;
+      }
+    }
+    if(line_end != start) {
+      ScanSegment s;
+      s.begin_index = start;
+      s.end_index = line_end;
+      found_lines.push_back(s);
+      start = line_end + 1;
+    } else {
+      ++start;
+    }
+  }
+  return found_lines;
 }
 
 bool LidarUnit::try_get_scan(int ms_to_wait = 5000)

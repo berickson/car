@@ -50,30 +50,37 @@ void MainWindow::process_lidar()
         }
         scene.clear();
         QPen blue;
+        QPen red;
         QPen light_gray;
         blue.setColor(QColor(0,0,255,50));
+        red.setColor(QColor(255,0,0,50));
+        red.setWidth(4);
         light_gray.setColor(QColor(230,230,230));
         // draw 1m to 5m circles
         for(int i=1; i <=5; ++i) {
           scene.addEllipse(QRectF(world_to_screen({-i,-i}),world_to_screen({i,i})),
                            light_gray);
         }
+        Eigen::Vector2d world_origin(0,0);
+        QPointF screen_origin=world_to_screen(world_origin);
         for(LidarMeasurement & m : lidar.current_scan.measurements) {
             if(m.status == LidarMeasurement::measure_status::ok) {
                 QPointF sp = world_to_screen(m.get_point());
-                Eigen::Vector2d world_origin(0,0);
-                QPointF screen_origin=world_to_screen(world_origin);
                 float r = 3;
                 QRectF rect;
                 rect.setTopLeft(sp);
                 rect.setBottomRight(sp);
                 rect.adjust(-r,-r,r,r);
-                QPen pen;
-                QBrush brush;
-                scene.addEllipse(rect);
+                scene.addEllipse(rect, light_gray);
 
                 scene.addLine(QLineF(screen_origin, sp), blue);
             }
+        }
+        vector<LidarScan::ScanSegment> found_lines = lidar.current_scan.find_lines(0.02);
+        for(LidarScan::ScanSegment & found_line : found_lines) {
+          QPointF p1 = world_to_screen(lidar.current_scan.measurements[found_line.begin_index].get_point());
+          QPointF p2 = world_to_screen(lidar.current_scan.measurements[found_line.end_index].get_point());
+          scene.addLine(QLineF(p1, p2), red);
         }
     }
 }

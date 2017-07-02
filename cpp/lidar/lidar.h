@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <vector>
 #include <queue>
+#include <cstdint>
 #include <eigen3/Eigen/Dense>
 
 using namespace std;
@@ -27,7 +28,13 @@ struct LidarMeasurement {
 };
 
 struct LidarScan {
+    struct ScanSegment {
+      int begin_index;
+      int end_index;
+    };
+
     vector<LidarMeasurement> measurements;
+    vector<ScanSegment> find_lines(double tolerance);
 
     LidarScan();
 
