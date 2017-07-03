@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/SVD>
 
 std::__cxx11::string LidarMeasurement::display_string() {
   stringstream s;
@@ -26,6 +27,9 @@ std::__cxx11::string LidarScan::display_string() {
   return s.str();
 }
 
+Eigen::Vector2f homogeneous_to_2d(const Eigen::Vector3f & v) {
+  return {v[0]/v[2], v[1]/v[2]};
+}
 
 Eigen::Vector3f normalized(const Eigen::Vector3f & v) {
   Eigen::Vector3f rv;
@@ -38,6 +42,42 @@ double distance_point_to_line(const Eigen::Vector3f & p, const Eigen::Vector3f &
   return fabs(normalized(l).dot(normalized(p)));
 }
 
+/*
+Finds the best fit line in the form ax + by + c = 0
+points is matrix with homogeneous points in each row
+returns a,b,c (which is homogeneous coordinates for the line)
+*/
+//template<typename Derived>
+Eigen::Vector3f fit_line(const Eigen::MatrixX3f & points) {
+  Eigen::JacobiSVD<Eigen::MatrixXf> svd(points,Eigen::ComputeFullV);
+  const Eigen::MatrixX3f & V = svd.matrixV();
+  cout << V.rows() << endl;
+  Eigen::Vector3f rv = V.col(V.rows()-1);
+  return rv;
+
+}
+
+// returns homogeneous coordinate to point on line closest to given point
+// see https://math.stackexchange.com/questions/727743/homogeneous-coordinates
+Eigen::Vector3f closest_point_on_line(Eigen::Vector3f line, Eigen::Vector3f point) {
+  Eigen::Vector3f pn = normalized(point);
+  float a = pn(0);
+  float b = pn(1);
+  float c = pn(2);
+
+  float u = line(0);
+  float v = line(1);
+  float w = line(2);
+  Eigen::Vector3f rv = normalized({b*(b*u-a*v)-a*c, -a*(b*u-a*v)-b*c, w*(a*a+b*b)});
+  return rv;
+}
+
+/*
+ takes a matrix of homogeneous points along the line
+
+ Finds the best fit line in the form ax + by + c = 0
+ returns a,b,c (which is homogeneous coordinates for the line
+*/
 template <typename Derived>
 bool is_line(const Eigen::MatrixBase<Derived> & points, double tolerance) {
   if(points.hasNaN()){
@@ -80,16 +120,25 @@ vector<LidarScan::ScanSegment> LidarScan::find_lines(double tolerance) {
   while (start < measurements.size()) {
     line_end = start;
     for(uint16_t end = start+5; end < 360; end++) {
-      if(is_line(points.block(start,0,end-start+1,3), tolerance)){
+      auto const & block = points.block(start, 0, end-start+1, 3);
+      if(is_line(block, tolerance)){
         line_end = end;
       } else {
         break;
       }
     }
     if(line_end != start) {
+      auto const & block = points.block(start, 0, line_end-start+1, 3);
+      Eigen::Vector3f line = fit_line(block);
+
       ScanSegment s;
       s.begin_index = start;
       s.end_index = line_end;
+      //s.p1 = homogeneous_to_2d(closest_point_on_line(line,block.row(0)));
+      //s.p2 = homogeneous_to_2d(closest_point_on_line(line,block.row(line_end-start)));
+      s.p1 = homogeneous_to_2d(block.row(0));
+      s.p2 = homogeneous_to_2d(block.row(line_end-start));
+
       found_lines.push_back(s);
       start = line_end + 1;
     } else {
@@ -177,4 +226,12 @@ void LidarUnit::stop() {
   usb2.write_line("MotorOff");
   usb2.flush();
   usb2.stop();
+}
+
+void test_lidar() {
+  cout << "lidar tests" << endl;
+  Eigen::Matrix3f m;
+  m << 0.,0.,1., 1.,1.,1., 2.,2.,1. ;
+  cout << m << endl;
+  cout << fit_line(m) << endl;
 }

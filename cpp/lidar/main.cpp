@@ -1,6 +1,8 @@
 #include "lidar.h"
 
 int main() {
+    test_lidar();
+    return 0;
     LidarUnit lidar;
     try {
         lidar.run();

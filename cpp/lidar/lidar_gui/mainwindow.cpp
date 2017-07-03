@@ -27,16 +27,17 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
 #include <eigen3/Eigen/Dense>
-QPointF world_to_screen(Eigen::Vector2d w) {
-    Eigen::Transform<double, 2, Eigen::Affine> t;
+
+
+QPointF world_to_screen(Eigen::Vector2f w) {
+    Eigen::Transform<float, 2, Eigen::Affine> t;
     t = t.Identity();
-    t.scale(Eigen::Vector2d(-50,50));
-    t.translate(Eigen::Vector2d(25,0));
+    t.scale(Eigen::Vector2f(-50,50));
+    t.translate(Eigen::Vector2f(25,0));
     t.rotate(M_PI/2.);
 
-    Eigen::Vector2d s = t * w;
+    Eigen::Vector2f s = t * w;
     return QPointF(s[0], s[1]);
 }
 
@@ -50,37 +51,59 @@ void MainWindow::process_lidar()
         }
         scene.clear();
         QPen blue;
-        QPen red;
-        QPen light_gray;
         blue.setColor(QColor(0,0,255,50));
-        red.setColor(QColor(255,0,0,50));
-        red.setWidth(4);
+
+        QPen light_gray;
         light_gray.setColor(QColor(230,230,230));
+
+        // wall colors
+        QPen red;
+        red.setColor(QColor(255,0,0,100));
+        red.setWidth(4);
+        QPen green;
+        green.setColor(QColor(0,255,0,100));
+        green.setWidth(4);
+        QPen black;
+        black.setColor(QColor(0,0,0,100));
+        black.setWidth(4);
         // draw 1m to 5m circles
         for(int i=1; i <=5; ++i) {
-          scene.addEllipse(QRectF(world_to_screen({-i,-i}),world_to_screen({i,i})),
+          scene.addEllipse(QRectF(world_to_screen({(float)-i,(float)-i}),world_to_screen({(float)i,(float)i})),
                            light_gray);
         }
-        Eigen::Vector2d world_origin(0,0);
+        Eigen::Vector2f world_origin(0,0);
         QPointF screen_origin=world_to_screen(world_origin);
-        for(LidarMeasurement & m : lidar.current_scan.measurements) {
-            if(m.status == LidarMeasurement::measure_status::ok) {
-                QPointF sp = world_to_screen(m.get_point());
-                float r = 3;
-                QRectF rect;
-                rect.setTopLeft(sp);
-                rect.setBottomRight(sp);
-                rect.adjust(-r,-r,r,r);
-                scene.addEllipse(rect, light_gray);
 
-                scene.addLine(QLineF(screen_origin, sp), blue);
+        if(ui->show_measurements_checkbox->isChecked()) {
+            for(LidarMeasurement & m : lidar.current_scan.measurements) {
+                if(m.status == LidarMeasurement::measure_status::ok) {
+                    QPointF sp = world_to_screen(m.get_point());
+                    float r = 3;
+                    QRectF rect;
+                    rect.setTopLeft(sp);
+                    rect.setBottomRight(sp);
+                    rect.adjust(-r,-r,r,r);
+                    scene.addEllipse(rect, light_gray);
+
+                    scene.addLine(QLineF(screen_origin, sp), blue);
+                }
             }
         }
-        vector<LidarScan::ScanSegment> found_lines = lidar.current_scan.find_lines(0.02);
-        for(LidarScan::ScanSegment & found_line : found_lines) {
-          QPointF p1 = world_to_screen(lidar.current_scan.measurements[found_line.begin_index].get_point());
-          QPointF p2 = world_to_screen(lidar.current_scan.measurements[found_line.end_index].get_point());
-          scene.addLine(QLineF(p1, p2), red);
+
+        if(ui->show_walls_lines_checkbox->isChecked()) {
+          vector<QPen> pens {red,green,black};
+
+          vector<LidarScan::ScanSegment> found_lines = lidar.current_scan.find_lines(0.02);
+          int line_number = 0;
+          for(LidarScan::ScanSegment & found_line : found_lines) {
+            line_number++;
+            //QPointF p1 = world_to_screen(lidar.current_scan.measurements[found_line.begin_index].get_point());
+            //QPointF p2 = world_to_screen(lidar.current_scan.measurements[found_line.end_index].get_point());
+            QPointF p1 = world_to_screen(found_line.p1);
+            QPointF p2 = world_to_screen(found_line.p2);
+            QPen & pen = pens[line_number % pens.size()];
+            scene.addLine(QLineF(p1, p2), pen);
+          }
         }
     }
 }
@@ -111,3 +134,14 @@ void MainWindow::on_record_button_clicked()
     }
   }
 }
+
+void MainWindow::on_show_text_checkbox_clicked()
+{
+  if(ui->show_text_checkbox->isChecked()) {
+    ui->lidar_output_panel->show();
+  }
+  else {
+    ui->lidar_output_panel->hide();
+  }
+}
+

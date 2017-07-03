@@ -27,6 +27,10 @@ private slots:
 
     void on_record_button_clicked();
 
+    void on_show_text_checkbox_clicked();
+
+    void on_show_measurements_checkbox_clicked();
+
 private:
     std::fstream out_file;
 

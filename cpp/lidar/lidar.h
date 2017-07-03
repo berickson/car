@@ -19,8 +19,8 @@ struct LidarMeasurement {
     double distance_meters = NAN;
     double signal_strength = NAN;
     enum measure_status {ok, crc_error, invalid_data, low_signal, uninitialized} status = measure_status::uninitialized;
-    Eigen::Vector2d get_point() {
-      return Eigen::Vector2d(distance_meters * cos(angle.radians()),
+    Eigen::Vector2f get_point() {
+      return Eigen::Vector2f(distance_meters * cos(angle.radians()),
                              distance_meters * sin(angle.radians()));
     }
 
@@ -31,6 +31,8 @@ struct LidarScan {
     struct ScanSegment {
       int begin_index;
       int end_index;
+      Eigen::Vector2f p1;
+      Eigen::Vector2f p2;
     };
 
     vector<LidarMeasurement> measurements;
@@ -63,3 +65,4 @@ public:
 };
 
 
+void test_lidar();
