@@ -5,6 +5,8 @@
 #include <vector>
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/SVD>
+using namespace Eigen;
+Eigen::IOFormat HeavyFormat(FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");
 
 std::__cxx11::string LidarMeasurement::display_string() {
   stringstream s;
@@ -51,26 +53,26 @@ returns a,b,c (which is homogeneous coordinates for the line)
 Eigen::Vector3f fit_line(const Eigen::MatrixX3f & points) {
   Eigen::JacobiSVD<Eigen::MatrixXf> svd(points,Eigen::ComputeFullV);
   const Eigen::MatrixX3f & V = svd.matrixV();
-  cout << V.rows() << endl;
-  Eigen::Vector3f rv = V.col(V.rows()-1);
+  Eigen::Vector3f rv = V.col(V.cols()-1);
   return rv;
-
 }
 
 // returns homogeneous coordinate to point on line closest to given point
 // see https://math.stackexchange.com/questions/727743/homogeneous-coordinates
+
 Eigen::Vector3f closest_point_on_line(Eigen::Vector3f line, Eigen::Vector3f point) {
   Eigen::Vector3f pn = normalized(point);
-  float a = pn(0);
-  float b = pn(1);
-  float c = pn(2);
+  float u = pn(0);
+  float v = pn(1);
+  float w = pn(2);
 
-  float u = line(0);
-  float v = line(1);
-  float w = line(2);
+  float a = line(0);
+  float b = line(1);
+  float c = line(2);
   Eigen::Vector3f rv = normalized({b*(b*u-a*v)-a*c, -a*(b*u-a*v)-b*c, w*(a*a+b*b)});
   return rv;
 }
+
 
 /*
  takes a matrix of homogeneous points along the line
@@ -134,10 +136,10 @@ vector<LidarScan::ScanSegment> LidarScan::find_lines(double tolerance) {
       ScanSegment s;
       s.begin_index = start;
       s.end_index = line_end;
-      //s.p1 = homogeneous_to_2d(closest_point_on_line(line,block.row(0)));
-      //s.p2 = homogeneous_to_2d(closest_point_on_line(line,block.row(line_end-start)));
-      s.p1 = homogeneous_to_2d(block.row(0));
-      s.p2 = homogeneous_to_2d(block.row(line_end-start));
+      s.p1 = homogeneous_to_2d(closest_point_on_line(line,block.row(0)));
+      s.p2 = homogeneous_to_2d(closest_point_on_line(line,block.row(line_end-start)));
+      //s.p1 = homogeneous_to_2d(block.row(0));
+      //s.p2 = homogeneous_to_2d(block.row(line_end-start));
 
       found_lines.push_back(s);
       start = line_end + 1;
@@ -228,10 +230,24 @@ void LidarUnit::stop() {
   usb2.stop();
 }
 
+void test_line_fit(MatrixX3f m, Vector3f p) {
+  cout << "m" << m.format(HeavyFormat) << endl;
+  cout << fit_line(m) << endl;
+  cout << "nearest to " << endl;
+  cout << p.format(HeavyFormat) << endl;
+  cout << " is " << closest_point_on_line(fit_line(m), p).format(HeavyFormat) << endl;
+
+}
+
 void test_lidar() {
   cout << "lidar tests" << endl;
-  Eigen::Matrix3f m;
-  m << 0.,0.,1., 1.,1.,1., 2.,2.,1. ;
-  cout << m << endl;
-  cout << fit_line(m) << endl;
+
+  Eigen::Matrix<float,4,3> m;
+  m << 1.,0.,1., 2.,1.,1., 3.,2.,1., 4.,3.,1. ;
+  Eigen::Vector3f p {3.0,0.1,1};
+  test_line_fit(m,p);
+  cout << "---------------------------" << endl;
+  m << 0.,0.,1., 1.,0.,1., 2.,0.,1., 3.,0.,1. ;
+  test_line_fit(m,p);
+
 }

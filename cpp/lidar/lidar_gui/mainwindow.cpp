@@ -30,10 +30,12 @@ MainWindow::~MainWindow()
 #include <eigen3/Eigen/Dense>
 
 
-QPointF world_to_screen(Eigen::Vector2f w) {
+QPointF MainWindow::world_to_screen(Eigen::Vector2f w) {
     Eigen::Transform<float, 2, Eigen::Affine> t;
     t = t.Identity();
-    t.scale(Eigen::Vector2f(-50,50));
+
+    double zoom = ui->zoom_slider->value();
+    t.scale(Eigen::Vector2f(-50 * zoom,50 * zoom));
     t.translate(Eigen::Vector2f(25,0));
     t.rotate(M_PI/2.);
 

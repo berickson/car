@@ -22,6 +22,7 @@ public:
     ~MainWindow();
     QGraphicsScene scene;
 
+    QPointF world_to_screen(Eigen::Vector2f w);
 private slots:
     void process_lidar();
 
