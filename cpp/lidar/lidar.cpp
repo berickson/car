@@ -150,6 +150,64 @@ vector<LidarScan::ScanSegment> LidarScan::find_lines(double tolerance, int min_p
   return found_lines;
 }
 
+Vector3f v2d_to_homogeneous(const Vector2f & x) {
+  return {x(0),x(1),1};
+}
+
+Vector3f line_through_points(const Vector3f & p1, const Vector3f & p2) {
+  return p1.cross(p2);
+}
+
+Vector3f line_through_points(const Vector2f & p1, const Vector2f & p2) {
+  return line_through_points(v2d_to_homogeneous(p1), v2d_to_homogeneous(p2));
+}
+
+Vector3f line_intersection(Vector3f line1, Vector3f line2) {
+  return line1.cross(line2);
+};
+
+
+// http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/BEARDSLEY/node2.html
+Angle angle_between_lines(Vector3f l1, Vector3f l2) {
+  Vector3f l1n = normalized(l1);
+  Vector3f l2n = normalized(l2);
+  return Angle::radians(acos(l1n[0]*l2n[0] + l1n[1]*l2n[1]));
+}
+
+vector<Corner>  find_corners(const vector<LidarScan::ScanSegment> & walls) {
+  vector<Corner> corners;
+  for(unsigned int i = 1; i < walls.size(); ++i) {
+    const LidarScan :: ScanSegment & w1 = walls[i-1];
+    const LidarScan :: ScanSegment & w2 = walls[i];
+
+    // corners must be near 90 degrees
+    Vector3f line1 = line_through_points(w1.p1, w1.p2);
+    Vector3f line2 = line_through_points(w2.p1, w2.p2);
+    Angle theta = angle_between_lines(line1, line2);
+    if(isnan(theta.radians())|| theta.degrees()>95 || theta.degrees() < 85) {
+      cout << "rejected corner " << theta.degrees() <<endl;
+      continue;
+    }
+
+
+    Vector3f corner_point = line_intersection(line1, line2);
+
+    // Adjacent line segments must be close to each other
+    if((w1.p2 - w2.p1).norm() > std::min( (w1.p2-w1.p1).norm(), (w2.p2-w1.p1).norm())) {
+      continue;
+    }
+    cout << " found close corners at angle " << theta.degrees() << " degres" << endl;
+    Corner corner;
+    corner.p = homogeneous_to_2d(corner_point);
+    corners.push_back(corner);
+
+    // Angle must be greater than 45 degrees
+    //if(abs(theta.degrees()<45))
+
+  }
+  return corners;
+}
+
 bool LidarUnit::try_get_scan(int ms_to_wait = 5000)
 {
   string l;

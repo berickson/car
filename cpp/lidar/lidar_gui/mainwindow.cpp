@@ -106,6 +106,16 @@ void MainWindow::process_lidar()
             QPen & pen = pens[line_number % pens.size()];
             scene.addLine(QLineF(p1, p2), pen);
           }
+          vector<Corner> corners = find_corners(found_lines);
+          for(auto corner : corners) {
+            QPointF p_screen = world_to_screen(corner.p);
+            QRectF rect;
+            double r = 10;
+            rect.setTopLeft(p_screen);
+            rect.setBottomRight(p_screen);
+            rect.adjust(-r,-r,r,r);
+            scene.addEllipse(rect, red);
+          }
         }
     }
 }

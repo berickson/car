@@ -64,5 +64,11 @@ public:
     bool try_get_scan(int ms_to_wait);
 };
 
+struct Corner {
+  Eigen::Vector2f p;
+};
+
+vector<Corner> find_corners(const vector<LidarScan::ScanSegment> &walls);
+
 
 void test_lidar();
