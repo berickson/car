@@ -32,6 +32,8 @@ private slots:
 
     void on_show_measurements_checkbox_clicked();
 
+    void on_show_walls_lines_checkbox_clicked();
+
 private:
     std::fstream out_file;
 

@@ -98,7 +98,7 @@ bool is_line(const Eigen::MatrixBase<Derived> & points, double tolerance) {
   return true;
 }
 
-vector<LidarScan::ScanSegment> LidarScan::find_lines(double tolerance) {
+vector<LidarScan::ScanSegment> LidarScan::find_lines(double tolerance, int min_point_count) {
   vector<ScanSegment> found_lines;
   Eigen::Matrix<float,360,3> points;
 
@@ -121,7 +121,7 @@ vector<LidarScan::ScanSegment> LidarScan::find_lines(double tolerance) {
   uint16_t line_end = 0;
   while (start < measurements.size()) {
     line_end = start;
-    for(uint16_t end = start+5; end < 360; end++) {
+    for(uint16_t end = start+min_point_count; end < 360; end++) {
       auto const & block = points.block(start, 0, end-start+1, 3);
       if(is_line(block, tolerance)){
         line_end = end;

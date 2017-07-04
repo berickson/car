@@ -36,7 +36,7 @@ struct LidarScan {
     };
 
     vector<LidarMeasurement> measurements;
-    vector<ScanSegment> find_lines(double tolerance);
+    vector<ScanSegment> find_lines(double tolerance, int min_point_count = 8);
 
     LidarScan();
 

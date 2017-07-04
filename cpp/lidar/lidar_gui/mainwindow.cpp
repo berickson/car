@@ -35,8 +35,8 @@ QPointF MainWindow::world_to_screen(Eigen::Vector2f w) {
     t = t.Identity();
 
     double zoom = ui->zoom_slider->value();
+    t.translate(Eigen::Vector2f(0.5,0));
     t.scale(Eigen::Vector2f(-50 * zoom,50 * zoom));
-    t.translate(Eigen::Vector2f(25,0));
     t.rotate(M_PI/2.);
 
     Eigen::Vector2f s = t * w;
@@ -147,3 +147,13 @@ void MainWindow::on_show_text_checkbox_clicked()
   }
 }
 
+
+void MainWindow::on_show_walls_lines_checkbox_clicked()
+{
+
+}
+
+void MainWindow::on_show_measurements_checkbox_clicked()
+{
+
+}
