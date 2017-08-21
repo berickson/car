@@ -1,0 +1,4 @@
+
+#!/usr/bin/env bash
+sudo -E env "PATH=$PATH" gunicorn web_server:app -b 0.0.0.0:80 -w 1 --threads 2
+

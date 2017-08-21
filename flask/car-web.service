@@ -1,0 +1,12 @@
+[Unit]
+Description=Car Web Service
+ 
+[Service]
+WorkingDirectory=/home/pi/car/flask
+ExecStart=-/home/pi/miniconda3/bin/python web_server.py
+StandardOutput=journal
+ 
+[Install]
+WantedBy=multi-user.target
+Alias=car-web.service
+
