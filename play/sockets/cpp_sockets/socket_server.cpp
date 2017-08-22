@@ -98,7 +98,11 @@ public:
     return "";
   }
 
-  void send_response(std::string response);
+  void send_response(std::string response) {
+    if(client_socket_fd > 0) {
+      write(client_socket_fd, response.c_str(), response.length()+1);
+    }
+  }
 };
 
 
@@ -153,7 +157,8 @@ void play_with_socket_server() {
   while(true) {
     string s = server.get_request();
     if(s.length()) {
-      cout << s << endl;
+      server.send_response(string{"<"}+s+">");
+      // cout << s << endl;
     }
   }
 }
