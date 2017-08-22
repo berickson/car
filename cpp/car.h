@@ -183,7 +183,7 @@ private:
   list<WorkQueue<Dynamics>*> listeners;
   std::mutex listeners_mutex;
 
-  //SocketServer socket_server;
+  SocketServer socket_server;
   void process_socket();
 };
 
