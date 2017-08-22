@@ -3,7 +3,11 @@
 // http://www.linuxhowtos.org/data/6/server.c
 
 #include "socket_server.h"
-
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
 using namespace std;
 
 void error(const char *msg) {
@@ -15,6 +19,7 @@ void SocketServer::open_socket(int portno) {
   server_socket_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
   if (server_socket_fd < 0)
     error("ERROR opening socket");
+  struct sockaddr_in serv_addr;
   bzero((char *)&serv_addr, sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_addr.s_addr = INADDR_ANY;

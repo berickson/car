@@ -162,10 +162,9 @@ void set_optimize_velocity(double v){run_settings.optimize_velocity = v;}
 double get_optimize_velocity(){return run_settings.optimize_velocity;}
 
 
-
 SubMenu pi_menu {
-  {"shutdown",shutdown},
-  {"reboot",reboot},
+  MenuItem{"shutdown",shutdown},
+  MenuItem{"reboot",reboot},
   //{"restart",restart},
   //{"update software 2",update_software}
 };

@@ -7,11 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sstream>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
+
 
 class SocketServer {
 public:
@@ -22,7 +18,6 @@ public:
 
   int server_socket_fd = -1;
   int client_socket_fd = -1;
-  struct sockaddr_in serv_addr;
   const int max_connection_count = 1;
   size_t buffer_next = 0;
   size_t buffer_end = 0;
