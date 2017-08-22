@@ -65,9 +65,9 @@ int main(int, char *[]) {
 
   } catch (string & s) {
     log_error(s);
-    log_error("main exiting because of erorr");
+    log_error("main exiting because of error");
   } catch (...) {
-    log_error("main exiting because of erorr");
+    log_error("main exiting because of error");
   }
   log_info("exit main");
 }

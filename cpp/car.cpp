@@ -7,6 +7,7 @@
 #include "logger.h"
 #include <chrono>
 #include "async_buf.h"
+#include "socket_server.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -40,7 +41,23 @@ void Car::connect_usb() {
   usb_thread = thread(&Car::usb_thread_start, this);
 }
 
+void Car::process_socket() {
+  while(true){
+    string request = socket_server.get_request();
+    if(request.length()==0) return;
+    if(request=="get_state"){
+      stringstream reply;
+      reply << "{v_bat:" << get_voltage()<<"}";
+      socket_server.send_response(reply.str());
+    } else {
+      socket_server.send_response("Error, unknown command: "+request);
+    }
+  }
+
+}
+
 void Car::usb_thread_start() {
+  socket_server.open_socket(5571);
   usb.add_line_listener(&usb_queue);
   usb.write_on_connect("\ntd+\n");
   usb.run();
@@ -51,6 +68,7 @@ void Car::usb_thread_start() {
         log_warning_if_duration_exceeded w("processing usb line", 10ms);
         process_line_from_log(line);
       }
+      process_socket();
     }
     catch (string error_string) {
       log_error("error caught in usb_thread_start"+error_string);

@@ -28,6 +28,7 @@ public:
   const int max_connection_count = 1;
   size_t buffer_next = 0;
   size_t buffer_end = 0;
+  static const size_t buffer_size = 2000;
   stringstream ss;
 
   void open_socket(int portno) {
@@ -44,7 +45,7 @@ public:
     listen(server_socket_fd, max_connection_count);
   }
 
-  char buffer[256];
+  char buffer[buffer_size];
 
   std::string get_request() {
     // ensure connected to client
@@ -72,8 +73,8 @@ public:
         int result = select(client_socket_fd + 1, &readset, NULL, NULL, &timeout);
         if(result < 1) return "";
 
-          bzero(buffer, 256);
-          buffer_end = recv(client_socket_fd, buffer, 1, MSG_DONTWAIT);
+          bzero(buffer, buffer_size);
+          buffer_end = recv(client_socket_fd, buffer, buffer_size-1, MSG_DONTWAIT);
           if (buffer_end  == 0) {
             // client disconnected
             client_socket_fd = -1;

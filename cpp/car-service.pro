@@ -31,7 +31,8 @@ SOURCES += main.cpp \
     logger.cpp \
     speedometer.cpp \
     pid.cpp \
-    kalman.cpp
+    kalman.cpp \
+    socket_server.cpp
 
 HEADERS += \
     geometry.h \
@@ -64,7 +65,8 @@ HEADERS += \
     speedometer.h \
     pid.h \
     kalman.h \
-    async_buf.h
+    async_buf.h \
+    socket_server.h
 
 
 

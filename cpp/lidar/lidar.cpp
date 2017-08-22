@@ -29,17 +29,17 @@ std::__cxx11::string LidarScan::display_string() {
   return s.str();
 }
 
-Eigen::Vector2f homogeneous_to_2d(const Eigen::Vector3f & v) {
+Vector2f homogeneous_to_2d(const Vector3f & v) {
   return {v[0]/v[2], v[1]/v[2]};
 }
 
-Eigen::Vector3f normalized(const Eigen::Vector3f & v) {
-  Eigen::Vector3f rv;
+Vector3f normalized(const Vector3f & v) {
+  Vector3f rv;
   rv << v[0]/v[2],v[1]/v[2],1;
   return rv;
 }
 
-double distance_point_to_line(const Eigen::Vector3f & p, const Eigen::Vector3f & l) {
+double distance_point_to_line(const Vector3f & p, const Vector3f & l) {
 
   return fabs(normalized(l).dot(normalized(p)));
 }
@@ -50,18 +50,18 @@ points is matrix with homogeneous points in each row
 returns a,b,c (which is homogeneous coordinates for the line)
 */
 //template<typename Derived>
-Eigen::Vector3f fit_line(const Eigen::MatrixX3f & points) {
-  Eigen::JacobiSVD<Eigen::MatrixXf> svd(points,Eigen::ComputeFullV);
-  const Eigen::MatrixX3f & V = svd.matrixV();
-  Eigen::Vector3f rv = V.col(V.cols()-1);
+Vector3f fit_line(const MatrixX3f & points) {
+  JacobiSVD<MatrixXf> svd(points,ComputeFullV);
+  const MatrixX3f & V = svd.matrixV();
+  Vector3f rv = V.col(V.cols()-1);
   return rv;
 }
 
 // returns homogeneous coordinate to point on line closest to given point
 // see https://math.stackexchange.com/questions/727743/homogeneous-coordinates
 
-Eigen::Vector3f closest_point_on_line(Eigen::Vector3f line, Eigen::Vector3f point) {
-  Eigen::Vector3f pn = normalized(point);
+Vector3f closest_point_on_line(Vector3f line, Vector3f point) {
+  Vector3f pn = normalized(point);
   float u = pn(0);
   float v = pn(1);
   float w = pn(2);
@@ -69,7 +69,7 @@ Eigen::Vector3f closest_point_on_line(Eigen::Vector3f line, Eigen::Vector3f poin
   float a = line(0);
   float b = line(1);
   float c = line(2);
-  Eigen::Vector3f rv = normalized({b*(b*u-a*v)-a*c, -a*(b*u-a*v)-b*c, w*(a*a+b*b)});
+  Vector3f rv = normalized({b*(b*u-a*v)-a*c, -a*(b*u-a*v)-b*c, w*(a*a+b*b)});
   return rv;
 }
 
@@ -81,16 +81,16 @@ Eigen::Vector3f closest_point_on_line(Eigen::Vector3f line, Eigen::Vector3f poin
  returns a,b,c (which is homogeneous coordinates for the line
 */
 template <typename Derived>
-bool is_line(const Eigen::MatrixBase<Derived> & points, double tolerance) {
+bool is_line(const MatrixBase<Derived> & points, double tolerance) {
   if(points.hasNaN()){
     return false;
   }
-  Eigen::Vector3f p1 = points.row(0);
-  Eigen::Vector3f p2 = points.row(points.rows()-1);
+  Vector3f p1 = points.row(0);
+  Vector3f p2 = points.row(points.rows()-1);
 
   auto line = p1.cross(p2);
   for(int i = 0; i < points.rows(); i++) {
-    Eigen::Vector3f p = points.row(i);
+    Vector3f p = points.row(i);
     double d = distance_point_to_line(p, line);
     if(d>tolerance)
       return false;
@@ -100,7 +100,7 @@ bool is_line(const Eigen::MatrixBase<Derived> & points, double tolerance) {
 
 vector<LidarScan::ScanSegment> LidarScan::find_lines(double tolerance, int min_point_count) {
   vector<ScanSegment> found_lines;
-  Eigen::Matrix<float,360,3> points;
+  Matrix<float,360,3> points;
 
   // get all measurment locations as homogeneous 2d points
   for(int i=0; i < 360; ++i) {
@@ -131,7 +131,7 @@ vector<LidarScan::ScanSegment> LidarScan::find_lines(double tolerance, int min_p
     }
     if(line_end != start) {
       auto const & block = points.block(start, 0, line_end-start+1, 3);
-      Eigen::Vector3f line = fit_line(block);
+      Vector3f line = fit_line(block);
 
       ScanSegment s;
       s.begin_index = start;
@@ -185,7 +185,7 @@ vector<Corner>  find_corners(const vector<LidarScan::ScanSegment> & walls) {
     Vector3f line2 = line_through_points(w2.p1, w2.p2);
     Angle theta = angle_between_lines(line1, line2);
     if(isnan(theta.radians())|| theta.degrees()>95 || theta.degrees() < 85) {
-      cout << "rejected corner " << theta.degrees() <<endl;
+      //cout << "rejected corner " << theta.degrees() <<endl;
       continue;
     }
 
@@ -196,7 +196,7 @@ vector<Corner>  find_corners(const vector<LidarScan::ScanSegment> & walls) {
     if((w1.p2 - w2.p1).norm() > std::min( (w1.p2-w1.p1).norm(), (w2.p2-w1.p1).norm())) {
       continue;
     }
-    cout << " found close corners at angle " << theta.degrees() << " degres" << endl;
+    //cout << " found close corners at angle " << theta.degrees() << " degres" << endl;
     Corner corner;
     corner.p = homogeneous_to_2d(corner_point);
     corners.push_back(corner);
@@ -300,9 +300,9 @@ void test_line_fit(MatrixX3f m, Vector3f p) {
 void test_lidar() {
   cout << "lidar tests" << endl;
 
-  Eigen::Matrix<float,4,3> m;
+  Matrix<float,4,3> m;
   m << 1.,0.,1., 2.,1.,1., 3.,2.,1., 4.,3.,1. ;
-  Eigen::Vector3f p {3.0,0.1,1};
+  Vector3f p {3.0,0.1,1};
   test_line_fit(m,p);
   cout << "---------------------------" << endl;
   m << 0.,0.,1., 1.,0.,1., 2.,0.,1., 3.,0.,1. ;

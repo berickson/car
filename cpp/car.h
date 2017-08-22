@@ -11,6 +11,7 @@
 #include "usb.h"
 #include "speedometer.h"
 #include "async_buf.h"
+#include "socket_server.h"
 
 using namespace std;
 
@@ -181,6 +182,9 @@ private:
   void read_configuration(string path);
   list<WorkQueue<Dynamics>*> listeners;
   std::mutex listeners_mutex;
+
+  SocketServer socket_server;
+  void process_socket();
 };
 
 
