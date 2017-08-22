@@ -1,0 +1,4 @@
+#ifndef SOCKET_SERVER_H
+#define SOCKET_SERVER_H
+
+#endif // SOCKET_SERVER_H
