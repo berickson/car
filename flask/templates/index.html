@@ -79,15 +79,12 @@ app.controller("carController", function($scope, $http, $timeout) {
     });
   var poller = function() {
     $http.get('/car/get_state').
-      success(function(data, status, headers, config) {
-        $scope.car_status = data;
-      }).
-      error(function(data, status, headers, config) {
-        // log error
+      then(function(r) {
+        $scope.car_status = r.data;
+        $timeout(poller,100);
       });
-      $timeout(poller,100);
     };
-    poller();
+  poller();
 
 
 });    
