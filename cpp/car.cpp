@@ -47,7 +47,7 @@ void Car::process_socket() {
     if(request.length()==0) return;
     if(request=="get_state"){
       stringstream reply;
-      reply << "{v_bat:" << get_voltage()<<"}";
+      reply << "{\"v_bat\":" << get_voltage()<<"}";
       socket_server.send_response(reply.str());
     } else {
       socket_server.send_response("Error, unknown command: "+request);

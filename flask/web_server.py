@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
 
 '''
 started from tutorial at https://www.tutorialspoint.com/flask/flask_application.htm
 '''
 import pandas as pd # must import BEFORE flask or high CPU on PI
-from flask import Flask, request, send_from_directory, jsonify
+from flask import Flask, request, send_from_directory, jsonify,Response
+import socket
 import tracks
 
 TRACK_STORAGE = tracks.TrackStorage()
@@ -29,6 +31,16 @@ class CommandError(Exception):
         rv = dict(self.payload or ())
         rv['message'] = self.message
         return rv
+
+@app.route('/car/get_state')
+def get_car_state():
+#    recv_string = '{"vbat":3}'
+    connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    connection.connect(('localhost', 5571))
+    connection.send(("get_state\x00").encode())
+    recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
+    connection.close()
+    return Response(recv_string,mimetype='application/json')
 
 
 @app.route('/command/go', methods=['PUT'])

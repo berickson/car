@@ -62,7 +62,7 @@ string SocketServer::get_request() {
       if (buffer_end  == 0) {
         // client disconnected
         client_socket_fd = -1;
-        cout << "client disconnected" << endl;
+        // cout << "client disconnected" << endl;
         return "";
       }
     }
