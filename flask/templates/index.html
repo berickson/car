@@ -78,7 +78,7 @@ app.controller("carController", function($scope, $http, $timeout) {
       // log error
     });
   var poller = function() {
-    $http.get('/car/get_state').
+    $http.get('/car/get_state',{timeout:500}).
       then(function(r) {
         $scope.car_status = r.data;
         $timeout(poller,100);
