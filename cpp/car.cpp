@@ -52,7 +52,7 @@ void Car::process_socket() {
       reply << ", \"bl\":" << get_back_left_wheel().get_json_state();
       reply << ", \"br\":" << get_back_right_wheel().get_json_state();
       reply << ", \"fl\":" << get_front_left_wheel().get_json_state();
-      reply << ", \"fl\":" << get_front_right_wheel().get_json_state();
+      reply << ", \"fr\":" << get_front_right_wheel().get_json_state();
       reply << "}";
 
       socket_server.send_response(reply.str());

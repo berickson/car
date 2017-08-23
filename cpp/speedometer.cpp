@@ -27,12 +27,13 @@ double Speedometer::get_meters_travelled() const {
   return meters_travelled;
 }
 
-std::__cxx11::string Speedometer::get_json_state() const
+std::string Speedometer::get_json_state() const
 {
   stringstream ss;
   ss << "{";
-  ss << "\"v\":" << this->get_smooth_velocity();
-  ss << ",\"a\":" << this->get_smooth_acceleration();
+  ss << "\"v\":" << this->get_velocity();
+  ss << ",\"v_smooth\":" << this->get_smooth_velocity();
+  ss << ",\"a_smooth\":" << this->get_smooth_acceleration();
   ss << ",\"meters\":" << this->get_meters_travelled();
   ss << ",\"ticks\":" << this->get_ticks();
   ss << "}";

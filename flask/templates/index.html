@@ -4,7 +4,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
 </head>
 <body>
-  <h1>Anaranjado!</h1>
+  <h1>Anaranjado! {{poll_ok ? "online" : "offline"}} </h1>
   <form>
     select a track:
     <select name='2' ng-model="selected_track" id="2" ng-options="track.name for track in tracks"></select>
@@ -64,7 +64,7 @@ app.controller("carController", function($scope, $http, $timeout) {
         }).error(function(data, status, headers, config) {
           $scope.route_names = ['n/a'];
         // log error
-      });
+        });
     }
   });
 
@@ -77,11 +77,17 @@ app.controller("carController", function($scope, $http, $timeout) {
     error(function(data, status, headers, config) {
       // log error
     });
+  $scope.poll_ok = false;
   var poller = function() {
-    $http.get('/car/get_state',{timeout:500}).
-      then(function(r) {
+    $http({method:'GET', timeout:5000, url : '/car/get_state'})
+      .then(function(r) {
         $scope.car_status = r.data;
+        $scope.poll_ok = true;
         $timeout(poller,100);
+      },
+      function(e) { 
+        $scope.poll_ok = false;
+        $timeout(poller,1000);
       });
     };
   poller();
