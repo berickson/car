@@ -36,8 +36,8 @@ class TrackStorage:
     '''
     storage for all Tracks
     '''
-    def __init__(self, folder='../tracks'):
-        self.folder = os.path.abspath(folder)
+    def __init__(self, folder='/home/pi/car/tracks'):
+        self.folder = folder #os.path.abspath(folder)
 
     def get_track(self, name):
         ''' returns a single track '''

@@ -35,11 +35,15 @@ class CommandError(Exception):
 @app.route('/car/get_state')
 def get_car_state():
 #    recv_string = '{"vbat":3}'
-    connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    connection.connect(('localhost', 5571))
-    connection.send(("get_state\x00").encode())
-    recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
-    connection.close()
+    recv_strin = ""
+    try:
+      connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      connection.connect(('localhost', 5571))
+      connection.send(("get_state\x00").encode())
+      recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
+      connection.close()
+    except:
+      pass
     return Response(recv_string,mimetype='application/json')
 
 
