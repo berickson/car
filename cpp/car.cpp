@@ -47,7 +47,14 @@ void Car::process_socket() {
     if(request.length()==0) return;
     if(request=="get_state"){
       stringstream reply;
-      reply << "{\"v_bat\":" << get_voltage()<<"}";
+      reply << "{";
+      reply << "\"v_bat\":" << get_voltage();
+      reply << ", \"bl\":" << get_back_left_wheel().get_json_state();
+      reply << ", \"br\":" << get_back_right_wheel().get_json_state();
+      reply << ", \"fl\":" << get_front_left_wheel().get_json_state();
+      reply << ", \"fl\":" << get_front_right_wheel().get_json_state();
+      reply << "}";
+
       socket_server.send_response(reply.str());
     } else {
       socket_server.send_response("Error, unknown command: "+request);
