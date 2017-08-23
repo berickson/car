@@ -3,6 +3,7 @@
 
 #include "math.h"
 #include "kalman.h"
+#include <string>
 
 class Speedometer
 {
@@ -26,8 +27,8 @@ public:
   double get_velocity() const;
   double get_smooth_velocity() const;
   double get_smooth_acceleration() const;
-
   double get_meters_travelled() const;
+  std::string get_json_state() const;
 
 
   // updates internal state and returns meters just moved
