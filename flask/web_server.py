@@ -7,6 +7,7 @@ import pandas as pd # must import BEFORE flask or high CPU on PI
 from flask import Flask, request, send_from_directory, jsonify,Response
 import socket
 import tracks
+import psutil
 
 TRACK_STORAGE = tracks.TrackStorage()
 
@@ -31,6 +32,14 @@ class CommandError(Exception):
         rv = dict(self.payload or ())
         rv['message'] = self.message
         return rv
+
+@app.route('/pi/get_state')
+def get_pi_state():
+    try:
+        cpu = psutil.cpu_percent(percpu=True)
+        return jsonify(cpu=cpu)
+    except:
+        return jsonify(error='error reading cpu_percent')
 
 @app.route('/car/get_state')
 def get_car_state():

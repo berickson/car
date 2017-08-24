@@ -25,6 +25,10 @@
       heading: {{car_state.heading * 180 / Math.PI | number:0}}°
     </div>
   </div>
+  <div style='display:inline-block'>
+    <div ng-repeat="cpu in pi_state.cpu">{{cpu}}
+    </div>
+  </div>
 
   <form>
     select a track:
@@ -101,6 +105,8 @@ app.controller("carController", function($scope, $http, $timeout) {
     });
   $scope.poll_ok = false;
   $scope.display_car_state = false;
+
+
   var poller = function() {
     $http({method:'GET', timeout:5000, url : '/car/get_state'})
       .then(function(r) {
@@ -118,6 +124,18 @@ app.controller("carController", function($scope, $http, $timeout) {
       });
     };
   poller();
+
+  var poller2 = function() {
+    $http({method:'GET', timeout:5000, url : '/pi/get_state'})
+      .then(function(r) {
+        $scope.pi_state = r.data;
+        $timeout(poller2,1000);
+      },
+      function(e) { 
+        $timeout(poller2,1000);
+      });
+    };
+  poller2();
 
 
 });    
