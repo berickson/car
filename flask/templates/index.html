@@ -6,27 +6,30 @@
 <body>
   <h1>Orange Crash</h1>
   <div>{{poll_ok ? "online" : "offline"}}</div>
-  <div style='display:inline-block'>
+  <div style='display:inline-block;margin:30px'>
+    <div>{{car_state.v_bat | number:1}}V</div>
       <svg width="64" height="32">
       <rect x="2" y="2" width="60" height="28" style="fill:lightgray;stroke:gray;stroke-width:2" />
       <rect x="4" y="4" width="{{56*battery_percent/100}}" height="24" style="fill:black;stroke:black" />
 
     </svg>
-    {{car_state.v_bat | number:1}}V
     <div>{{battery_percent | number:0}}% </div>
   </div>
-  <div style='display:inline-block'>
+  <div style='display:inline-block';margin:30px>
+    <div>Heading</div>
+    <div>
     <svg width="32" height="32">
       <circle cx="16" cy="16" r="14" stroke="gray" stroke-width="2" fill="LightGray" />
       <line x1="16" y1="16" x2={{16-14*Math.sin(car_state.heading)}} y2={{16-14*Math.cos(car_state.heading)}} style="stroke:gray;stroke-width:2" />
     </svg>
+    </div>
 
     <div>
-      heading: {{car_state.heading * 180 / Math.PI | number:0}}°
+      {{car_state.heading * 180 / Math.PI | number:0}}°
     </div>
   </div>
-  <div style='display:inline-block'>
-    <div ng-repeat="cpu in pi_state.cpu">{{cpu}}
+  <div style='display:inline-block;margin:30px'>
+    <div ng-repeat="cpu in pi_state.cpu">cpu{{$index}} {{cpu}}
     </div>
   </div>
 
@@ -73,8 +76,8 @@ app.controller("carController", function($scope, $http, $timeout) {
     if ($scope.selected_track !== null && $scope.selected_track.name.length > 0) {
       console.log("selected track:",$scope.selected_track)
       $http.get('/tracks/'+$scope.selected_track.name+"/routes").
-        success(function(routes, status, headers, config) {
-          $scope.routes = routes;
+        success(function(result, status, headers, config) {
+          $scope.routes = result.routes;
         }).error(function(data, status, headers, config) {
           $scope.route_names = ['n/a'];
         // log error
@@ -96,8 +99,8 @@ app.controller("carController", function($scope, $http, $timeout) {
 
 
   $http.get('/tracks').
-    success(function(tracks, status, headers, config) {
-      $scope.tracks = tracks;
+    success(function(result, status, headers, config) {
+      $scope.tracks = result.tracks;
       $scope.route_names = ['data'];
     }).
     error(function(data, status, headers, config) {
