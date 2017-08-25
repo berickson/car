@@ -20,6 +20,7 @@ class Car
 public:
   Car(bool online = true);
   ~Car();
+
   void reset_odometry();
 
   void add_listener(WorkQueue<Dynamics>*);
@@ -170,6 +171,7 @@ public:
 
   string command_from_socket = "";
 private:
+  bool rc_mode_enabled = false;
   unique_ptr<async_buf> input_recording_buf;
   unique_ptr<ostream> input_recording_file;
 
