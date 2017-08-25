@@ -61,6 +61,7 @@ string SocketServer::get_request() {
       buffer_end = recv(client_socket_fd, buffer, buffer_size-1, MSG_DONTWAIT);
       if (buffer_end  == 0) {
         // client disconnected
+        close(client_socket_fd);
         client_socket_fd = -1;
         // cout << "client disconnected" << endl;
         return "";

@@ -3,6 +3,7 @@ access to track data
 '''
 import os
 import os.path
+from operator import itemgetter, attrgetter, methodcaller
 
 class FolderBasedItem:
     ''' folder for a track '''
@@ -25,7 +26,9 @@ class Track(FolderBasedItem):
     def get_routes(self):
         ''' returns routes for this track '''
         routes_folder = os.path.join(self.folder, 'routes')
-        return [self.get_route(name) for name in os.listdir(routes_folder)]
+        routes = [self.get_route(name) for name in os.listdir(routes_folder)]
+        routes=sorted(routes,key=methodcaller('get_name'))
+        return routes
 
     def get_route(self, name):
         ''' returns route with given name '''
@@ -36,8 +39,8 @@ class TrackStorage:
     '''
     storage for all Tracks
     '''
-    def __init__(self, folder='../tracks'):
-        self.folder = os.path.abspath(folder)
+    def __init__(self, folder='/home/pi/car/tracks'):
+        self.folder = folder #os.path.abspath(folder)
 
     def get_track(self, name):
         ''' returns a single track '''
@@ -45,4 +48,6 @@ class TrackStorage:
 
     def get_tracks(self):
         ''' returns list of tracks '''
-        return [self.get_track(name) for name in os.listdir(self.folder)]
+        tracks = [self.get_track(name) for name in os.listdir(self.folder)]
+        tracks=sorted(tracks,key=methodcaller('get_name'))
+        return tracks

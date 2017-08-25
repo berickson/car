@@ -49,6 +49,7 @@ void Car::process_socket() {
       stringstream reply;
       reply << "{";
       reply << "\"v_bat\":" << get_voltage();
+      reply << ", \"heading\":" << get_heading();
       reply << ", \"bl\":" << get_back_left_wheel().get_json_state();
       reply << ", \"br\":" << get_back_right_wheel().get_json_state();
       reply << ", \"fl\":" << get_front_left_wheel().get_json_state();

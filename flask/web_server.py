@@ -7,6 +7,7 @@ import pandas as pd # must import BEFORE flask or high CPU on PI
 from flask import Flask, request, send_from_directory, jsonify,Response
 import socket
 import tracks
+import psutil
 
 TRACK_STORAGE = tracks.TrackStorage()
 
@@ -32,14 +33,26 @@ class CommandError(Exception):
         rv['message'] = self.message
         return rv
 
+@app.route('/pi/get_state')
+def get_pi_state():
+    try:
+        cpu = psutil.cpu_percent(percpu=True)
+        return jsonify(cpu=cpu)
+    except:
+        return jsonify(error='error reading cpu_percent')
+
 @app.route('/car/get_state')
 def get_car_state():
 #    recv_string = '{"vbat":3}'
-    connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    connection.connect(('localhost', 5571))
-    connection.send(("get_state\x00").encode())
-    recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
-    connection.close()
+    recv_strin = ""
+    try:
+      connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      connection.connect(('localhost', 5571))
+      connection.send(("get_state\x00").encode())
+      recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
+      connection.close()
+    except:
+      pass
     return Response(recv_string,mimetype='application/json')
 
 
@@ -57,16 +70,16 @@ def get_d3():
 @app.route('/tracks')
 def get_tracks():
     tracks = TRACK_STORAGE.get_tracks()
-    return jsonify([{'name': t.get_name()} for t in tracks])
+    return jsonify(tracks=[{'name': t.get_name()} for t in tracks])
 
 @app.route('/tracks/<track_name>')
 def get_track_options(track_name):
-    return jsonify({'name', track_name})
+    return jsonify(track={'name', track_name})
 
 @app.route('/tracks/<track_name>/routes')
 def get_routes(track_name):
     routes = TRACK_STORAGE.get_track(track_name).get_routes()
-    return jsonify([{'name':route.get_name()} for route in routes])
+    return jsonify(routes=[{'name':route.get_name()} for route in routes])
 
 @app.route('/tracks/<track_name>/routes/<route_name>')
 def get_route(track_name, route_name):
