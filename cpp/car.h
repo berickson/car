@@ -167,6 +167,8 @@ public:
   bool process_line_from_log(string s);
   void apply_dynamics(Dynamics & d);
   Usb usb;
+
+  string command_from_socket = "";
 private:
   unique_ptr<async_buf> input_recording_buf;
   unique_ptr<ostream> input_recording_file;

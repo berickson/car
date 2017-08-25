@@ -7,7 +7,7 @@
 #include <unistd.h> // usleep
 #include "system.h"
 
-void ConsoleMenu::run() {
+void ConsoleMenu::  run() {
   ui.init();
   // curses initialization
 

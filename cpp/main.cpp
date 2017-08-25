@@ -34,10 +34,16 @@ using namespace std;
 
 
 
+void run_socket() {
+  Car car;
+
+}
+
 int main(int, char *[]) {
   try {
     log_info("enter main");
-    run_car_menu();
+    // run_car_menu();
+    run_socket();
 
 
     //test_ackerman();

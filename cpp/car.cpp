@@ -59,6 +59,9 @@ void Car::process_socket() {
     } else {
       socket_server.send_response("Error, unknown command: "+request);
     }
+    if(request=="go") {
+      command_from_socket = "go";
+    }
   }
 }
 

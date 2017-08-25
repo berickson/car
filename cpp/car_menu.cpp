@@ -363,6 +363,20 @@ string calibration_string(int a) {
   return ss.str();
 }
 
+void run_car_socket() {
+  Car car;
+  CarUI ui;
+  run_settings.load_from_file(run_settings_path);
+
+  while(true) {
+    if(car.command_from_socket == "go") {
+      car.command_from_socket = "";
+      go(car, ui);
+    }
+    usleep(30000);
+  }
+}
+
 void run_car_menu() {
 #ifdef RASPBERRY_PI
   Car car;

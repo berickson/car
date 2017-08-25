@@ -10,5 +10,6 @@ public:
 };
 
 void run_car_menu();
+void run_car_socket();
 
 #endif // CARMENU_H
