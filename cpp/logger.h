@@ -22,6 +22,15 @@ private:
   std::chrono::high_resolution_clock::time_point start_time;
 };
 
+// logs info on entry and exit of a scope
+class log_entry_exit {
+public:
+  log_entry_exit(std::string scope_label);
+  ~log_entry_exit();
+private:
+  std::string scope_label;
+};
+
 
 
 #endif // LOGGER_H

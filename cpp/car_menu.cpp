@@ -194,7 +194,7 @@ SubMenu crash_recovery_menu{};
 SubMenu optimize_velocity_menu{};
 
 void go(Car& car, CarUI & ui) {
-  log_info("entering go menu command");
+  log_entry_exit("go");
   try {
     auto f = FileNames();
     string & track_name = run_settings.track_name;
@@ -306,7 +306,6 @@ void go(Car& car, CarUI & ui) {
     //ui.wait_key();
 
   }
-  log_info("exiting go menu command");
 }
 
 void record(Car& car, CarUI & ui) {

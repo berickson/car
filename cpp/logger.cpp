@@ -56,3 +56,14 @@ log_warning_if_duration_exceeded::~log_warning_if_duration_exceeded()
   }
 }
 
+
+log_entry_exit::log_entry_exit(string scope_label)
+{
+  this->scope_label = scope_label;
+  log_info("entering " + scope_label);
+}
+
+log_entry_exit::~log_entry_exit()
+{
+  log_info("exiting " + scope_label);
+}
