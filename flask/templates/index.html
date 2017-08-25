@@ -38,19 +38,20 @@
     <select name='2' ng-model="selected_track" id="2" ng-options="track.name for track in tracks"></select>
     select a route: <select name='1' ng-model="selected_route" id="1" ng-options="route.name for route in routes"></select>
   </form>
-  <button ng-click="go()">Go!{{go_error}}</button>
-    <h2> Selected track: {{selected_track.name}}!</h2>
-    <h2> Selected route: {{selected_route.name}}!</h2>
-    <label><h3><input type="checkbox" id="xxx" ng-model="display_car_state"> car_state: </h3></label>
-    <div ng-if="display_car_state" ng-repeat="(key,value) in car_state">{{key}} = {{value}}</div>
-    <table>
-    <tr><td>secs</td><td>x</td><td>y</td></tr>
-    <tr ng-repeat="path_node in route_path">
-        <td>{{path_node.secs}}</td>
-        <td>{{path_node.secs}}</td>
-        <td>{{path_node.secs}}</td>
-    </tr>
-    </table>
+  <button ng-click="go()">Go{{go_error}}</button>
+  <button ng-click="stop()">Stop{{go_error}}</button>
+  <h2> Selected track: {{selected_track.name}}!</h2>
+  <h2> Selected route: {{selected_route.name}}!</h2>
+  <label><h3><input type="checkbox" id="xxx" ng-model="display_car_state"> car_state: </h3></label>
+  <div ng-if="display_car_state" ng-repeat="(key,value) in car_state">{{key}} = {{value}}</div>
+  <table>
+  <tr><td>secs</td><td>x</td><td>y</td></tr>
+  <tr ng-repeat="path_node in route_path">
+      <td>{{path_node.secs}}</td>
+      <td>{{path_node.secs}}</td>
+      <td>{{path_node.secs}}</td>
+  </tr>
+  </table>
 </body>
 <script>
 var app = angular.module("car", []);
@@ -70,7 +71,16 @@ app.controller("carController", function($scope, $http, $timeout) {
       $scope.go_error = "  ("+code+")"+response.message;
     })
     console.log("go clicked");
-  }
+  };
+
+  $scope.stop = function() {
+    $http.put('/command/stop',"1").success(function() {
+      console.log('stop success');
+    }).error(function(response,code) {
+      $scope.stop_error = "  ("+code+")"+response.message;
+    })
+    console.log("stop clicked");
+  };
 
   $scope.$watch("selected_track", function(newValue, oldValue) {
     if ($scope.selected_track !== null && $scope.selected_track.name.length > 0) {

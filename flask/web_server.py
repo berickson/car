@@ -68,6 +68,18 @@ def command_go():
       pass
     return jsonify(result=recv_string)
 
+@app.route('/command/stop', methods=['PUT'])
+def command_stop():
+    try:
+      connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      connection.connect(('localhost', 5571))
+      connection.send(("stop\x00").encode())
+      recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
+      connection.close()
+    except:
+      pass
+    return jsonify(result=recv_string)
+
 
 @app.route('/d3')
 def get_d3():

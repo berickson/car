@@ -131,11 +131,13 @@ void Car::send_command(string command) {
 }
 
 void Car::set_rc_mode() {
+  rc_mode_enabled = true;
   send_command("rc");
 
 }
 
 void Car::set_manual_mode() {
+  rc_mode_enabled = false;
   send_command("m");
 }
 
