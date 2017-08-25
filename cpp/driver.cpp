@@ -210,9 +210,9 @@ void Driver::drive_route(Route & route) {
 
   WorkQueue<Dynamics> queue;
   car.add_listener(&queue);
-  ui.clear();
-  ui.print("[abort]");
-  ui.refresh();
+  //ui.clear();
+  //ui.print("[abort]");
+  //ui.refresh();
   try {
     car.set_rc_mode();
     PID steering_pid;
@@ -233,11 +233,11 @@ void Driver::drive_route(Route & route) {
     recovering_from_crash = false;
     int crash_count = 0;
     while(!route_complete) {
-      if(ui.getkey()!=-1) {
-        error_text = "run aborted by user";
-        log_info("run aborted by user");
-        route_complete = true;
-      }
+    //  if(ui.getkey()!=-1) {
+    //    error_text = "run aborted by user";
+    //    log_info("run aborted by user");
+    //    route_complete = true;
+    //  }
 
 
       Dynamics d;

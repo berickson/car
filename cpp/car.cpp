@@ -62,6 +62,7 @@ void Car::process_socket() {
     }
     if(request=="go") {
       command_from_socket = "go";
+      socket_server.send_response("ok");
     }
   }
 }

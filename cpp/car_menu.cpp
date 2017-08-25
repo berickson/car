@@ -209,9 +209,9 @@ void go(Car& car, CarUI & ui) {
     car.reset_odometry();
     string input_path = f.path_file_path(track_name,route_name);
     Route rte;
-    ui.clear();
-    ui.print("loading route\n");
-    ui.refresh();
+    //ui.clear();
+    //ui.print("loading route\n");
+    //ui.refresh();
     rte.load_from_file(input_path);
     StereoCamera camera;
     if(run_settings.capture_video) {
@@ -219,33 +219,33 @@ void go(Car& car, CarUI & ui) {
     }
 
 
-    ui.clear();
-    ui.print("smoothing route\n");
-    ui.refresh();
+    //ui.clear();
+    //ui.print("smoothing route\n");
+    //ui.refresh();
     rte.smooth(run_settings.k_smooth);
-    ui.print("pruning route\n");
+    //ui.print("pruning route\n");
     rte.prune(run_settings.prune_max, run_settings.prune_tolerance);
-    ui.refresh();
+    //ui.refresh();
 
-    ui.clear();
-    ui.move(0,0);
-    ui.refresh();
+    //ui.clear();
+    //ui.move(0,0);
+    //ui.refresh();
     if(run_settings.optimize_velocity) {
       rte.optimize_velocity(run_settings.max_v, run_settings.max_accel_lat, run_settings.max_accel, run_settings.max_decel);
-      ui.print("optimized velocity\n");
+      //ui.print("optimized velocity\n");
     } else {
-      ui.print("using saved velocities\n");
+      //ui.print("using saved velocities\n");
     }
-    ui.print((string)"max_v calculated at " + format(rte.get_max_velocity(),4,1) + "\n\n");
-    ui.print("[back] [] []  [go]");
-    ui.refresh();
-    if(ui.wait_key()!='4') {
-      return;
-    }
+    //ui.print((string)"max_v calculated at " + format(rte.get_max_velocity(),4,1) + "\n\n");
+    //ui.print("[back] [] []  [go]");
+    //ui.refresh();
+    //if(ui.wait_key()!='4') {
+    //  return;
+    //}
 
-    ui.clear();
-    ui.print((string)"playing route with max velocity " + format(rte.get_max_velocity()));
-    ui.refresh();
+    //ui.clear();
+    //ui.print((string)"playing route with max velocity " + format(rte.get_max_velocity()));
+    //ui.refresh();
 
     if(run_settings.capture_video) {
       vector<string> video_paths = f.stereo_video_file_paths(track_name,route_name,run_name);
@@ -272,8 +272,8 @@ void go(Car& car, CarUI & ui) {
     }
     car.end_recording_input();
     car.end_recording_state();
-    ui.clear();
-    ui.print("making path");
+    //ui.clear();
+    //ui.print("making path");
     log_info("making path");
 
     string path_file_path = f.path_file_path(track_name, route_name, run_name);
@@ -283,27 +283,27 @@ void go(Car& car, CarUI & ui) {
     run_settings.write_to_file(run_settings_path);
 
     if(error_text.size()) {
-      ui.clear();
-      ui.print((string) "Error:: \n"+error_text);
+      //ui.clear();
+      //ui.print((string) "Error:: \n"+error_text);
       log_error((string) "Error during play route: "+error_text);
 
-      ui.print("[ok]");
-      ui.refresh();
-      ui.wait_key();
+      //ui.print("[ok]");
+      //ui.refresh();
+      //ui.wait_key();
     } else {
-      ui.clear();
-      ui.print("Playback Success [ok]");
-      ui.refresh();
-      ui.wait_key();
+      //ui.clear();
+      //ui.print("Playback Success [ok]");
+      //ui.refresh();
+      //ui.wait_key();
     }
 
   } catch (string s) {
-    ui.clear();
-    ui.move(0,0);
-    ui.print("error: " + s);
+    //ui.clear();
+    //ui.move(0,0);
+    //ui.print("error: " + s);
     log_error("go caught error:" + s);
-    ui.refresh();
-    ui.wait_key();
+    //ui.refresh();
+    //ui.wait_key();
 
   }
   log_info("exiting go menu command");
@@ -364,16 +364,23 @@ string calibration_string(int a) {
 }
 
 void run_car_socket() {
-  Car car;
-  CarUI ui;
-  run_settings.load_from_file(run_settings_path);
+  try {
+    Car car;
+    CarUI ui;
+    run_settings.load_from_file(run_settings_path);
 
-  while(true) {
-    if(car.command_from_socket == "go") {
-      car.command_from_socket = "";
-      go(car, ui);
-    }
-    usleep(30000);
+    while(true) {
+      if(car.command_from_socket == "go") {
+        run_settings.track_name = "desk";
+        run_settings.route_name = "K";
+        car.command_from_socket = "";
+        go(car, ui);
+      }
+      usleep(30000);
+    } 
+  }
+  catch (...) {
+    log_error("exception caught in run_car_socket");
   }
 }
 
