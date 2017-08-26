@@ -508,7 +508,7 @@ void loop() {
        + ",aa,"+ ftos(mpu9150.ax) + "," + ftos(mpu9150.ay)+","+ ftos(mpu9150.az)
        +",spur_us,"+   microseconds_between_spur_pulse_count + "," + last_spur_pulse_us
        +",spur_odo," + spur_pulse_count
-       +",ping_mm,"+ping.millimeters()
+       +",mode,"+modes.current_task->name
        +",odo_fl,"+ fl_odo_a +"," +  fl_odo_a_us + "," + fl_odo_b +"," + fl_odo_b_us + "," + fl_odo_ab_us
        +",odo_fr,"+ fr_odo_a +"," +  fr_odo_a_us + "," + fr_odo_b +"," + fr_odo_b_us + "," + fr_odo_ab_us
        +",odo_bl,"+ bl_odo_a +"," +  bl_odo_a_us + "," + bl_odo_b +"," + bl_odo_b_us + "," + bl_odo_ab_us
