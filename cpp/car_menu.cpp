@@ -194,7 +194,7 @@ SubMenu crash_recovery_menu{};
 SubMenu optimize_velocity_menu{};
 
 void go(Car& car, CarUI & ui) {
-  log_entry_exit("go");
+  log_entry_exit w("go");
   try {
     auto f = FileNames();
     string & track_name = run_settings.track_name;
@@ -277,10 +277,22 @@ void go(Car& car, CarUI & ui) {
     log_info("making path");
 
     string path_file_path = f.path_file_path(track_name, route_name, run_name);
+    log_info("1");
     write_path_from_recording_file(recording_file_path, path_file_path);
-    write_dynamics_csv_from_recording_file(recording_file_path, f.dynamics_file_path(track_name,route_name,run_name));
+    log_info("2");
+    log_info("recording: " + recording_file_path);
+    log_info("track: " + track_name);
+    log_info("route: " + route_name);
+    log_info("run: " + run_name);
+    string dynamics_path = f.dynamics_file_path(track_name,route_name,run_name);
+    log_info(dynamics_path);
+    log_info(recording_file_path);
+    write_dynamics_csv_from_recording_file(recording_file_path, dynamics_path);
+    log_info("3");
     rte.write_to_file(f.planned_path_file_path(track_name, route_name, run_name));
+    log_info("4");
     run_settings.write_to_file(run_settings_path);
+    log_info("5");
 
     if(error_text.size()) {
       //ui.clear();
@@ -304,7 +316,8 @@ void go(Car& car, CarUI & ui) {
     log_error("go caught error:" + s);
     //ui.refresh();
     //ui.wait_key();
-
+  } catch (...) {
+    log_error("unknown error caught in go");
   }
 }
 
@@ -373,7 +386,11 @@ void run_car_socket() {
         run_settings.track_name = "desk";
         run_settings.route_name = "K";
         car.command_from_socket = "";
-        go(car, ui);
+        try {
+           go(car, ui);
+        } catch (...) {
+           log_error("exception caught in run_car_socket go");
+        }
       }
       usleep(30000);
     } 

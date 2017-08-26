@@ -61,10 +61,12 @@ void Car::process_socket() {
       socket_server.send_response("Error, unknown command: "+request);
     }
     if(request=="go") {
+      log_info("go");
       command_from_socket = "go";
       socket_server.send_response("ok");
     }
     if(request=="stop") {
+      log_info("stop requested from socket");
       if ( rc_mode_enabled) {
         set_esc_and_str(1500,1500);
       }
@@ -144,7 +146,7 @@ void Car::set_manual_mode() {
 void Car::set_esc_and_str(unsigned esc, unsigned str)
 {
   if(!rc_mode_enabled) {
-    throw("autonomous mode disabled");
+    throw string("autonomous mode disabled");
   }
   send_command((string)"pse "+to_string(str)+","+to_string(esc));
   commanded_esc = esc;

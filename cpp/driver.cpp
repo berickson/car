@@ -203,7 +203,7 @@ void Driver::set_evasive_actions_for_crash(Route& route)
 }
 
 void Driver::drive_route(Route & route) {
-  log_entry_exit("drive_route");
+  log_entry_exit w("drive_route");
 
   // we will set error text if something goes wrong
   string error_text = "";
