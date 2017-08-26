@@ -67,10 +67,6 @@ void Car::process_socket() {
     }
     if(request=="stop") {
       log_info("stop requested from socket");
-      if ( rc_mode_enabled) {
-        set_esc_and_str(1500,1500);
-      }
-
       set_manual_mode();
       socket_server.send_response("ok");
 
