@@ -1,4 +1,4 @@
-git pull &&./build && sudo killall car-service ; sudo ./run &
+git pull && ./build && sudo killall car-service ; sudo ./run &
 sudo systemctl restart car-web.service
 echo all done
 

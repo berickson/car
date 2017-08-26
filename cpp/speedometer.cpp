@@ -2,6 +2,7 @@
 #include "kalman.h"
 #include <algorithm>
 #include <sstream>
+#include "json.hpp"
 using namespace std;
 
 Speedometer::Speedometer()  {
@@ -27,17 +28,16 @@ double Speedometer::get_meters_travelled() const {
   return meters_travelled;
 }
 
-std::string Speedometer::get_json_state() const
+nlohmann::json Speedometer::get_json_state() const
 {
-  stringstream ss;
-  ss << "{";
-  ss << "\"v\":" << this->get_velocity();
-  ss << ",\"v_smooth\":" << this->get_smooth_velocity();
-  ss << ",\"a_smooth\":" << this->get_smooth_acceleration();
-  ss << ",\"meters\":" << this->get_meters_travelled();
-  ss << ",\"ticks\":" << this->get_ticks();
-  ss << "}";
-  return ss.str();
+  nlohmann::json j;
+
+  j["v"] = get_velocity();
+  j["v_smooth"] = get_smooth_velocity();
+  j["a_smooth"] = get_smooth_acceleration();
+  j["meters"] = get_meters_travelled();
+  j["ticks"] = get_ticks();
+  return j;
 }
 
 double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigned int a_us, int odo_b, unsigned int b_us, int ab_us, float ax) {

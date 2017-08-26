@@ -3,6 +3,7 @@
 #include "iostream"
 #include "split.h"
 #include "trim.h"
+#include "json.hpp"
 
 
 RunSettings::RunSettings(){
@@ -22,7 +23,44 @@ RunSettings::RunSettings(){
   route_name = route_names[0];
 }
 
+void RunSettings::write_to_file2(string path) {
+  fstream file;
+  file.open(path,ios_base::out);
+  if(!file.is_open()) {
+    throw (string) "could not open " + path;
+
+  }
+
+  nlohmann::json j;
+  j["track_name"] = track_name;
+  j["route_name"] = route_name;
+  j["max_accel_lat"] = max_accel_lat;
+  j["max_accel"] = max_accel;
+  j["max_decel"] = max_decel;
+  j["max_v"] = max_v;
+  j["steering_k_p"] = steering_k_p;
+  j["steering_k_i"] = steering_k_i;
+  j["steering_k_d"] = steering_k_d;
+  j["v_k_p"] = v_k_p;
+  j["v_k_i"] = v_k_i;
+  j["v_k_d"] = v_k_d;
+  j["slip_rate"] = slip_rate;
+  j["slip_slop"] = slip_slop;
+  j["t_ahead"] = t_ahead;
+  j["d_ahead"] = d_ahead;
+  j["k_smooth"] = k_smooth;
+  j["prune_max"] = prune_max;
+  j["prune_tolerance"] = prune_tolerance;
+  j["capture_video"] = capture_video;
+  j["crash_recovery"] = crash_recovery;
+  j["optimize_velocity"] = optimize_velocity;
+
+  const int indent = 2;
+  file << std::setw(indent) << j << std::endl;
+}
+
 void RunSettings::write_to_file(string path) {
+
   fstream file;
   file.open(path,ios_base::out);
   if(!file.is_open()) {
@@ -60,6 +98,7 @@ void RunSettings::write_to_file(string path) {
 
 void RunSettings::load_from_file(string path)
 {
+  
   ifstream file;
   file.open(path,ios_base::in);
   if(!file.is_open()) {

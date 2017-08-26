@@ -8,6 +8,7 @@
 #include <chrono>
 #include "async_buf.h"
 #include "socket_server.h"
+#include "json.hpp"
 
 using namespace std;
 using namespace std::chrono;
@@ -46,18 +47,19 @@ void Car::process_socket() {
     string request = socket_server.get_request();
     if(request.length()==0) return;
     if(request=="get_state"){
+      nlohmann::json j;
+      
+      
       stringstream reply;
-      reply << "{";
-      reply << "\"v_bat\":" << get_voltage();
-      reply << ", \"mode\":" << (rc_mode_enabled ? "\"automatic\"" : "\"manual\"");
-      reply << ", \"heading\":" << get_heading();
-      reply << ", \"bl\":" << get_back_left_wheel().get_json_state();
-      reply << ", \"br\":" << get_back_right_wheel().get_json_state();
-      reply << ", \"fl\":" << get_front_left_wheel().get_json_state();
-      reply << ", \"fr\":" << get_front_right_wheel().get_json_state();
-      reply << "}";
+      j["v_bat"] = get_voltage();
+      j["mode"] = rc_mode_enabled ? "\"automatic\"" : "\"manual\"";
+      j["heading"] = get_heading().radians();
+      j["bl"] = get_back_left_wheel().get_json_state();
+      j["br"] = get_back_right_wheel().get_json_state();
+      j["fl"] = get_front_left_wheel().get_json_state();
+      j["fr"] = get_front_right_wheel().get_json_state();
 
-      socket_server.send_response(reply.str());
+      socket_server.send_response(j.dump());
     } else {
       socket_server.send_response("Error, unknown command: "+request);
     }

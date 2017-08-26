@@ -205,7 +205,9 @@ void go(Car& car, CarUI & ui) {
     mkdir(runs_folder);
     mkdir(run_folder);
     run_settings.write_to_file(f.config_file_path(track_name, route_name, run_name));
+    run_settings.write_to_file2(f.config_file_path(track_name, route_name, run_name));
     run_settings.write_to_file(run_settings_path);
+    run_settings.write_to_file2(run_settings_path);
     car.reset_odometry();
     string input_path = f.path_file_path(track_name,route_name);
     Route rte;
@@ -288,11 +290,9 @@ void go(Car& car, CarUI & ui) {
     log_info(dynamics_path);
     log_info(recording_file_path);
     write_dynamics_csv_from_recording_file(recording_file_path, dynamics_path);
-    log_info("3");
     rte.write_to_file(f.planned_path_file_path(track_name, route_name, run_name));
-    log_info("4");
     run_settings.write_to_file(run_settings_path);
-    log_info("5");
+    run_settings.write_to_file2(run_settings_path+".json");
 
     if(error_text.size()) {
       //ui.clear();
