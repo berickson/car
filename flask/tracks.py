@@ -27,7 +27,7 @@ class Track(FolderBasedItem):
         ''' returns routes for this track '''
         routes_folder = os.path.join(self.folder, 'routes')
         routes = [self.get_route(name) for name in os.listdir(routes_folder)]
-        routes=sorted(routes,key=methodcaller('get_name'))
+        routes = sorted(routes, key=methodcaller('get_name'))
         return routes
 
     def get_route(self, name):
@@ -49,5 +49,8 @@ class TrackStorage:
     def get_tracks(self):
         ''' returns list of tracks '''
         tracks = [self.get_track(name) for name in os.listdir(self.folder)]
-        tracks=sorted(tracks,key=methodcaller('get_name'))
+        tracks = sorted(tracks, key=methodcaller('get_name'))
         return tracks
+
+def get_run_settings_path():
+    return "/home/pi/car/bin/pi/run_settings.json"

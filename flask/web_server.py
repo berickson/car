@@ -126,6 +126,18 @@ def get_path(track_name, route_name):
     s = df.to_json(orient=orient)
     return s
 
+@app.route('/run_settings')
+def run_settings():
+    path = 'empty'
+    try:
+        path = tracks.get_run_settings_path()
+        with open(path, 'r') as f:
+            run_settings = f.read()
+    except Exception:
+        return "there was an error reading " + path
+    return Response(run_settings, mimetype='application/json')
+
+
 
 @app.route('/car/status')
 def car_status():
