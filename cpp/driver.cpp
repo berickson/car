@@ -203,7 +203,7 @@ void Driver::set_evasive_actions_for_crash(Route& route)
 }
 
 void Driver::drive_route(Route & route) {
-  log_entry_exit("drive_route");
+  log_entry_exit w("drive_route");
 
   // we will set error text if something goes wrong
   string error_text = "";
@@ -287,7 +287,6 @@ void Driver::drive_route(Route & route) {
     error_text = "unknown exception caught during play_route";
   }
 
-  car.set_esc_and_str(1500,1500);
   car.set_manual_mode();
   car.remove_listener(&queue);
   if(error_text.size() > 0) throw error_text;
