@@ -49,6 +49,7 @@ void Car::process_socket() {
       stringstream reply;
       reply << "{";
       reply << "\"v_bat\":" << get_voltage();
+      reply << ", \"mode\":" << (rc_mode_enabled ? "\"automatic\"" : "\"manual\"");
       reply << ", \"heading\":" << get_heading();
       reply << ", \"bl\":" << get_back_left_wheel().get_json_state();
       reply << ", \"br\":" << get_back_right_wheel().get_json_state();
@@ -108,7 +109,6 @@ bool Car::process_line_from_log(string line) {
     return false;
   }
   Dynamics d;
-  log_info(line);
   bool ok = Dynamics::from_log_string(d,line);
   if(ok) {
     apply_dynamics(d);
@@ -208,7 +208,7 @@ void Car::apply_dynamics(Dynamics & d) {
 
   // update state
   Dynamics & current = current_dynamics;
-  if (current.control_mode == 'm') {
+  if (current.control_mode == 'm' && previous.control_mode!='m') {
      rc_mode_enabled = false;
   }
 
