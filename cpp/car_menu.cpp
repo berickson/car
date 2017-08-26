@@ -322,6 +322,7 @@ void go(Car& car, CarUI & ui) {
 }
 
 void record(Car& car, CarUI & ui) {
+  log_entry_exit w("record");
   car.reset_odometry();
   FileNames f;
   string track_name = run_settings.track_name;
@@ -340,11 +341,16 @@ void record(Car& car, CarUI & ui) {
   car.begin_recording_input(recording_path);
   car.begin_recording_state(f.state_log_path(track_name,route_name));
 
-  ui.clear();
-  ui.move(0,0);
-  ui.print("Recording - [stop]");
-  ui.refresh();
-  ui.wait_key();
+  while(car.command_from_socket == "record") {
+    usleep(30000);
+  }
+
+
+  // ui.clear();
+  // ui.move(0,0);
+  // ui.print("Recording - [stop]");
+  // ui.refresh();
+  // ui.wait_key();
 
   car.end_recording_input();
   car.end_recording_state();
@@ -353,9 +359,10 @@ void record(Car& car, CarUI & ui) {
     camera.end_recording();
   }
 
-  ui.clear();
-  ui.print("making path");
-  ui.refresh();
+  log_info("done recording - making path");
+  // ui.clear();
+  // ui.print("making path");
+  // ui.refresh();
 
   string path_file_path = f.path_file_path(track_name, route_name);
   write_path_from_recording_file(recording_path, path_file_path);
@@ -385,12 +392,20 @@ void run_car_socket() {
     while(true) {
       if(car.command_from_socket == "go") {
         run_settings.track_name = "desk";
-        run_settings.route_name = "K";
+        run_settings.route_name = "L";
         car.command_from_socket = "";
         try {
            go(car, ui);
         } catch (...) {
            log_error("exception caught in run_car_socket go");
+        }
+      }
+      if(car.command_from_socket == "record") {
+        run_settings.track_name = "desk";
+        try {
+           record(car, ui);
+        } catch (...) {
+           log_error("exception caught in run_car_socket record");
         }
       }
       usleep(30000);
