@@ -67,10 +67,16 @@ void Car::process_socket() {
       socket_server.send_response("ok");
     }
     if(request=="stop") {
+      command_from_socket = "stop";
       log_info("stop requested from socket");
       set_manual_mode();
       socket_server.send_response("ok");
-
+    }
+    if(request=="record") {
+      command_from_socket = ("record");
+      log_info("record requested from socket");
+      set_manual_mode();
+      socket_server.send_response("ok");
     }
   }
 }

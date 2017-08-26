@@ -94,7 +94,8 @@
       </div>
    
       <button class='button' ng-click="go()">Go{{go_error}}</button>
-      <button class='button' ng-click="stop()">Stop{{go_error}}</button>
+      <button class='button' ng-click="stop()">Stop{{stop_error}}</button>
+      <button class='button' ng-click="record()">Record{{record_error}}</button>
     </div>
   </div>
   <h2> Selected track: {{selected_track.name}}!</h2>
@@ -139,6 +140,15 @@ app.controller("carController", function($scope, $http, $timeout) {
       $scope.stop_error = "  ("+code+")"+response.message;
     })
     console.log("stop clicked");
+  };
+
+  $scope.record = function() {
+    $http.put('/command/record',"1").success(function() {
+      console.log('record success');
+    }).error(function(response,code) {
+      $scope.record_error = "  ("+code+")"+response.message;
+    })
+    console.log("record clicked");
   };
 
   $scope.$watch("selected_track", function(newValue, oldValue) {
