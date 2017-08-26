@@ -22,7 +22,7 @@ string Dynamics::to_string() {
      << "spur_last_us:" << spur_last_us << endl
      << "spur_odo:" << spur_odo << endl
 
-     << "ping_millimeters:" << ping_millimeters << endl
+     << "ping_millimeters:" << control_mode << endl
 
      << "odometer_front_left_a:" << odometer_front_left_a << endl
      << "odometer_front_left_a_us:" << odometer_front_left_a_us << endl
@@ -162,7 +162,7 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
     d.spur_delta_us = stoul(fields[11]);
     d.spur_last_us = stoul(fields[12]);
     d.spur_odo = stoi(fields[14]);
-    d.ping_millimeters = stoi(fields[16]);
+    d.control_mode = fields[16];
 
     d.odometer_front_left_a =  stoi(fields[18]);
     d.odometer_front_left_a_us =  stoul(fields[19]);

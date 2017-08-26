@@ -44,7 +44,6 @@ def get_pi_state():
 @app.route('/car/get_state')
 def get_car_state():
 #    recv_string = '{"vbat":3}'
-    recv_strin = ""
     try:
       connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       connection.connect(('localhost', 5571))
@@ -58,9 +57,28 @@ def get_car_state():
 
 @app.route('/command/go', methods=['PUT'])
 def command_go():
-    response = jsonify({"message":"sorry dave, I can't let you do that"})
-    response.status_code = 400
-    return response
+#    recv_string = '{"vbat":3}'
+    try:
+      connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      connection.connect(('localhost', 5571))
+      connection.send(("go\x00").encode())
+      recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
+      connection.close()
+    except:
+      pass
+    return jsonify(result=recv_string)
+
+@app.route('/command/stop', methods=['PUT'])
+def command_stop():
+    try:
+      connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      connection.connect(('localhost', 5571))
+      connection.send(("stop\x00").encode())
+      recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
+      connection.close()
+    except:
+      pass
+    return jsonify(result=recv_string)
 
 
 @app.route('/d3')

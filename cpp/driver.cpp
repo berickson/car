@@ -142,7 +142,7 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
   if(rear_slipping() && 0)
     esc = 1500;
 
-  if(route.done && fabs(car.get_velocity()) < 0.01) {
+  if(route.done && fabs(car.get_velocity()) < 0.03) {
     log_info("route completed normally");
     route_complete = true;
     esc = 1500;
@@ -203,16 +203,16 @@ void Driver::set_evasive_actions_for_crash(Route& route)
 }
 
 void Driver::drive_route(Route & route) {
-  log_info("entering drive_route");
+  log_entry_exit w("drive_route");
 
   // we will set error text if something goes wrong
   string error_text = "";
 
   WorkQueue<Dynamics> queue;
   car.add_listener(&queue);
-  ui.clear();
-  ui.print("[abort]");
-  ui.refresh();
+  //ui.clear();
+  //ui.print("[abort]");
+  //ui.refresh();
   try {
     car.set_rc_mode();
     PID steering_pid;
@@ -233,11 +233,11 @@ void Driver::drive_route(Route & route) {
     recovering_from_crash = false;
     int crash_count = 0;
     while(!route_complete) {
-      if(ui.getkey()!=-1) {
-        error_text = "run aborted by user";
-        log_info("run aborted by user");
-        route_complete = true;
-      }
+    //  if(ui.getkey()!=-1) {
+    //    error_text = "run aborted by user";
+    //    log_info("run aborted by user");
+    //    route_complete = true;
+    //  }
 
 
       Dynamics d;
@@ -287,11 +287,9 @@ void Driver::drive_route(Route & route) {
     error_text = "unknown exception caught during play_route";
   }
 
-  car.set_esc_and_str(1500,1500);
   car.set_manual_mode();
   car.remove_listener(&queue);
   if(error_text.size() > 0) throw error_text;
-  log_info("exiting drive_route");
 }
 
 Angle Driver::steering_angle_by_cte(Route &route) {

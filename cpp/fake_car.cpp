@@ -42,6 +42,7 @@ bool FakeCar::step() {
 }
 
 void write_dynamics_csv_from_recording_file(string recording_path, string outpath ){
+  log_entry_exit w("write_dynamics_csv_from_recording_file");
   fstream infile(recording_path);
   fstream csv;
   csv.open(outpath, ios_base::out);
@@ -56,7 +57,7 @@ void write_dynamics_csv_from_recording_file(string recording_path, string outpat
 }
 
 void write_path_from_recording_file(string recording_path, string outpath) {
-  log_info("entering write_path_from_recording_file");
+  log_entry_exit w("write_path_from_recording_file");
 
   const double min_length = 0.03;
   FakeCar car(recording_path);
@@ -116,7 +117,6 @@ void write_path_from_recording_file(string recording_path, string outpath) {
   }
   outfile.flush();
   outfile.close();
-  log_info("exiting write_path_from_recording_file");
 }
 
 
