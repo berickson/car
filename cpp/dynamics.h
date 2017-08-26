@@ -30,7 +30,7 @@ public:
 
   unsigned int spur_last_us;
   int spur_odo;
-  string control_mode;
+  char control_mode;
 
   int odometer_front_left_a;
   unsigned int odometer_front_left_a_us;

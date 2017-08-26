@@ -376,6 +376,7 @@ string calibration_string(int a) {
 }
 
 void run_car_socket() {
+  log_entry_exit w("run_car_socket");
   try {
     Car car;
     CarUI ui;

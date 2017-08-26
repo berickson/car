@@ -32,13 +32,6 @@
 using namespace std;
 
 
-
-
-void run_socket() {
-  Car car;
-
-}
-
 int main(int, char *[]) {
   try {
     log_info("enter main");

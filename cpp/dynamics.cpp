@@ -3,6 +3,7 @@
 #include <iostream>
 #include "system.h"
 #include "split.h"
+#include "logger.h"
 
 Dynamics::Dynamics() {
    memset(this,0,sizeof(*this));
@@ -144,13 +145,14 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
   if(fields[1] != "TD")
     return false;
   if(fields.size() != 51) {
-    cerr << "field size was " << fields.size() << endl;
+    log_warning((string) "too many fields in TD");
     //usb_error_count++;
     return false;
   }
 //    self.datetime = dateutil.parser.parse(fields[0])
 
   try {
+    log_entry_exit w("converting_td");
     d.datetime = time_from_string(fields[0]);
     d.str = stoi(fields[3]);
     d.esc = stoi(fields[5]);
@@ -162,7 +164,7 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
     d.spur_delta_us = stoul(fields[11]);
     d.spur_last_us = stoul(fields[12]);
     d.spur_odo = stoi(fields[14]);
-    d.control_mode = fields[16];
+    d.control_mode = fields[16][0];
 
     d.odometer_front_left_a =  stoi(fields[18]);
     d.odometer_front_left_a_us =  stoul(fields[19]);

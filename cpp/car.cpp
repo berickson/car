@@ -75,6 +75,7 @@ void Car::process_socket() {
 }
 
 void Car::usb_thread_start() {
+  log_entry_exit w("usb thread");
   socket_server.open_socket(5571);
   usb.add_line_listener(&usb_queue);
   usb.write_on_connect("\ntd+\n");
@@ -107,8 +108,10 @@ bool Car::process_line_from_log(string line) {
     return false;
   }
   Dynamics d;
+  log_info(line);
   bool ok = Dynamics::from_log_string(d,line);
   if(ok) {
+    log_info("1");
     apply_dynamics(d);
     {
       lock_guard<mutex> lock(listeners_mutex);
@@ -118,8 +121,10 @@ bool Car::process_line_from_log(string line) {
     }
   }
   else {
+    log_info("a");
     ++usb_error_count;
-    cerr << "dynamics not ok for " << line << endl;
+    log_warning((string) "bad dynamics: " + line);
+//    cerr << "dynamics not ok for " << line << endl;
   }
   return ok;
 }
