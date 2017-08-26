@@ -22,7 +22,7 @@ string Dynamics::to_string() {
      << "spur_last_us:" << spur_last_us << endl
      << "spur_odo:" << spur_odo << endl
 
-     << "ping_millimeters:" << control_mode << endl
+     << "mode:" << control_mode << endl
 
      << "odometer_front_left_a:" << odometer_front_left_a << endl
      << "odometer_front_left_a_us:" << odometer_front_left_a_us << endl
