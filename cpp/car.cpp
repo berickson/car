@@ -111,7 +111,6 @@ bool Car::process_line_from_log(string line) {
   log_info(line);
   bool ok = Dynamics::from_log_string(d,line);
   if(ok) {
-    log_info("1");
     apply_dynamics(d);
     {
       lock_guard<mutex> lock(listeners_mutex);
@@ -209,6 +208,9 @@ void Car::apply_dynamics(Dynamics & d) {
 
   // update state
   Dynamics & current = current_dynamics;
+  if (current.control_mode == 'm') {
+     rc_mode_enabled = false;
+  }
 
   // correct heading with adjustment factor
   Angle d_theta = (current.yaw - previous.yaw);

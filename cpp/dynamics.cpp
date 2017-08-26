@@ -152,7 +152,6 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
 //    self.datetime = dateutil.parser.parse(fields[0])
 
   try {
-    log_entry_exit w("converting_td");
     d.datetime = time_from_string(fields[0]);
     d.str = stoi(fields[3]);
     d.esc = stoi(fields[5]);
