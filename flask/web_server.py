@@ -8,6 +8,7 @@ from flask import Flask, request, send_from_directory, jsonify,Response
 import socket
 import tracks
 import psutil
+import os
 
 TRACK_STORAGE = tracks.TrackStorage()
 
@@ -33,6 +34,11 @@ class CommandError(Exception):
         rv['message'] = self.message
         return rv
 
+@app.route('/pi/poweroff', methods=['PUT'])
+def pi_poweroff():
+    os.system("sudo poweroff")
+
+
 @app.route('/pi/get_state')
 def get_pi_state():
     try:
@@ -45,13 +51,13 @@ def get_pi_state():
 def get_car_state():
 #    recv_string = '{"vbat":3}'
     try:
-      connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      connection.connect(('localhost', 5571))
-      connection.send(("get_state\x00").encode())
-      recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
-      connection.close()
+        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        connection.connect(('localhost', 5571))
+        connection.send(("get_state\x00").encode())
+        recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
+        connection.close()
     except:
-      pass
+        pass
     return Response(recv_string,mimetype='application/json')
 
 
@@ -59,35 +65,35 @@ def get_car_state():
 def command_go():
 #    recv_string = '{"vbat":3}'
     try:
-      connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      connection.connect(('localhost', 5571))
-      connection.send(("go\x00").encode())
-      recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
-      connection.close()
+        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        connection.connect(('localhost', 5571))
+        connection.send(("go\x00").encode())
+        recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
+        connection.close()
     except:
-      pass
+        pass
     return jsonify(result=recv_string)
 
 @app.route('/command/stop', methods=['PUT'])
 def command_stop():
     try:
-      connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      connection.connect(('localhost', 5571))
-      connection.send(("stop\x00").encode())
-      recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
-      connection.close()
+        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        connection.connect(('localhost', 5571))
+        connection.send(("stop\x00").encode())
+        recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
+        connection.close()
     except:
-      pass
+        pass
     return jsonify(result=recv_string)
 
 @app.route('/command/record', methods=['PUT'])
 def command_record():
     try:
-      connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      connection.connect(('localhost', 5571))
-      connection.send(("record\x00").encode())
-      recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
-      connection.close()
+        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        connection.connect(('localhost', 5571))
+        connection.send(("record\x00").encode())
+        recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
+        connection.close()
     except:
       pass
     return jsonify(result=recv_string)
@@ -97,6 +103,11 @@ def command_record():
 def get_d3():
     return send_from_directory('templates', 'd3.html')
 
+@app.route('/track_names')
+def get_track_names():
+    tracks = TRACK_STORAGE.get_tracks()
+    return jsonify(track_names=[t.get_name() for t in tracks])
+
 @app.route('/tracks')
 def get_tracks():
     tracks = TRACK_STORAGE.get_tracks()
@@ -105,6 +116,11 @@ def get_tracks():
 @app.route('/tracks/<track_name>')
 def get_track_options(track_name):
     return jsonify(track={'name', track_name})
+
+@app.route('/tracks/<track_name>/route_names')
+def get_route_names(track_name):
+    routes = TRACK_STORAGE.get_track(track_name).get_routes()
+    return jsonify(route_names=[route.get_name() for route in routes])
 
 @app.route('/tracks/<track_name>/routes')
 def get_routes(track_name):
@@ -125,6 +141,16 @@ def get_path(track_name, route_name):
     df = pd.read_csv(path_path)
     s = df.to_json(orient=orient)
     return s
+
+@app.route('/run_settings', methods=['PUT'])
+def put_run_settings():
+    run_settings = request.get_json(force=True)
+    path = tracks.get_run_settings_path()
+    try:
+        with open(path+'.new', 'w') as f:
+            run_settings = f.write(run_setting)
+    except Exception:
+        return "there was an error writing run settings " + request
 
 @app.route('/run_settings')
 def run_settings():

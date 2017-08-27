@@ -21,6 +21,16 @@
   box-shadow: 5px 5px 11px -2px rgba(0,0,0,0.5);
 }
 
+
+.select {
+   
+   background-color:rgb(220,220,220);
+   /*height: 34px;*/
+   font-size: 24px;
+   /* width: 240px; */
+}
+
+
 .small_text {
   font-size: 10px;
 }
@@ -105,42 +115,58 @@
     <div class='groupbox'> 
       <div class='itembox'>
       track:
-      <select name='2' ng-model="selected_track" id="2" ng-options="track_name for track_name in track_names"></select>
+      <select class='select' name='2' ng-model="run_settings.track_name" id="2" ng-options="track_name for track_name in track_names"></select>
       </div>
 
       <div class='itembox'>
-      route: <select name='1' ng-model="selected_route" id="1" ng-options="route_name for route_name in route_names"></select>
+      route: <select class='select' name='1' ng-model="run_settings.route_name" id="1" ng-options="route_name for route_name in route_names"></select>
       </div>
    
+      <button class='button' ng-click="poweroff()">Power Off</button>
       <button class='button' ng-click="go()">Go{{go_error}}</button>
       <button class='button' ng-click="stop()">Stop{{stop_error}}</button>
       <button class='button' ng-click="record()">Record{{record_error}}</button>
     </div>
   </div>
-  <h2> Selected track: {{selected_track}}!</h2>
-  <h2> Selected route: {{selected_route}}!</h2>
+  <div class='groupbox'>
+    <div class='itembox'>
+      <svg viewBox="{{route_path_min_x}} {{-route_path_max_y}} {{route_path_width}} {{route_path_height}}" preserveAspectRatio="xMidYMid meet" style="width:300px;height:300px">
+          <!-- <line x1="0" y1="0" x2="1" y2="1" style="stroke:black;stroke-width:2"/> -->
+          <g>
+          <line 
+            ng-repeat="path_node in route_path" 
+            ng-if="! $last" 
+            x1="{{route_path[$index].x}}" 
+            y1="{{-route_path[$index].y}}" 
+            x2="{{route_path[$index+1].x}}" 
+            y2="{{-route_path[$index+1].y}}" 
+            style="stroke:black;stroke-width:2px" vector-effect="non-scaling-stroke" />
+          </g>
+      </svg>
+  </div>
+</div>
+
   <label><h3><input type="checkbox" id="xxx" ng-model="display_car_state"> car_state: </h3></label>
   <div class='groupbox'>
   <div ng-if="display_car_state" class='small_text' ng-repeat="(key,value) in car_state">{{key}} = {{value}}</div>
   </div>
-  <table>
-  <tr><td>secs</td><td>x</td><td>y</td></tr>
-  <tr ng-repeat="path_node in route_path">
-      <td>{{path_node.secs}}</td>
-      <td>{{path_node.x}}</td>
-      <td>{{path_node.y}}</td>
-  </tr>
-  </table>
+
 </body>
 <script>
 var app = angular.module("car", []);
 app.controller("carController", function($scope, $http, $timeout) {
   $scope.Math = Math
-  $scope.run = function() {
-    alert('run clicked')
-  }
-  $scope.selected_track = null;
-  $scope.selected_route = null;
+
+  $scope.poweroff = function() {
+    go_error = ""
+    $http.put('/pi/poweroff',"1").success(function() {
+      console.log('poweroff success');
+    }).error(function(response,code) {
+      $scope.go_error = "  ("+code+")"+response.message;
+    })
+    console.log("poweoff clicked");
+  };
+
 
   $scope.go = function() {
     go_error = ""
@@ -170,16 +196,12 @@ app.controller("carController", function($scope, $http, $timeout) {
     console.log("record clicked");
   };
 
-  $scope.$watch("selected_track", function(newValue, oldValue) {
-    if ($scope.selected_track !== null && $scope.selected_track.length > 0) {
-      console.log("selected track:",$scope.selected_track)
-      $http.get('/tracks/'+$scope.selected_track+"/routes").
+  $scope.$watch("run_settings.track_name", function(newValue, oldValue) {
+    if ($scope.run_settings.track_name !== null && $scope.run_settings.track_name.length > 0) {
+      console.log("selected track:",$scope.run_settings.track_name)
+      $http.get('/tracks/'+$scope.run_settings.track_name+"/route_names").
         success(function(result, status, headers, config) {
-          $scope.routes = result.routes;
-          $scope.route_names = []
-          for (route in $scope.routes) {
-            $scope.route_names.push($scope.routes[route].name)
-          }
+          $scope.route_names = result.route_names
         }).error(function(data, status, headers, config) {
           $scope.route_names = ['n/a'];
         // log error
@@ -187,11 +209,20 @@ app.controller("carController", function($scope, $http, $timeout) {
     }
   });
 
-  $scope.$watch("selected_route", function(newValue, oldValue) {
-    if ($scope.selected_route !== null && $scope.selected_route.length > 0) {
-      $http.get('/tracks/'+$scope.selected_track+"/routes/"+$scope.selected_route+"/path").
+  $scope.$watch("run_settings.route_name", function(newValue, oldValue) {
+    if ($scope.run_settings.route_name !== null && $scope.run_settings.route_name.length > 0) {
+      $http.get('/tracks/'+$scope.run_settings.track_name+"/routes/"+$scope.run_settings.route_name+"/path").
         success(function(route_path, status, headers, config) {
           $scope.route_path = route_path;
+          var route_x = route_path.map(function(v){return v.x});
+          var route_y = route_path.map(function(v){return v.y});
+
+          $scope.route_path_min_x  = Math.min.apply(null, route_x)
+          $scope.route_path_min_y  = Math.min.apply(null, route_y)
+          $scope.route_path_max_x  = Math.max.apply(null, route_x)
+          $scope.route_path_max_y  = Math.max.apply(null, route_y)
+          $scope.route_path_width  = $scope.route_path_max_x - $scope.route_path_min_x
+          $scope.route_path_height = $scope.route_path_max_y - $scope.route_path_min_y
         }).error(function(data, status, headers, config) {
           $scope.route_names = ['n/a'];
         // log error
@@ -200,15 +231,9 @@ app.controller("carController", function($scope, $http, $timeout) {
   });
 
 
-  $http.get('/tracks').
+  $http.get('/track_names').
     success(function(result, status, headers, config) {
-      $scope.tracks = result.tracks;
-      var track_names = [];
-      for(track in result.tracks) {
-        track_names.push(result.tracks[track].name);
-      }
-      $scope.track_names = track_names;
-      //$scope.route_names = ['data'];
+      $scope.track_names = result.track_names;
     }).
     error(function(data, status, headers, config) {
       // log error
@@ -256,9 +281,6 @@ app.controller("carController", function($scope, $http, $timeout) {
     $http({method:'GET', timeout:5000, url : '/run_settings'})
       .then(function(r) {
         $scope.run_settings = r.data;
-        $scope.selected_track = r.data.track_name
-        $scope.selected_route = r.data.route_name
-        $timeout(poller3,1000);
       },
       function(e) { 
         $timeout(poller3,1000);

@@ -3,7 +3,7 @@ access to track data
 '''
 import os
 import os.path
-from operator import itemgetter, attrgetter, methodcaller
+from operator import methodcaller
 
 class FolderBasedItem:
     ''' folder for a track '''
