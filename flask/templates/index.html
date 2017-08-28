@@ -145,11 +145,25 @@
           </g>
       </svg>
   </div>
+  <div class='itembox'>
+    <table>
+      <tbody>
+        <tr ng-repeat="(variable, setting) in run_settings"> 
+        <td>{{variable}}</td>
+        <td>
+          <input type="checkbox" ng-if="type_of(setting) === 'boolean'" ng-model="setting"/>
+          <input ng-if="type_of(setting) === 'number'" ng-model="setting" style='width:4ch'/>
+        </td>
+      <tr>
+      </table>
+  </div>
 </div>
 
   <label><h3><input type="checkbox" id="xxx" ng-model="display_car_state"> car_state: </h3></label>
   <div class='groupbox'>
-  <div ng-if="display_car_state" class='small_text' ng-repeat="(key,value) in car_state">{{key}} = {{value}}</div>
+  <div ng-if="display_car_state" class='small_text' ng-repeat="(key,value) in car_state">{{key}} = {{value}}
+
+  </div>
   </div>
 
 </body>
@@ -310,6 +324,8 @@ app.controller("carController", function($scope, $http, $timeout) {
       });
     };
   poller3();
+
+  $scope.type_of = function(val) { return typeof val; };
 
 
 });    
