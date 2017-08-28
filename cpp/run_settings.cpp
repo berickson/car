@@ -23,7 +23,7 @@ RunSettings::RunSettings(){
   route_name = route_names[0];
 }
 
-void RunSettings::write_to_file2(string path) {
+void RunSettings::write_to_file_json(string path) {
   fstream file;
   file.open(path,ios_base::out);
   if(!file.is_open()) {
@@ -59,7 +59,7 @@ void RunSettings::write_to_file2(string path) {
   file << std::setw(indent) << j << std::endl;
 }
 
-void RunSettings::write_to_file(string path) {
+void RunSettings::write_to_file_txt(string path) {
 
   fstream file;
   file.open(path,ios_base::out);
@@ -96,7 +96,7 @@ void RunSettings::write_to_file(string path) {
 
 }
 
-void RunSettings::load_from_file(string path)
+void RunSettings::load_from_file_txt(string path)
 {
   
   ifstream file;
@@ -161,4 +161,32 @@ void RunSettings::load_from_file(string path)
       this->optimize_velocity= stod(value)>0;
 
   }
+}
+
+void RunSettings::load_from_file_json(string path) {
+  std::ifstream ifs(path);
+  nlohmann::json j = nlohmann::json::parse(ifs); 
+
+  track_name = j["track_name"];
+  route_name = j["route_name"];
+  max_accel_lat = j["max_accel_lat"];
+  max_accel = j["max_accel"];
+  max_decel = j["max_decel"];
+  max_v = j["max_v"];
+  steering_k_p = j["steering_k_p"];
+  steering_k_i = j["steering_k_i"];
+  steering_k_d = j["steering_k_d"];
+  v_k_p = j["v_k_p"];
+  v_k_i = j["v_k_i"];
+  v_k_d = j["v_k_d"];
+  slip_rate = j["slip_rate"];
+  slip_slop = j["slip_slop"];
+  t_ahead = j["t_ahead"];
+  d_ahead = j["d_ahead"];
+  k_smooth = j["k_smooth"];
+  prune_max = j["prune_max"];
+  prune_tolerance = j["prune_tolerance"];
+  capture_video = j["capture_video"];
+  crash_recovery = j["crash_recovery"];
+  optimize_velocity = j["optimize_velocity"];
 }

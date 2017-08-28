@@ -4,7 +4,7 @@
 started from tutorial at https://www.tutorialspoint.com/flask/flask_application.htm
 '''
 import pandas as pd # must import BEFORE flask or high CPU on PI
-from flask import Flask, request, send_from_directory, jsonify,Response
+from flask import Flask, request, send_from_directory, jsonify, json, Response
 import socket
 import tracks
 import psutil
@@ -95,7 +95,7 @@ def command_record():
         recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
         connection.close()
     except:
-      pass
+        pass
     return jsonify(result=recv_string)
 
 
@@ -142,28 +142,33 @@ def get_path(track_name, route_name):
     s = df.to_json(orient=orient)
     return s
 
-@app.route('/run_settings', methods=['PUT'])
-def put_run_settings():
-    run_settings = request.get_json(force=True)
-    path = tracks.get_run_settings_path()
-    try:
-        with open(path+'.new', 'w') as f:
-            run_settings = f.write(run_setting)
-    except Exception:
-        return "there was an error writing run settings " + request
+#@app.route('/run_settings', methods=['PUT'])
+#def put_run_settings():
+##    return
+    #return Response("ok")
+#    try:
+#    except Exception:
+#        return "I'm having a hard time"
+#        return Response("there was an error writing run settings " + request)
 
-@app.route('/run_settings')
+@app.route('/run_settings', methods=['GET','PUT'])
 def run_settings():
-    path = 'empty'
-    try:
-        path = tracks.get_run_settings_path()
-        with open(path, 'r') as f:
-            run_settings = f.read()
-    except Exception:
-        return "there was an error reading " + path
-    return Response(run_settings, mimetype='application/json')
-
-
+    path = tracks.get_run_settings_path()
+    if request.method == 'PUT':
+        run_settings = request.json
+        with open(path, 'w+') as f:
+            f.write(json.dumps(request.json))
+            #f.write(request.data)
+        return "ok"
+    elif request.method == 'GET':
+        path = 'empty'
+        try:
+            path = tracks.get_run_settings_path()
+            with open(path, 'r') as f:
+                run_settings = f.read()
+        except Exception:
+            return "there was an error reading " + path
+        return Response(run_settings, mimetype='application/json')
 
 @app.route('/car/status')
 def car_status():

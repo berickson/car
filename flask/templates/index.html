@@ -123,6 +123,7 @@
       </div>
    
       <button class='button' ng-click="poweroff()">Power Off</button>
+      <button class='button' ng-click="save_run_settings()">Save</button>
       <button class='button' ng-click="go()">Go{{go_error}}</button>
       <button class='button' ng-click="stop()">Stop{{stop_error}}</button>
       <button class='button' ng-click="record()">Record{{record_error}}</button>
@@ -166,6 +167,28 @@ app.controller("carController", function($scope, $http, $timeout) {
     })
     console.log("poweoff clicked");
   };
+
+
+  $scope.save_run_settings = function() {
+    go_error = ""
+    req = {
+      url:'/run_settings',
+      method: 'PUT',
+      data: JSON.stringify($scope.run_settings),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+
+    $http(req).success(function() {
+      console.log('save run settings success');
+    }).error(function(response,code) {
+      $scope.go_error = "  ("+code+")"+response;
+    });
+
+    console.log("save_run_settings clicked");
+    
+  }
 
 
   $scope.go = function() {

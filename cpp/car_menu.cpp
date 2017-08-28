@@ -20,7 +20,7 @@
 
 
 
-string run_settings_path = "run_settings.txt";
+string run_settings_path = "run_settings.json";
 
 RunSettings run_settings;
 
@@ -196,6 +196,7 @@ SubMenu optimize_velocity_menu{};
 void go(Car& car, CarUI & ui) {
   log_entry_exit w("go");
   try {
+    run_settings.load_from_file_json(run_settings_path);
     auto f = FileNames();
     string & track_name = run_settings.track_name;
     string & route_name = run_settings.route_name;
@@ -204,10 +205,8 @@ void go(Car& car, CarUI & ui) {
     string runs_folder = f.get_runs_folder(track_name,route_name);
     mkdir(runs_folder);
     mkdir(run_folder);
-    run_settings.write_to_file(f.config_file_path(track_name, route_name, run_name));
-    run_settings.write_to_file2(f.config_file_path(track_name, route_name, run_name));
-    run_settings.write_to_file(run_settings_path);
-    run_settings.write_to_file2(run_settings_path);
+    run_settings.write_to_file_json(f.config_file_path(track_name, route_name, run_name));
+    run_settings.write_to_file_json(run_settings_path);
     car.reset_odometry();
     string input_path = f.path_file_path(track_name,route_name);
     Route rte;
@@ -291,8 +290,7 @@ void go(Car& car, CarUI & ui) {
     log_info(recording_file_path);
     write_dynamics_csv_from_recording_file(recording_file_path, dynamics_path);
     rte.write_to_file(f.planned_path_file_path(track_name, route_name, run_name));
-    run_settings.write_to_file(run_settings_path);
-    run_settings.write_to_file2(run_settings_path+".json");
+    run_settings.write_to_file_json(run_settings_path);
 
     if(error_text.size()) {
       //ui.clear();
@@ -370,7 +368,7 @@ void record(Car& car, CarUI & ui) {
 
   run_settings.route_name = route_name;
   update_route_selection_menu();
-  run_settings.write_to_file(run_settings_path);
+  run_settings.write_to_file_json(run_settings_path);
   return;
 }
 
@@ -387,7 +385,7 @@ void run_car_socket() {
   try {
     Car car;
     CarUI ui;
-    run_settings.load_from_file(run_settings_path);
+    run_settings.load_from_file_json(run_settings_path);
 
     while(true) {
       if(car.command_from_socket == "go") {
@@ -425,7 +423,7 @@ void run_car_menu() {
   CarUI ui;
 
   if(file_exists(run_settings_path)) {
-      run_settings.load_from_file(run_settings_path);
+      run_settings.load_from_file_json(run_settings_path);
   }
 
   selection_menu<double>(max_accel_lat_menu, linspace(0.25,10,0.25), get_max_accel_lat, set_max_accel_lat );
