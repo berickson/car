@@ -42,6 +42,16 @@ void Car::connect_usb() {
   usb_thread = thread(&Car::usb_thread_start, this);
 }
 
+string Car::get_mode() {
+  if(rc_mode_enabled ) 
+    return "automatic";
+
+  if(command_from_socket == "record")
+    return "recording";
+
+  return "manual";
+}
+
 void Car::process_socket() {
   while(true){
     string request = socket_server.get_request();
@@ -52,7 +62,7 @@ void Car::process_socket() {
       
       stringstream reply;
       j["v_bat"] = get_voltage();
-      j["mode"] = rc_mode_enabled ? "\"automatic\"" : "\"manual\"";
+      j["mode"] = get_mode();
       j["heading"] = get_heading().radians();
       j["bl"] = get_back_left_wheel().get_json_state();
       j["br"] = get_back_right_wheel().get_json_state();

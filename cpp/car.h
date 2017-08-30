@@ -96,6 +96,8 @@ public:
     return reading_count;
   }
 
+  string get_mode();
+
   int get_esc() {
     return current_dynamics.esc;
   }

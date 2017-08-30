@@ -286,6 +286,9 @@ void Driver::drive_route(Route & route) {
   } catch (...) {
     error_text = "unknown exception caught during play_route";
   }
+  if(error_text.length() > 0) {
+    log_error(error_text);
+  }
 
   car.set_manual_mode();
   car.remove_listener(&queue);

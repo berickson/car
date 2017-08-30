@@ -210,6 +210,7 @@ void go(Car& car, CarUI & ui) {
     car.reset_odometry();
     string input_path = f.path_file_path(track_name,route_name);
     Route rte;
+    log_info("loading route: " + input_path);
     //ui.clear();
     //ui.print("loading route\n");
     //ui.refresh();
@@ -389,9 +390,6 @@ void run_car_socket() {
 
     while(true) {
       if(car.command_from_socket == "go") {
-        run_settings.track_name = "desk";
-        run_settings.route_name = "L";
-        car.command_from_socket = "";
         try {
            go(car, ui);
         } catch (...) {
@@ -406,6 +404,7 @@ void run_car_socket() {
            log_error("exception caught in run_car_socket record");
         }
       }
+      car.command_from_socket = "";
       usleep(30000);
     } 
   }
