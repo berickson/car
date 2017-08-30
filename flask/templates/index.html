@@ -4,6 +4,9 @@
 <style>
 /* colors from https://coolors.co/738873-9b9992-dbd7cd-ffb97d-c3c7ba */
 
+.changed {
+  background-color:yellow;
+}
 .button {
   background-color: #738873;
   border: none;
@@ -131,7 +134,10 @@
   </div>
   <div class='groupbox'>
     <div class='itembox'>
-      <svg viewBox="{{route_path_min_x}} {{-route_path_max_y}} {{route_path_width}} {{route_path_height}}" preserveAspectRatio="xMidYMid meet" style="width:300px;height:300px">
+      <svg 
+      viewBox="{{route_path_min_x}} {{-route_path_max_y}} {{route_path_width}} {{route_path_height}}" 
+      preserveAspectRatio="xMidYMid meet" 
+      style="width:600px;height:600px">
           <!-- <line x1="0" y1="0" x2="1" y2="1" style="stroke:black;stroke-width:2"/> -->
           <g>
           <line 
@@ -148,11 +154,14 @@
   <div class='itembox'>
     <table>
       <tbody>
-        <tr ng-repeat="(variable, setting) in run_settings"> 
-        <td>{{variable}}</td>
+        <tr ng-repeat="item in run_settings_array" ng.key="item.key"> 
+        <td>{{item.key}}</td>
         <td>
-          <input type="checkbox" ng-if="type_of(setting) === 'boolean'" ng-model="setting"/>
-          <input ng-if="type_of(setting) === 'number'" ng-model="setting" style='width:4ch'/>
+          <input type="checkbox" ng-if="item.data_type === 'boolean'" ng-model="item.value"/>
+          <input 
+            ng-if="item.data_type === 'number'" 
+            ng-model="item.value" style='width:4ch' 
+            ng-class="is_changed(item) ? 'changed' : ''"/>
         </td>
       <tr>
       </table>
@@ -172,6 +181,44 @@ var app = angular.module("car", []);
 app.controller("carController", function($scope, $http, $timeout) {
   $scope.Math = Math
 
+  $scope.type_of = function(val) { 
+    return typeof(val); 
+  };
+
+  $scope.is_changed = function(field) {
+    return field.original_value.toString() !== field.value.toString();
+
+  }
+
+  $scope.to_field_array = function(x) { 
+    rv = []; 
+    for(k in x) {
+      rv.push({
+        key:k,
+        value:x[k],
+        original_value:x[k],
+        data_type:typeof(x[k])
+        });
+    }
+    return rv;
+  };
+
+  $scope.set_changes_from_field_array = function(o, field_array) { 
+    for(i in field_array) {
+      var field = field_array[i];
+      if($scope.is_changed(field)) {
+        if(field.data_type == 'number') {
+          o[field.key] = Number(field.value);
+        }
+        if(field.data_type == 'boolean)') {
+          o[field.key] == Boolean(field.value);
+        }
+      }
+    }
+    return rv;
+  };
+
+
   $scope.poweroff = function() {
     go_error = ""
     $http.put('/pi/poweroff',"1").success(function() {
@@ -185,6 +232,7 @@ app.controller("carController", function($scope, $http, $timeout) {
 
   $scope.save_run_settings = function() {
     go_error = ""
+    $scope.set_changes_from_field_array($scope.run_settings, $scope.run_settings_array);
     req = {
       url:'/run_settings',
       method: 'PUT',
@@ -318,15 +366,13 @@ app.controller("carController", function($scope, $http, $timeout) {
     $http({method:'GET', timeout:5000, url : '/run_settings'})
       .then(function(r) {
         $scope.run_settings = r.data;
+        $scope.run_settings_array = $scope.to_field_array($scope.run_settings);
       },
       function(e) { 
         $timeout(poller3,1000);
       });
     };
   poller3();
-
-  $scope.type_of = function(val) { return typeof val; };
-
 
 });    
 </script>    
