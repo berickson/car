@@ -4,6 +4,7 @@
 #include <fstream>
 #include "split.h"
 #include <string>
+#include "logger.h"
 
 #include "trim.h"
 
@@ -14,6 +15,7 @@ Config::Config() {
 }
 
 void Config::load_from_file(string path) {
+  log_entry_exit w("config::load_from_file");
   fstream fs;
   fs.open(path,fstream::in);
   if(fs.fail()) {

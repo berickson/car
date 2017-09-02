@@ -25,7 +25,6 @@
   box-shadow: 5px 5px 11px -2px rgba(0,0,0,0.5);
 }
 
-
 .select {
    
    background-color:rgb(220,220,220);
@@ -39,6 +38,11 @@
   font-size: 10px;
 }
 
+.bigtext {
+  font-size: 28px;
+}
+
+
 .groupbox {
   background-color:#DBD7CD;
   margin:10px;
@@ -51,12 +55,20 @@
   box-shadow: 5px 5px 11px -2px rgba(0,0,0,0.5);
 }
 
+.row {
+  display:flex;
+  flex-direction: row;
+  align-items:stretch;
+}
+
 .itembox {
   background-color:#C3C7BA;
   margin:5px;
   padding:5px;
-  display:inline-block;
+  
+  
   font-family: Consolas, monaco, monospace;
+  display:inline-block;
 
   /*https://www.cssmatic.com/box-shadow*/
   -webkit-box-shadow: 5px 5px 11px -2px rgba(0,0,0,0.5);
@@ -86,8 +98,13 @@
 <body class='main'>
   <h1 class='orange'>Orange Crash</h1>
   <div class='itembox'>{{poll_ok ? "online - " + car_state.mode : "offline"}}</div>
-  <div class="groupbox">
-  <div class="itembox">
+  <div class="groupbox row">
+    <div class='itembox'>
+        <div class='bigtext data'>{{ rjust((car_state.fl.v * 2.23694).toFixed(1),5) }}</div>
+        <div style='text-align:right'>mph</div>
+        <div style='text-align:right' class='data'>{{ rjust(car_state.fl.v.toFixed(1),5) }} m/s</div>
+      </div>
+    <div class="itembox">
     <div >{{car_state.v_bat | number:1}}V</div>
       <svg width="64" height="32">
       <rect x="2" y="2" width="60" height="28" style="fill:lightgray;stroke:gray;stroke-width:2" />
@@ -113,6 +130,10 @@
       <div ng-repeat="cpu in pi_state.cpu">cpu{{$index}} <span class='data'>{{rjust(cpu,7)}}</span>
       </div>
     </div>
+
+    <!-- final div eats up space on right-->
+    <div></div> 
+
   </div>
 
   <div>

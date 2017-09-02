@@ -211,10 +211,8 @@ void go(Car& car, CarUI & ui) {
     string input_path = f.path_file_path(track_name,route_name);
     Route rte;
     log_info("loading route: " + input_path);
-    //ui.clear();
-    //ui.print("loading route\n");
-    //ui.refresh();
     rte.load_from_file(input_path);
+    log_info("1");
     StereoCamera camera;
     if(run_settings.capture_video) {
       camera.warm_up();
@@ -224,6 +222,7 @@ void go(Car& car, CarUI & ui) {
     //ui.clear();
     //ui.print("smoothing route\n");
     //ui.refresh();
+    log_info("preparing route");
     rte.smooth(run_settings.k_smooth);
     //ui.print("pruning route\n");
     rte.prune(run_settings.prune_max, run_settings.prune_tolerance);

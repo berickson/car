@@ -5,6 +5,7 @@
 #include <iomanip>
 #include "string_utils.h"
 #include <vector>
+#include "logger.h"
 
 
 // todo:  make separate object for current location
@@ -304,39 +305,46 @@ void RouteNode::set_from_standard_file(vector<string> fields) {
 }
 
 void Route::load_from_file(string path) {
-  fstream f;
-  f.open(path,ios_base::in);
-  if(!f.is_open()) {
-    throw (string) "could not open route at " + path;
-  }
-
-  string line;
-  // read header
-  if(!std::getline(f,line)) {
-    throw (string) "error reading header for " + path;
-  }
-  trim(line);
-  if(line != header_string()) {
-    throw (string) "bad header for " + path;
-  }
-  nodes.clear();
-  int line_number = 1;
-  while(std::getline(f, line)) {
-    ++line_number;
-    trim(line);
-    if(line=="") break;
-    auto fields=split(line,',');
-    if(fields.size()!=columns.size()) {
-      stringstream ss;
-      ss << "wrong number of columns in line " << line_number
-          << " expected " << columns.size()
-          << " was "  << fields.size();
-      throw ss.str();
+  log_entry_exit w("Route::load_from_file");
+  try {
+    fstream f;
+    f.open(path,ios_base::in);
+    if(!f.is_open()) {
+      throw (string) "could not open route at " + path;
     }
-    auto node = RouteNode();
-    node.set_from_standard_file(fields);
-    nodes.push_back(node);
-    index = 0;
+
+    string line;
+    // read header
+    if(!std::getline(f,line)) {
+      throw (string) "error reading header for " + path;
+    }
+    trim(line);
+    if(line != header_string()) {
+      throw (string) "bad header for " + path;
+    }
+    nodes.clear();
+    int line_number = 1;
+    while(std::getline(f, line)) {
+      ++line_number;
+      trim(line);
+      if(line=="") break;
+      auto fields=split(line,',');
+      if(fields.size()!=columns.size()) {
+        stringstream ss;
+        ss << "wrong number of columns in line " << line_number
+            << " expected " << columns.size()
+            << " was "  << fields.size();
+        throw ss.str();
+      }
+      auto node = RouteNode();
+      node.set_from_standard_file(fields);
+      nodes.push_back(node);
+      index = 0;
+    }
+  }
+  catch(...)
+  {
+    throw (string) "Uknown error loading route " + path;
   }
 }
 
