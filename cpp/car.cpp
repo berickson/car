@@ -68,6 +68,9 @@ void Car::process_socket() {
       j["br"] = get_back_right_wheel().get_json_state();
       j["fl"] = get_front_left_wheel().get_json_state();
       j["fr"] = get_front_right_wheel().get_json_state();
+      j["front_x"] = get_front_position().x;
+      j["front_y"] = get_front_position().y;
+      
 
       socket_server.send_response(j.dump());
     } else {
