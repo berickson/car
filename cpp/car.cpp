@@ -61,6 +61,7 @@ void Car::process_socket() {
       
       
       stringstream reply;
+      j["velocity"] = get_velocity();
       j["v_bat"] = get_voltage();
       j["mode"] = get_mode();
       j["heading"] = get_heading().radians();
@@ -73,25 +74,26 @@ void Car::process_socket() {
       
 
       socket_server.send_response(j.dump());
-    } else {
-      socket_server.send_response("Error, unknown command: "+request);
-    }
-    if(request=="go") {
+    } else if(request=="go") {
       log_info("go");
       command_from_socket = "go";
       socket_server.send_response("ok");
-    }
-    if(request=="stop") {
+    } else if(request=="stop") {
       command_from_socket = "stop";
       log_info("stop requested from socket");
       set_manual_mode();
       socket_server.send_response("ok");
-    }
-    if(request=="record") {
+    } else if(request=="record") {
       command_from_socket = ("record");
       log_info("record requested from socket");
       set_manual_mode();
       socket_server.send_response("ok");
+    } else if (request=="reset_odometer") {
+      log_info("reset_odometer requested from socket");
+      reset_odometry();
+      socket_server.send_response("ok");
+    } else {
+        socket_server.send_response("Error, unknown command: "+request);
     }
   }
 }

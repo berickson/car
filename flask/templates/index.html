@@ -100,9 +100,9 @@
   <div class='itembox'>{{poll_ok ? "online - " + car_state.mode : "offline"}}</div>
   <div class="groupbox row">
     <div class='itembox'>
-        <div class='bigtext data'>{{ rjust((car_state.fl.v * 2.23694).toFixed(1),5) }}</div>
+        <div class='bigtext data'>{{ rjust((car_state.velocity * 2.23694).toFixed(1),5) }}</div>
         <div style='text-align:right'>mph</div>
-        <div style='text-align:right' class='data'>{{ rjust(car_state.fl.v.toFixed(1),5) }} m/s</div>
+        <div style='text-align:right' class='data'>{{ rjust(car_state.velocity.toFixed(1),5) }} m/s</div>
       </div>
     <div class="itembox">
     <div >{{car_state.v_bat | number:1}}V</div>
@@ -156,6 +156,7 @@
       <button class='button' ng-click="go()">Go{{go_error}}</button>
       <button class='button' ng-click="stop()">Stop{{stop_error}}</button>
       <button class='button' ng-click="record()">Record{{record_error}}</button>
+      <button class='button' ng-click="reset_odometer()">Reset Odometer{{record_error}}</button>
     </div>
   </div>
   <div class='groupbox'>
@@ -317,6 +318,16 @@ app.controller("carController", function($scope, $http, $timeout) {
     })
     console.log("record clicked");
   };
+
+  $scope.reset_odometer = function() {
+    $http.put('/command/reset_odometer',"1").success(function() {
+      console.log('reset_odometer success');
+    }).error(function(response,code) {
+      $scope.reset_odometer_error = "  ("+code+")"+response.message;
+    })
+    console.log("reset_odometer clicked");
+  };
+  
 
   $scope.$watch("run_settings.track_name", function(newValue, oldValue) {
     if ($scope.run_settings.track_name !== null && $scope.run_settings.track_name.length > 0) {

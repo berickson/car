@@ -123,7 +123,7 @@ public:
   };
 
   inline double get_velocity() {
-      return (front_left_wheel.get_smooth_velocity() + front_right_wheel.get_smooth_velocity()) / 2;
+      return (front_left_wheel.get_velocity() + front_right_wheel.get_velocity()) / 2;
   }
 
   double get_rear_velocity() {

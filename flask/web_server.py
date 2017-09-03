@@ -61,6 +61,19 @@ def get_car_state():
     return Response(recv_string,mimetype='application/json')
 
 
+@app.route('/command/reset_odometer', methods=['PUT'])
+def command_reset_odometer():
+    try:
+        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        connection.connect(('localhost', 5571))
+        connection.send(("reset_odometer\x00").encode())
+        recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
+        connection.close()
+    except:
+        pass
+    return jsonify(result=recv_string)
+
+
 @app.route('/command/go', methods=['PUT'])
 def command_go():
 #    recv_string = '{"vbat":3}'
