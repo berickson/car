@@ -130,6 +130,20 @@
       <div>x: {{car_state.front_x.toFixed(2)}}</div>
       <div>y: {{car_state.front_y.toFixed(2)}}</div>
     </div>
+    <div class='itembox'>
+      <table class='data small_text'>
+        <thead><td></td><td>      v</td><td>v_smooth</td><td>a_smooth</td></thead>
+        <tbody>
+          <tr ng-repeat = 'wheel in ["fl","fr","bl","br"]'>
+            <td>{{wheel}}</td>
+            <td>{{rjust(car_state[wheel].v.toFixed(2),7)}}</td>
+            <td>{{rjust(car_state[wheel].v_smooth.toFixed(2),8)}}</td>
+            <td>{{rjust(car_state[wheel].a_smooth.toFixed(2),8)}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
   <div class='itembox'>
       <div ng-repeat="cpu in pi_state.cpu">cpu{{$index}} <span class='data'>{{rjust(cpu,7)}}</span>
       </div>

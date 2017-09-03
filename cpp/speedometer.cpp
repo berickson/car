@@ -41,13 +41,12 @@ nlohmann::json Speedometer::get_json_state() const
 }
 
 double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigned int a_us, int odo_b, unsigned int b_us, int ab_us, float ax) {
-
-
-
+  double last_v = velocity;
 
   if (a_us > last_a_us) {
     v_a =  (odo_a-last_odo_a)*2*meters_per_tick / (a_us - last_a_us) *1E6;
-  } if(odo_b != last_odo_b) {
+  } 
+  if(odo_b != last_odo_b) {
     v_b =  (odo_b-last_odo_b)*2*meters_per_tick / (b_us - last_b_us) *1E6;
   }
   velocity = (v_a + v_b) / 2.;
@@ -93,16 +92,15 @@ double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigne
       }
     }
   }
-  double last_v = kalman_v.mean;
   meters_travelled += meters_moved;
   if(last_clock_us > 0) {
     auto dt = (clock_us - last_clock_us) * 1E-6;
     kalman_v.predict(dt*ax,dt*dt);
-    kalman_a.predict(0,3.0*dt*dt);
+    kalman_a.predict(0,300.0*dt*dt);
   }
   kalman_v.update(velocity,0.01);
   if(elapsed_seconds > 0) {
-    auto a = (kalman_v.mean - last_v) / elapsed_seconds;
+    auto a = (velocity - last_v) / elapsed_seconds;
     kalman_a.update(a,1.0*1.0);
   }
 
