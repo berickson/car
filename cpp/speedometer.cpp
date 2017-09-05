@@ -95,8 +95,8 @@ double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigne
   meters_travelled += meters_moved;
   if(last_clock_us > 0) {
     auto dt = (clock_us - last_clock_us) * 1E-6;
-    kalman_v.predict(dt*ax,dt*dt);
-    kalman_a.predict(0,300.0*dt*dt);
+    kalman_v.predict(0,100.0 *dt*dt); // sigma = 10m/s^2 * dt, variance = sigma^2 = 100 * dt^2
+    kalman_a.predict(0,900.0*dt*dt);  // sigma = 30m/s^3 * dt, variance = 900 m/s^2 * dt^2
   }
   kalman_v.update(velocity,0.01);
   if(elapsed_seconds > 0) {

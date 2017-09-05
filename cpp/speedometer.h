@@ -16,8 +16,8 @@ public:
   int last_odo_b = 0;
   unsigned int last_a_us = 0;
   unsigned int last_b_us = 0;
-  int last_ab_us = 0;
-  int last_clock_us = 0;
+  unsigned int last_ab_us = 0;
+  unsigned int last_clock_us = 0;
 
   double velocity = 0.0;
   double meters_travelled = 0.0;

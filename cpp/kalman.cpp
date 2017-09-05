@@ -3,17 +3,17 @@
 KalmanFilter::KalmanFilter() {
 }
 
-void KalmanFilter::init(float mean, float variance) {
-  this->mean = mean;
-  this->variance = variance;
+void KalmanFilter::init(float _mean, float _variance) {
+  this->mean = _mean;
+  this->variance = _variance;
 }
 
-void KalmanFilter::update(float mean, float variance) {
-  this->mean = (this->variance * mean + this->mean * variance) / (this->variance + variance);
-  this->variance = 1 / ((1 / variance)+(1 / this->variance));
+void KalmanFilter::update(float _mean, float _variance) {
+  this->mean = (this->variance * _mean + this->mean * _variance) / (this->variance + _variance);
+  this->variance = 1. / ((1. / _variance)+(1. / this->variance));
 }
 
-void KalmanFilter::predict(float change, float variance) {
+void KalmanFilter::predict(float change, float _variance) {
   this->mean += change;
-  this->variance += variance;
+  this->variance += _variance;
 }
