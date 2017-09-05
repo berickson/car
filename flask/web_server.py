@@ -12,11 +12,17 @@ import os
 
 TRACK_STORAGE = tracks.TrackStorage()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='')
+
+#@app.route('/angular.min.js')
+#@app.route('/sitemap.xml')
+#def static_from_root():
+#    return send_from_directory(app.static_folder, request.path[1:])
 
 @app.route('/')
 def index():
-    return send_from_directory('templates', 'index.html')
+    return send_from_directory('static', 'index.html')
+
 
 
 class CommandError(Exception):
