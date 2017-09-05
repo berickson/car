@@ -83,15 +83,15 @@ int Driver::esc_for_velocity(PID & velocity_pid, double goal_velocity, double go
 
 class VelocityTracker {
 public:
-  double v_sp = 0;
-  double k_v = 10.0;
-  double k_a = 5.0;
+  double velocity_output = 0;
+  double k_v = 10000.0;
+  double k_a = 0.0;
   double last_t = 0;
   double max_v_sp = 10;
   double min_v_sp = -10;
 
   void reset() {
-    v_sp = 0;
+    velocity_output = 0;
     last_t = 0;
   }
 
@@ -99,14 +99,28 @@ public:
     double t = car.get_time_in_seconds();
     if (last_t != 0) {
       double dt = t - last_t;
-      double v_error = route.get_velocity() - car.get_rear_velocity();
-      double a_error = route.get_acceleration() - car.get_smooth_acceleration();
-      v_sp += (k_v * v_error + k_a * a_error) * dt;
-      v_sp = clamp(v_sp, min_v_sp, max_v_sp);
+      double v = car.get_rear_velocity();
+      double a = car.get_smooth_acceleration();
+      double v_sp = route.get_velocity();
+      double a_sp = route.get_acceleration();
+      double v_error = v_sp - v;
+      double a_error = a_sp - a;
 
+      velocity_output += (k_v * v_error) * dt;
+      
+      // don't consider acceleration at the end of the run
+      if(v_sp != 0 || a_sp != 0)
+        velocity_output += (k_a * a_error) * dt;
+
+      velocity_output = clamp(velocity_output, min_v_sp, max_v_sp);
+      stringstream ss;
+      ss.precision(1);
+      ss <<  "rt.v:" << route.get_velocity() << "  car.v:" << v;
+      ss <<  "rt.a:" << route.get_acceleration() << "  car.a:" << a << "  velocity_output:" << velocity_output;
+      log_info(ss.str());
     }
    last_t = t;
-   return car.esc_for_velocity(v_sp);
+   return car.esc_for_velocity(velocity_output);
   }
 };
 
@@ -142,7 +156,7 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
   if(rear_slipping() && 0)
     esc = 1500;
 
-  if(route.done && fabs(car.get_velocity()) < 0.03) {
+  if(route.done && fabs(car.get_velocity()) < 0.01) {
     log_info("route completed normally");
     route_complete = true;
     esc = 1500;

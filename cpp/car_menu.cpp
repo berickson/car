@@ -321,10 +321,12 @@ void go(Car& car, CarUI & ui) {
 
 void record(Car& car, CarUI & ui) {
   log_entry_exit w("record");
+  run_settings.load_from_file_json(run_settings_path);  
   car.reset_odometry();
   FileNames f;
   string track_name = run_settings.track_name;
   string route_name = f.next_route_name(track_name);
+  log_info((string)"recording route name: " + route_name);
   mkdir(f.get_routes_folder(track_name));
   mkdir(f.get_route_folder(track_name,route_name));
 
