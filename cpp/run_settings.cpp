@@ -168,7 +168,8 @@ void RunSettings::load_from_file_json(string path) {
   nlohmann::json j = nlohmann::json::parse(ifs); 
 
   track_name = j["track_name"];
-  route_name = j["route_name"];
+  route_name = j["route_name"].is_string() ? j["route_name"] : "";
+  //route_name = j["route_name"];
   max_accel_lat = j["max_accel_lat"];
   max_accel = j["max_accel"];
   max_decel = j["max_decel"];
