@@ -132,14 +132,16 @@
       <div>y: {{car_state.front_y.toFixed(2)}}</div>
     </div>
     <div class='itembox'>
-      <table class='data small_text'>
-        <thead><td></td><td>      v</td><td>v_smooth</td><td>a_smooth</td></thead>
-        <tbody>
+      <table class='small_text'>
+        <thead style='text-align:right'><td></td><td>v</td><td>v<sub>smooth</sub></td><td>a<sub>smooth</sub></td><td>meters</td><td>ticks</td></thead>
+        <tbody class='data small_text'>
           <tr ng-repeat = 'wheel in ["fl","fr","bl","br"]'>
             <td>{{wheel}}</td>
             <td>{{rjust(car_state[wheel].v.toFixed(2),7)}}</td>
-            <td>{{rjust(car_state[wheel].v_smooth.toFixed(2),8)}}</td>
-            <td>{{rjust(car_state[wheel].a_smooth.toFixed(2),8)}}</td>
+            <td>{{rjust(car_state[wheel].v_smooth.toFixed(1),6)}}</td>
+            <td>{{rjust(car_state[wheel].a_smooth.toFixed(1),6)}}</td>
+            <td>{{rjust(car_state[wheel].meters.toFixed(2),8)}}</td>
+            <td>{{rjust(car_state[wheel].ticks,8)}}</td>
           </tr>
         </tbody>
       </table>
