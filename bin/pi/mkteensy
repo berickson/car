@@ -1,0 +1,3 @@
+pushd /home/pi/car/teensy
+./upload
+popd

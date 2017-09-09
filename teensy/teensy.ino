@@ -385,8 +385,9 @@ void setup() {
   mpu9150.az_bias = 715.62;
   mpu9150.rest_a_mag = 7893.51;
   mpu9150.zero_adjust = Quaternion(-0.07, 0.67, -0.07, 0.73);
-  mpu9150.yaw_slope_rads_per_ms  = (-13.823402 / (1000 * 60 * 60)) * PI/180;
-  mpu9150.yaw_actual_per_raw = 1.004826221;
+  // was ((-13.823402+4.9) / (1000 * 60 * 60)) * PI/180;
+  mpu9150.yaw_slope_rads_per_ms  = (2.7 / (10 * 60 * 1000)) * PI / 180;
+  mpu9150.yaw_actual_per_raw = (360.*10.)/(360.*10.-328);// 1.00; // 1.004826221;
 
   mpu9150.zero_heading();
 
@@ -501,13 +502,14 @@ void loop() {
     auto br_odo_b_us = odometer_back_right.last_odometer_b_us;
     auto br_odo_ab_us = odometer_back_right.odometer_ab_us;
     interrupts();
+
     
     log(TD,
        "str," + steering.readMicroseconds()
        + ",esc," + speed.readMicroseconds()
        + ",aa,"+ ftos(mpu9150.ax) + "," + ftos(mpu9150.ay)+","+ ftos(mpu9150.az)
        +",spur_us,"+   microseconds_between_spur_pulse_count + "," + last_spur_pulse_us
-       +",spur_odo," + spur_pulse_count
+       +",spur_odo," + mpu9150.temperature // spur_pulse_count
        +",mode,"+modes.current_task->name
        +",odo_fl,"+ fl_odo_a +"," +  fl_odo_a_us + "," + fl_odo_b +"," + fl_odo_b_us + "," + fl_odo_ab_us
        +",odo_fr,"+ fr_odo_a +"," +  fr_odo_a_us + "," + fr_odo_b +"," + fr_odo_b_us + "," + fr_odo_ab_us

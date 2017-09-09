@@ -123,7 +123,7 @@
           </svg>
           </div>
         <div>
-        {{car_state.heading * 180 / Math.PI | number:0}}°
+        {{car_state.heading * 180 / Math.PI | number:1}}°
       </div>
     </div>
     <div class='itembox'>
@@ -148,12 +148,19 @@
   <div class='itembox'>
       <div ng-repeat="cpu in pi_state.cpu">cpu{{$index}} <span class='data'>{{rjust(cpu,7)}}</span>
       </div>
-    </div>
+  </div>
+  <div class='itembox'>
+    <div>mpu temp</div>
+    <div>{{(car_state.temperature*1.8+32).toFixed(1)}}°</div>
+  </div>
+</div>
+
 
     <!-- final div eats up space on right-->
     <div></div> 
 
   </div>
+  
 
   <div>
     <div class='groupbox'> 

@@ -110,6 +110,10 @@ public:
     return current_dynamics.battery_voltage;
   };
 
+  double get_temperature() {
+    return current_dynamics.spur_odo;
+  }
+
   int get_spur_odo() {
     return current_dynamics.spur_odo;
   }

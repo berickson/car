@@ -210,6 +210,7 @@ void Mpu9150::execute(){
     ay = g * (a.y/rest_a_mag - gravity.y);
     az = g * (a.z/rest_a_mag - gravity.z);
 
+    temperature = mpu.getTemperature();
 
     float last_yaw = yaw_pitch_roll[0];
     mpu.dmpGetYawPitchRoll(yaw_pitch_roll, &q, &gravity);

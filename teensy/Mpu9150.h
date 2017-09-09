@@ -49,6 +49,9 @@ public:
   float yaw_adjust_start_ms;
 
 
+  int32_t temperature;
+
+
 
   // orientation/motion vars
   Quaternion q,qraw;           // [w, x, y, z]         quaternion container

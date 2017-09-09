@@ -63,6 +63,9 @@ void Car::process_socket() {
       stringstream reply;
       j["velocity"] = get_velocity();
       j["v_bat"] = get_voltage();
+      // https://www.invensense.com/wp-content/uploads/2015/02/MPU-9150-Register-Map.pdf p.6
+      j["temperature"] = get_temperature()/340.0 + 35.0; // constants from https://playground.arduino.cc/Main/MPU-9150
+      //j["temperature"] = (get_temperature() + 12412.0)/340.0; // constants from https://playground.arduino.cc/Main/MPU-9150
       j["mode"] = get_mode();
       j["heading"] = get_heading().radians();
       j["bl"] = get_back_left_wheel().get_json_state();
