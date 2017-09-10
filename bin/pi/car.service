@@ -1,0 +1,17 @@
+[Unit]
+Description=Car Web Service
+ 
+[Service]
+WorkingDirectory=/home/pi/car/bin/pi
+
+Environment="LD_LIBRARY_PATH=/home/pi/opencv/build/lib"
+User=pi
+ExecStart=-/home/pi/car/bin/pi/car-service
+Restart=always
+RestartSec=3
+StandardOutput=journal
+ 
+[Install]
+WantedBy=multi-user.target
+Alias=car.service
+

@@ -3,7 +3,10 @@ Description=Car Web Service
  
 [Service]
 WorkingDirectory=/home/pi/car/flask
-ExecStart=-/home/pi/miniconda3/bin/python web_server.py
+
+# todo: change back to anaconda
+ExecStart=-/usr/bin/python web_server.py
+#ExecStart=-/home/pi/miniconda3/bin/python web_server.py
 StandardOutput=journal
  
 [Install]

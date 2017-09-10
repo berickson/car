@@ -26,7 +26,7 @@ public:
   void add_listener(WorkQueue<Dynamics>*);
   void remove_listener(WorkQueue<Dynamics>*);
 
-  string config_path = "/home/brian/car/python/car.ini";
+  string config_path = "car.ini";
 
 
   bool online = false;

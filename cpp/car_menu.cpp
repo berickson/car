@@ -385,11 +385,16 @@ string calibration_string(int a) {
 void run_car_socket() {
   log_entry_exit w("run_car_socket");
   try {
+    log_info("0");
     Car car;
     CarUI ui;
+    log_info("1");
     run_settings.load_from_file_json(run_settings_path);
-
+    log_info("2");
+    
     while(true) {
+      log_info("3");
+     
       if(car.command_from_socket == "go") {
         try {
            go(car, ui);
