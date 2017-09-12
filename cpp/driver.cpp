@@ -113,10 +113,10 @@ public:
         velocity_output += (k_a * a_error) * dt;
 
       velocity_output = clamp(velocity_output, min_v_sp, max_v_sp);
-      stringstream ss;
-      ss.precision(1);
-      ss <<  "rt.v:" << route.get_velocity() << "  car.v:" << v;
-      ss <<  "rt.a:" << route.get_acceleration() << "  car.a:" << a << "  velocity_output:" << velocity_output;
+      //stringstream ss;
+      //ss.precision(1);
+      //ss <<  "rt.v:" << route.get_velocity() << "  car.v:" << v;
+      //ss <<  "rt.a:" << route.get_acceleration() << "  car.a:" << a << "  velocity_output:" << velocity_output;
       log_info(ss.str());
     }
    last_t = t;

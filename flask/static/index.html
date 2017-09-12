@@ -110,7 +110,7 @@
     <div >{{car_state.v_bat | number:1}}V</div>
       <svg width="64" height="32">
       <rect x="2" y="2" width="60" height="28" style="fill:lightgray;stroke:gray;stroke-width:2" />
-      <rect x="4" y="4" width="{{56*battery_percent/100}}" height="24" style="fill:black;stroke:black" />
+      <rect x="4" y="4" width="{{Math.max(56*battery_percent/100,0)}}" height="24" style="fill:black;stroke:black" />
 
     </svg>
     <div>{{battery_percent | number:0}}% </div>
@@ -186,12 +186,20 @@
   </div>
   <div class='groupbox'>
     <div class='itembox'>
+      <div class='row'>
+      <button class='button' ng-click="zoom_in()">+</button>
+      <button class='button' ng-click="zoom_out()">-</button>
+      <button class='button' ng-click="pan_right()">-></button>
+      <button class='button' ng-click="pan_left()">&lt;-</button>
+      <button class='button' ng-click="pan_up()">^</button>
+      <button class='button' ng-click="pan_down()">v</button>
+      </div>
       <svg 
-      viewBox="{{route_path_min_x-0.5}} {{-route_path_max_y}} {{route_path_width+2}} {{route_path_height}}" 
+      viewBox="{{viewbox_left}} {{viewbox_top}} {{viewbox_width}} {{viewbox_height}}" 
       preserveAspectRatio="xMidYMid meet" 
       style="width:600px;height:600px">
-      <g transform = "scale(1, -1)" >
-          <circle ng-repeat="path_node in route_path"  cx="{{route_path[$index].x}}" cy="{{route_path[$index].y}}" r="0.01"/>
+      <g transform = "scale({{1}}, {{-1}})" >
+          <circle ng-repeat="path_node in route_path"  cx="{{route_path[$index].x}}" cy="{{route_path[$index].y}}" r="0.01" ng-click="node_clicked($event)"/>
           <rect 
             ng-attr-x = "{{car_state.front_x-0.15}}" 
             ng-attr-y = "{{car_state.front_y}}" 
@@ -281,7 +289,7 @@ app.controller("carController", function($scope, $http, $timeout) {
     }).error(function(response,code) {
       $scope.go_error = "  ("+code+")"+response.message;
     })
-    console.log("poweoff clicked");
+    console.log("poweroff clicked");
   };
 
 
@@ -344,6 +352,55 @@ app.controller("carController", function($scope, $http, $timeout) {
     })
     console.log("reset_odometer clicked");
   };
+
+  $scope.reset_zoom = function() {
+    $scope.viewbox_left = $scope.route_path_min_x-0.5;
+    $scope.viewbox_top = -$scope.route_path_max_y;
+    $scope.viewbox_width = $scope.route_path_width+0.5;
+    $scope.viewbox_height = $scope.route_path_height;
+  }
+
+
+  $scope.pan_delta = 0.1;
+  $scope.zoom_ratio = Math.sqrt(2);
+
+  $scope.zoom_in = function() {
+    var center_x = $scope.viewbox_left + $scope.viewbox_width/2.0;
+    var center_y = $scope.viewbox_top + $scope.viewbox_height/2.0;
+
+    $scope.viewbox_height /= $scope.zoom_ratio;
+    $scope.viewbox_width /= $scope.zoom_ratio;
+
+    $scope.view_box_top = center_y - $scope.viewbox_height/2;
+    $scope.view_box_left = center_x - $scope.viewbox_width/2;
+  }
+
+  $scope.zoom_out = function() {
+    var center_x = $scope.viewbox_left + $scope.viewbox_width/2.0;
+    var center_y = $scope.viewbox_top + $scope.viewbox_height/2.0;
+
+    $scope.viewbox_height *= $scope.zoom_ratio;
+    $scope.viewbox_width *= $scope.zoom_ratio;
+
+    $scope.view_box_top = center_y - $scope.viewbox_height/2;
+    $scope.view_box_left = center_x - $scope.viewbox_width/2;
+  }
+
+  $scope.pan_left = function() {
+    $scope.viewbox_left += $scope.viewbox_width * $scope.pan_delta;
+  }
+
+  $scope.pan_right = function() {
+    $scope.viewbox_left -= $scope.viewbox_width * $scope.pan_delta;
+  }
+
+  $scope.pan_up = function() {
+    $scope.viewbox_top += $scope.viewbox_height * $scope.pan_delta;
+  }
+  
+  $scope.pan_down = function() {
+    $scope.viewbox_top -= $scope.viewbox_height * $scope.pan_delta;
+  }
   
 
   $scope.$watch("run_settings.track_name", function(newValue, oldValue) {
@@ -373,6 +430,7 @@ app.controller("carController", function($scope, $http, $timeout) {
           $scope.route_path_max_y  = Math.max.apply(null, route_y)
           $scope.route_path_width  = $scope.route_path_max_x - $scope.route_path_min_x
           $scope.route_path_height = $scope.route_path_max_y - $scope.route_path_min_y
+          $scope.reset_zoom();
         }).error(function(data, status, headers, config) {
           $scope.route_names = ['n/a'];
         // log error
@@ -413,6 +471,21 @@ app.controller("carController", function($scope, $http, $timeout) {
   $scope.rjust = function(s, width) {
     s = s.toString()
     return " ".repeat(width-s.length)+s
+  }
+
+  $scope.property_list = function(o) {
+    s = [];
+    for(var property_name in o) {
+      s.push(property_name);
+    }
+    return s.join(", ");
+    
+  }
+
+  $scope.node_clicked = function($event) {
+    o = $event.currentTarget;
+    alert("clicked node at (" + o.cx.baseVal.value.toFixed(2) +", "+o.cy.baseVal.value.toFixed(2)+")");
+    return;
   }
 
   var poller2 = function() {
