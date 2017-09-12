@@ -117,7 +117,7 @@ public:
       //ss.precision(1);
       //ss <<  "rt.v:" << route.get_velocity() << "  car.v:" << v;
       //ss <<  "rt.a:" << route.get_acceleration() << "  car.a:" << a << "  velocity_output:" << velocity_output;
-      log_info(ss.str());
+      //log_info(ss.str());
     }
    last_t = t;
    return car.esc_for_velocity(velocity_output);
