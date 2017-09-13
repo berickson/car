@@ -10,7 +10,7 @@
   "optimize_velocity": true,
   "prune_max": 0.5,
   "prune_tolerance": 0.02,
-  "route_name": "C",
+  "route_name": "A",
   "slip_rate": 0.2,
   "slip_slop": 0.5,
   "steering_k_d": 20.0,
@@ -18,7 +18,7 @@
   "steering_k_p": 40.0,
   "t_ahead": 0.3,
   "track_name": "desk",
-  "v_k_d": 6.0,
+  "v_k_d": 4.0,
   "v_k_i": 0.0,
-  "v_k_p": 15.0
+  "v_k_p": 10.0
 }

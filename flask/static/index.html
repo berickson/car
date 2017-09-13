@@ -1,129 +1,146 @@
 <!doctype html>
 <html ng-app="car" ng-controller="carController">
+
 <head>
   <title>Orange Crash</title>
-<style>
-/* colors from https://coolors.co/738873-9b9992-dbd7cd-ffb97d-c3c7ba */
+  <style>
+    /* colors from https://coolors.co/738873-9b9992-dbd7cd-ffb97d-c3c7ba */
 
-.changed {
-  background-color:yellow;
-}
-.button {
-  background-color: #738873;
-  border: none;
-  border-radius: 5px;
-  color: white;
-  padding: 12px 12px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  font-weight: bold;
+    .changed {
+      background-color: yellow;
+    }
 
-  /*https://www.cssmatic.com/box-shadow*/
-  -webkit-box-shadow: 5px 5px 11px -2px rgba(0,0,0,0.5);
-  -moz-box-shadow: 5px 5px 11px -2px rgba(0,0,0,0.5);
-  box-shadow: 5px 5px 11px -2px rgba(0,0,0,0.5);
-}
+    .button {
+      background-color: #738873;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      padding: 12px 12px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      font-weight: bold;
+      pointer-events:all;
 
-.select {
-   
-   background-color:rgb(220,220,220);
-   /*height: 34px;*/
-   font-size: 24px;
-   /* width: 240px; */
-}
+      /*https://www.cssmatic.com/box-shadow*/
+      -webkit-box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
+      -moz-box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
+      box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
+    }
 
+    .select {
 
-.small_text {
-  font-size: 10px;
-}
-
-.bigtext {
-  font-size: 28px;
-}
+      background-color: rgb(220, 220, 220);
+      /*height: 34px;*/
+      font-size: 24px;
+      /* width: 240px; */
+    }
 
 
-.groupbox {
-  background-color:#DBD7CD;
-  margin:10px;
-  padding:10px;
-  display:block;
-  font-family: Consolas, monaco, monospace;
-  /*https://www.cssmatic.com/box-shadow*/
-  -webkit-box-shadow: 5px 5px 11px -2px rgba(0,0,0,0.5);
-  -moz-box-shadow: 5px 5px 11px -2px rgba(0,0,0,0.5);
-  box-shadow: 5px 5px 11px -2px rgba(0,0,0,0.5);
-}
+    .small_text {
+      font-size: 10px;
+    }
 
-.row {
-  display:flex;
-  flex-direction: row;
-  align-items:stretch;
-}
+    .bigtext {
+      font-size: 28px;
+    }
 
-.itembox {
-  background-color:#C3C7BA;
-  margin:5px;
-  padding:5px;
-  
-  
-  font-family: Consolas, monaco, monospace;
-  display:inline-block;
 
-  /*https://www.cssmatic.com/box-shadow*/
-  -webkit-box-shadow: 5px 5px 11px -2px rgba(0,0,0,0.5);
-  -moz-box-shadow: 5px 5px 11px -2px rgba(0,0,0,0.5);
-  box-shadow: 5px 5px 11px -2px rgba(0,0,0,0.5);
-}
+    .groupbox {
+      background-color: #DBD7CD;
+      margin: 10px;
+      padding: 10px;
+      display: block;
+      font-family: Consolas, monaco, monospace;
+      /*https://www.cssmatic.com/box-shadow*/
+      -webkit-box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
+      -moz-box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
+      box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
+    }
 
-.data {
-  white-space: pre;
-}
+    .row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
 
-.orange {
-  color:#FFB97D;
-  display:inline;
-  margin:10px;
-  padding:0px;
-}
+    .column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-.main {
-  background-color:#9B9992;
-  font-family: Consolas, monaco, monospace;
-}
+    .itembox {
+      background-color: #C3C7BA;
+      margin: 5px;
+      padding: 5px;
 
-</style>
-<script src="angular.min.js"></script>
-<link rel="favicon" href="favicon.png" />
+      font-family: Consolas, monaco, monospace;
+      display: inline-block;
+
+      /*https://www.cssmatic.com/box-shadow*/
+      -webkit-box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
+      -moz-box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
+      box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
+    }
+
+    .data {
+      white-space: pre;
+    }
+
+    .orange {
+      color: #FFB97D;
+      display: inline;
+      margin: 10px;
+      padding: 0px;
+    }
+
+    .atop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .main {
+      background-color: #9B9992;
+      font-family: Consolas, monaco, monospace;
+    }
+  </style>
+  <script src="angular.min.js"></script>
+  <link rel="favicon" href="favicon.png" />
 </head>
+
 <body class='main'>
   <h1 class='orange'>Orange Crash</h1>
   <div class='itembox'>{{poll_ok ? "online - " + car_state.mode : "offline"}}</div>
   <div class="groupbox row">
     <div class='itembox'>
-        <div class='bigtext data'>{{ rjust((car_state.velocity * 2.23694).toFixed(1),5) }}</div>
-        <div style='text-align:right'>mph</div>
-        <div style='text-align:right' class='data'>{{ rjust(car_state.velocity.toFixed(1),5) }} m/s</div>
-      </div>
+      <div class='bigtext data'>{{ rjust((car_state.velocity * 2.23694).toFixed(1),5) }}</div>
+      <div style='text-align:right'>mph</div>
+      <div style='text-align:right' class='data'>{{ rjust(car_state.velocity.toFixed(1),5) }} m/s</div>
+    </div>
     <div class="itembox">
-    <div >{{car_state.v_bat | number:1}}V</div>
+      <div>{{car_state.v_bat | number:1}}V</div>
       <svg width="64" height="32">
-      <rect x="2" y="2" width="60" height="28" style="fill:lightgray;stroke:gray;stroke-width:2" />
-      <rect x="4" y="4" width="{{Math.max(56*battery_percent/100,0)}}" height="24" style="fill:black;stroke:black" />
+        <rect x="2" y="2" width="60" height="28" style="fill:lightgray;stroke:gray;stroke-width:2" />
+        <rect x="4" y="4" width="{{Math.max(56*battery_percent/100,0)}}" height="24" style="fill:black;stroke:black" />
 
-    </svg>
-    <div>{{battery_percent | number:0}}% </div>
-  </div>
+      </svg>
+      <div>{{battery_percent | number:0}}% </div>
+    </div>
     <div class='itembox'>
       <div>Heading</div>
-        <div>
-          <svg width="32" height="32">
-            <circle cx="16" cy="16" r="14" stroke="gray" stroke-width="2" fill="LightGray" />
-            <line x1="16" y1="16" x2={{16-14*Math.sin(car_state.heading)}} y2={{16-14*Math.cos(car_state.heading)}} style="stroke:gray;stroke-width:2" />
-          </svg>
-          </div>
-        <div>
+      <div>
+        <svg width="32" height="32">
+          <circle cx="16" cy="16" r="14" stroke="gray" stroke-width="2" fill="LightGray" />
+          <line x1="16" y1="16" x2={{16-14*Math.sin(car_state.heading)}} y2={{16-14*Math.cos(car_state.heading)}} style="stroke:gray;stroke-width:2"
+          />
+        </svg>
+      </div>
+      <div>
         {{car_state.heading * 180 / Math.PI | number:1}}°
       </div>
     </div>
@@ -134,9 +151,16 @@
     </div>
     <div class='itembox'>
       <table class='small_text'>
-        <thead style='text-align:right'><td></td><td>v</td><td>v<sub>smooth</sub></td><td>a<sub>smooth</sub></td><td>meters</td><td>ticks</td></thead>
+        <thead style='text-align:right'>
+          <td></td>
+          <td>v</td>
+          <td>v<sub>smooth</sub></td>
+          <td>a<sub>smooth</sub></td>
+          <td>meters</td>
+          <td>ticks</td>
+        </thead>
         <tbody class='data small_text'>
-          <tr ng-repeat = 'wheel in ["fl","fr","bl","br"]'>
+          <tr ng-repeat='wheel in ["fl","fr","bl","br"]'>
             <td>{{wheel}}</td>
             <td>{{rjust(car_state[wheel].v.toFixed(2),7)}}</td>
             <td>{{rjust(car_state[wheel].v_smooth.toFixed(1),6)}}</td>
@@ -148,34 +172,33 @@
       </table>
 
     </div>
-  <div class='itembox'>
+    <div class='itembox'>
       <div ng-repeat="cpu in pi_state.cpu">cpu{{$index}}<span class='data'>{{rjust(cpu.toFixed(1),5)}}</span>
+      </div>
+    </div>
+    <div class='itembox'>
+      <div>mpu temp</div>
+      <div>{{(car_state.temperature*1.8+32).toFixed(1)}}°</div>
+    </div>
   </div>
-  </div>
-  <div class='itembox'>
-    <div>mpu temp</div>
-    <div>{{(car_state.temperature*1.8+32).toFixed(1)}}°</div>
-  </div>
-</div>
 
 
-    <!-- final div eats up space on right-->
-    <div></div> 
+  <!-- final div eats up space on right-->
 
   </div>
-  
+
 
   <div>
-    <div class='groupbox'> 
+    <div class='groupbox'>
       <div class='itembox'>
-      track:
-      <select class='select' name='2' ng-model="run_settings.track_name" id="2" ng-options="track_name for track_name in track_names"></select>
+        track:
+        <select class='select' name='2' ng-model="run_settings.track_name" id="2" ng-options="track_name for track_name in track_names"></select>
       </div>
 
       <div class='itembox'>
-      route: <select class='select' name='1' ng-model="run_settings.route_name" id="1" ng-options="route_name for route_name in route_names"></select>
+        route: <select class='select' name='1' ng-model="run_settings.route_name" id="1" ng-options="route_name for route_name in route_names"></select>
       </div>
-   
+
       <button class='button' ng-click="poweroff()">Power Off</button>
       <button class='button' ng-click="save_run_settings()">Save</button>
       <button class='button' ng-click="go()">Go</button>
@@ -185,334 +208,332 @@
     </div>
   </div>
   <div class='groupbox'>
-    <div class='itembox'>
-      <div class='row'>
-      <button class='button' ng-click="zoom_in()">+</button>
-      <button class='button' ng-click="zoom_out()">-</button>
-      <button class='button' ng-click="pan_right()">-></button>
-      <button class='button' ng-click="pan_left()">&lt;-</button>
-      <button class='button' ng-click="pan_up()">^</button>
-      <button class='button' ng-click="pan_down()">v</button>
-      </div>
-      <svg 
-      viewBox="{{viewbox_left}} {{viewbox_top}} {{viewbox_width}} {{viewbox_height}}" 
-      preserveAspectRatio="xMidYMid meet" 
-      style="width:600px;height:600px">
-      <g transform = "scale({{1}}, {{-1}})" >
-          <circle ng-repeat="path_node in route_path"  cx="{{route_path[$index].x}}" cy="{{route_path[$index].y}}" r="0.01" ng-click="node_clicked($event)"/>
-          <rect 
-            ng-attr-x = "{{car_state.front_x-0.15}}" 
-            ng-attr-y = "{{car_state.front_y}}" 
-            width = "0.3" 
-            height = "0.6" 
-            fill = "orange" 
-            fill-opacity="0.5"
-            stroke = "gray"
-            stroke-width="0.03"
-            
-            transform = "translate(0, 0) rotate({{car_state.heading*180/Math.PI+90}} {{car_state.front_x}} {{car_state.front_y}})"/>
-      </g>
+    <div class='itembox' style='position:relative;overflow:hidden'>
+      <svg viewBox="{{viewbox_left}} {{viewbox_top}} {{viewbox_width}} {{viewbox_height}}" preserveAspectRatio="xMidYMid meet"
+      style='width:600px;height:600px'
+      >
+        <g transform="scale({{1}}, {{-1}})">
+          <circle ng-repeat="path_node in route_path" cx="{{route_path[$index].x}}" cy="{{route_path[$index].y}}" r="0.01" ng-click="node_clicked($event)"
+          />
+          <rect ng-attr-x="{{car_state.front_x-0.15}}" ng-attr-y="{{car_state.front_y}}" width="0.3" height="0.6" fill="orange" fill-opacity="0.5"
+            stroke="gray" stroke-width="0.03" transform="translate(0, 0) rotate({{car_state.heading*180/Math.PI+90}} {{car_state.front_x}} {{car_state.front_y}})"
+          />
+        </g>
       </svg>
-  </div>
-  <div class='itembox'>
-    <table>
-      <tbody>
-        <tr ng-repeat="item in run_settings_array" ng.key="item.key"> 
-        <td>{{item.key}}</td>
-        <td>
-          <input type="checkbox" ng-if="item.data_type === 'boolean'" ng-model="item.value"/>
-          <input 
-            ng-if="item.data_type === 'number'" 
-            ng-model="item.value" style='width:4ch' 
-            ng-class="is_changed(item) ? 'changed' : ''"/>
-        </td>
-      <tr>
+      <div class='atop' style='padding:10px'>
+        <div class='row'>
+          <button class='button' ng-click="zoom_in()">+</button>
+          <button class='button' ng-click="zoom_out()">-</button>
+          &nbsp;
+          <div class='column'>
+            <button class='button' ng-click="pan_up()">^</button>
+            <div class='row'>
+              <button class='button' ng-click="pan_left()">&lt; </button>
+              <button class='button' ng-click="reset_zoom()">[]</button>
+              <button class='button' ng-click="pan_right()">></button>
+            </div>
+            <button class='button' ng-click="pan_down()">v</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class='itembox'>
+      <table>
+        <tbody>
+          <tr ng-repeat="item in run_settings_array" ng.key="item.key">
+            <td>{{item.key}}</td>
+            <td>
+              <input type="checkbox" ng-if="item.data_type === 'boolean'" ng-model="item.value" />
+              <input ng-if="item.data_type === 'number'" ng-model="item.value" style='width:4ch' ng-class="is_changed(item) ? 'changed' : ''"
+              />
+            </td>
+            <tr>
       </table>
+    </div>
   </div>
-</div>
 
   <label><h3><input type="checkbox" id="xxx" ng-model="display_car_state"> car_state: </h3></label>
   <div class='groupbox'>
-  <div ng-if="display_car_state" class='small_text' ng-repeat="(key,value) in car_state">{{key}} = {{value}}
+    <div ng-if="display_car_state" class='small_text' ng-repeat="(key,value) in car_state">{{key}} = {{value}}
 
-  </div>
-  </div>
-
+    </div>
 </body>
 <script>
-var app = angular.module("car", []);
-app.controller("carController", function($scope, $http, $timeout) {
-  $scope.Math = Math
+  var app = angular.module("car", []);
+  app.controller("carController", function ($scope, $http, $timeout) {
+    $scope.Math = Math
 
-  $scope.type_of = function(val) { 
-    return typeof(val); 
-  };
+    $scope.type_of = function (val) {
+      return typeof (val);
+    };
 
-  $scope.is_changed = function(field) {
-    return field.original_value.toString() !== field.value.toString();
+    $scope.is_changed = function (field) {
+      return field.original_value.toString() !== field.value.toString();
 
-  }
-
-  $scope.to_field_array = function(x) { 
-    rv = []; 
-    for(k in x) {
-      rv.push({
-        key:k,
-        value:x[k],
-        original_value:x[k],
-        data_type:typeof(x[k])
-        });
     }
-    return rv;
-  };
 
-  $scope.set_changes_from_field_array = function(o, field_array) { 
-    for(i in field_array) {
-      var field = field_array[i];
-      if($scope.is_changed(field)) {
-        if(field.data_type == 'number') {
-          o[field.key] = Number(field.value);
-        }
-        if(field.data_type == 'boolean)') {
-          o[field.key] == Boolean(field.value);
+    $scope.to_field_array = function (x) {
+      rv = [];
+      for (k in x) {
+        rv.push({
+          key: k,
+          value: x[k],
+          original_value: x[k],
+          data_type: typeof (x[k])
+        });
+      }
+      return rv;
+    };
+
+    $scope.set_changes_from_field_array = function (o, field_array) {
+      for (i in field_array) {
+        var field = field_array[i];
+        if ($scope.is_changed(field)) {
+          if (field.data_type == 'number') {
+            o[field.key] = Number(field.value);
+          }
+          if (field.data_type == 'boolean)') {
+            o[field.key] == Boolean(field.value);
+          }
         }
       }
+      return rv;
+    };
+
+
+    $scope.poweroff = function () {
+      go_error = ""
+      $http.put('/pi/poweroff', "1").success(function () {
+        console.log('poweroff success');
+      }).error(function (response, code) {
+        $scope.go_error = "  (" + code + ")" + response.message;
+      })
+      console.log("poweroff clicked");
+    };
+
+
+    $scope.save_run_settings = function () {
+      go_error = ""
+      $scope.set_changes_from_field_array($scope.run_settings, $scope.run_settings_array);
+      req = {
+        url: '/run_settings',
+        method: 'PUT',
+        data: JSON.stringify($scope.run_settings),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
+
+      $http(req).success(function () {
+        console.log('save run settings success');
+      }).error(function (response, code) {
+        $scope.go_error = "  (" + code + ")" + response;
+      });
+
+      console.log("save_run_settings clicked");
+
     }
-    return rv;
-  };
 
 
-  $scope.poweroff = function() {
-    go_error = ""
-    $http.put('/pi/poweroff',"1").success(function() {
-      console.log('poweroff success');
-    }).error(function(response,code) {
-      $scope.go_error = "  ("+code+")"+response.message;
-    })
-    console.log("poweroff clicked");
-  };
+    $scope.go = function () {
+      go_error = ""
+      $http.put('/command/go', "1").success(function () {
+        console.log('go success');
+      }).error(function (response, code) {
+        $scope.go_error = "  (" + code + ")" + response.message;
+      })
+      console.log("go clicked");
+    };
+
+    $scope.stop = function () {
+      $http.put('/command/stop', "1").success(function () {
+        console.log('stop success');
+      }).error(function (response, code) {
+        $scope.stop_error = "  (" + code + ")" + response.message;
+      })
+      console.log("stop clicked");
+    };
+
+    $scope.record = function () {
+      $http.put('/command/record', "1").success(function () {
+        console.log('record success');
+      }).error(function (response, code) {
+        $scope.record_error = "  (" + code + ")" + response.message;
+      })
+      console.log("record clicked");
+    };
+
+    $scope.reset_odometer = function () {
+      $http.put('/command/reset_odometer', "1").success(function () {
+        console.log('reset_odometer success');
+      }).error(function (response, code) {
+        $scope.reset_odometer_error = "  (" + code + ")" + response.message;
+      })
+      console.log("reset_odometer clicked");
+    };
+
+    $scope.reset_zoom = function () {
+      $scope.viewbox_left = $scope.route_path_min_x - 0.7;
+      $scope.viewbox_top = -$scope.route_path_max_y;
+      $scope.viewbox_width = $scope.route_path_width + 0.8;
+      $scope.viewbox_height = $scope.route_path_height;
+    }
 
 
-  $scope.save_run_settings = function() {
-    go_error = ""
-    $scope.set_changes_from_field_array($scope.run_settings, $scope.run_settings_array);
-    req = {
-      url:'/run_settings',
-      method: 'PUT',
-      data: JSON.stringify($scope.run_settings),
-      headers: {
-        'Content-Type': 'application/json'
+    $scope.pan_delta = 0.1;
+    $scope.zoom_ratio = Math.sqrt(2);
+
+    $scope.zoom_in = function () {
+      var center_x = $scope.viewbox_left + $scope.viewbox_width / 2.0;
+      var center_y = $scope.viewbox_top + $scope.viewbox_height / 2.0;
+
+      $scope.viewbox_height /= $scope.zoom_ratio;
+      $scope.viewbox_width /= $scope.zoom_ratio;
+
+      $scope.view_box_top = center_y - $scope.viewbox_height / 2;
+      $scope.view_box_left = center_x - $scope.viewbox_width / 2;
+    }
+
+    $scope.zoom_out = function () {
+      var center_x = $scope.viewbox_left + $scope.viewbox_width / 2.0;
+      var center_y = $scope.viewbox_top + $scope.viewbox_height / 2.0;
+
+      $scope.viewbox_height *= $scope.zoom_ratio;
+      $scope.viewbox_width *= $scope.zoom_ratio;
+
+      $scope.view_box_top = center_y - $scope.viewbox_height / 2;
+      $scope.view_box_left = center_x - $scope.viewbox_width / 2;
+    }
+
+    $scope.pan_left = function () {
+      $scope.viewbox_left += $scope.viewbox_width * $scope.pan_delta;
+    }
+
+    $scope.pan_right = function () {
+      $scope.viewbox_left -= $scope.viewbox_width * $scope.pan_delta;
+    }
+
+    $scope.pan_up = function () {
+      $scope.viewbox_top += $scope.viewbox_height * $scope.pan_delta;
+    }
+
+    $scope.pan_down = function () {
+      $scope.viewbox_top -= $scope.viewbox_height * $scope.pan_delta;
+    }
+
+
+    $scope.$watch("run_settings.track_name", function (newValue, oldValue) {
+      if ($scope.run_settings.track_name !== null && $scope.run_settings.track_name.length > 0) {
+        console.log("selected track:", $scope.run_settings.track_name)
+        $http.get('/tracks/' + $scope.run_settings.track_name + "/route_names").
+          success(function (result, status, headers, config) {
+            $scope.route_names = result.route_names
+          }).error(function (data, status, headers, config) {
+            $scope.route_names = ['n/a'];
+            // log error
+          });
       }
-    };
-
-    $http(req).success(function() {
-      console.log('save run settings success');
-    }).error(function(response,code) {
-      $scope.go_error = "  ("+code+")"+response;
     });
 
-    console.log("save_run_settings clicked");
-    
-  }
+    $scope.$watch("run_settings.route_name", function (newValue, oldValue) {
+      if ($scope.run_settings.route_name !== null && $scope.run_settings.route_name.length > 0) {
+        $http.get('/tracks/' + $scope.run_settings.track_name + "/routes/" + $scope.run_settings.route_name + "/path").
+          success(function (route_path, status, headers, config) {
+            $scope.route_path = route_path;
+            var route_x = route_path.map(function (v) { return v.x });
+            var route_y = route_path.map(function (v) { return v.y });
+
+            $scope.route_path_min_x = Math.min.apply(null, route_x)
+            $scope.route_path_min_y = Math.min.apply(null, route_y)
+            $scope.route_path_max_x = Math.max.apply(null, route_x)
+            $scope.route_path_max_y = Math.max.apply(null, route_y)
+            $scope.route_path_width = $scope.route_path_max_x - $scope.route_path_min_x
+            $scope.route_path_height = $scope.route_path_max_y - $scope.route_path_min_y
+            $scope.reset_zoom();
+          }).error(function (data, status, headers, config) {
+            $scope.route_names = ['n/a'];
+            // log error
+          });
+      }
+    });
 
 
-  $scope.go = function() {
-    go_error = ""
-    $http.put('/command/go',"1").success(function() {
-      console.log('go success');
-    }).error(function(response,code) {
-      $scope.go_error = "  ("+code+")"+response.message;
-    })
-    console.log("go clicked");
-  };
-
-  $scope.stop = function() {
-    $http.put('/command/stop',"1").success(function() {
-      console.log('stop success');
-    }).error(function(response,code) {
-      $scope.stop_error = "  ("+code+")"+response.message;
-    })
-    console.log("stop clicked");
-  };
-
-  $scope.record = function() {
-    $http.put('/command/record',"1").success(function() {
-      console.log('record success');
-    }).error(function(response,code) {
-      $scope.record_error = "  ("+code+")"+response.message;
-    })
-    console.log("record clicked");
-  };
-
-  $scope.reset_odometer = function() {
-    $http.put('/command/reset_odometer',"1").success(function() {
-      console.log('reset_odometer success');
-    }).error(function(response,code) {
-      $scope.reset_odometer_error = "  ("+code+")"+response.message;
-    })
-    console.log("reset_odometer clicked");
-  };
-
-  $scope.reset_zoom = function() {
-    $scope.viewbox_left = $scope.route_path_min_x-0.5;
-    $scope.viewbox_top = -$scope.route_path_max_y;
-    $scope.viewbox_width = $scope.route_path_width+0.5;
-    $scope.viewbox_height = $scope.route_path_height;
-  }
-
-
-  $scope.pan_delta = 0.1;
-  $scope.zoom_ratio = Math.sqrt(2);
-
-  $scope.zoom_in = function() {
-    var center_x = $scope.viewbox_left + $scope.viewbox_width/2.0;
-    var center_y = $scope.viewbox_top + $scope.viewbox_height/2.0;
-
-    $scope.viewbox_height /= $scope.zoom_ratio;
-    $scope.viewbox_width /= $scope.zoom_ratio;
-
-    $scope.view_box_top = center_y - $scope.viewbox_height/2;
-    $scope.view_box_left = center_x - $scope.viewbox_width/2;
-  }
-
-  $scope.zoom_out = function() {
-    var center_x = $scope.viewbox_left + $scope.viewbox_width/2.0;
-    var center_y = $scope.viewbox_top + $scope.viewbox_height/2.0;
-
-    $scope.viewbox_height *= $scope.zoom_ratio;
-    $scope.viewbox_width *= $scope.zoom_ratio;
-
-    $scope.view_box_top = center_y - $scope.viewbox_height/2;
-    $scope.view_box_left = center_x - $scope.viewbox_width/2;
-  }
-
-  $scope.pan_left = function() {
-    $scope.viewbox_left += $scope.viewbox_width * $scope.pan_delta;
-  }
-
-  $scope.pan_right = function() {
-    $scope.viewbox_left -= $scope.viewbox_width * $scope.pan_delta;
-  }
-
-  $scope.pan_up = function() {
-    $scope.viewbox_top += $scope.viewbox_height * $scope.pan_delta;
-  }
-  
-  $scope.pan_down = function() {
-    $scope.viewbox_top -= $scope.viewbox_height * $scope.pan_delta;
-  }
-  
-
-  $scope.$watch("run_settings.track_name", function(newValue, oldValue) {
-    if ($scope.run_settings.track_name !== null && $scope.run_settings.track_name.length > 0) {
-      console.log("selected track:",$scope.run_settings.track_name)
-      $http.get('/tracks/'+$scope.run_settings.track_name+"/route_names").
-        success(function(result, status, headers, config) {
-          $scope.route_names = result.route_names
-        }).error(function(data, status, headers, config) {
-          $scope.route_names = ['n/a'];
+    $http.get('/track_names').
+      success(function (result, status, headers, config) {
+        $scope.track_names = result.track_names;
+      }).
+      error(function (data, status, headers, config) {
         // log error
       });
-    }
-  });
+    $scope.poll_ok = false;
+    $scope.display_car_state = false;
 
-  $scope.$watch("run_settings.route_name", function(newValue, oldValue) {
-    if ($scope.run_settings.route_name !== null && $scope.run_settings.route_name.length > 0) {
-      $http.get('/tracks/'+$scope.run_settings.track_name+"/routes/"+$scope.run_settings.route_name+"/path").
-        success(function(route_path, status, headers, config) {
-          $scope.route_path = route_path;
-          var route_x = route_path.map(function(v){return v.x});
-          var route_y = route_path.map(function(v){return v.y});
 
-          $scope.route_path_min_x  = Math.min.apply(null, route_x)
-          $scope.route_path_min_y  = Math.min.apply(null, route_y)
-          $scope.route_path_max_x  = Math.max.apply(null, route_x)
-          $scope.route_path_max_y  = Math.max.apply(null, route_y)
-          $scope.route_path_width  = $scope.route_path_max_x - $scope.route_path_min_x
-          $scope.route_path_height = $scope.route_path_max_y - $scope.route_path_min_y
-          $scope.reset_zoom();
-        }).error(function(data, status, headers, config) {
-          $scope.route_names = ['n/a'];
-        // log error
+    var poller = function () {
+      $http({ method: 'GET', timeout: 5000, url: '/car/get_state' })
+        .then(function (r) {
+          $scope.car_state = r.data;
+          var v_bat = $scope.car_state.v_bat;
+          var min_bat = 3.5 * 3;
+          var max_bat = 4.2 * 3;
+          $scope.battery_percent = 100 * (v_bat - min_bat) / (max_bat - min_bat);
+          $scope.poll_ok = true;
+          $timeout(poller, 100);
+        },
+        function (e) {
+          $scope.poll_ok = false;
+          $timeout(poller, 1000);
         });
+    };
+    poller();
+
+    $scope.rjust = function (s, width) {
+      s = s.toString()
+      return " ".repeat(width - s.length) + s
     }
+
+    $scope.property_list = function (o) {
+      s = [];
+      for (var property_name in o) {
+        s.push(property_name);
+      }
+      return s.join(", ");
+
+    }
+
+    $scope.node_clicked = function ($event) {
+      o = $event.currentTarget;
+      alert("clicked node at (" + o.cx.baseVal.value.toFixed(2) + ", " + o.cy.baseVal.value.toFixed(2) + ")");
+      return;
+    }
+
+    var poller2 = function () {
+      $http({ method: 'GET', timeout: 5000, url: '/pi/get_state' })
+        .then(function (r) {
+          $scope.pi_state = r.data;
+          $timeout(poller2, 1000);
+        },
+        function (e) {
+          $timeout(poller2, 1000);
+        });
+    };
+    poller2();
+
+    var poller3 = function () {
+      $http({ method: 'GET', timeout: 5000, url: '/run_settings' })
+        .then(function (r) {
+          $scope.run_settings = r.data;
+          $scope.run_settings_array = $scope.to_field_array($scope.run_settings);
+        },
+        function (e) {
+          $timeout(poller3, 1000);
+        });
+    };
+    poller3();
+
   });
 
-
-  $http.get('/track_names').
-    success(function(result, status, headers, config) {
-      $scope.track_names = result.track_names;
-    }).
-    error(function(data, status, headers, config) {
-      // log error
-    });
-  $scope.poll_ok = false;
-  $scope.display_car_state = false;
-
-
-  var poller = function() {
-    $http({method:'GET', timeout:5000, url : '/car/get_state'})
-      .then(function(r) {
-        $scope.car_state = r.data;
-        var v_bat = $scope.car_state.v_bat;
-        var min_bat = 3.5 * 3;
-        var max_bat = 4.2 * 3;
-        $scope.battery_percent = 100*(v_bat-min_bat)/(max_bat-min_bat);
-        $scope.poll_ok = true;
-        $timeout(poller, 100);
-      },
-      function(e) { 
-        $scope.poll_ok = false;
-        $timeout(poller,1000);
-      });
-    };
-  poller();
-  
-  $scope.rjust = function(s, width) {
-    s = s.toString()
-    return " ".repeat(width-s.length)+s
-  }
-
-  $scope.property_list = function(o) {
-    s = [];
-    for(var property_name in o) {
-      s.push(property_name);
-    }
-    return s.join(", ");
-    
-  }
-
-  $scope.node_clicked = function($event) {
-    o = $event.currentTarget;
-    alert("clicked node at (" + o.cx.baseVal.value.toFixed(2) +", "+o.cy.baseVal.value.toFixed(2)+")");
-    return;
-  }
-
-  var poller2 = function() {
-    $http({method:'GET', timeout:5000, url : '/pi/get_state'})
-      .then(function(r) {
-        $scope.pi_state = r.data;
-        $timeout(poller2,1000);
-      },
-      function(e) { 
-        $timeout(poller2,1000);
-      });
-    };
-  poller2();
-
-  var poller3 = function() {
-    $http({method:'GET', timeout:5000, url : '/run_settings'})
-      .then(function(r) {
-        $scope.run_settings = r.data;
-        $scope.run_settings_array = $scope.to_field_array($scope.run_settings);
-      },
-      function(e) { 
-        $timeout(poller3,1000);
-      });
-    };
-  poller3();
-
-});    
-</script>    
+</script>
 
 </html>
