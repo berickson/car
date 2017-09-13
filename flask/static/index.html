@@ -126,7 +126,7 @@
       <div>{{car_state.v_bat | number:1}}V</div>
       <svg width="64" height="32">
         <rect x="2" y="2" width="60" height="28" style="fill:lightgray;stroke:gray;stroke-width:2" />
-        <rect x="4" y="4" width="{{Math.max(56*battery_percent/100,0)}}" height="24" style="fill:black;stroke:black" />
+        <rect ng-if="battery_percent" x="4" y="4" ng-attr-width="{{Math.max(56*battery_percent/100,0)}}" height="24" style="fill:black;stroke:black" />
 
       </svg>
       <div>{{battery_percent | number:0}}% </div>
@@ -136,7 +136,7 @@
       <div>
         <svg width="32" height="32">
           <circle cx="16" cy="16" r="14" stroke="gray" stroke-width="2" fill="LightGray" />
-          <line x1="16" y1="16" x2={{16-14*Math.sin(car_state.heading)}} y2={{16-14*Math.cos(car_state.heading)}} style="stroke:gray;stroke-width:2"
+          <line ng-if="car_state" x1="16" y1="16" ng-attr-x2={{16-14*Math.sin(car_state.heading)}} ng-attr-y2={{16-14*Math.cos(car_state.heading)}} style="stroke:gray;stroke-width:2"
           />
         </svg>
       </div>
@@ -173,7 +173,7 @@
 
     </div>
     <div class='itembox'>
-      <div ng-repeat="cpu in pi_state.cpu">cpu{{$index}}<span class='data'>{{rjust(cpu.toFixed(1),5)}}</span>
+      <div ng-if="pi_state" ng-repeat="cpu in pi_state.cpu track by $index">cpu{{$index}}<span class='data'>{{rjust(cpu.toFixed(1),5)}}</span>
       </div>
     </div>
     <div class='itembox'>
@@ -209,18 +209,20 @@
   </div>
   <div class='groupbox'>
     <div class='itembox' style='position:relative;overflow:hidden'>
-      <svg viewBox="{{viewbox_left}} {{viewbox_top}} {{viewbox_width}} {{viewbox_height}}" preserveAspectRatio="xMidYMid meet"
+      <!-- 2nd viewbox is to -->
+      <svg ng-attr-viewBox="{{viewbox_left}} {{viewbox_top}} {{viewbox_width}} {{viewbox_height}}" viewbox="0 0 100 100" preserveAspectRatio="xMidYMid meet"
       style='width:600px;height:600px'
       >
-        <g transform="scale({{1}}, {{-1}})">
-          <circle ng-repeat="path_node in route_path" cx="{{route_path[$index].x}}" cy="{{route_path[$index].y}}" r="0.01" ng-click="node_clicked($event)"
+        <g transform="scale(1, -1)">
+          <circle ng-repeat="path_node in route_path" ng-attr-cx="{{route_path[$index].x}}" ng-attr-cy="{{route_path[$index].y}}" r="0.01" ng-click="node_clicked($event)"
           />
           <rect ng-attr-x="{{car_state.front_x-0.15}}" ng-attr-y="{{car_state.front_y}}" width="0.3" height="0.6" fill="orange" fill-opacity="0.5"
-            stroke="gray" stroke-width="0.03" transform="translate(0, 0) rotate({{car_state.heading*180/Math.PI+90}} {{car_state.front_x}} {{car_state.front_y}})"
+            stroke="gray" stroke-width="0.03" ng-attr-transform="translate(0, 0) rotate({{car_state.heading*180/Math.PI+90}} {{car_state.front_x}} {{car_state.front_y}})"
           />
         </g>
       </svg>
-      <div class='atop' style='padding:10px'>
+      
+      <div class='atop' style='padding:10px' style='background-color:rgba(50,50,50,1)'>
         <div class='row'>
           <button class='button' ng-click="zoom_in()">+</button>
           <button class='button' ng-click="zoom_out()">-</button>
@@ -236,6 +238,7 @@
           </div>
         </div>
       </div>
+    
     </div>
 
     <div class='itembox'>
@@ -424,7 +427,7 @@
 
 
     $scope.$watch("run_settings.track_name", function (newValue, oldValue) {
-      if ($scope.run_settings.track_name !== null && $scope.run_settings.track_name.length > 0) {
+      if ($scope.run_settings && $scope.run_settings.track_name !== null && $scope.run_settings.track_name.length > 0) {
         console.log("selected track:", $scope.run_settings.track_name)
         $http.get('/tracks/' + $scope.run_settings.track_name + "/route_names").
           success(function (result, status, headers, config) {
@@ -437,7 +440,7 @@
     });
 
     $scope.$watch("run_settings.route_name", function (newValue, oldValue) {
-      if ($scope.run_settings.route_name !== null && $scope.run_settings.route_name.length > 0) {
+      if ($scope.run_settings && $scope.run_settings.route_name !== null && $scope.run_settings.route_name.length > 0) {
         $http.get('/tracks/' + $scope.run_settings.track_name + "/routes/" + $scope.run_settings.route_name + "/path").
           success(function (route_path, status, headers, config) {
             $scope.route_path = route_path;
@@ -459,6 +462,8 @@
     });
 
 
+    $scope.track_names=[]
+    $scope.track_name=""
     $http.get('/track_names').
       success(function (result, status, headers, config) {
         $scope.track_names = result.track_names;
@@ -489,6 +494,9 @@
     poller();
 
     $scope.rjust = function (s, width) {
+      if (s==undefined) {
+        return " ".repeat(width);
+      }
       s = s.toString()
       return " ".repeat(width - s.length) + s
     }
