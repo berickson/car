@@ -214,7 +214,9 @@
       style='width:600px;height:600px'
       >
         <g transform="scale(1, -1)">
-          <circle ng-repeat="path_node in route_path" ng-attr-cx="{{route_path[$index].x}}" ng-attr-cy="{{route_path[$index].y}}" r="0.01" ng-click="node_clicked($event)"
+          <circle ng-repeat="path_node in route_path" ng-attr-cx="{{route_path[$index].x}}" ng-attr-cy="{{route_path[$index].y}}" r="0.01" ng-click="node_clicked($event, route_path[$index])"
+          />
+          <circle ng-repeat="path_node in route_path" ng-show="{{route_path[$index].road_sign}}" ng-attr-cx="{{route_path[$index].x}}" ng-attr-cy="{{route_path[$index].y}}" r="1" ng-click="node_clicked($event, route_path[$index])"
           />
           <rect ng-attr-x="{{car_state.front_x-0.15}}" ng-attr-y="{{car_state.front_y}}" width="0.3" height="0.6" fill="orange" fill-opacity="0.5"
             stroke="gray" stroke-width="0.03" ng-attr-transform="translate(0, 0) rotate({{car_state.heading*180/Math.PI+90}} {{car_state.front_x}} {{car_state.front_y}})"
@@ -255,6 +257,13 @@
       </table>
     </div>
   </div>
+  <div class='groupbox'>
+    <div ng-show="selected_node" ng-model = "selected_node" class='itembox'>
+      <div>{{selected_node.x}}, {{selected_node.y}} {{selected_node.road_sign}}</div>
+      <div><form><input ng-model="selected_node.road_sign" /></form></div>
+      <button ng-click = "selected_node = null">ok</button>
+    </div>
+  </div>
 
   <label><h3><input type="checkbox" id="xxx" ng-model="display_car_state"> car_state: </h3></label>
   <div class='groupbox'>
@@ -266,6 +275,7 @@
   var app = angular.module("car", []);
   app.controller("carController", function ($scope, $http, $timeout) {
     $scope.Math = Math
+    $scope.JSON = JSON
 
     $scope.type_of = function (val) {
       return typeof (val);
@@ -510,9 +520,12 @@
 
     }
 
-    $scope.node_clicked = function ($event) {
-      o = $event.currentTarget;
-      alert("clicked node at (" + o.cx.baseVal.value.toFixed(2) + ", " + o.cy.baseVal.value.toFixed(2) + ")");
+    $scope.node_clicked = function ($event, node) {
+      $scope.selected_node = node;
+      if(node.road_sign == undefined) 
+        $scope.selected_node.road_sign = "";
+        $event.scope().apply();
+        //$scope.apply();
       return;
     }
 
