@@ -505,6 +505,7 @@
             $scope.route_path_width = $scope.route_path_max_x - $scope.route_path_min_x
             $scope.route_path_height = $scope.route_path_max_y - $scope.route_path_min_y
             $scope.reset_zoom();
+            $scope.road_sign_nodes = [];
             for(var i in $scope.route_path) {
               var node = $scope.route_path[i];
               if(node.road_sign_label !== undefined && node.road_sign_label && node.road_sign_label.length > 0) {
@@ -571,8 +572,8 @@
 
     $scope.delete_road_sign = function(road_sign_index) {
       var node = $scope.road_sign_nodes[road_sign_index];
-      delete node.road_sign_label;
-      delete node.road_sign_command;
+      node.road_sign_label = "";
+      node.road_sign_command = "";
       $scope.road_sign_nodes.splice(road_sign_index, 1); // splice deletes from array
     }
 

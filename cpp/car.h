@@ -29,6 +29,7 @@ public:
   string config_path = "car.ini";
 
 
+
   bool online = false;
   bool quit = false;
   bool usb_error_count = 0;
@@ -154,7 +155,8 @@ public:
   void set_rc_mode();
   void set_manual_mode();
   void set_esc_and_str(unsigned esc, unsigned str);
-
+  void beep();
+  
   // logging
   void begin_recording_input(string path);
   void end_recording_input();

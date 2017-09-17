@@ -254,6 +254,13 @@ RouteNode Route::get_position_ahead(double d)
 }
 
 
+bool RouteNode::has_road_sign() const {
+  if(road_sign_label.length() > 0 || road_sign_command.length() > 0) {
+    return true;
+  }
+  return false;
+}
+
 string RouteNode::to_string()
 {
   stringstream ss;
@@ -426,11 +433,12 @@ void Route::smooth(double k_smooth) {
 
 void Route::prune(double max_segment_length, double tolerance)
 {
+  //return;
   // need at least 3 nodes to start pruning
   vector<int> nodes_to_prune;
 
   unsigned int i_segment_start = 0;
-  unsigned int i_segment_end = 2;
+  unsigned int i_segment_end = 1;
 
   while(i_segment_end < nodes.size()) {
     const RouteNode & start_node = nodes[i_segment_start];
@@ -438,14 +446,18 @@ void Route::prune(double max_segment_length, double tolerance)
     bool segment_ok = true; // segment within tolerance
     Point s1 = start_node.get_front_position();
     Point s2 = end_node.get_front_position();
-    if(distance(s1,s2)>max_segment_length)
+    if(distance(s1,s2)>max_segment_length || end_node.has_road_sign())
       segment_ok = false;
     for(unsigned int j=i_segment_start + 1; segment_ok && j < i_segment_end; j++) {
       // all candidates must be closer than tolerance
       const RouteNode & candidate= nodes[j];
       Point p = candidate.get_front_position();
-      if(distance_from_segment_to_pointt(s1, s2, p) > tolerance)
+      if(distance_from_segment_to_pointt(s1, s2, p) > tolerance){
         segment_ok = false;
+      }
+      if(end_node.has_road_sign()){
+        segment_ok = false;
+      }
     }
     if(segment_ok ) {
       ++i_segment_end;
@@ -454,10 +466,12 @@ void Route::prune(double max_segment_length, double tolerance)
       for(unsigned int i_prune = i_segment_start + 1; i_prune < i_segment_end-1; ++i_prune) {
         nodes_to_prune.push_back(i_prune);
       }
-      i_segment_start = i_segment_end-1;
-      i_segment_end = i_segment_start + 2;
+      i_segment_start = i_segment_end;
+      i_segment_end = i_segment_start + 1;
     }
   }
+
+  log_info((string)"pruned "+format(nodes_to_prune.size()) + "nodes");
   for (auto it = nodes_to_prune.rbegin(); it != nodes_to_prune.rend(); ++it) {
    nodes.erase(nodes.begin()+*it);
   }

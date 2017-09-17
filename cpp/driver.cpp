@@ -132,8 +132,17 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
   auto p_rear = car.get_rear_position();
   double v = car.get_velocity();
   double ahead = settings.d_ahead + v*settings.t_ahead;
-  if(!route.done)
-  route.set_position(p_front, p_rear, v);
+  if(!route.done) {
+    unsigned int old_index = route.index;;
+    route.set_position(p_front, p_rear, v);
+    unsigned int new_index = route.index;;
+    for(int i = old_index + 1; i <= new_index; i++) {
+      if(route.nodes[i].road_sign_command == "beep") {
+        log_info("car commanded to beep");
+        car.beep();
+      }
+    }
+  }
 
   // Angle steering_angle = steering_angle_by_look_ahead(route, ahead);
   Angle e_heading = route.get_heading_at_current_position() - car.get_heading();

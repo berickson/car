@@ -179,6 +179,11 @@ void Car::set_esc_and_str(unsigned esc, unsigned str)
   commanded_str = str;
 }
 
+void Car::beep()
+{
+  send_command((string)"beep");
+}
+
 
 void Car::begin_recording_state(string path) {
   end_recording_state();

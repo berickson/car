@@ -188,6 +188,11 @@ void command_pulse_steer_and_esc() {
   remote_mode.command_steer_and_esc(s_str.toInt(),  s_esc.toInt());
 }
 
+void command_beep() {
+  beeper.beep(beeper.note_c5);
+
+}
+
 void command_follow() {
   modes.set_event("follow");
 }
@@ -219,7 +224,9 @@ const Command commands[] = {
   {"m", "manual", command_manual},
   {"f", "follow", command_follow},
   {"rc", "remote control", command_remote_control},
-  {"pse", "pulse steer, esc", command_pulse_steer_and_esc}
+  {"pse", "pulse steer, esc", command_pulse_steer_and_esc},
+  {"beep", "beep", command_beep},
+  
 };
 
 void help() {
@@ -387,7 +394,7 @@ void setup() {
   mpu9150.zero_adjust = Quaternion(-0.07, 0.67, -0.07, 0.73);
   // was ((-13.823402+4.9) / (1000 * 60 * 60)) * PI/180;
   mpu9150.yaw_slope_rads_per_ms  = (2.7 / (10 * 60 * 1000)) * PI / 180;
-  mpu9150.yaw_actual_per_raw = (360.*10.)/(360.*10.-328);// 1.00; // 1.004826221;
+  mpu9150.yaw_actual_per_raw = (3600. / (3600 - 29.0 )); //1.0; // (360.*10.)/(360.*10.-328);// 1.00; // 1.004826221;
 
   mpu9150.zero_heading();
 

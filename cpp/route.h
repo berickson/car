@@ -29,6 +29,8 @@ struct RouteNode {
   string arg2;
   string arg3;
 
+  bool has_road_sign() const;
+
   Point get_front_position() const {
     return Point(front_x,front_y);
   }
