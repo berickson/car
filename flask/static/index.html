@@ -214,10 +214,21 @@
       style='width:600px;height:600px'
       >
         <g transform="scale(1, -1)">
+          <g>
           <circle ng-repeat="path_node in route_path" ng-attr-cx="{{route_path[$index].x}}" ng-attr-cy="{{route_path[$index].y}}" r="0.01" ng-click="node_clicked($event, route_path[$index])"
           />
-          <circle ng-repeat="path_node in route_path" ng-show="{{route_path[$index].road_sign}}" ng-attr-cx="{{route_path[$index].x}}" ng-attr-cy="{{route_path[$index].y}}" r="1" ng-click="node_clicked($event, route_path[$index])"
-          />
+          <a xlink:href="#0">
+            <g ng-repeat="path_node in route_path" transform="translate({{route_path[$index].x}}, {{route_path[$index].y}})">
+              <circle cx="0" cy="0" r="0.02" fill="blue" ng-click="node_clicked($event, route_path[$index])"/>
+            </g>
+            <g ng-repeat="path_node in route_path" transform="translate({{route_path[$index].x}}, {{route_path[$index].y}})">
+              <g ng-if="route_path[$index].road_sign.length > 0">
+                <circle cx="0" cy="0" r="0.1" fill="red" ng-click="node_clicked($event, route_path[$index])"/>
+                <text transform="scale(1,-1)"   x="0" y="0" text-anchor="middle" stroke="#51c5cf" font-size="0.1" stroke-width="0.001" dy=".3em">{{route_path[$index].road_sign}}</text>
+              </g>
+            </g>
+          </a>
+          
           <rect ng-attr-x="{{car_state.front_x-0.15}}" ng-attr-y="{{car_state.front_y}}" width="0.3" height="0.6" fill="orange" fill-opacity="0.5"
             stroke="gray" stroke-width="0.03" ng-attr-transform="translate(0, 0) rotate({{car_state.heading*180/Math.PI+90}} {{car_state.front_x}} {{car_state.front_y}})"
           />
@@ -250,7 +261,7 @@
             <td>{{item.key}}</td>
             <td>
               <input type="checkbox" ng-if="item.data_type === 'boolean'" ng-model="item.value" />
-              <input ng-if="item.data_type === 'number'" ng-model="item.value" style='width:4ch' ng-class="is_changed(item) ? 'changed' : ''"
+              <input ng-visible="item.data_type === 'number'" ng-model="item.value" style='width:4ch' ng-class="is_changed(item) ? 'changed' : ''"
               />
             </td>
             <tr>
@@ -260,6 +271,7 @@
   <div class='groupbox'>
     <div ng-show="selected_node" ng-model = "selected_node" class='itembox'>
       <div>{{selected_node.x}}, {{selected_node.y}} {{selected_node.road_sign}}</div>
+      <div><form><input ng-model="selected_node.x" /></form></div>
       <div><form><input ng-model="selected_node.road_sign" /></form></div>
       <button ng-click = "selected_node = null">ok</button>
     </div>
@@ -453,6 +465,9 @@
       if ($scope.run_settings && $scope.run_settings.route_name !== null && $scope.run_settings.route_name.length > 0) {
         $http.get('/tracks/' + $scope.run_settings.track_name + "/routes/" + $scope.run_settings.route_name + "/path").
           success(function (route_path, status, headers, config) {
+            for(var j in route_path) {
+              route_path[j].road_sign = "";
+            }
             $scope.route_path = route_path;
             var route_x = route_path.map(function (v) { return v.x });
             var route_y = route_path.map(function (v) { return v.y });
@@ -524,7 +539,7 @@
       $scope.selected_node = node;
       if(node.road_sign == undefined) 
         $scope.selected_node.road_sign = "";
-        $event.scope().apply();
+        //$event.scope().apply();
         //$scope.apply();
       return;
     }
