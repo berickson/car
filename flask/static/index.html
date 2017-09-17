@@ -30,7 +30,6 @@
     }
 
     .select {
-
       background-color: rgb(220, 220, 220);
       /*height: 34px;*/
       font-size: 24px;
@@ -207,7 +206,7 @@
       <button class='button' ng-click="reset_odometer()">Reset</button>
     </div>
   </div>
-  <div class='groupbox'>
+  <div class='groupbox row'>
     <div class='itembox' style='position:relative;overflow:hidden'>
       <!-- 2nd viewbox is to -->
       <svg ng-attr-viewBox="{{viewbox_left}} {{viewbox_top}} {{viewbox_width}} {{viewbox_height}}" viewbox="0 0 100 100" preserveAspectRatio="xMidYMid meet"
@@ -234,7 +233,8 @@
           />
         </g>
       </svg>
-      
+
+
       <div class='atop' style='padding:10px' style='background-color:rgba(50,50,50,1)'>
         <div class='row'>
           <button class='button' ng-click="zoom_in()">+</button>
@@ -252,26 +252,28 @@
         </div>
       </div>
     </div>
-
     <div class='itembox'>
-      <div ng-repeat="node in road_sign_nodes">
-        <input ng-model="node.road_sign_label" size="2em"/> <input ng-model="node.road_sign_command"/> <button ng-click = "delete_road_sign($index)">X</button>
+      <div >
+        <div ng-repeat="node in road_sign_nodes">
+          <input ng-model="node.road_sign_label" size="2em"/> <input ng-model="node.road_sign_command"/> <button ng-click = "delete_road_sign($index)">X</button>
+        </div>
+      </div>
+
+      <div>
+        <table>
+          <tbody>
+            <tr ng-repeat="item in run_settings_array" ng.key="item.key">
+              <td>{{item.key}}</td>
+              <td>
+                <input type="checkbox" ng-if="item.data_type === 'boolean'" ng-model="item.value" />
+                <input ng-visible="item.data_type === 'number'" ng-model="item.value" style='width:4ch' ng-class="is_changed(item) ? 'changed' : ''"
+                />
+              </td>
+              <tr>
+        </table>
       </div>
     </div>
 
-    <div class='itembox'>
-      <table>
-        <tbody>
-          <tr ng-repeat="item in run_settings_array" ng.key="item.key">
-            <td>{{item.key}}</td>
-            <td>
-              <input type="checkbox" ng-if="item.data_type === 'boolean'" ng-model="item.value" />
-              <input ng-visible="item.data_type === 'number'" ng-model="item.value" style='width:4ch' ng-class="is_changed(item) ? 'changed' : ''"
-              />
-            </td>
-            <tr>
-      </table>
-    </div>
   </div>
   <div class='groupbox'>
     <div ng-show="selected_node" ng-model = "selected_node" class='itembox'>

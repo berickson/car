@@ -169,17 +169,27 @@ def get_path(track_name, route_name):
         df.to_csv(
             path_path,
             index = False,
-            columns=["secs","x","y","rear_x", "rear_y", "reverse", "heading","adj","esc","str","m/s","road_sign_label","road_sign_command","arg1","arg2","arg3"])
+            columns=[
+                "secs",
+                "x",
+                "y",
+                "rear_x",
+                "rear_y",
+                "reverse",
+                "heading",
+                "adj",
+                "esc",
+                "str",
+                "m/s",
+                "road_sign_label",
+                "road_sign_command",
+                "arg1",
+                "arg2",
+                "arg3"])
+
         return "ok"
 
-#@app.route('/run_settings', methods=['PUT'])
-#def put_run_settings():
-##    return
-    #return Response("ok")
-#    try:
-#    except Exception:
-#        return "I'm having a hard time"
-#        return Response("there was an error writing run settings " + request)
+
 
 @app.route('/run_settings', methods=['GET','PUT'])
 def run_settings():
@@ -199,18 +209,6 @@ def run_settings():
         except Exception:
             return "there was an error reading " + path
         return Response(run_settings, mimetype='application/json')
-
-@app.route('/car/status')
-def car_status():
-    car_state = {
-        'esc':1500,
-        'str':1700,
-        'us':1234343,
-        'name':'Erickson, Brian',
-        'description': 'he said "it would work".'
-    }
-    return jsonify(car_state)
-
 
 
 if __name__ == '__main__':
