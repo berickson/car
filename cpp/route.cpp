@@ -10,6 +10,8 @@
 
 // todo:  make separate object for current location
 
+vector<string> Route::columns{"secs","x","y","rear_x", "rear_y", "reverse", "heading","adj","esc","str","m/s","road_sign_label","road_sign_command","arg1","arg2","arg3"};
+
 void Route::add_node(RouteNode node){
   nodes.push_back(node);
 }
@@ -42,14 +44,14 @@ Angle Route::get_total_curvature()
 
 string Route::to_string() {
   stringstream ss;
-  ss<<RouteNode::csv_header() << endl;
+  ss<<Route::csv_header() << endl;
   for(auto node:nodes) {
     ss << node.csv_row() << endl;
   }
   return ss.str();
 }
 
-string Route::header_string() {
+string Route::csv_header() {
   return join(columns,",");
 }
 
@@ -269,10 +271,6 @@ string RouteNode::to_string()
   return ss.str();
 }
 
-string RouteNode::csv_header() {
-  string header = join({"secs","x","y","rear_x", "rear_y", "reverse", "heading","adj","esc","str","m/s"});
-  return header;
-}
 
 string RouteNode::csv_row(){
   stringstream ss;
@@ -286,7 +284,13 @@ string RouteNode::csv_row(){
      << heading_adjustment << ","
      << esc << ","
      << str << ","
-     << velocity;
+     << velocity << ","
+     << road_sign_label << ","
+     << road_sign_command << ","
+     << arg1 << ","
+     << arg2 << ","
+     << arg3;
+
   return ss.str();
 }
 
@@ -302,6 +306,13 @@ void RouteNode::set_from_standard_file(vector<string> fields) {
   esc = stod(fields[8]);
   str = stod(fields[9]);
   velocity = stod(fields[10]);
+  if(fields.size() > 11) {
+    road_sign_label = fields[11];
+    road_sign_command = fields[12];
+    arg1 = fields[12];
+    arg2 = fields[13];
+    arg3 = fields[14];
+  }
 }
 
 void Route::load_from_file(string path) {
@@ -319,8 +330,8 @@ void Route::load_from_file(string path) {
       throw (string) "error reading header for " + path;
     }
     trim(line);
-    if(line != header_string()) {
-      throw (string) "bad header for " + path;
+    if(csv_header().compare(0, line.length(), line) != 0) {
+      throw (string) "bad header for " + path + "was :" + line + " expected: " + csv_header();
     }
     nodes.clear();
     int line_number = 1;
@@ -329,10 +340,11 @@ void Route::load_from_file(string path) {
       trim(line);
       if(line=="") break;
       auto fields=split(line,',');
-      if(fields.size()!=columns.size()) {
+      const int min_field_count = 11;
+      if(fields.size() < min_field_count) {
         stringstream ss;
         ss << "wrong number of columns in line " << line_number
-            << " expected " << columns.size()
+            << " expected " << min_field_count
             << " was "  << fields.size();
         throw ss.str();
       }
@@ -342,9 +354,12 @@ void Route::load_from_file(string path) {
       index = 0;
     }
   }
+  catch(string s) {
+    throw (string) "Error loading route: " + s ;
+  }
   catch(...)
   {
-    throw (string) "Uknown error loading route " + path;
+    throw (string) "Unknown error loading route " + path;
   }
 }
 
@@ -451,7 +466,7 @@ void Route::prune(double max_segment_length, double tolerance)
 void Route::write_to_file(string path) {
   fstream f;
   f.open(path, ios_base::out);
-  f<<RouteNode::csv_header() << endl;
+  f<<Route::csv_header() << endl;
   for(auto node:nodes) {
     f << node.csv_row() << endl;
   }

@@ -23,6 +23,12 @@ struct RouteNode {
   double velocity;
   bool reverse;
 
+  string road_sign_label;
+  string road_sign_command;
+  string arg1;
+  string arg2;
+  string arg3;
+
   Point get_front_position() const {
     return Point(front_x,front_y);
   }
@@ -35,7 +41,6 @@ struct RouteNode {
   void set_from_standard_file(vector<string> fields);
 
 public:
-  static string csv_header();
   string csv_row();
 };
 
@@ -57,7 +62,7 @@ public:
 
   void add_node(RouteNode node);
   string to_string();
-  string header_string();
+  static string csv_header();
 
   Angle heading();
 
@@ -67,7 +72,7 @@ public:
   double get_velocity();
   RouteNode get_position_ahead(double get_length);
 
-  vector<string> columns = {"secs","x","y","rear_x", "rear_y", "reverse", "heading","adj","esc","str","m/s"};
+  static vector<string> columns;
   vector<RouteNode> nodes;
   unsigned int index = 0;
   double cte = 0;

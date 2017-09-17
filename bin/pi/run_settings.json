@@ -10,7 +10,7 @@
   "optimize_velocity": true,
   "prune_max": 0.5,
   "prune_tolerance": 0.02,
-  "route_name": "A",
+  "route_name": "E",
   "slip_rate": 0.2,
   "slip_slop": 0.5,
   "steering_k_d": 20.0,

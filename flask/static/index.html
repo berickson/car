@@ -222,9 +222,9 @@
               <circle cx="0" cy="0" r="0.02" fill="blue" ng-click="node_clicked($event, route_path[$index])"/>
             </g>
             <g ng-repeat="path_node in route_path" transform="translate({{route_path[$index].x}}, {{route_path[$index].y}})">
-              <g ng-if="route_path[$index].road_sign !== undefined">
+              <g ng-if="path_node.road_sign_label !== undefined && path_node.road_sign_label.length > 0">
                 <circle cx="0" cy="0" r="0.1" fill="red" ng-click="node_clicked($event, route_path[$index])"/>
-                <text transform="scale(1,-1)"   x="0" y="0" text-anchor="middle" stroke="#51c5cf" font-size="0.1" stroke-width="0.001" dy=".3em">{{route_path[$index].road_sign.label}}</text >
+                <text transform="scale(1,-1)"   x="0" y="0" text-anchor="middle" stroke="#51c5cf" font-size="0.1" stroke-width="0.001" dy=".3em">{{route_path[$index].road_sign_label}}</text >
               </g>
             </g>
           </a>
@@ -254,8 +254,8 @@
     </div>
 
     <div class='itembox'>
-      <div ng-repeat="road_sign in road_signs">
-        <input ng-model="road_sign.label" size="2em"/> <input ng-model="road_sign.command"/> <button ng-click = "delete_road_sign($index)">X</button>
+      <div ng-repeat="node in road_sign_nodes">
+        <input ng-model="node.road_sign_label" size="2em"/> <input ng-model="node.road_sign_command"/> <button ng-click = "delete_road_sign($index)">X</button>
       </div>
     </div>
 
@@ -275,9 +275,9 @@
   </div>
   <div class='groupbox'>
     <div ng-show="selected_node" ng-model = "selected_node" class='itembox'>
-      <div>{{selected_node.x}}, {{selected_node.y}} {{selected_node.road_sign.label}}</div>
+      <div>{{selected_node.x}}, {{selected_node.y}} {{selected_node.road_sign_label}}</div>
       <div><form><input ng-model="selected_node.x" /></form></div>
-      <div><form><input ng-model="selected_node.road_sign.label" /></form></div>
+      <div><form><input ng-model="selected_node.road_sign_label" /></form></div>
       <button ng-click = "selected_node = null">ok</button>
     </div>
   </div>
@@ -355,8 +355,23 @@
         }
       };
 
+      req2 = {
+        url: $scope.route_path_url(),
+        method: 'PUT',
+        data: JSON.stringify($scope.route_path),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
+
       $http(req).success(function () {
         console.log('save run settings success');
+        $http(req2).success(function() {
+          console.log('save route path success');
+        }).error(function (response, code) {
+          console.log("failed to save route path");
+          console.log("  (" + code + ")" + response);
+        });
       }).error(function (response, code) {
         $scope.go_error = "  (" + code + ")" + response;
       });
@@ -466,9 +481,16 @@
       }
     });
 
+    $scope.route_path_url = function() {
+      return '/tracks/' + $scope.run_settings.track_name + "/routes/" + $scope.run_settings.route_name + "/path";
+    }
+
+
+
+
     $scope.$watch("run_settings.route_name", function (newValue, oldValue) {
       if ($scope.run_settings && $scope.run_settings.route_name !== null && $scope.run_settings.route_name.length > 0) {
-        $http.get('/tracks/' + $scope.run_settings.track_name + "/routes/" + $scope.run_settings.route_name + "/path").
+        $http.get($scope.route_path_url()).
           success(function (route_path, status, headers, config) {
             $scope.route_path = route_path;
             var route_x = route_path.map(function (v) { return v.x });
@@ -481,6 +503,13 @@
             $scope.route_path_width = $scope.route_path_max_x - $scope.route_path_min_x
             $scope.route_path_height = $scope.route_path_max_y - $scope.route_path_min_y
             $scope.reset_zoom();
+            for(var i in $scope.route_path) {
+              var node = $scope.route_path[i];
+              if(node.road_sign_label !== undefined && node.road_sign_label && node.road_sign_label.length > 0) {
+                $scope.road_sign_nodes.push(node)
+              }
+            }
+            
           }).error(function (data, status, headers, config) {
             $scope.route_names = ['n/a'];
             // log error
@@ -520,7 +549,7 @@
     };
     poller();
 
-    $scope.road_signs = [];
+    $scope.road_sign_nodes = [];
 
     $scope.rjust = function (s, width) {
       if (s==undefined) {
@@ -538,23 +567,19 @@
       return s.join(", ");
     }
 
-    function new_road_sign() {
-      return {name:$scope.road_signs.length.toString()}
-    }
-
     $scope.delete_road_sign = function(road_sign_index) {
-      var to_delete = $scope.road_signs[road_sign_index];
-      $scope.road_signs.splice(road_sign_index, 1); // splice deletes from array
-      delete to_delete.node.road_sign
-      delete to_delete
+      var node = $scope.road_sign_nodes[road_sign_index];
+      delete node.road_sign_label;
+      delete node.road_sign_command;
+      $scope.road_sign_nodes.splice(road_sign_index, 1); // splice deletes from array
     }
 
     $scope.node_clicked = function ($event, node) {
       $scope.selected_node = node;
-      if(node.road_sign == undefined) {
-        var new_sign = {label:$scope.road_signs.length.toString(),node:node,command:"stop"};
-        $scope.selected_node.road_sign = new_sign;
-        $scope.road_signs.push(new_sign)
+      if(node.road_sign_label == undefined || node.road_sign_label.length == 0) {
+        node.road_sign_label = $scope.road_sign_nodes.length.toString();
+        node.road_sign_command =  "stop";
+        $scope.road_sign_nodes.push(node)
       }
       return;
     }

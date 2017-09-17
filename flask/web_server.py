@@ -151,15 +151,26 @@ def get_route(track_name, route_name):
     route = TRACK_STORAGE.get_track(track_name).get_route(route_name)
     return jsonify({'name', route.get_name()})
 
-@app.route('/tracks/<track_name>/routes/<route_name>/path')
+@app.route('/tracks/<track_name>/routes/<route_name>/path', methods=['GET','PUT'])
 def get_path(track_name, route_name):
-    # allowed value are {‘split’,’records’,’index’,’columns’,’values’}
-    orient = request.args.get('orient', 'records')
     route = TRACK_STORAGE.get_track(track_name).get_route(route_name)
     path_path = route.folder+"/path.csv"
-    df = pd.read_csv(path_path)
-    s = df.to_json(orient=orient)
-    return s
+    # allowed value are {‘split’,’records’,’index’,’columns’,’values’}
+    orient = request.args.get('orient', 'records')
+    if request.method == 'GET':
+        df = pd.read_csv(path_path)
+        s = df.to_json(orient=orient)
+        return s
+    elif request.method == 'PUT':
+        app.logger.error("saving path")
+        route = json.dumps(request.json)
+        app.logger.error("route" + route)
+        df = pd.read_json(route)
+        df.to_csv(
+            path_path,
+            index = False,
+            columns=["secs","x","y","rear_x", "rear_y", "reverse", "heading","adj","esc","str","m/s","road_sign_label","road_sign_command","arg1","arg2","arg3"])
+        return "ok"
 
 #@app.route('/run_settings', methods=['PUT'])
 #def put_run_settings():
