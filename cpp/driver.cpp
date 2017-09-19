@@ -287,7 +287,7 @@ void Driver::drive_route(Route & route) {
             route_complete = true;
           } else {
             mode = "wait";
-            double wait_seconds(5);//stod(stop_node->arg1));
+            double wait_seconds = stod(stop_node->arg1);
             wait_end_time = system_clock::now() + milliseconds((long)(wait_seconds * 1000));
             log_info("waiting");
           }
