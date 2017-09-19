@@ -255,7 +255,10 @@
     <div class='itembox'>
       <div >
         <div ng-repeat="node in road_sign_nodes">
-          <input ng-model="node.road_sign_label" size="2em"/> <input ng-model="node.road_sign_command"/> <input size="2em" ng-model="node.arg1"/> <button ng-click = "delete_road_sign($index)">X</button>
+          <input ng-model="node.road_sign_label" size="2em"/> 
+          <input ng-model="node.road_sign_command" size="5en"/> 
+          <input ng-model="node.arg1" size="2em" /> 
+          <button ng-click = "delete_road_sign($index)">X</button>
         </div>
       </div>
 
