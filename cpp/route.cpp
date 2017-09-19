@@ -338,6 +338,9 @@ void RouteNode::set_from_standard_file(vector<string> fields) {
   str = stod(fields[9]);
   velocity = stod(fields[10]);
   if(fields.size() > 11) {
+    if(fields.size() != 16) {
+      log_error((string)"invalid field count: " + format(fields.size()) );
+    }
     road_sign_label = fields[11];
     road_sign_command = fields[12];
     arg1 = fields[13];
