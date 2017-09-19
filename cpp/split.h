@@ -4,24 +4,29 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 using namespace std;
 
-inline vector<string> split(string str, char delimiter=',') {
-  vector<string> internal;
-  stringstream ss(str); // Turn the string into a stream.
-  string tok;
-
-  while(getline(ss, tok, delimiter)) {
-    internal.push_back(tok);
+inline vector<string> split(const string& s, char delim_char=',') {
+  string delim = string(1, delim_char);
+  vector<string> items;
+  string::const_iterator substart = s.begin(), subend;
+  while (true) {
+    subend = search(substart, s.end(), delim.begin(), delim.end());
+    string temp(substart, subend);
+    items.push_back(temp);
+    if (subend == s.end()) {
+      break;
+    }
+    substart = subend + delim.size();
   }
-
-  return internal;
+  return items;
 }
 
 
 inline void test_split() {
-  string s = "a,b,c";
+  string s = "a,b,c,,";
   auto a = split(s,',');
   cout << "splitting \"" << s << "\" produced: " <<  endl;
   for(auto t:a) {
