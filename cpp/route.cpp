@@ -529,6 +529,13 @@ void Route::optimize_velocity(double max_velocity, double max_lateral_accelerati
   // final velocity must be zero
   nodes[nodes.size()-1].velocity = 0.0;
 
+  // all "stop" node velocities must be zero
+  for(RouteNode & node : nodes) {
+    if(node.road_sign_command == "stop") {
+      node.velocity = 0.0;
+    }
+  }
+
   // apply speed limit of zero for switching direction
   for(unsigned i=0;i<nodes.size()-2; i++) {
     RouteNode & p0 = nodes[i];
