@@ -193,7 +193,7 @@ SubMenu capture_video_menu{};
 SubMenu crash_recovery_menu{};
 SubMenu optimize_velocity_menu{};
 
-void go(Car& car, CarUI & ui) {
+void go(Car& car) {
   log_entry_exit w("go");
   try {
     run_settings.load_from_file_json(run_settings_path);
@@ -261,7 +261,7 @@ void go(Car& car, CarUI & ui) {
     car.begin_recording_state(state_file_path);
     std::string error_text = "";
     try {
-      Driver d(car,ui,run_settings);
+      Driver d(car,run_settings);
       d.drive_route(rte);
       log_info("back from drive_route");
     } catch (std::string e) {
@@ -319,7 +319,7 @@ void go(Car& car, CarUI & ui) {
   }
 }
 
-void record(Car& car, CarUI & ui) {
+void record(Car& car) {
   log_entry_exit w("record");
   run_settings.load_from_file_json(run_settings_path);  
   car.reset_odometry();
@@ -345,13 +345,6 @@ void record(Car& car, CarUI & ui) {
     usleep(30000);
   }
 
-
-  // ui.clear();
-  // ui.move(0,0);
-  // ui.print("Recording - [stop]");
-  // ui.refresh();
-  // ui.wait_key();
-
   car.end_recording_input();
   car.end_recording_state();
 
@@ -360,9 +353,6 @@ void record(Car& car, CarUI & ui) {
   }
 
   log_info("done recording - making path");
-  // ui.clear();
-  // ui.print("making path");
-  // ui.refresh();
 
   string path_file_path = f.path_file_path(track_name, route_name);
   write_path_from_recording_file(recording_path, path_file_path);
@@ -386,14 +376,13 @@ void run_car_socket() {
   log_entry_exit w("run_car_socket");
   try {
     Car car;
-    CarUI ui;
     run_settings.load_from_file_json(run_settings_path);
     
     while(true) {
      
       if(car.command_from_socket == "go") {
         try {
-           go(car, ui);
+           go(car);
         } catch (...) {
            log_error("exception caught in run_car_socket go");
         }
@@ -401,7 +390,7 @@ void run_car_socket() {
       if(car.command_from_socket == "record") {
         run_settings.track_name = "desk";
         try {
-           record(car, ui);
+           record(car);
         } catch (...) {
            log_error("exception caught in run_car_socket record");
         }
@@ -415,13 +404,13 @@ void run_car_socket() {
   }
 }
 
+/*
 void run_car_menu() {
 #ifdef RASPBERRY_PI
   Car car;
 #else
   FakeCar car;
 #endif
-  CarUI ui;
 
   if(file_exists(run_settings_path)) {
       run_settings.load_from_file_json(run_settings_path);
@@ -460,7 +449,7 @@ void run_car_menu() {
   SubMenu route_menu {
     {[](){return (string)"track ["+run_settings.track_name+"]";},&track_selection_menu},
     {[](){return (string)"route ["+run_settings.route_name+"]";},&route_selection_menu},
-    MenuItem("go...",[&car,&ui](){go(car,ui);}),
+    MenuItem("go...",[&car,&ui](){go(car);}),
     {[&car](){
         return (string) calibration_string(car.current_dynamics.calibration_status)
             + " " + format(car.get_heading().degrees(),5,1) + "° "
@@ -526,3 +515,4 @@ void run_car_menu() {
 void test_car_menu() {
   run_car_menu();
 }
+*/

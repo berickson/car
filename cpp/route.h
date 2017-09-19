@@ -84,6 +84,9 @@ public:
   Angle get_heading_at_current_position();
   double get_acceleration();
   void write_to_file(string path);
+  void advance_to_next_segment();
+  bool is_stop_ahead();
+  RouteNode * get_target_node();
 };
 
 void test_route();

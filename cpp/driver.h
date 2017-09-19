@@ -12,9 +12,8 @@
 class Driver
 {
 public:
-  Driver(Car & car, CarUI & ui, RunSettings & settings);
+  Driver(Car & car, RunSettings & settings);
   Car & car;
-  CarUI & ui;
   RunSettings & settings;
 
   void drive_route(Route & route);
@@ -35,6 +34,7 @@ private:
   int esc_for_max_decel();
   int esc_for_velocity(PID &velocity_pid, double goal_velocity, double goal_accel);
   void continue_along_route(Route& route, PID &steering_pid, PID &velocity_pid);
+  bool continue_to_stop(const RouteNode * stop_node);
   void set_evasive_actions_for_crash(Route& route);
 };
 

@@ -106,10 +106,30 @@ Angle Route::get_heading_at_current_position()
   return start_angle + (end_angle - start_angle) * this->progress;
 }
 
+void Route::advance_to_next_segment()
+{
+  if (index >= nodes.size()-2) {
+    done = true;
+  }
+  ++index;
+}
+
+bool Route::is_stop_ahead() {
+  return done || nodes[index+1].road_sign_command == "stop";
+}
+
+RouteNode * Route::get_target_node()
+{
+  if (done) {
+    return & nodes[index];
+  }
+  return & nodes[index+1];
+}
+
 void Route::set_position(Point front, Point rear, double velocity)
 {
   const double stopped_velocity = 0.01;
-  while(true) {
+  while(!done) {
     RouteNode & p1 = nodes[index];
     RouteNode & p2 = nodes[index+1];
     double dx = NAN;
@@ -148,15 +168,19 @@ void Route::set_position(Point front, Point rear, double velocity)
       cte = (drx * dy - dry * dx ) / l;
     }
 
-    if (progress < 1.0 || done)
+    if (progress < 1.0)
       break;
-    if (index >= nodes.size()-2) {
-      done = true;
+
+    // can advance nodes only if next node isn't a stop sign
+    // to advance that, we need to mark as stopped
+    if(p2.road_sign_command != "stop") {
+      advance_to_next_segment();
+    } else {
       break;
     }
-    ++index;
   }
 }
+
 
 void Route::reset_position_to_start()
 {

@@ -8,8 +8,8 @@
 #include "string_utils.h"
 
 
-Driver::Driver(Car & car, CarUI& ui, RunSettings& settings)
-  : car(car), ui(ui), settings(settings)
+Driver::Driver(Car & car, RunSettings& settings)
+  : car(car), settings(settings)
 {
 }
 
@@ -133,10 +133,10 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
   double v = car.get_velocity();
   double ahead = settings.d_ahead + v*settings.t_ahead;
   if(!route.done) {
-    unsigned int old_index = route.index;;
+    unsigned int old_index = route.index;
     route.set_position(p_front, p_rear, v);
-    unsigned int new_index = route.index;;
-    for(int i = old_index + 1; i <= new_index; i++) {
+    unsigned int new_index = route.index;
+    for(unsigned int i = old_index + 1; i <= new_index; i++) {
       if(route.nodes[i].road_sign_command == "beep") {
         log_info("car commanded to beep");
         car.beep();
@@ -150,10 +150,6 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
 
   Angle d_adjust = Angle::degrees(clamp(settings.steering_k_d * d_error,-20,20));
   Angle p_adjust = Angle::degrees(clamp(settings.steering_k_p * route.cte  / (v+1),-20,20));
-  //Angle i_adjust = Angle::degrees(clamp(settings.steering_k_p * route.cte  / (v+1),-20,20));
-
-  //steering_pid.add_reading((double)car.current_dynamics.us / 1E6, -route.cte);
-  //Angle pid_adjust = Angle::degrees(clamp(steering_pid.output(),-60,60));
   Angle curvature = required_turn_curvature_by_look_ahead(route, ahead);
 
 
@@ -172,6 +168,14 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
     str = 1500;
   }
   car.set_esc_and_str(esc, str);
+}
+
+// tries to stop at stop_node
+// returns true if done
+bool Driver::continue_to_stop(const RouteNode *stop_node)
+{
+  car.set_esc_and_str(1500,500);
+  return fabs(car.get_velocity()) < 0.01;
 }
 
 void Driver::set_evasive_actions_for_crash(Route& route)
@@ -233,9 +237,7 @@ void Driver::drive_route(Route & route) {
 
   WorkQueue<Dynamics> queue;
   car.add_listener(&queue);
-  //ui.clear();
-  //ui.print("[abort]");
-  //ui.refresh();
+
   try {
     car.set_rc_mode();
     PID steering_pid;
@@ -255,18 +257,53 @@ void Driver::drive_route(Route & route) {
     route_complete = false;
     recovering_from_crash = false;
     int crash_count = 0;
+    system_clock::time_point wait_end_time = system_clock::now();
+    string mode = "follow_route";
     while(!route_complete) {
-    //  if(ui.getkey()!=-1) {
-    //    error_text = "run aborted by user";
-    //    log_info("run aborted by user");
-    //    route_complete = true;
-    //  }
-
-
       Dynamics d;
       if(!queue.try_pop(d,1000)) {
         log_error("timed out reading dynamics in drive_route");
         throw (string) "timed out waiting to read dynamics";
+      }
+      // execute route flow, based on
+      // https://docs.google.com/drawings/d/1S2gPPzPD42xvuomWY12pHNqIRDZXRV040nHIy7_USxc/edit?usp=sharing
+
+      if(mode == "follow_route") {
+        continue_along_route(route, steering_pid, velocity_pid);
+        if(route.is_stop_ahead()) {
+          mode = "stop_at_point";
+        }
+      }
+
+      if(mode=="stop_at_point") {
+        RouteNode * stop_node = route.get_target_node();
+        route.advance_to_next_segment();
+        // todo: try best to stop at the given point
+        bool stop_complete  = continue_to_stop(stop_node);
+        if (stop_complete) {
+          route.advance_to_next_segment();
+          if(route.done) {
+            mode = "done";
+            route_complete = true;
+          } else {
+            mode = "wait";
+            double wait_seconds(stod(stop_node->arg1));
+            wait_end_time = wait_end_time + milliseconds((long)(wait_seconds * 1000));
+          }
+        }
+      }
+
+      if(mode == "wait") {
+        car.set_esc_and_str(1500,1500);
+        if(system_clock::now() > wait_end_time) {
+          mode == "follow_route";
+        }
+
+      }
+
+      if(mode == "done") {
+        car.set_esc_and_str(1500,1500);
+        car.set_manual_mode();
       }
 
       if(settings.crash_recovery == true && !recovering_from_crash) {
@@ -380,9 +417,8 @@ void test_driver() {
     route.optimize_velocity();
     cout << route.to_string() << endl;
 
-    CarUI ui;
     RunSettings settings;
-    Driver driver(car,ui,settings);
+    Driver driver(car,settings);
     for(auto look_ahead : linspace(0,25,1)){
         RouteNode n_ahead = route.get_position_ahead(look_ahead);
         cout << "look_ahead: " << look_ahead
