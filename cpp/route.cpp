@@ -340,9 +340,9 @@ void RouteNode::set_from_standard_file(vector<string> fields) {
   if(fields.size() > 11) {
     road_sign_label = fields[11];
     road_sign_command = fields[12];
-    arg1 = fields[12];
-    arg2 = fields[13];
-    arg3 = fields[14];
+    arg1 = fields[13];
+    arg2 = fields[14];
+    arg3 = fields[15];
   }
 }
 

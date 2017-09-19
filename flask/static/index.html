@@ -255,7 +255,7 @@
     <div class='itembox'>
       <div >
         <div ng-repeat="node in road_sign_nodes">
-          <input ng-model="node.road_sign_label" size="2em"/> <input ng-model="node.road_sign_command"/> <button ng-click = "delete_road_sign($index)">X</button>
+          <input ng-model="node.road_sign_label" size="2em"/> <input ng-model="node.road_sign_command"/> <input size="2em" ng-model="node.arg1"/> <button ng-click = "delete_road_sign($index)">X</button>
         </div>
       </div>
 
@@ -486,9 +486,6 @@
     $scope.route_path_url = function() {
       return '/tracks/' + $scope.run_settings.track_name + "/routes/" + $scope.run_settings.route_name + "/path";
     }
-
-
-
 
     $scope.$watch("run_settings.route_name", function (newValue, oldValue) {
       if ($scope.run_settings && $scope.run_settings.route_name !== null && $scope.run_settings.route_name.length > 0) {
