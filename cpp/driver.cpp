@@ -272,6 +272,7 @@ void Driver::drive_route(Route & route) {
         continue_along_route(route, steering_pid, velocity_pid);
         if(route.is_stop_ahead()) {
           mode = "stop_at_point";
+          log_info("stopping");
         }
       }
 
@@ -287,8 +288,9 @@ void Driver::drive_route(Route & route) {
             route_complete = true;
           } else {
             mode = "wait";
-            double wait_seconds(stod(stop_node->arg1));
-            wait_end_time = wait_end_time + milliseconds((long)(wait_seconds * 1000));
+            double wait_seconds(5);//stod(stop_node->arg1));
+            wait_end_time = system_clock::now() + milliseconds((long)(wait_seconds * 1000));
+            log_info("waiting");
           }
         }
       }
@@ -297,6 +299,7 @@ void Driver::drive_route(Route & route) {
         car.set_esc_and_str(1500,1500);
         if(system_clock::now() > wait_end_time) {
           mode == "follow_route";
+          log_info("done waiting");
         }
 
       }
