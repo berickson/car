@@ -174,7 +174,7 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
 // returns true if done
 bool Driver::continue_to_stop(const RouteNode *stop_node)
 {
-  car.set_esc_and_str(1500,500);
+  car.set_esc_and_str(1500,1500);
   return fabs(car.get_velocity()) < 0.01;
 }
 
