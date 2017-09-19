@@ -278,7 +278,6 @@ void Driver::drive_route(Route & route) {
 
       if(mode=="stop_at_point") {
         RouteNode * stop_node = route.get_target_node();
-        route.advance_to_next_segment();
         // todo: try best to stop at the given point
         bool stop_complete  = continue_to_stop(stop_node);
         if (stop_complete) {
