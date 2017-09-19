@@ -307,6 +307,7 @@ void Driver::drive_route(Route & route) {
         car.set_esc_and_str(1500,1500);
         car.set_manual_mode();
       }
+      /*
 
       if(settings.crash_recovery == true && !recovering_from_crash) {
         if(check_for_crash()) {
@@ -342,6 +343,7 @@ void Driver::drive_route(Route & route) {
       } else {
         continue_along_route(route, steering_pid, velocity_pid);
       }
+      */
     }
   } catch (string s) {
     error_text = s;
