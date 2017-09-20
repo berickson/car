@@ -1,5 +1,5 @@
 <!doctype html>
-<html ng-app="car" ng-controller="carController">
+<html ng-app="car" ng-controller="CarController as car">
 
 <head>
   <title>Orange Crash</title>
@@ -109,44 +109,45 @@
     }
   </style>
   <script src="angular.min.js"></script>
+  <script src="index.js"></script>
   <link rel="favicon" href="favicon.png" />
 </head>
 
 <body class='main'>
   <h1 class='orange'>Orange Crash</h1>
-  <div class='itembox'>{{poll_ok ? "online - " + car_state.mode : "offline"}}</div>
+  <div class='itembox'>{{car.poll_ok ? "online - " + car_state.mode : "offline"}}</div>
   <div class="groupbox row">
     <div class='itembox'>
-      <div class='bigtext data'>{{ rjust((car_state.velocity * 2.23694).toFixed(1),5) }}</div>
+      <div class='bigtext data'>{{ car.rjust((car.car_state.velocity * 2.23694).toFixed(1),5) }}</div>
       <div style='text-align:right'>mph</div>
-      <div style='text-align:right' class='data'>{{ rjust(car_state.velocity.toFixed(1),5) }} m/s</div>
+      <div style='text-align:right' class='data'>{{ car.rjust(car.car_state.velocity.toFixed(1),5) }} m/s</div>
     </div>
     <div class="itembox">
-      <div>{{car_state.v_bat | number:1}}V</div>
+      <div>{{car.car_state.v_bat | number:1}}V</div>
       <svg width="64" height="32">
         <rect x="2" y="2" width="60" height="28" style="fill:lightgray;stroke:gray;stroke-width:2" />
-        <rect ng-if="battery_percent" x="4" y="4" ng-attr-width="{{Math.max(56*battery_percent/100,0)}}" height="24" style="fill:black;stroke:black" />
+        <rect ng-if="battery_percent" x="4" y="4" ng-attr-width="{{car.Math.max(56*car.battery_percent/100,0)}}" height="24" style="fill:black;stroke:black" />
 
       </svg>
-      <div>{{battery_percent | number:0}}% </div>
+      <div>{{car.battery_percent | number:0}}% </div>
     </div>
     <div class='itembox'>
       <div>Heading</div>
       <div>
         <svg width="32" height="32">
           <circle cx="16" cy="16" r="14" stroke="gray" stroke-width="2" fill="LightGray" />
-          <line ng-if="car_state" x1="16" y1="16" ng-attr-x2={{16-14*Math.sin(car_state.heading)}} ng-attr-y2={{16-14*Math.cos(car_state.heading)}} style="stroke:gray;stroke-width:2"
+          <line ng-if="car.car_state" x1="16" y1="16" ng-attr-x2={{16-14*car.Math.sin(car.car_state.heading)}} ng-attr-y2={{16-14*car.Math.cos(car.car_state.heading)}} style="stroke:gray;stroke-width:2"
           />
         </svg>
       </div>
       <div>
-        {{car_state.heading * 180 / Math.PI | number:1}}°
+        {{car.car_state.heading * 180 / car.Math.PI | number:1}}°
       </div>
     </div>
     <div class='itembox'>
       <div>Position</div>
-      <div>x: {{car_state.front_x.toFixed(2)}}</div>
-      <div>y: {{car_state.front_y.toFixed(2)}}</div>
+      <div>x: {{car.car_state.front_x.toFixed(2)}}</div>
+      <div>y: {{car.car_state.front_y.toFixed(2)}}</div>
     </div>
     <div class='itembox'>
       <table class='small_text'>
@@ -161,23 +162,23 @@
         <tbody class='data small_text'>
           <tr ng-repeat='wheel in ["fl","fr","bl","br"]'>
             <td>{{wheel}}</td>
-            <td>{{rjust(car_state[wheel].v.toFixed(2),7)}}</td>
-            <td>{{rjust(car_state[wheel].v_smooth.toFixed(1),6)}}</td>
-            <td>{{rjust(car_state[wheel].a_smooth.toFixed(1),6)}}</td>
-            <td>{{rjust(car_state[wheel].meters.toFixed(2),8)}}</td>
-            <td>{{rjust(car_state[wheel].ticks,8)}}</td>
+            <td>{{car.rjust(car.car_state[wheel].v.toFixed(2),7)}}</td>
+            <td>{{car.rjust(car.car_state[wheel].v_smooth.toFixed(1),6)}}</td>
+            <td>{{car.rjust(car.car_state[wheel].a_smooth.toFixed(1),6)}}</td>
+            <td>{{car.rjust(car.car_state[wheel].meters.toFixed(2),8)}}</td>
+            <td>{{car.rjust(car.car_state[wheel].ticks,8)}}</td>
           </tr>
         </tbody>
       </table>
 
     </div>
     <div class='itembox'>
-      <div ng-if="pi_state" ng-repeat="cpu in pi_state.cpu track by $index">cpu{{$index}}<span class='data'>{{rjust(cpu.toFixed(1),5)}}</span>
+      <div ng-if="pi_state" ng-repeat="cpu in pi_state.cpu track by $index">{{cpu{{$index}}<span class='data'>{{car.rjust(car.cpu.toFixed(1),5)}}</span>
       </div>
     </div>
     <div class='itembox'>
       <div>mpu temp</div>
-      <div>{{(car_state.temperature*1.8+32).toFixed(1)}}°</div>
+      <div>{{(car.car_state.temperature*1.8+32).toFixed(1)}}°</div>
     </div>
   </div>
 
@@ -191,45 +192,45 @@
     <div class='groupbox'>
       <div class='itembox'>
         track:
-        <select class='select' name='2' ng-model="run_settings.track_name" id="2" ng-options="track_name for track_name in track_names"></select>
+        <select class='select' name='2' ng-model="car.run_settings.track_name" id="2" ng-options="track_name for track_name in car.track_names"></select>
       </div>
 
       <div class='itembox'>
-        route: <select class='select' name='1' ng-model="run_settings.route_name" id="1" ng-options="route_name for route_name in route_names"></select>
+        route: <select class='select' name='1' ng-model="car.run_settings.route_name" id="1" ng-options="route_name for route_name in car.route_names"></select>
       </div>
 
-      <button class='button' ng-click="poweroff()">Power Off</button>
-      <button class='button' ng-click="save_run_settings()">Save</button>
-      <button class='button' ng-click="go()">Go</button>
-      <button class='button' ng-click="stop()">Stop</button>
-      <button class='button' ng-click="record()">Record</button>
-      <button class='button' ng-click="reset_odometer()">Reset</button>
+      <button class='button' ng-click="car.poweroff()">Power Off</button>
+      <button class='button' ng-click="car.save_run_settings()">Save</button>
+      <button class='button' ng-click="car.go()">Go</button>
+      <button class='button' ng-click="car.stop()">Stop</button>
+      <button class='button' ng-click="car.record()">Record</button>
+      <button class='button' ng-click="car.reset_odometer()">Reset</button>
     </div>
   </div>
   <div class='groupbox row'>
     <div class='itembox' style='position:relative;overflow:hidden'>
       <!-- 2nd viewbox is to -->
-      <svg ng-attr-viewBox="{{viewbox_left}} {{viewbox_top}} {{viewbox_width}} {{viewbox_height}}" viewbox="0 0 100 100" preserveAspectRatio="xMidYMid meet"
+      <svg ng-attr-viewBox="{{car.viewbox_left}} {{car.viewbox_top}} {{car.viewbox_width}} {{car.viewbox_height}}" viewbox="0 0 100 100" preserveAspectRatio="xMidYMid meet"
       style='width:600px;height:600px'
       >
         <g transform="scale(1, -1)">
           <g>
-          <circle ng-repeat="path_node in route_path" ng-attr-cx="{{route_path[$index].x}}" ng-attr-cy="{{route_path[$index].y}}" r="0.01" ng-click="node_clicked($event, route_path[$index])"
+          <circle ng-repeat="path_node in car.route_path" ng-attr-cx="{{car.route_path[$index].x}}" ng-attr-cy="{{car.route_path[$index].y}}" r="0.01" ng-click="car.node_clicked($event, route_path[$index])"
           />
           <a xlink:href="#0">
-            <g ng-repeat="path_node in route_path" transform="translate({{route_path[$index].x}}, {{route_path[$index].y}})">
+            <g ng-repeat="path_node in car.route_path" ng-attr-transform="translate({{car.route_path[$index].x}}, {{car.route_path[$index].y}})">
               <circle cx="0" cy="0" r="0.02" fill="blue" ng-click="node_clicked($event, route_path[$index])"/>
             </g>
-            <g ng-repeat="path_node in route_path" transform="translate({{route_path[$index].x}}, {{route_path[$index].y}})">
+            <g ng-repeat="path_node in car.route_path" ng-attr-transform="translate({{car.route_path[$index].x}}, {{car.route_path[$index].y}})">
               <g ng-if="path_node.road_sign_label !== undefined && path_node.road_sign_label.length > 0">
                 <circle cx="0" cy="0" r="0.1" fill="red" ng-click="node_clicked($event, route_path[$index])"/>
-                <text transform="scale(1,-1)"   x="0" y="0" text-anchor="middle" stroke="#51c5cf" font-size="0.1" stroke-width="0.001" dy=".3em">{{route_path[$index].road_sign_label}}</text >
+                <text transform="scale(1,-1)"   x="0" y="0" text-anchor="middle" stroke="#51c5cf" font-size="0.1" stroke-width="0.001" dy=".3em">{{car.route_path[$index].road_sign_label}}</text >
               </g>
             </g>
           </a>
           
-          <rect ng-attr-x="{{car_state.front_x-0.15}}" ng-attr-y="{{car_state.front_y}}" width="0.3" height="0.6" fill="orange" fill-opacity="0.5"
-            stroke="gray" stroke-width="0.03" ng-attr-transform="translate(0, 0) rotate({{car_state.heading*180/Math.PI+90}} {{car_state.front_x}} {{car_state.front_y}})"
+          <rect ng-attr-x="{{car.car_state.front_x-0.15}}" ng-attr-y="{{car.car_state.front_y}}" width="0.3" height="0.6" fill="orange" fill-opacity="0.5"
+            stroke="gray" stroke-width="0.03" ng-attr-transform="translate(0, 0) rotate({{car.car_state.heading*180/car.Math.PI+90}} {{car.car_state.front_x}} {{car.car_state.front_y}})"
           />
         </g>
       </svg>
@@ -237,35 +238,35 @@
 
       <div class='atop' style='padding:10px' style='background-color:rgba(50,50,50,1)'>
         <div class='row'>
-          <button class='button' ng-click="zoom_in()">+</button>
-          <button class='button' ng-click="zoom_out()">-</button>
+          <button class='button' ng-click="car.zoom_in()">+</button>
+          <button class='button' ng-click="car.zoom_out()">-</button>
           &nbsp;
           <div class='column'>
-            <button class='button' ng-click="pan_up()">^</button>
+            <button class='button' ng-click="car.pan_up()">^</button>
             <div class='row'>
-              <button class='button' ng-click="pan_left()">&lt; </button>
-              <button class='button' ng-click="reset_zoom()">[]</button>
-              <button class='button' ng-click="pan_right()">></button>
+              <button class='button' ng-click="car.pan_left()">&lt; </button>
+              <button class='button' ng-click="car.reset_zoom()">[]</button>
+              <button class='button' ng-click="car.pan_right()">></button>
             </div>
-            <button class='button' ng-click="pan_down()">v</button>
+            <button class='button' ng-click="car.pan_down()">v</button>
           </div>
         </div>
       </div>
     </div>
     <div class='itembox'>
       <div >
-        <div ng-repeat="node in road_sign_nodes">
+        <div ng-repeat="node in car.road_sign_nodes">
           <input ng-model="node.road_sign_label" size="2em"/> 
           <input ng-model="node.road_sign_command" size="5en"/> 
           <input ng-model="node.arg1" size="2em" /> 
-          <button ng-click = "delete_road_sign($index)">X</button>
+          <button ng-click = "car.delete_road_sign($index)">X</button>
         </div>
       </div>
 
       <div>
         <table>
           <tbody>
-            <tr ng-repeat="item in run_settings_array" ng.key="item.key">
+            <tr ng-repeat="item in car.run_settings_array" ng.key="item.key">
               <td>{{item.key}}</td>
               <td>
                 <input type="checkbox" ng-if="item.data_type === 'boolean'" ng-model="item.value" />
@@ -280,7 +281,7 @@
   </div>
   <div class='groupbox'>
     <div ng-show="selected_node" ng-model = "selected_node" class='itembox'>
-      <div>{{selected_node.x}}, {{selected_node.y}} {{selected_node.road_sign_label}}</div>
+      <div>{{car.selected_node.x}}, {{car.selected_node.y}} {{car.selected_node.road_sign_label}}</div>
       <div><form><input ng-model="selected_node.x" /></form></div>
       <div><form><input ng-model="selected_node.road_sign_label" /></form></div>
       <button ng-click = "selected_node = null">ok</button>
@@ -293,326 +294,4 @@
 
     </div>
 </body>
-<script>
-  var app = angular.module("car", []);
-  app.controller("carController", function ($scope, $http, $timeout) {
-    $scope.Math = Math
-    $scope.JSON = JSON
-
-    $scope.type_of = function (val) {
-      return typeof (val);
-    };
-
-    $scope.is_changed = function (field) {
-      return field.original_value.toString() !== field.value.toString();
-
-    }
-
-    $scope.to_field_array = function (x) {
-      rv = [];
-      for (k in x) {
-        rv.push({
-          key: k,
-          value: x[k],
-          original_value: x[k],
-          data_type: typeof (x[k])
-        });
-      }
-      return rv;
-    };
-
-    $scope.set_changes_from_field_array = function (o, field_array) {
-      for (i in field_array) {
-        var field = field_array[i];
-        if ($scope.is_changed(field)) {
-          if (field.data_type == 'number') {
-            o[field.key] = Number(field.value);
-          }
-          if (field.data_type == 'boolean)') {
-            o[field.key] == Boolean(field.value);
-          }
-        }
-      }
-      return rv;
-    };
-
-
-    $scope.poweroff = function () {
-      go_error = ""
-      $http.put('/pi/poweroff', "1").success(function () {
-        console.log('poweroff success');
-      }).error(function (response, code) {
-        $scope.go_error = "  (" + code + ")" + response.message;
-      })
-      console.log("poweroff clicked");
-    };
-
-
-    $scope.save_run_settings = function () {
-      go_error = ""
-      $scope.set_changes_from_field_array($scope.run_settings, $scope.run_settings_array);
-      req = {
-        url: '/run_settings',
-        method: 'PUT',
-        data: JSON.stringify($scope.run_settings),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-
-      req2 = {
-        url: $scope.route_path_url(),
-        method: 'PUT',
-        data: JSON.stringify($scope.route_path),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-
-      $http(req).success(function () {
-        console.log('save run settings success');
-        $http(req2).success(function() {
-          console.log('save route path success');
-        }).error(function (response, code) {
-          console.log("failed to save route path");
-          console.log("  (" + code + ")" + response);
-        });
-      }).error(function (response, code) {
-        $scope.go_error = "  (" + code + ")" + response;
-      });
-
-      console.log("save_run_settings clicked");
-
-    }
-
-
-    $scope.go = function () {
-      go_error = ""
-      $http.put('/command/go', "1").success(function () {
-        console.log('go success');
-      }).error(function (response, code) {
-        $scope.go_error = "  (" + code + ")" + response.message;
-      })
-      console.log("go clicked");
-    };
-
-    $scope.stop = function () {
-      $http.put('/command/stop', "1").success(function () {
-        console.log('stop success');
-      }).error(function (response, code) {
-        $scope.stop_error = "  (" + code + ")" + response.message;
-      })
-      console.log("stop clicked");
-    };
-
-    $scope.record = function () {
-      $http.put('/command/record', "1").success(function () {
-        console.log('record success');
-      }).error(function (response, code) {
-        $scope.record_error = "  (" + code + ")" + response.message;
-      })
-      console.log("record clicked");
-    };
-
-    $scope.reset_odometer = function () {
-      $http.put('/command/reset_odometer', "1").success(function () {
-        console.log('reset_odometer success');
-      }).error(function (response, code) {
-        $scope.reset_odometer_error = "  (" + code + ")" + response.message;
-      })
-      console.log("reset_odometer clicked");
-    };
-
-    $scope.reset_zoom = function () {
-      $scope.viewbox_left = $scope.route_path_min_x - 0.7;
-      $scope.viewbox_top = -$scope.route_path_max_y;
-      $scope.viewbox_width = $scope.route_path_width + 0.8;
-      $scope.viewbox_height = $scope.route_path_height;
-    }
-
-
-    $scope.pan_delta = 0.1;
-    $scope.zoom_ratio = Math.sqrt(2);
-
-    $scope.zoom_in = function () {
-      var center_x = $scope.viewbox_left + $scope.viewbox_width / 2.0;
-      var center_y = $scope.viewbox_top + $scope.viewbox_height / 2.0;
-
-      $scope.viewbox_height /= $scope.zoom_ratio;
-      $scope.viewbox_width /= $scope.zoom_ratio;
-
-      $scope.view_box_top = center_y - $scope.viewbox_height / 2;
-      $scope.view_box_left = center_x - $scope.viewbox_width / 2;
-    }
-
-    $scope.zoom_out = function () {
-      var center_x = $scope.viewbox_left + $scope.viewbox_width / 2.0;
-      var center_y = $scope.viewbox_top + $scope.viewbox_height / 2.0;
-
-      $scope.viewbox_height *= $scope.zoom_ratio;
-      $scope.viewbox_width *= $scope.zoom_ratio;
-
-      $scope.view_box_top = center_y - $scope.viewbox_height / 2;
-      $scope.view_box_left = center_x - $scope.viewbox_width / 2;
-    }
-
-    $scope.pan_left = function () {
-      $scope.viewbox_left += $scope.viewbox_width * $scope.pan_delta;
-    }
-
-    $scope.pan_right = function () {
-      $scope.viewbox_left -= $scope.viewbox_width * $scope.pan_delta;
-    }
-
-    $scope.pan_up = function () {
-      $scope.viewbox_top += $scope.viewbox_height * $scope.pan_delta;
-    }
-
-    $scope.pan_down = function () {
-      $scope.viewbox_top -= $scope.viewbox_height * $scope.pan_delta;
-    }
-
-
-    $scope.$watch("run_settings.track_name", function (newValue, oldValue) {
-      if ($scope.run_settings && $scope.run_settings.track_name !== null && $scope.run_settings.track_name.length > 0) {
-        console.log("selected track:", $scope.run_settings.track_name)
-        $http.get('/tracks/' + $scope.run_settings.track_name + "/route_names").
-          success(function (result, status, headers, config) {
-            $scope.route_names = result.route_names
-          }).error(function (data, status, headers, config) {
-            $scope.route_names = ['n/a'];
-            // log error
-          });
-      }
-    });
-
-    $scope.route_path_url = function() {
-      return '/tracks/' + $scope.run_settings.track_name + "/routes/" + $scope.run_settings.route_name + "/path";
-    }
-
-    $scope.$watch("run_settings.route_name", function (newValue, oldValue) {
-      if ($scope.run_settings && $scope.run_settings.route_name !== null && $scope.run_settings.route_name.length > 0) {
-        $http.get($scope.route_path_url()).
-          success(function (route_path, status, headers, config) {
-            $scope.route_path = route_path;
-            var route_x = route_path.map(function (v) { return v.x });
-            var route_y = route_path.map(function (v) { return v.y });
-
-            $scope.route_path_min_x = Math.min.apply(null, route_x)
-            $scope.route_path_min_y = Math.min.apply(null, route_y)
-            $scope.route_path_max_x = Math.max.apply(null, route_x)
-            $scope.route_path_max_y = Math.max.apply(null, route_y)
-            $scope.route_path_width = $scope.route_path_max_x - $scope.route_path_min_x
-            $scope.route_path_height = $scope.route_path_max_y - $scope.route_path_min_y
-            $scope.reset_zoom();
-            $scope.road_sign_nodes = [];
-            for(var i in $scope.route_path) {
-              var node = $scope.route_path[i];
-              if(node.road_sign_label !== undefined && node.road_sign_label && node.road_sign_label.length > 0) {
-                $scope.road_sign_nodes.push(node)
-              }
-            }
-            
-          }).error(function (data, status, headers, config) {
-            $scope.route_names = ['n/a'];
-            // log error
-          });
-      }
-    });
-
-
-    $scope.track_names=[]
-    $scope.track_name=""
-    $http.get('/track_names').
-      success(function (result, status, headers, config) {
-        $scope.track_names = result.track_names;
-      }).
-      error(function (data, status, headers, config) {
-        // log error
-      });
-    $scope.poll_ok = false;
-    $scope.display_car_state = false;
-
-
-    var poller = function () {
-      $http({ method: 'GET', timeout: 5000, url: '/car/get_state' })
-        .then(function (r) {
-          $scope.car_state = r.data;
-          var v_bat = $scope.car_state.v_bat;
-          var min_bat = 3.5 * 3;
-          var max_bat = 4.2 * 3;
-          $scope.battery_percent = 100 * (v_bat - min_bat) / (max_bat - min_bat);
-          $scope.poll_ok = true;
-          $timeout(poller, 100);
-        },
-        function (e) {
-          $scope.poll_ok = false;
-          $timeout(poller, 1000);
-        });
-    };
-    poller();
-
-    $scope.road_sign_nodes = [];
-
-    $scope.rjust = function (s, width) {
-      if (s==undefined) {
-        return " ".repeat(width);
-      }
-      s = s.toString()
-      return " ".repeat(width - s.length) + s
-    }
-
-    $scope.property_list = function (o) {
-      s = [];
-      for (var property_name in o) {
-        s.push(property_name);
-      }
-      return s.join(", ");
-    }
-
-    $scope.delete_road_sign = function(road_sign_index) {
-      var node = $scope.road_sign_nodes[road_sign_index];
-      node.road_sign_label = "";
-      node.road_sign_command = "";
-      $scope.road_sign_nodes.splice(road_sign_index, 1); // splice deletes from array
-    }
-
-    $scope.node_clicked = function ($event, node) {
-      $scope.selected_node = node;
-      if(node.road_sign_label == undefined || node.road_sign_label.length == 0) {
-        node.road_sign_label = $scope.road_sign_nodes.length.toString();
-        node.road_sign_command =  "stop";
-        $scope.road_sign_nodes.push(node)
-      }
-      return;
-    }
-
-    var poller2 = function () {
-      $http({ method: 'GET', timeout: 5000, url: '/pi/get_state' })
-        .then(function (r) {
-          $scope.pi_state = r.data;
-          $timeout(poller2, 1000);
-        },
-        function (e) {
-          $timeout(poller2, 1000);
-        });
-    };
-    poller2();
-
-    var poller3 = function () {
-      $http({ method: 'GET', timeout: 5000, url: '/run_settings' })
-        .then(function (r) {
-          $scope.run_settings = r.data;
-          $scope.run_settings_array = $scope.to_field_array($scope.run_settings);
-        },
-        function (e) {
-          $timeout(poller3, 1000);
-        });
-    };
-    poller3();
-
-  });
-
-</script>
-
 </html>
