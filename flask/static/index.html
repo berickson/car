@@ -29,6 +29,10 @@
       box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
     }
 
+    .error-background {
+      background-color: rgb(255,30,30);
+    }
+
     .select {
       background-color: rgb(220, 220, 220);
       /*height: 34px;*/
@@ -115,7 +119,7 @@
 
 <body class='main'>
   <h1 class='orange'>Orange Crash</h1>
-  <div class='itembox'>{{car.poll_ok ? "online - " + car_state.mode : "offline"}}</div>
+  <div class='itembox'  ><div ng-class='car.poll_ok?"":"error-background"'>{{car.poll_ok ? "online - " + car.car_state.mode : "offline"}}</div></div>
   <div class="groupbox row">
     <div class='itembox'>
       <div class='bigtext data'>{{ car.rjust((car.car_state.velocity * 2.23694).toFixed(1),5) }}</div>
