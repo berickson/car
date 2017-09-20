@@ -129,7 +129,6 @@
         <rect ng-if="battery_percent" x="4" y="4" ng-attr-width="{{car.Math.max(56*car.battery_percent/100,0)}}" height="24" style="fill:black;stroke:black" />
 
       </svg>
-      <div>{{car.battery_percent | number:0}}% </div>
     </div>
     <div class='itembox'>
       <div>Heading</div>
@@ -173,7 +172,7 @@
 
     </div>
     <div class='itembox'>
-      <div ng-if="pi_state" ng-repeat="cpu in pi_state.cpu track by $index">{{cpu{{$index}}<span class='data'>{{car.rjust(car.cpu.toFixed(1),5)}}</span>
+      <div ng-if="car.pi_state" ng-repeat="cpu in car.pi_state.cpu track by $index">cpu{{$index}}<span class='data'>{{car.rjust(cpu.toFixed(0),4)}}</span>
       </div>
     </div>
     <div class='itembox'>
@@ -215,15 +214,15 @@
       >
         <g transform="scale(1, -1)">
           <g>
-          <circle ng-repeat="path_node in car.route_path" ng-attr-cx="{{car.route_path[$index].x}}" ng-attr-cy="{{car.route_path[$index].y}}" r="0.01" ng-click="car.node_clicked($event, route_path[$index])"
+          <circle ng-repeat="path_node in car.route_path" ng-attr-cx="{{car.route_path[$index].x}}" ng-attr-cy="{{car.route_path[$index].y}}" r="0.01" ng-click="car.node_clicked($event, car.route_path[$index])"
           />
           <a xlink:href="#0">
             <g ng-repeat="path_node in car.route_path" ng-attr-transform="translate({{car.route_path[$index].x}}, {{car.route_path[$index].y}})">
-              <circle cx="0" cy="0" r="0.02" fill="blue" ng-click="node_clicked($event, route_path[$index])"/>
+              <circle cx="0" cy="0" r="0.02" fill="blue" ng-click="car.node_clicked($event, car.route_path[$index])"/>
             </g>
             <g ng-repeat="path_node in car.route_path" ng-attr-transform="translate({{car.route_path[$index].x}}, {{car.route_path[$index].y}})">
-              <g ng-if="path_node.road_sign_label !== undefined && path_node.road_sign_label.length > 0">
-                <circle cx="0" cy="0" r="0.1" fill="red" ng-click="node_clicked($event, route_path[$index])"/>
+              <g ng-if="car.has_road_sign(path_node)">
+                <circle cx="0" cy="0" r="0.1" fill="red" ng-click="car.node_clicked($event, car.route_path[$index])"/>
                 <text transform="scale(1,-1)"   x="0" y="0" text-anchor="middle" stroke="#51c5cf" font-size="0.1" stroke-width="0.001" dy=".3em">{{car.route_path[$index].road_sign_label}}</text >
               </g>
             </g>
@@ -270,28 +269,13 @@
               <td>{{item.key}}</td>
               <td>
                 <input type="checkbox" ng-if="item.data_type === 'boolean'" ng-model="item.value" />
-                <input ng-visible="item.data_type === 'number'" ng-model="item.value" style='width:4ch' ng-class="is_changed(item) ? 'changed' : ''"
+                <input ng-if="item.data_type === 'number'" ng-model="item.value" style='width:4ch' ng-class="is_changed(item) ? 'changed' : ''"
                 />
               </td>
               <tr>
         </table>
       </div>
     </div>
-
   </div>
-  <div class='groupbox'>
-    <div ng-show="selected_node" ng-model = "selected_node" class='itembox'>
-      <div>{{car.selected_node.x}}, {{car.selected_node.y}} {{car.selected_node.road_sign_label}}</div>
-      <div><form><input ng-model="selected_node.x" /></form></div>
-      <div><form><input ng-model="selected_node.road_sign_label" /></form></div>
-      <button ng-click = "selected_node = null">ok</button>
-    </div>
-  </div>
-
-  <label><h3><input type="checkbox" id="xxx" ng-model="display_car_state"> car_state: </h3></label>
-  <div class='groupbox'>
-    <div ng-if="display_car_state" class='small_text' ng-repeat="(key,value) in car_state">{{key}} = {{value}}
-
-    </div>
 </body>
 </html>
