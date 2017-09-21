@@ -5,8 +5,8 @@
   "k_smooth": 0.4,
   "max_accel": 2.0,
   "max_accel_lat": 3.0,
-  "max_decel": 0.25,
-  "max_v": 0.25,
+  "max_decel": 0.5,
+  "max_v": 3.0,
   "optimize_velocity": true,
   "prune_max": 0.5,
   "prune_tolerance": 0.02,
@@ -20,5 +20,5 @@
   "track_name": "desk",
   "v_k_d": 4.0,
   "v_k_i": 0.0,
-  "v_k_p": 10.0
+  "v_k_p": 30.0
 }

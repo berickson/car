@@ -99,7 +99,7 @@ public:
     double t = car.get_time_in_seconds();
     if (last_t != 0) {
       double dt = t - last_t;
-      double v = car.get_rear_velocity();
+      double v = car.get_velocity();
       double a = car.get_smooth_acceleration();
       double v_sp = route.get_velocity();
       double a_sp = route.get_acceleration();
@@ -172,9 +172,10 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
 
 // tries to stop at stop_node
 // returns true if done
-bool Driver::continue_to_stop(const RouteNode *stop_node)
+bool Driver::continue_to_stop(Route& route, const RouteNode *stop_node)
 {
-  car.set_esc_and_str(1500,1500);
+  unsigned esc = velocity_tracker.get_esc(route, car);
+  car.set_esc_and_str(esc, 1500);
   return fabs(car.get_velocity()) < 0.01;
 }
 
@@ -231,6 +232,7 @@ void Driver::set_evasive_actions_for_crash(Route& route)
 
 void Driver::drive_route(Route & route) {
   log_entry_exit w("drive_route");
+  route.nodes[route.nodes.size()-1].road_sign_command = "stop";
 
   // we will set error text if something goes wrong
   string error_text = "";
@@ -298,6 +300,7 @@ void Driver::drive_route(Route & route) {
         car.set_esc_and_str(1500,1500);
         if(system_clock::now() > wait_end_time) {
           mode = "follow_route";
+          velocity_tracker.reset(); // otherwise, excessive accel after waiting
           log_info("done waiting");
         }
 
