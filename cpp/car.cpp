@@ -322,7 +322,7 @@ double Car::get_acceleration()
 }
 
 double Car::get_smooth_acceleration() {
-  return get_front_left_wheel().get_smooth_acceleration() + get_front_right_wheel().get_smooth_acceleration() / 2.0;
+  return (get_front_left_wheel().get_smooth_acceleration() + get_front_right_wheel().get_smooth_acceleration()) / 2.0;
 }
 
 double Car::get_time_in_seconds()

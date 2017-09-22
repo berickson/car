@@ -113,11 +113,14 @@ public:
         velocity_output += (k_a * a_error) * dt;
 
       velocity_output = clamp(velocity_output, min_v_sp, max_v_sp);
-      //stringstream ss;
-      //ss.precision(1);
-      //ss <<  "rt.v:" << route.get_velocity() << "  car.v:" << v;
-      //ss <<  "rt.a:" << route.get_acceleration() << "  car.a:" << a << "  velocity_output:" << velocity_output;
-      //log_info(ss.str());
+
+      if(false) {
+        stringstream ss;
+        ss.precision(1);
+        ss <<  "rt.v:" << route.get_velocity() << "  car.v:" << v;
+        ss <<  "rt.a:" << route.get_acceleration() << "  car.a:" << a << "  velocity_output:" << velocity_output;
+        log_info(ss.str());
+      }
     }
    last_t = t;
    return car.esc_for_velocity(velocity_output);
@@ -126,7 +129,7 @@ public:
 
 VelocityTracker velocity_tracker;
 
-void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity_pid)
+void Driver::continue_along_route(Route& route)
 {
   auto p_front = car.get_front_position();
   auto p_rear = car.get_rear_position();
@@ -174,8 +177,7 @@ void Driver::continue_along_route(Route& route, PID& steering_pid, PID& velocity
 // returns true if done
 bool Driver::continue_to_stop(Route& route, const RouteNode *stop_node)
 {
-  unsigned esc = velocity_tracker.get_esc(route, car);
-  car.set_esc_and_str(esc, 1500);
+  continue_along_route(route);
   return fabs(car.get_velocity()) < 0.01;
 }
 
@@ -271,7 +273,7 @@ void Driver::drive_route(Route & route) {
       // https://docs.google.com/drawings/d/1S2gPPzPD42xvuomWY12pHNqIRDZXRV040nHIy7_USxc/edit?usp=sharing
 
       if(mode == "follow_route") {
-        continue_along_route(route, steering_pid, velocity_pid);
+        continue_along_route(route);
         if(route.is_stop_ahead()) {
           mode = "stop_at_point";
           log_info("stopping");
@@ -281,7 +283,7 @@ void Driver::drive_route(Route & route) {
       if(mode=="stop_at_point") {
         RouteNode * stop_node = route.get_target_node();
         // todo: try best to stop at the given point
-        bool stop_complete  = continue_to_stop(stop_node);
+        bool stop_complete  = continue_to_stop(route, stop_node);
         if (stop_complete) {
           route.advance_to_next_segment();
           if(route.done) {

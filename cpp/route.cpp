@@ -199,14 +199,16 @@ double Route::get_acceleration() {
   const RouteNode & p0 = nodes[index];
   const RouteNode & p1 = nodes[index+1];
   double d = distance(p0.get_front_position(), p1.get_front_position());
-
-  return acceleration_for_distance_and_velocities(d,p0.velocity,p1.velocity);
+  double a = acceleration_for_distance_and_velocities(d,p0.velocity,p1.velocity);
+  log_trace((string)"accel" + format(a));
+  return a;
 
 }
 
 // returns desired velocity for current position
 double Route::get_velocity()
 {
+  log_trace((string)"progress:" + format(progress));
   if(done)
     return 0;
   auto p0 = nodes[index];

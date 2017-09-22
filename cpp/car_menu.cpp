@@ -217,6 +217,8 @@ void go(Car& car) {
     if(run_settings.capture_video) {
       log_info("capture video enabled, warming up camera");
       camera.warm_up();
+    } else {
+      log_info("capturing video not enabled");
     }
 
 

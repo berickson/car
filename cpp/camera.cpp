@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <array>
 #include "geometry.h"
+#include "logger.h"
 
 #include <opencv2/core/core.hpp>
 #include "opencv2/videoio.hpp"
@@ -116,6 +117,7 @@ int Camera::get_frame_count_saved()
 }
 
 void Camera::record_thread_proc() {
+  log_entry_exit w("record_thread_proc");
   cout << "inside record thread proc" << endl;
   prepare_video_writer(recording_path);
 

@@ -1,5 +1,5 @@
 {
-  "capture_video": true,
+  "capture_video": false,
   "crash_recovery": false,
   "d_ahead": 0.2,
   "k_smooth": 0.4,
@@ -18,7 +18,7 @@
   "steering_k_p": 40.0,
   "t_ahead": 0.3,
   "track_name": "desk",
-  "v_k_d": 4.0,
+  "v_k_d": 5.0,
   "v_k_i": 0.0,
-  "v_k_p": 30.0
+  "v_k_p": 20.0
 }
