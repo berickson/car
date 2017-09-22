@@ -40,7 +40,7 @@ nlohmann::json Speedometer::get_json_state() const
   return j;
 }
 
-double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigned int a_us, int odo_b, unsigned int b_us, int ab_us, float ax) {
+double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigned int a_us, int odo_b, unsigned int b_us, int ab_us) {
   double last_v = velocity;
 
   if (a_us > last_a_us) {

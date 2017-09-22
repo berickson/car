@@ -1,8 +1,7 @@
-#include "car_menu.h"
+#include "car_controller.h"
 #include "menu.h"
 #include "route.h"
 #include "system.h"
-#include "console_menu.h"
 #include "fake_car.h"
 #include "file_names.h"
 #include "string_utils.h"
@@ -16,20 +15,10 @@
 #include "camera.h"
 #include "logger.h"
 
-#include <ncurses.h> // sudo apt-get install libncurses5-dev
-
-
 
 string run_settings_path = "run_settings.json";
 
 RunSettings run_settings;
-
-
-string wheel_display_string(const Speedometer & wheel){
-  return format(wheel.get_meters_travelled(),7,2)+"m "
-         + format(wheel.get_smooth_velocity(),4,1)+"m/s "
-         + format(wheel.get_ticks()) + "t";
-}
 
 void assert0(int n) {
   if(n!=0) {
@@ -222,35 +211,14 @@ void go(Car& car) {
     }
 
 
-    //ui.clear();
-    //ui.print("smoothing route\n");
-    //ui.refresh();
     log_info("preparing route");
     rte.smooth(run_settings.k_smooth);
-    //ui.print("pruning route\n");
     rte.prune(run_settings.prune_max, run_settings.prune_tolerance);
-    //ui.refresh();
-
-    //ui.clear();
-    //ui.move(0,0);
-    //ui.refresh();
     if(run_settings.optimize_velocity) {
       rte.optimize_velocity(run_settings.max_v, run_settings.max_accel_lat, run_settings.max_accel, run_settings.max_decel);
-      //ui.print("optimized velocity\n");
     } else {
-      //ui.print("using saved velocities\n");
+      log_info("using saved velocities");
     }
-    //ui.print((string)"max_v calculated at " + format(rte.get_max_velocity(),4,1) + "\n\n");
-    //ui.print("[back] [] []  [go]");
-    //ui.refresh();
-    //if(ui.wait_key()!='4') {
-    //  return;
-    //}
-
-    //ui.clear();
-    //ui.print((string)"playing route with max velocity " + format(rte.get_max_velocity()));
-    //ui.refresh();
-
     if(run_settings.capture_video) {
       vector<string> video_paths = f.stereo_video_file_paths(track_name,route_name,run_name);
       camera.begin_recording(video_paths[0],video_paths[1]);
@@ -276,14 +244,10 @@ void go(Car& car) {
     }
     car.end_recording_input();
     car.end_recording_state();
-    //ui.clear();
-    //ui.print("making path");
     log_info("making path");
 
     string path_file_path = f.path_file_path(track_name, route_name, run_name);
-    log_info("1");
     write_path_from_recording_file(recording_file_path, path_file_path);
-    log_info("2");
     log_info("recording: " + recording_file_path);
     log_info("track: " + track_name);
     log_info("route: " + route_name);
@@ -296,27 +260,10 @@ void go(Car& car) {
     run_settings.write_to_file_json(run_settings_path);
 
     if(error_text.size()) {
-      //ui.clear();
-      //ui.print((string) "Error:: \n"+error_text);
       log_error((string) "Error during play route: "+error_text);
-
-      //ui.print("[ok]");
-      //ui.refresh();
-      //ui.wait_key();
-    } else {
-      //ui.clear();
-      //ui.print("Playback Success [ok]");
-      //ui.refresh();
-      //ui.wait_key();
     }
-
   } catch (string s) {
-    //ui.clear();
-    //ui.move(0,0);
-    //ui.print("error: " + s);
     log_error("go caught error:" + s);
-    //ui.refresh();
-    //ui.wait_key();
   } catch (...) {
     log_error("unknown error caught in go");
   }
@@ -368,12 +315,6 @@ void record(Car& car) {
 }
 
 
-string calibration_string(int a) {
-  std::bitset<8> x(a);
-  stringstream ss;
-   ss << x;
-  return ss.str();
-}
 
 void run_car_socket() {
   log_entry_exit w("run_car_socket");
@@ -407,115 +348,3 @@ void run_car_socket() {
   }
 }
 
-/*
-void run_car_menu() {
-#ifdef RASPBERRY_PI
-  Car car;
-#else
-  FakeCar car;
-#endif
-
-  if(file_exists(run_settings_path)) {
-      run_settings.load_from_file_json(run_settings_path);
-  }
-
-  selection_menu<double>(max_accel_lat_menu, linspace(0.25,10,0.25), get_max_accel_lat, set_max_accel_lat );
-  selection_menu<double>(max_accel_menu, linspace(0.25,10,0.25), get_max_accel, set_max_accel );
-  selection_menu<double>(max_decel_menu, linspace(0.25,10,0.25), get_max_decel, set_max_decel );
-  selection_menu<double>(max_v_menu, linspace(0.5,20,0.5), get_max_v, set_max_v );
-  selection_menu<double>(k_p_menu, linspace(0.,300,10), get_k_p, set_k_p );
-  selection_menu<double>(k_i_menu, linspace(0.,30,0.5), get_k_i, set_k_i );
-  selection_menu<double>(k_d_menu, linspace(0.,300,5), get_k_d, set_k_d );
-
-  selection_menu<double>(v_k_p_menu, linspace(0.,15,0.5), get_v_k_p, set_v_k_p );
-  selection_menu<double>(v_k_i_menu, linspace(0.,30,1.), get_v_k_i, set_v_k_i );
-  selection_menu<double>(v_k_d_menu, linspace(0.,3,0.25), get_v_k_d, set_v_k_d );
-
-  selection_menu<double>(prune_max_menu, linspace(0.0 ,3.0, 0.1), get_prune_max, set_prune_max );
-  selection_menu<double>(prune_tolerance_menu, linspace(0.0, 0.2, 0.01), get_prune_tolerance, set_prune_tolerance);
-
-
-  selection_menu<double>(k_smooth_menu, linspace(0.,1,0.1), get_k_smooth, set_k_smooth );
-  selection_menu<double>(t_ahead_menu, linspace(0.,1,0.1), get_t_ahead, set_t_ahead );
-  selection_menu<double>(d_ahead_menu, linspace(0.,.1,0.01), get_d_ahead, set_d_ahead );
-  selection_menu<double>(capture_video_menu, {0,1}, get_capture_video, set_capture_video );
-  selection_menu<double>(crash_recovery_menu, {0,1}, get_crash_recovery, set_crash_recovery );
-  selection_menu<double>(optimize_velocity_menu, {0,1}, get_optimize_velocity, set_optimize_velocity );
-
-
-  SubMenu track_selection_menu{};
-  vector<string> track_names = FileNames().get_track_names();
-  selection_menu<string>(track_selection_menu, track_names, get_track_name, set_track_name);
-
-  update_route_selection_menu();
-
-  SubMenu route_menu {
-    {[](){return (string)"track ["+run_settings.track_name+"]";},&track_selection_menu},
-    {[](){return (string)"route ["+run_settings.route_name+"]";},&route_selection_menu},
-    MenuItem("go...",[&car,&ui](){go(car);}),
-    {[&car](){
-        return (string) calibration_string(car.current_dynamics.calibration_status)
-            + " " + format(car.get_heading().degrees(),5,1) + "° "
-            + format(car.get_reading_count(),6,0)
-            + " " + format(car.current_dynamics.battery_voltage,4,1)+"v"; }},
-    MenuItem("record",[&car,&ui](){record(car,ui);}),
-    {[](){return (string)"optimize velocity ["+format(run_settings.optimize_velocity)+"]";},&optimize_velocity_menu},
-    {[](){return (string)"max_accel_lat ["+format(run_settings.max_accel_lat)+"]";},&max_accel_lat_menu},
-    {[](){return (string)"max_accel ["+format(run_settings.max_accel)+"]";},&max_accel_menu},
-    {[](){return (string)"max_decel ["+format(run_settings.max_decel)+"]";},&max_decel_menu},
-    {[](){return (string)"max_v ["+format(run_settings.max_v)+"]";},&max_v_menu},
-
-    {[](){return (string)"crash recovery ["+format(run_settings.crash_recovery)+"]";},&crash_recovery_menu},
-    {[](){return (string)"k_p ["+format(run_settings.steering_k_p)+"]";},&k_p_menu},
-    {[](){return (string)"k_i ["+format(run_settings.steering_k_i)+"]";},&k_i_menu},
-    {[](){return (string)"k_d ["+format(run_settings.steering_k_d)+"]";},&k_d_menu},
-
-    {[](){return (string)"v_k_p ["+format(run_settings.v_k_p)+"]";},&v_k_p_menu},
-    {[](){return (string)"v_k_i ["+format(run_settings.v_k_i)+"]";},&v_k_i_menu},
-    {[](){return (string)"v_k_d ["+format(run_settings.v_k_d)+"]";},&v_k_d_menu},
-
-
-    {[](){return (string)"prune tol ["+format(run_settings.prune_tolerance)+"]";},&prune_tolerance_menu},
-    {[](){return (string)"prune max ["+format(run_settings.prune_max)+"]";},&prune_max_menu},
-
-    {[](){return (string)"k_smooth ["+format(run_settings.k_smooth)+"]";},&k_smooth_menu},
-    {[](){return (string)"t_ahead ["+format(run_settings.t_ahead)+"]";},&t_ahead_menu},
-    {[](){return (string)"d_ahead ["+format(run_settings.d_ahead)+"]";},&d_ahead_menu},
-    {[](){return (string)"cap video ["+format(run_settings.capture_video)+"]";},&capture_video_menu}
-
-  };
-
-  SubMenu mid_menu {
-    {"routes",&route_menu},
-    {"pi",&pi_menu}
-  };
-
-
-  SubMenu car_menu {
-    {[&car](){return get_first_ip_address();}, &mid_menu},
-    {[&car](){return "v: " + format(car.get_voltage());}},
-    {[&car](){return "front: " + to_string(car.get_front_position());}},
-    {[&car](){return "usb readings: " + format(car.get_reading_count());}},
-    {[&car](){return "usb errors: " + format(car .get_usb_error_count());}},
-    {[&car](){return "reset odo ";}, [&car]() {car.reset_odometry();}},
-    {[&car](){return "heading: " + format(car.get_heading().degrees());}},
-    {[&car](){return "heading_adj: " + format(car.get_zero_heading().degrees());}},
-    {[&car](){return "rear: " + to_string(car.get_rear_position());}},
-    {[&car](){return "spur: " + format(car.get_spur_odo());}},
-    {[&car](){return "fl: " + wheel_display_string(car.get_front_left_wheel());}},
-    {[&car](){return "fr: " + wheel_display_string(car.get_front_right_wheel());}},
-    {[&car](){return "bl: " + wheel_display_string(car.get_back_left_wheel());}},
-    {[&car](){return "br: " + wheel_display_string(car.get_back_right_wheel());}},
-    {[&car](){return "str: " + format(car.get_str());}},
-    {[&car](){return "esc: " + format(car.get_esc());}}
-
-  };
-
-  ConsoleMenu menu(&car_menu);
-  menu.run();
-}
-
-void test_car_menu() {
-  run_car_menu();
-}
-*/

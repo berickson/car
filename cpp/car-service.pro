@@ -12,16 +12,11 @@ SOURCES += main.cpp \
     config.cpp \
     work_queue.cpp \
     fake_car.cpp \
-    menu.cpp \
     system.cpp \
-    car_menu.cpp \
-    console_menu.cpp \
     geometry.cpp \
-    pi_buttons.cpp \
     route.cpp \
     string_utils.cpp \
     driver.cpp \
-    car_ui.cpp \
     lookup_table.cpp \
     run_settings.cpp \
     camera.cpp \
@@ -32,7 +27,8 @@ SOURCES += main.cpp \
     speedometer.cpp \
     pid.cpp \
     kalman.cpp \
-    socket_server.cpp
+    socket_server.cpp \
+    car_controller.cpp
 
 HEADERS += \
     geometry.h \
@@ -48,8 +44,6 @@ HEADERS += \
     fake_car.h \
     menu.h \
     system.h \
-    car_menu.h \
-    console_menu.h \
     pi_buttons.h \
     route.h \
     string_utils.h \
@@ -71,7 +65,7 @@ HEADERS += \
 
 
 
-unix|win32: LIBS += -L/usr/local/lib -lncurses -lwiringPi -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d
+unix|win32: LIBS += -L/usr/local/lib -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d
 
 DISTFILES += \
     README.md

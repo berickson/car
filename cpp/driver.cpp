@@ -175,7 +175,7 @@ void Driver::continue_along_route(Route& route)
 
 // tries to stop at stop_node
 // returns true if done
-bool Driver::continue_to_stop(Route& route, const RouteNode *stop_node)
+bool Driver::continue_to_stop(Route& route)
 {
   continue_along_route(route);
   return fabs(car.get_velocity()) < 0.01;
@@ -260,7 +260,7 @@ void Driver::drive_route(Route & route) {
 
     route_complete = false;
     recovering_from_crash = false;
-    int crash_count = 0;
+    //int crash_count = 0;
     system_clock::time_point wait_end_time = system_clock::now();
     string mode = "follow_route";
     while(!route_complete) {
@@ -282,8 +282,7 @@ void Driver::drive_route(Route & route) {
 
       if(mode=="stop_at_point") {
         RouteNode * stop_node = route.get_target_node();
-        // todo: try best to stop at the given point
-        bool stop_complete  = continue_to_stop(route, stop_node);
+        bool stop_complete  = continue_to_stop(route);
         if (stop_complete) {
           route.advance_to_next_segment();
           if(route.done) {

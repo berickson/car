@@ -180,7 +180,6 @@ void StereoCamera::end_recording()
 
 void StereoCamera::record_thread_proc()
 {
-
   left_camera.prepare_video_writer(left_recording_path);
   right_camera.prepare_video_writer(right_recording_path);
 
