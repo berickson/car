@@ -31,9 +31,10 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
       if (vm.is_changed(field)) {
         if (field.data_type == 'number') {
           o[field.key] = Number(field.value);
-        }
-        if (field.data_type == 'boolean)') {
+        } else if (field.data_type == 'boolean') {
           o[field.key] = Boolean(field.value);
+        } else {
+          $log.error("unknown data type" + field.data_type);
         }
       }
     }

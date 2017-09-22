@@ -215,6 +215,7 @@ void go(Car& car) {
     log_info("route loaded");
     StereoCamera camera;
     if(run_settings.capture_video) {
+      log_info("capture video enabled, warming up camera");
       camera.warm_up();
     }
 
