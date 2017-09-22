@@ -60,7 +60,8 @@ HEADERS += \
     pid.h \
     kalman.h \
     async_buf.h \
-    socket_server.h
+    socket_server.h \
+    car_controller.h
 
 
 
