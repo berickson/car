@@ -28,7 +28,7 @@ public:
   cv::VideoCapture * cap;
 
   std::queue<cv::Mat> buffer;
-  std::mutex mtxCam;
+  std::mutex grabber_mutex;
   std::atomic<bool> grab_on; //this is lock free
   int frames_grabbed = 0;
 
