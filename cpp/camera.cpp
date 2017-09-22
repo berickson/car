@@ -180,31 +180,38 @@ void StereoCamera::end_recording()
 
 void StereoCamera::record_thread_proc()
 {
-  left_camera.prepare_video_writer(left_recording_path);
-  right_camera.prepare_video_writer(right_recording_path);
+  try {
+    log_entry_exit w("SteroCamera::record_thread_proc");
+    left_camera.prepare_video_writer(left_recording_path);
+    right_camera.prepare_video_writer(right_recording_path);
 
-  cv::Mat left_frame;
-  cv::Mat right_frame;
+    cv::Mat left_frame;
+    cv::Mat right_frame;
 
-  double fps = 10;
-  auto t_start = std::chrono::high_resolution_clock::now();
-  auto t_next_frame = t_start;
-  std::chrono::microseconds us_per_frame((int) (1E6/fps) );
+    double fps = 10;
+    auto t_start = std::chrono::high_resolution_clock::now();
+    auto t_next_frame = t_start;
+    std::chrono::microseconds us_per_frame((int) (1E6/fps) );
 
-  while(this->record_on.load()) {
-    std::this_thread::sleep_until(t_next_frame);
-    if(!left_camera.get_latest_frame())
-      continue;
-    if(!right_camera.get_latest_frame())
-      continue;
-    left_camera.write_latest_frame();
-    right_camera.write_latest_frame();
-    t_next_frame += us_per_frame;
-    ++frames_recorded;
+    while(this->record_on.load()) {
+      usleep(1000); // 1000 = one mstd::this_thread::sleep_until(t_next_frame);
+      if(!left_camera.get_latest_frame())
+        continue;
+      if(!right_camera.get_latest_frame())
+        continue;
+      left_camera.write_latest_frame();
+      right_camera.write_latest_frame();
+      t_next_frame += us_per_frame;
+      ++frames_recorded;
 
+    }
+    left_camera.release_video_writer();
+    right_camera.release_video_writer();
+  } catch (cv::Exception) {
+    log_error("caught cv::Exception in StereoCamera::record_thread_proc");
+  } catch (...) {
+    log_error("unknown exception caught StereoCamera::record_thread_proc");
   }
-  left_camera.release_video_writer();
-  right_camera.release_video_writer();
 
 }
 

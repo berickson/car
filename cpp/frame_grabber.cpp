@@ -1,6 +1,7 @@
 #include "frame_grabber.h"
 #include <map>
 #include <unistd.h> // usleep
+#include "logger.h"
 
 using namespace std;
 using namespace cv;
@@ -68,31 +69,39 @@ int FrameGrabber::get_frame_count_grabbed() {
 
 void FrameGrabber::grab_thread_proc()
 {
-  Mat tmp;
+  try {
+    Mat tmp;
 
-  //Even if you grab N frames and create N x Mat in the queue
-  //only few real memory blocks will be allocated
-  //thanks to std::queue and cv::Mat memory recycling
+    //Even if you grab N frames and create N x Mat in the queue
+    //only few real memory blocks will be allocated
+    //thanks to std::queue and cv::Mat memory recycling
 
-  while (grab_on.load() == true) //this is lock free
-  {
-      //grab will wait for cam FPS
-      //keep grab out of lock so that
-      //idle time can be used by other threads
-      *cap >> tmp; //this will wait for cam FPS
+    while (grab_on.load() == true) //this is lock free
+    {
+        //grab will wait for cam FPS
+        //keep grab out of lock so that
+        //idle time can be used by other threads
+        *cap >> tmp; //this will wait for cam FPS
 
-      if (tmp.empty()){
-        usleep(1000);
-        continue;
-      }
+        if (tmp.empty()){
+          usleep(1000);
+          continue;
+        }
 
-      //get lock only when we have a frame
-      mtxCam.lock();
-      ++frames_grabbed;
-      //buffer.push(tmp) stores item by reference than avoid
-      //this will create a new cv::Mat for each grab
-      buffer.push(Mat(tmp.size(), tmp.type()));
-      tmp.copyTo(buffer.back());
-      mtxCam.unlock();
+        log_info("grabbing frame");
+
+        //get lock only when we have a frame
+        mtxCam.lock();
+        ++frames_grabbed;
+        //buffer.push(tmp) stores item by reference than avoid
+        //this will create a new cv::Mat for each grab
+        buffer.push(Mat(tmp.size(), tmp.type()));
+        tmp.copyTo(buffer.back());
+        mtxCam.unlock();
+    }
+  } catch (cv::Exception) {
+    log_error("caught cv::Exception in FrameGrabber::grab_thread_proc");
+  } catch (...) {
+    log_error("unknown exception caught FrameGrabber::grab_thread_proc");
   }
 }

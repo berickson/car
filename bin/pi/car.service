@@ -4,7 +4,7 @@ Description=Car Web Service
 [Service]
 WorkingDirectory=/home/pi/car/bin/pi
 
-Environment="LD_LIBRARY_PATH=/home/pi/opencv/build/lib"
+Environment=LD_LIBRARY_PATH=/usr/local/lib
 User=pi
 ExecStart=-/home/pi/car/bin/pi/car-service
 Restart=always
