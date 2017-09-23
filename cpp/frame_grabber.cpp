@@ -15,8 +15,9 @@ FrameGrabber::~FrameGrabber() {
   end_grabbing();
 }
 
-void FrameGrabber::begin_grabbing(cv::VideoCapture * _cap)
+void FrameGrabber::begin_grabbing(cv::VideoCapture * _cap, string _name = "unnamed")
 {
+  name = _name;
   cap = _cap;
   grab_thread = thread(&FrameGrabber::grab_thread_proc, this);
   grab_on.store(true);
@@ -76,11 +77,13 @@ void FrameGrabber::grab_thread_proc()
         // only lock after frame is grabbed
         lock_guard<mutex> lock(grabber_mutex);
         ++frames_grabbed;
+        log_info((string)"grabbed " + to_string(frames_grabbed) + " frames from  " + name + " buffer size: " + to_string(buffer.size()));
         buffer.push(frame);
       }
     }
-  } catch (cv::Exception) {
+  } catch (cv::Exception &e) {
     log_error("caught cv::Exception in FrameGrabber::grab_thread_proc");
+    log_error(e.what());
   } catch (...) {
     log_error("unknown exception caught FrameGrabber::grab_thread_proc");
   }

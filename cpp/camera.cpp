@@ -46,8 +46,67 @@ void Camera::warm_up()
   if(warmed_up) return;
 
   cap.open(cam_number);
-  grabber.begin_grabbing(&cap);
+  
+  /*
+  v4l2-ctl --list-formats-ext --device=/dev/video1
+ 
+  Below is for stereo camera
+
+	Index       : 0
+	Type        : Video Capture
+	Pixel Format: 'YUYV'
+	Name        : YUYV 4:2:2
+		Size: Discrete 1280x720
+			Interval: Discrete 0.100s (10.000 fps)
+			Interval: Discrete 0.200s (5.000 fps)
+		Size: Discrete 800x600
+			Interval: Discrete 0.067s (15.000 fps)
+		Size: Discrete 640x360
+			Interval: Discrete 0.032s (31.000 fps)
+		Size: Discrete 640x480
+			Interval: Discrete 0.033s (30.000 fps)
+			Interval: Discrete 0.067s (15.000 fps)
+		Size: Discrete 352x288
+			Interval: Discrete 0.033s (30.000 fps)
+			Interval: Discrete 0.067s (15.000 fps)
+		Size: Discrete 320x240
+			Interval: Discrete 0.033s (30.000 fps)
+			Interval: Discrete 0.067s (15.000 fps)
+
+	Index       : 1
+	Type        : Video Capture
+	Pixel Format: 'MJPG' (compressed)
+	Name        : Motion-JPEG
+		Size: Discrete 1280x720
+			Interval: Discrete 0.033s (30.000 fps)
+			Interval: Discrete 0.040s (25.000 fps)
+			Interval: Discrete 0.067s (15.000 fps)
+		Size: Discrete 800x600
+			Interval: Discrete 0.033s (30.000 fps)
+		Size: Discrete 640x360
+			Interval: Discrete 0.017s (60.000 fps)
+		Size: Discrete 640x480
+			Interval: Discrete 0.033s (30.000 fps)
+			Interval: Discrete 0.067s (15.000 fps)
+		Size: Discrete 352x288
+			Interval: Discrete 0.033s (30.000 fps)
+			Interval: Discrete 0.067s (15.000 fps)
+		Size: Discrete 320x240
+			Interval: Discrete 0.033s (30.000 fps)
+			Interval: Discrete 0.067s (15.000 fps)
+  
+  */
+  
+  cap.set(CV_CAP_PROP_FRAME_WIDTH,320);
+  cap.set(CV_CAP_PROP_FRAME_HEIGHT,240);
+  cap.set(CV_CAP_PROP_FPS,15);
+  //cap.set(CV_CAP_PROP_FOURCC, CV_FOURCC('F','M','P','4'));
+  cap.set(CV_CAP_PROP_FOURCC, CV_FOURCC('M','J','P','G'));
+
+  grabber.begin_grabbing(&cap, to_string(cam_number));
   warmed_up = true;
+  log_info((string)"warmed up"+to_string(cam_number));
+  
 }
 
 void Camera::prepare_video_writer(string path)
@@ -92,14 +151,16 @@ void Camera::end_capture_movie() {
 
 void Camera::release_video_writer()
 {
+  grabber.end_grabbing();
   if(output_video.isOpened())
     output_video.release();
 }
 
 bool Camera::get_latest_frame()
 {
-  if(grabber.get_latest_frame(latest_frame)) {
-    cv::flip(latest_frame,latest_frame,-1); // todo: make separate function and accessor
+  cv::Mat new_frame;
+  if(grabber.get_latest_frame(new_frame)) {
+    cv::flip(new_frame, latest_frame, -1); // todo: make separate function and accessor
   }
 
   return grabber.get_frame_count_grabbed() > 0;
@@ -146,8 +207,8 @@ void Camera::write_latest_frame() {
 
 StereoCamera::StereoCamera()
 {
-  left_camera.cam_number = 1;
-  right_camera.cam_number = 0;
+  left_camera.cam_number = 0;
+  right_camera.cam_number = 1;
   cameras.push_back(&left_camera);
   cameras.push_back(&right_camera);
 }
@@ -181,30 +242,30 @@ void StereoCamera::end_recording()
 void StereoCamera::record_thread_proc()
 {
   try {
-    log_entry_exit w("SteroCamera::record_thread_proc");
+    log_entry_exit w("StereoCamera::record_thread_proc");
     left_camera.prepare_video_writer(left_recording_path);
     right_camera.prepare_video_writer(right_recording_path);
 
-    cv::Mat left_frame;
-    cv::Mat right_frame;
-
-    double fps = 10;
+    double fps = 15;
     auto t_start = std::chrono::high_resolution_clock::now();
     auto t_next_frame = t_start;
     std::chrono::microseconds us_per_frame((int) (1E6/fps) );
 
     while(this->record_on.load()) {
-      usleep(1000); // 1000 = one mstd::this_thread::sleep_until(t_next_frame);
-      if(!left_camera.get_latest_frame())
-        continue;
-      if(!right_camera.get_latest_frame())
-        continue;
-      left_camera.write_latest_frame();
-      right_camera.write_latest_frame();
       t_next_frame += us_per_frame;
-      ++frames_recorded;
-
+      std::this_thread::sleep_until(t_next_frame);
+      if(right_camera.get_latest_frame()) {
+        right_camera.write_latest_frame();
+        ++frames_recorded;
+        log_info("Wrote right frame");
+      }
+      if(left_camera.get_latest_frame()) {
+        left_camera.write_latest_frame();
+        ++frames_recorded;
+        log_info("Wrote left frame");
+      }
     }
+    log_trace("closing stereo cameras");
     left_camera.release_video_writer();
     right_camera.release_video_writer();
   } catch (cv::Exception) {
@@ -212,7 +273,6 @@ void StereoCamera::record_thread_proc()
   } catch (...) {
     log_error("unknown exception caught StereoCamera::record_thread_proc");
   }
-
 }
 
 

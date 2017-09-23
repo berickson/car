@@ -10,6 +10,7 @@
 #include <mutex>
 #include <queue>
 #include <atomic>
+#include <string>
 
 // based on http://answers.opencv.org/question/74255/time-delay-in-videocapture-opencv-due-to-capture-buffer/
 
@@ -19,7 +20,7 @@ public:
   FrameGrabber();
   ~FrameGrabber();
 
-  void begin_grabbing(cv::VideoCapture * cap);
+  void begin_grabbing(cv::VideoCapture * cap, std::string name);
   void end_grabbing();
   bool get_one_frame(cv::Mat & frame);
   bool get_latest_frame(cv::Mat & frame);
@@ -34,6 +35,7 @@ public:
 
   std::thread grab_thread;
   void grab_thread_proc();
+  std::string name;
 
 
 };
