@@ -1,4 +1,4 @@
-angular.module("car",[]).controller("CarController", function($scope, $http, $timeout,$log) {
+angular.module("car",[]).controller("CarController", function($scope, $http, $timeout, $log, $q) {
   var vm = this;
   vm.Math = Math;
   vm.JSON = JSON;
@@ -53,6 +53,7 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
 
 
   vm.save_run_settings = function () {
+    var deferred = $q.defer();
     vm.go_error = "";
     vm.set_changes_from_field_array(vm.run_settings, vm.run_settings_array);
     var req = {
@@ -76,28 +77,34 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
     $http(req).success(function () {
       $log.info('save run settings success');
       $http(req2).success(function () {
+        deferred.resolve();
         $log.info('save route path success');
       }).error(function (response, code) {
         $log.warn("failed to save route path");
         $log.warn("  (" + code + ")" + response);
+        deferred.reject(response);
       });
     }).error(function (response, code) {
       vm.go_error = "  (" + code + ")" + response;
+      deferred.reject(response);
     });
 
     $log.info("save_run_settings clicked");
+    return deferred.promise;
 
   };
 
 
   vm.go = function () {
-    vm.go_error = "";
-    $http.put('/command/go', "1").success(function () {
-      $log.info('go success');
-    }).error(function (response, code) {
-      vm.go_error = "  (" + code + ")" + response.message;
+    vm.save_run_settings().then(function() {
+      vm.go_error = "";
+      $http.put('/command/go', "1").success(function () {
+        $log.info('go success');
+      }).error(function (response, code) {
+        vm.go_error = "  (" + code + ")" + response.message;
+      });
+      $log.info("go clicked");
     });
-    $log.info("go clicked");
   };
 
   vm.stop = function () {
