@@ -1,5 +1,5 @@
-#  Project Anaranjado - Self Driving RC Car
-This is my personal project to add autonomous capabilities to an RC Car. "On-Uh-Ron-Ha-Doe" is Spanish for _orange_.
+#  Orange Crash - Self Driving RC Car
+This is my personal project to add autonomous capabilities to an RC Car.
 
 ## The Car
 
