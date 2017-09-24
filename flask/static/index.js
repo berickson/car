@@ -135,10 +135,12 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
   };
 
   vm.reset_zoom = function () {
-    vm.viewbox_left = vm.route_path_min_x - 0.7;
-    vm.viewbox_top = -vm.route_path_max_y;
-    vm.viewbox_width = vm.route_path_width + 0.8;
-    vm.viewbox_height = vm.route_path_height;
+    // viewbox is a square centered at center of route
+    var size = Math.max(vm.route_path_width + 0.8, vm.route_path_height);
+    vm.viewbox_left = ((vm.route_path_max_x+vm.route_path_min_x)/2 + size/2);
+    vm.viewbox_top = -((vm.route_path_max_y+vm.route_path_min_y)/2 + size/2);
+    vm.viewbox_width = size;
+    vm.viewbox_height = size;
   };
 
 
@@ -152,8 +154,8 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
     vm.viewbox_height /= vm.zoom_ratio;
     vm.viewbox_width /= vm.zoom_ratio;
 
-    vm.view_box_top = center_y - vm.viewbox_height / 2;
-    vm.view_box_left = center_x - vm.viewbox_width / 2;
+    vm.viewbox_top = center_y - vm.viewbox_height / 2;
+    vm.viewbox_left = center_x - vm.viewbox_width / 2;
   };
 
   vm.zoom_out = function () {
@@ -163,24 +165,24 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
     vm.viewbox_height *= vm.zoom_ratio;
     vm.viewbox_width *= vm.zoom_ratio;
 
-    vm.view_box_top = center_y - vm.viewbox_height / 2;
-    vm.view_box_left = center_x - vm.viewbox_width / 2;
+    vm.viewbox_top = center_y - vm.viewbox_height / 2;
+    vm.viewbox_left = center_x - vm.viewbox_width / 2;
   };
 
   vm.pan_left = function () {
-    vm.viewbox_left += vm.viewbox_width * vm.pan_delta;
-  };
-
-  vm.pan_right = function () {
     vm.viewbox_left -= vm.viewbox_width * vm.pan_delta;
   };
 
+  vm.pan_right = function () {
+    vm.viewbox_left += vm.viewbox_width * vm.pan_delta;
+  };
+
   vm.pan_up = function () {
-    vm.viewbox_top += vm.viewbox_height * vm.pan_delta;
+    vm.viewbox_top -= vm.viewbox_height * vm.pan_delta;
   };
 
   vm.pan_down = function () {
-    vm.viewbox_top -= vm.viewbox_height * vm.pan_delta;
+    vm.viewbox_top += vm.viewbox_height * vm.pan_delta;
   };
 
 
