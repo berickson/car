@@ -1,4 +1,4 @@
-angular.module("car",[]).controller("CarController", function($scope, $http, $timeout,$log) {
+angular.module("car",[]).controller("CarController", function($scope, $http, $timeout, $log, $q) {
   var vm = this;
   vm.Math = Math;
   vm.JSON = JSON;
@@ -53,6 +53,7 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
 
 
   vm.save_run_settings = function () {
+    var deferred = $q.defer();
     vm.go_error = "";
     vm.set_changes_from_field_array(vm.run_settings, vm.run_settings_array);
     var req = {
@@ -76,28 +77,34 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
     $http(req).success(function () {
       $log.info('save run settings success');
       $http(req2).success(function () {
+        deferred.resolve();
         $log.info('save route path success');
       }).error(function (response, code) {
         $log.warn("failed to save route path");
         $log.warn("  (" + code + ")" + response);
+        deferred.reject(response);
       });
     }).error(function (response, code) {
       vm.go_error = "  (" + code + ")" + response;
+      deferred.reject(response);
     });
 
     $log.info("save_run_settings clicked");
+    return deferred.promise;
 
   };
 
 
   vm.go = function () {
-    vm.go_error = "";
-    $http.put('/command/go', "1").success(function () {
-      $log.info('go success');
-    }).error(function (response, code) {
-      vm.go_error = "  (" + code + ")" + response.message;
+    vm.save_run_settings().then(function() {
+      vm.go_error = "";
+      $http.put('/command/go', "1").success(function () {
+        $log.info('go success');
+      }).error(function (response, code) {
+        vm.go_error = "  (" + code + ")" + response.message;
+      });
+      $log.info("go clicked");
     });
-    $log.info("go clicked");
   };
 
   vm.stop = function () {
@@ -128,10 +135,12 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
   };
 
   vm.reset_zoom = function () {
-    vm.viewbox_left = vm.route_path_min_x - 0.7;
-    vm.viewbox_top = -vm.route_path_max_y;
-    vm.viewbox_width = vm.route_path_width + 0.8;
-    vm.viewbox_height = vm.route_path_height;
+    // viewbox is a square centered at center of route
+    var size = Math.max(vm.route_path_width + 0.8, vm.route_path_height);
+    vm.viewbox_left = ((vm.route_path_max_x+vm.route_path_min_x)/2 + size/2);
+    vm.viewbox_top = -((vm.route_path_max_y+vm.route_path_min_y)/2 + size/2);
+    vm.viewbox_width = size;
+    vm.viewbox_height = size;
   };
 
 
@@ -145,8 +154,8 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
     vm.viewbox_height /= vm.zoom_ratio;
     vm.viewbox_width /= vm.zoom_ratio;
 
-    vm.view_box_top = center_y - vm.viewbox_height / 2;
-    vm.view_box_left = center_x - vm.viewbox_width / 2;
+    vm.viewbox_top = center_y - vm.viewbox_height / 2;
+    vm.viewbox_left = center_x - vm.viewbox_width / 2;
   };
 
   vm.zoom_out = function () {
@@ -156,24 +165,24 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
     vm.viewbox_height *= vm.zoom_ratio;
     vm.viewbox_width *= vm.zoom_ratio;
 
-    vm.view_box_top = center_y - vm.viewbox_height / 2;
-    vm.view_box_left = center_x - vm.viewbox_width / 2;
+    vm.viewbox_top = center_y - vm.viewbox_height / 2;
+    vm.viewbox_left = center_x - vm.viewbox_width / 2;
   };
 
   vm.pan_left = function () {
-    vm.viewbox_left += vm.viewbox_width * vm.pan_delta;
-  };
-
-  vm.pan_right = function () {
     vm.viewbox_left -= vm.viewbox_width * vm.pan_delta;
   };
 
+  vm.pan_right = function () {
+    vm.viewbox_left += vm.viewbox_width * vm.pan_delta;
+  };
+
   vm.pan_up = function () {
-    vm.viewbox_top += vm.viewbox_height * vm.pan_delta;
+    vm.viewbox_top -= vm.viewbox_height * vm.pan_delta;
   };
 
   vm.pan_down = function () {
-    vm.viewbox_top -= vm.viewbox_height * vm.pan_delta;
+    vm.viewbox_top += vm.viewbox_height * vm.pan_delta;
   };
 
 
