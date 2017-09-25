@@ -9,14 +9,18 @@
 #include "opencv2/videoio.hpp"
 #include "opencv2/calib3d.hpp"
 #include <QMessageBox>
+#include <QDateTime>
+#include <QDir>
 
 #include <string>
 #include <sstream>
+#include "../json.hpp"
+
 using namespace std;
 
 
 /*
-v4l2-ctl --list-formats-ext
+v4l2-ctl --device=/dev/video1 --list-formats-ext
 ioctl: VIDIOC_ENUM_FMT
   Index       : 0
   Type        : Video Capture
@@ -57,6 +61,23 @@ ioctl: VIDIOC_ENUM_FMT
       Interval: Discrete 0.033s (30.000 fps)
 */
 
+void MainWindow::set_camera()
+{
+  frame_grabber.end_grabbing();
+
+  if(cap.isOpened()) {
+    cap.release();
+  }
+
+  string device_name = ui->video_device->currentText().toStdString();
+  if(QFile(QString::fromStdString(device_name)).exists()) {
+    if(!cap.open(device_name)){
+      throw (string) "couldn't open camera";
+    }
+    frame_grabber.begin_grabbing(&cap, "");
+  }
+}
+
 MainWindow::MainWindow(QWidget *parent) :
   QDialog(parent),
   ui(new Ui::MainWindow)
@@ -66,30 +87,18 @@ MainWindow::MainWindow(QWidget *parent) :
   for(auto res : supported_resolutions) {
 
     stringstream ss;
-    ss << res.width() << " x " << res.height();
+    ss << res.width() << "_" << res.height();
     ui->resolutions_combo_box->addItem(QString::fromStdString(ss.str()));
   }
   ui->resolutions_combo_box->setCurrentIndex(1);
 
 
-  if(!cap.open(0)) throw (string) "couldn't open camera";
-  //cap.set(cv::CAP_PROP_EXPOSURE, 0);
-  //cap.set(cv::CAP_PROP_AUTO_EXPOSURE, 1);
-  //cap.set(cv::CAP_PROP_EXPOSURE, .50);
-  //cap.set(cv::CAP_PROP_BRIGHTNESS, .8);
-  //cap.set(cv::CAP_PROP_CONTRAST, .63);
-  //cap.set(cv::CAP_PROP_SATURATION, .66);
-  //cap.set(cv::CAP_PROP_FOURCC, CV_FOURCC('M','J','P','G'));
-  //cap.set(cv::CAP_PROP_FPS,120.001);
-  //cap.set(cv::CAP_PROP_FRAME_WIDTH,640);
-  //cap.set(cv::CAP_PROP_FRAME_HEIGHT,480);
+  set_camera();
 
   ui->brightness_slider->setValue(cap.get(cv::CAP_PROP_BRIGHTNESS)*100);
   ui->contrast_slider->setValue(cap.get(cv::CAP_PROP_CONTRAST)*100);
   ui->saturation_slider->setValue(cap.get(cv::CAP_PROP_SATURATION)*100);
-  //ui->hue_slider->setValue(cap.get(cv::CAP_PROP_HUE)*100);
 
-  frame_grabber.begin_grabbing(&cap);
 
   timer.setSingleShot(false);
   timer.setInterval(10);
@@ -102,6 +111,8 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
   frame_grabber.end_grabbing();
+  if(cap.isOpened())
+    cap.release();
   delete ui;
 }
 
@@ -115,43 +126,76 @@ void MainWindow::on_actionExit_triggered()
 void MainWindow::process_one_frame()
 {
   ui->cam_frame_count_text->setText(QString::number(frame_grabber.get_frame_count_grabbed()));
-  if(!frame_grabber.get_latest_frame(frame))
+  if(!frame_grabber.get_latest_frame(frame)) {
     return;
-  cv::flip(frame,frame,1);
+  }
+  frame.copyTo(original_frame);
+  if(ui->flip_checkbox->isChecked()) {
+    cv::flip(frame,frame,-1);
+  }
 
-  tracker.process_image(frame);
+  if(ui->undistort_checkbox->isChecked()) {
+    try {
+      stringstream ss;
+      ss << QDir::homePath().toStdString() + "/car/camera_calibrations.json";
+      string path = ss.str();
+
+      std::ifstream json_file(path);
+      nlohmann::json json;
+      json = nlohmann::json::parse(json_file);
+
+      string camera_name =
+          ui->camera_name->currentText().toStdString()
+          + "_"
+          + ui->resolutions_combo_box->currentText().toStdString();
+
+      string check = json.dump();
+
+      auto j = json.find(camera_name.c_str());
+      if(j==json.end())  {
+        throw string("could not find camera in json calibration");
+      }
+      auto m=j->at("camera_matrix");
 
 
-  // below calibration matrix is for 640 x 480 ELP mono camera
-  cv::Mat intrinsic = (cv::Mat1d(3, 3) <<  5.2212093413002049e+02, 0., 3.2542419118701633e+02, 0.,
-      5.2212093413002049e+02, 2.5473325838824445e+02, 0., 0., 1. );
+      // below calibration matrix is for 640 x 480 ELP mono camera
+      cv::Mat intrinsic = (cv::Mat1d(3, 3) <<  m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2], m[2][0], m[2][1], m[2][2]);
+      //cv::Mat intrinsic = (cv::Mat1d(3, 3) <<  5.2212093413002049e+02, 0., 3.2542419118701633e+02, 0.,
+      //    5.2212093413002049e+02, 2.5473325838824445e+02, 0., 0., 1. );
 
-  cv::Mat distortionCoefficients = (cv::Mat1d(1, 5) << -4.0852862075720786e-01, 2.4086510135654188e-01,
-                                    -9.7223521589240465e-04, 1.7209244108669266e-04,
-                                    -8.6751876741832365e-02);
+      //cv::Mat distortionCoefficients = (cv::Mat1d(1, 5) << -4.0852862075720786e-01, 2.4086510135654188e-01,
+//                                        -9.7223521589240465e-04, 1.7209244108669266e-04,
+  //                                      -8.6751876741832365e-02);
+      auto d = j->at("dist_coefs");
+      cv::Mat distortionCoefficients = (cv::Mat1d(1, 5) << d[0][0], d[0][1], d[0][2], d[0][3], d[0][4]);
+      cv::undistort(frame, view, intrinsic, distortionCoefficients);
+      frame = view;
+    } catch (...) {
+      ;
+    }
+
+  }
+
+  vector<cv::Point2f> corners;
+  cv::Size chessboard_size(6,9);
+  bool found = cv::findChessboardCorners(frame, chessboard_size, corners);
+  cv::drawChessboardCorners(frame, chessboard_size, corners, found);
 
 
-  cv::undistort(frame,view,intrinsic,distortionCoefficients);
-
-
-
+  if(ui->find_correspondences_checkbox->isChecked()) {
+    tracker.process_image(frame);
+  }
   ++frame_count;
-  //const cv::Scalar white = cv::Scalar(255,255,255);
-  //const cv::Scalar green = cv::Scalar(0,255,0);
-  //const cv::Scalar red = cv::Scalar(0,0,255);
 
-  //cv::putText(frame, (string) to_string(frame_count), cv::Point(50,50), cv::FONT_HERSHEY_SIMPLEX, 1, red, 3);
   ui->frame_count_text->setText(QString::number(frame_count));
 
 
-  cv::cvtColor(view,view,cv::COLOR_BGR2RGB);
-  QImage imdisplay((uchar*)view.data, view.cols, view.rows, view.step, QImage::Format_RGB888);
+  cv::cvtColor(frame,frame,cv::COLOR_BGR2RGB);
+  QImage imdisplay((uchar*)frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
   std::stringstream ss;
   ss << tracker.homography;
   ui->homography_text->setText(QString::fromStdString(ss.str()));
   //cv::putText(frame, ss.str(), cv::Point(50,50), cv::FONT_HERSHEY_SIMPLEX, 1, red, 3);
-
-
 
   ui->display_image->setFixedSize(imdisplay.size());
   if(ui->show_image_checkbox->checkState()==Qt::CheckState::Checked) {
@@ -159,7 +203,6 @@ void MainWindow::process_one_frame()
     ui->display_image->setPixmap(QPixmap::fromImage(imdisplay));
     ui->scroll_area_contents->setBaseSize(imdisplay.size());
   }
-
 }
 
 void MainWindow::fps_changed(int fps)
@@ -268,5 +311,22 @@ void MainWindow::on_resolutions_combo_box_currentIndexChanged(int )
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, resolution.height());
     ui->scroll_area_contents->setFixedSize(resolution);
     ui->display_image->setFixedSize(resolution);
+}
 
+void MainWindow::on_video_device_currentTextChanged(const QString &)
+{
+  set_camera();
+}
+
+void MainWindow::on_take_picture_button_clicked()
+{
+  stringstream ss;
+  ss << QDir::homePath().toStdString() + "/car/data/capture_"
+       << QDateTime::currentDateTime().toString("yyyy-MM-ddThh.mm.ss.zzz").toStdString()
+       << ".png";
+  string path = ss.str();
+
+  //cv::Mat bgr;
+  //cv::cvtColor(original_frame, bgr, cv::COLOR_RGB2BGR);
+  cv::imwrite(path, original_frame);
 }

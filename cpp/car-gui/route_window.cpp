@@ -117,7 +117,7 @@ void RouteWindow::on_route_list_itemSelectionChanged()
 
       RunSettings & run_settings = *current_run_settings;
       try {
-        run_settings.load_from_file(file_names.config_file_path(get_track_name(),get_route_name(),run_name));
+        run_settings.load_from_file_json(file_names.config_file_path(get_track_name(),get_route_name(),run_name));
       } catch (...) {}
       int i=0;
 

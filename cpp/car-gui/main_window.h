@@ -31,6 +31,8 @@ public:
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
 
+  void set_camera();
+
 private slots:
   void on_actionExit_triggered();
 
@@ -51,6 +53,10 @@ private slots:
 
   void on_resolutions_combo_box_currentIndexChanged(int index);
 
+  void on_video_device_currentTextChanged(const QString &arg1);
+
+  void on_take_picture_button_clicked();
+
 private:
 
   std::vector<QSize> supported_resolutions = {{320,240},{640,480},{800,600},{1024,768},{1280,720},{1920,1080}};
@@ -61,6 +67,7 @@ private:
   FrameGrabber frame_grabber;
 
   int frame_count = 0;
+  cv::Mat original_frame;
   cv::Mat frame;
   cv::Mat view;
   Tracker tracker;
@@ -68,3 +75,4 @@ private:
 };
 
 #endif // MAIN_WINDOW_H
+

@@ -23,14 +23,9 @@ SOURCES += main.cpp\
     ../usb.cpp \
     ../work_queue.cpp \
     ../camera.cpp \
-    ../car_menu.cpp \
-    ../car_ui.cpp \
-    ../console_menu.cpp \
     ../driver.cpp \
     ../geometry.cpp \
     ../lookup_table.cpp \
-    ../menu.cpp \
-    ../pi_buttons.cpp \
     ../route.cpp \
     ../run_settings.cpp \
     ../string_utils.cpp \
@@ -45,7 +40,9 @@ SOURCES += main.cpp\
     stereo_window.cpp \
     ../kalman.cpp \
     picker_window.cpp \
-    lidar_window.cpp
+    lidar_window.cpp \
+    ../car_controller.cpp \
+    ../socket_server.cpp
 
 HEADERS  += main_window.h \
     ../ackerman.h \

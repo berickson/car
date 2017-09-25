@@ -69,7 +69,8 @@ HEADERS += \
 unix|win32: LIBS += -L/usr/local/lib -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d
 
 DISTFILES += \
-    README.md
+    README.md \
+    ../camera_calibrations.json
 
 #TEMPLATE = subdirs
 
@@ -78,3 +79,6 @@ SUBDIRS += src
 CONFIG(debug, debug|release) {
     SUBDIRS += tests
 }
+
+FORMS += \
+    live_camrea.ui
