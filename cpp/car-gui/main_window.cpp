@@ -157,8 +157,10 @@ void MainWindow::process_one_frame()
 
       auto d = j->at("dist_coefs");
       cv::Mat distortionCoefficients = (cv::Mat1d(1, 5) << d[0][0], d[0][1], d[0][2], d[0][3], d[0][4]);
-      cv::undistort(frame, view, intrinsic, distortionCoefficients);
-      frame = view;
+      cv::Mat undistorted;
+      cv::undistort(frame, undistorted, intrinsic, distortionCoefficients);
+      undistorted.copyTo(frame);
+
     } catch (...) {
       ;
     }
@@ -319,7 +321,5 @@ void MainWindow::on_take_picture_button_clicked()
        << ".png";
   string path = ss.str();
 
-  //cv::Mat bgr;
-  //cv::cvtColor(original_frame, bgr, cv::COLOR_RGB2BGR);
   cv::imwrite(path, original_frame);
 }
