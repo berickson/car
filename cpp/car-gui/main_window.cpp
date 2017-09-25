@@ -126,13 +126,10 @@ void MainWindow::on_actionExit_triggered()
 void MainWindow::process_one_frame()
 {
   ui->cam_frame_count_text->setText(QString::number(frame_grabber.get_frame_count_grabbed()));
-  if(!frame_grabber.get_latest_frame(frame)) {
+  if(!frame_grabber.get_latest_frame(original_frame)) {
     return;
   }
-  frame.copyTo(original_frame);
-  if(ui->flip_checkbox->isChecked()) {
-    cv::flip(frame,frame,-1);
-  }
+  original_frame.copyTo(frame);
 
   if(ui->undistort_checkbox->isChecked()) {
     try {
@@ -141,31 +138,23 @@ void MainWindow::process_one_frame()
       string path = ss.str();
 
       std::ifstream json_file(path);
-      nlohmann::json json;
-      json = nlohmann::json::parse(json_file);
+      nlohmann::json calibration_json = nlohmann::json::parse(json_file);
 
       string camera_name =
           ui->camera_name->currentText().toStdString()
           + "_"
           + ui->resolutions_combo_box->currentText().toStdString();
 
-      string check = json.dump();
+      string check = calibration_json.dump();
 
-      auto j = json.find(camera_name.c_str());
-      if(j==json.end())  {
+      auto j = calibration_json.find(camera_name.c_str());
+      if(j==calibration_json.end())  {
+        ui->undistort_checkbox->setChecked(false);
         throw string("could not find camera in json calibration");
       }
       auto m=j->at("camera_matrix");
-
-
-      // below calibration matrix is for 640 x 480 ELP mono camera
       cv::Mat intrinsic = (cv::Mat1d(3, 3) <<  m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2], m[2][0], m[2][1], m[2][2]);
-      //cv::Mat intrinsic = (cv::Mat1d(3, 3) <<  5.2212093413002049e+02, 0., 3.2542419118701633e+02, 0.,
-      //    5.2212093413002049e+02, 2.5473325838824445e+02, 0., 0., 1. );
 
-      //cv::Mat distortionCoefficients = (cv::Mat1d(1, 5) << -4.0852862075720786e-01, 2.4086510135654188e-01,
-//                                        -9.7223521589240465e-04, 1.7209244108669266e-04,
-  //                                      -8.6751876741832365e-02);
       auto d = j->at("dist_coefs");
       cv::Mat distortionCoefficients = (cv::Mat1d(1, 5) << d[0][0], d[0][1], d[0][2], d[0][3], d[0][4]);
       cv::undistort(frame, view, intrinsic, distortionCoefficients);
@@ -174,6 +163,10 @@ void MainWindow::process_one_frame()
       ;
     }
 
+  }
+
+  if(ui->flip_checkbox->isChecked()) {
+    cv::flip(frame,frame,-1);
   }
 
   vector<cv::Point2f> corners;
