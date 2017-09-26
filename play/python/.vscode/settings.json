@@ -4,5 +4,6 @@
     "python.unitTest.unittestArgs": [
         "-p", 
         "*_test.py"
-    ]
+    ],
+    "python.pythonPath": "/Users/brian/anaconda/bin/python3.5"
 }
