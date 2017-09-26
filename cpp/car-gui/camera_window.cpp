@@ -64,9 +64,14 @@ ioctl: VIDIOC_ENUM_FMT
 void CameraWindow::set_camera()
 {
   frame_grabber.end_grabbing();
+  frame_grabber_2.end_grabbing();
 
   if(cap.isOpened()) {
     cap.release();
+  }
+
+  if(cap_2.isOpened()) {
+    cap_2.release();
   }
 
   string device_name = ui->video_device->currentText().toStdString();
@@ -75,6 +80,15 @@ void CameraWindow::set_camera()
       throw (string) "couldn't open camera";
     }
     frame_grabber.begin_grabbing(&cap, "");
+  }
+
+
+  string device_name_2 = ui->video_device_2->currentText().toStdString();
+  if(QFile(QString::fromStdString(device_name_2)).exists()) {
+    if(!cap_2.open(device_name_2)){
+      throw (string) "couldn't open camera";
+    }
+    frame_grabber_2.begin_grabbing(&cap_2, "");
   }
 }
 
@@ -101,7 +115,7 @@ CameraWindow::CameraWindow(QWidget *parent) :
 
 
   timer.setSingleShot(false);
-  timer.setInterval(10);
+  timer.setInterval(100);
   connect(&timer, SIGNAL(timeout()), this, SLOT(process_one_frame()));
   connect(ui->frames_per_second_slider, SIGNAL(valueChanged(int)), this, SLOT(fps_changed(int)));
   timer.start();
@@ -111,8 +125,11 @@ CameraWindow::CameraWindow(QWidget *parent) :
 CameraWindow::~CameraWindow()
 {
   frame_grabber.end_grabbing();
+  frame_grabber_2.end_grabbing();
   if(cap.isOpened())
     cap.release();
+  if(cap_2.isOpened())
+    cap_2.release();
   delete ui;
 }
 
@@ -122,14 +139,22 @@ void CameraWindow::on_actionExit_triggered()
 }
 
 
-
 void CameraWindow::process_one_frame()
 {
   ui->cam_frame_count_text->setText(QString::number(frame_grabber.get_frame_count_grabbed()));
+  if(!cap.isOpened()){
+     return;
+  }
   if(!frame_grabber.get_latest_frame(original_frame)) {
     return;
   }
   original_frame.copyTo(frame);
+  if(cap_2.isOpened()) {
+    if(!frame_grabber_2.get_latest_frame(original_frame_2)) {
+      return;
+    }
+    original_frame_2.copyTo(frame_2);
+  }
 
   if(ui->undistort_checkbox->isChecked()) {
     try {
@@ -169,6 +194,7 @@ void CameraWindow::process_one_frame()
 
   if(ui->flip_checkbox->isChecked()) {
     cv::flip(frame,frame,-1);
+    cv::flip(frame_2,frame_2,-1);
   }
 
   vector<cv::Point2f> corners;
@@ -185,34 +211,39 @@ void CameraWindow::process_one_frame()
   ui->frame_count_text->setText(QString::number(frame_count));
 
 
-  cv::cvtColor(frame,frame,cv::COLOR_BGR2RGB);
-  QImage imdisplay((uchar*)frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
   std::stringstream ss;
   ss << tracker.homography;
   ui->homography_text->setText(QString::fromStdString(ss.str()));
   //cv::putText(frame, ss.str(), cv::Point(50,50), cv::FONT_HERSHEY_SIMPLEX, 1, red, 3);
 
-  ui->display_image->setFixedSize(imdisplay.size());
   if(ui->show_image_checkbox->checkState()==Qt::CheckState::Checked) {
-    QPixmap pixmap = QPixmap::fromImage(imdisplay);
+
+    cv::cvtColor(frame,frame,cv::COLOR_BGR2RGB);
+    QImage imdisplay((uchar*)frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
+
     ui->display_image->setPixmap(QPixmap::fromImage(imdisplay));
-    ui->scroll_area_contents->setBaseSize(imdisplay.size());
+    //ui->display_image->setFixedSize(imdisplay.width(),imdisplay.height());
+
+    if(cap_2.isOpened()) {
+      cv::cvtColor(frame_2, frame_2, cv::COLOR_BGR2RGB);
+      QImage imdisplay_2((uchar*)frame_2.data, frame_2.cols, frame_2.rows, frame_2.step, QImage::Format_RGB888);
+      //ui->display_image_2->setFixedSize( imdisplay_2.size());
+      ui->display_image_2->setPixmap(QPixmap::fromImage(imdisplay_2));
+      //ui->display_image_2->setGeometry(imdisplay.width(),0,imdisplay_2.width(),imdisplay_2.height());
+    }
+
+
+    //ui->image_container->setGeometry(QRect(0,0,frame.cols*2, frame.rows));
   }
 }
+
+
 
 void CameraWindow::fps_changed(int fps)
 {
   timer.setInterval((1./fps)*1000);
 
 }
-
-void CameraWindow::on_routesButton_clicked()
-{
-    RouteWindow r(this);
-
-    r.exec();
-}
-
 void CameraWindow::on_webcamButton_clicked()
 {
 
@@ -304,8 +335,11 @@ void CameraWindow::on_resolutions_combo_box_currentIndexChanged(int )
     QSize resolution = supported_resolutions[ui->resolutions_combo_box->currentIndex()];
     cap.set(cv::CAP_PROP_FRAME_WIDTH, resolution.width());
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, resolution.height());
-    ui->scroll_area_contents->setFixedSize(resolution);
-    ui->display_image->setFixedSize(resolution);
+    cap_2.set(cv::CAP_PROP_FRAME_WIDTH, resolution.width());
+    cap_2.set(cv::CAP_PROP_FRAME_HEIGHT, resolution.height());
+    ui->scroll_area_contents->setFixedSize(resolution.width()*2, resolution.height());
+    ui->display_image->setFixedSize(resolution.width(), resolution.height());
+    ui->display_image->setFixedSize(resolution.width(), resolution.height());
 }
 
 void CameraWindow::on_video_device_currentTextChanged(const QString &)
@@ -315,11 +349,28 @@ void CameraWindow::on_video_device_currentTextChanged(const QString &)
 
 void CameraWindow::on_take_picture_button_clicked()
 {
-  stringstream ss;
-  ss << QDir::homePath().toStdString() + "/car/data/capture_"
-       << QDateTime::currentDateTime().toString("yyyy-MM-ddThh.mm.ss.zzz").toStdString()
-       << ".png";
-  string path = ss.str();
+  string time_string = QDateTime::currentDateTime().toString("yyyy-MM-ddThh.mm.ss.zzz").toStdString();
+  if(cap.isOpened()) {
+    stringstream ss;
+    ss << QDir::homePath().toStdString() + "/car/data/capture_"
+         << time_string
+         << ".png";
+    string path = ss.str();
 
-  cv::imwrite(path, original_frame);
+    cv::imwrite(path, original_frame);
+  }
+  if(cap_2.isOpened()) {
+    stringstream ss;
+    ss << QDir::homePath().toStdString() + "/car/data/capture2_"
+         << time_string
+         << ".png";
+    string path = ss.str();
+
+    cv::imwrite(path, original_frame_2);
+  }
+}
+
+void CameraWindow::on_video_device_2_currentTextChanged(const QString &arg1)
+{
+  set_camera();
 }

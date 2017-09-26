@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Anaranjado!</string>
+   <string>Orange Crash</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -31,8 +31,8 @@
     <rect>
      <x>0</x>
      <y>25</y>
-     <width>1223</width>
-     <height>801</height>
+     <width>1313</width>
+     <height>646</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -86,6 +86,66 @@
         </item>
         <item>
          <widget class="QComboBox" name="camera_name">
+          <property name="minimumSize">
+           <size>
+            <width>130</width>
+            <height>0</height>
+           </size>
+          </property>
+          <item>
+           <property name="text">
+            <string/>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>elp1_left</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>elp1_right</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="video_device_2">
+          <property name="minimumSize">
+           <size>
+            <width>130</width>
+            <height>0</height>
+           </size>
+          </property>
+          <item>
+           <property name="text">
+            <string/>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>/dev/video0</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>/dev/video1</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>/dev/video2</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>/dev/video3</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="camera_name_2">
           <property name="minimumSize">
            <size>
             <width>130</width>
@@ -191,13 +251,6 @@
           </property>
          </spacer>
         </item>
-        <item>
-         <widget class="QPushButton" name="routesButton">
-          <property name="text">
-           <string>Routes</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </item>
       <item>
@@ -217,14 +270,8 @@
            <x>0</x>
            <y>0</y>
            <width>640</width>
-           <height>480</height>
+           <height>240</height>
           </rect>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_10">
           <property name="spacing">
@@ -243,17 +290,43 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="display_image">
-            <property name="minimumSize">
-             <size>
-              <width>640</width>
-              <height>480</height>
-             </size>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetNoConstraint</enum>
             </property>
-            <property name="text">
-             <string>The image goes here</string>
-            </property>
-           </widget>
+            <item>
+             <widget class="QLabel" name="display_image">
+              <property name="minimumSize">
+               <size>
+                <width>320</width>
+                <height>240</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>image 1 here</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="display_image_2">
+              <property name="minimumSize">
+               <size>
+                <width>320</width>
+                <height>240</height>
+               </size>
+              </property>
+              <property name="baseSize">
+               <size>
+                <width>320</width>
+                <height>240</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>image2 here</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>

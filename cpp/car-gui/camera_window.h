@@ -39,8 +39,6 @@ private slots:
   void process_one_frame();
   void fps_changed(int fps);
 
-  void on_routesButton_clicked();
-
   void on_webcamButton_clicked();
 
   void on_brightness_slider_valueChanged(int value);
@@ -57,6 +55,8 @@ private slots:
 
   void on_take_picture_button_clicked();
 
+  void on_video_device_2_currentTextChanged(const QString &arg1);
+
 private:
 
   std::vector<QSize> supported_resolutions = {{320,240},{640,480},{800,600},{1024,768},{1280,720},{1920,1080}};
@@ -64,12 +64,15 @@ private:
   QTimer timer;
   Ui::CameraWindow *ui;
   cv::VideoCapture cap;
+  cv::VideoCapture cap_2;
   FrameGrabber frame_grabber;
+  FrameGrabber frame_grabber_2;
 
   int frame_count = 0;
   cv::Mat original_frame;
+  cv::Mat original_frame_2;
   cv::Mat frame;
-  cv::Mat view;
+  cv::Mat frame_2;
   Tracker tracker;
 
 };
