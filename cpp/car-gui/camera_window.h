@@ -1,5 +1,5 @@
-#ifndef MAIN_WINDOW_H
-#define MAIN_WINDOW_H
+#ifndef CAMERA_WINDOW_H
+#define CAMERA_WINDOW_H
 
 #include <vector>
 
@@ -19,17 +19,17 @@
 
 
 namespace Ui {
-class MainWindow;
+class CameraWindow;
 }
 
-class MainWindow : public QDialog
+class CameraWindow : public QDialog
 {
   Q_OBJECT
 
 public:
 
-  explicit MainWindow(QWidget *parent = 0);
-  ~MainWindow();
+  explicit CameraWindow(QWidget *parent = 0);
+  ~CameraWindow();
 
   void set_camera();
 
@@ -62,7 +62,7 @@ private:
   std::vector<QSize> supported_resolutions = {{320,240},{640,480},{800,600},{1024,768},{1280,720},{1920,1080}};
 
   QTimer timer;
-  Ui::MainWindow *ui;
+  Ui::CameraWindow *ui;
   cv::VideoCapture cap;
   FrameGrabber frame_grabber;
 
@@ -74,5 +74,5 @@ private:
 
 };
 
-#endif // MAIN_WINDOW_H
+#endif // CAMERA_WINDOW_H
 

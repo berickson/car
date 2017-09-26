@@ -11,15 +11,15 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
+class CameraWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
     LidarUnit lidar;
     QTimer timer;
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit CameraWindow(QWidget *parent = 0);
+    ~CameraWindow();
     QGraphicsScene scene;
 
     QPointF world_to_screen(Eigen::Vector2f w);

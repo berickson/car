@@ -1,4 +1,4 @@
-#include "main_window.h"
+#include "camera_window.h"
 #include "route_window.h"
 #include "stereo_window.h"
 #include "picker_window.h"

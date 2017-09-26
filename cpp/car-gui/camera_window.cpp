@@ -1,5 +1,5 @@
-#include "main_window.h"
-#include "ui_main_window.h"
+#include "camera_window.h"
+#include "ui_camera_window.h"
 #include "route_window.h"
 
 #include <opencv2/core/core.hpp>
@@ -61,7 +61,7 @@ ioctl: VIDIOC_ENUM_FMT
       Interval: Discrete 0.033s (30.000 fps)
 */
 
-void MainWindow::set_camera()
+void CameraWindow::set_camera()
 {
   frame_grabber.end_grabbing();
 
@@ -78,9 +78,9 @@ void MainWindow::set_camera()
   }
 }
 
-MainWindow::MainWindow(QWidget *parent) :
+CameraWindow::CameraWindow(QWidget *parent) :
   QDialog(parent),
-  ui(new Ui::MainWindow)
+  ui(new Ui::CameraWindow)
 {
   ui->setupUi(this);
 
@@ -108,7 +108,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 }
 
-MainWindow::~MainWindow()
+CameraWindow::~CameraWindow()
 {
   frame_grabber.end_grabbing();
   if(cap.isOpened())
@@ -116,14 +116,14 @@ MainWindow::~MainWindow()
   delete ui;
 }
 
-void MainWindow::on_actionExit_triggered()
+void CameraWindow::on_actionExit_triggered()
 {
   this->close();
 }
 
 
 
-void MainWindow::process_one_frame()
+void CameraWindow::process_one_frame()
 {
   ui->cam_frame_count_text->setText(QString::number(frame_grabber.get_frame_count_grabbed()));
   if(!frame_grabber.get_latest_frame(original_frame)) {
@@ -200,20 +200,20 @@ void MainWindow::process_one_frame()
   }
 }
 
-void MainWindow::fps_changed(int fps)
+void CameraWindow::fps_changed(int fps)
 {
   timer.setInterval((1./fps)*1000);
 
 }
 
-void MainWindow::on_routesButton_clicked()
+void CameraWindow::on_routesButton_clicked()
 {
     RouteWindow r(this);
 
     r.exec();
 }
 
-void MainWindow::on_webcamButton_clicked()
+void CameraWindow::on_webcamButton_clicked()
 {
 
   std::vector<std::string> prop_names =
@@ -277,29 +277,29 @@ void MainWindow::on_webcamButton_clicked()
   dialog.exec();
 }
 
-void MainWindow::on_brightness_slider_valueChanged(int value)
+void CameraWindow::on_brightness_slider_valueChanged(int value)
 {
     cap.set(cv::CAP_PROP_BRIGHTNESS,value/100.);
 }
 
-void MainWindow::on_contrast_slider_valueChanged(int value)
+void CameraWindow::on_contrast_slider_valueChanged(int value)
 {
     cap.set(cv::CAP_PROP_CONTRAST,value/100.);
 }
 
-void MainWindow::on_hue_slider_valueChanged(int value)
+void CameraWindow::on_hue_slider_valueChanged(int value)
 {
   cap.set(cv::CAP_PROP_HUE,value/100.);
 
 }
 
-void MainWindow::on_saturation_slider_valueChanged(int value)
+void CameraWindow::on_saturation_slider_valueChanged(int value)
 {
   cap.set(cv::CAP_PROP_SATURATION,value/100.);
 }
 
 
-void MainWindow::on_resolutions_combo_box_currentIndexChanged(int )
+void CameraWindow::on_resolutions_combo_box_currentIndexChanged(int )
 {
     QSize resolution = supported_resolutions[ui->resolutions_combo_box->currentIndex()];
     cap.set(cv::CAP_PROP_FRAME_WIDTH, resolution.width());
@@ -308,12 +308,12 @@ void MainWindow::on_resolutions_combo_box_currentIndexChanged(int )
     ui->display_image->setFixedSize(resolution);
 }
 
-void MainWindow::on_video_device_currentTextChanged(const QString &)
+void CameraWindow::on_video_device_currentTextChanged(const QString &)
 {
   set_camera();
 }
 
-void MainWindow::on_take_picture_button_clicked()
+void CameraWindow::on_take_picture_button_clicked()
 {
   stringstream ss;
   ss << QDir::homePath().toStdString() + "/car/data/capture_"
