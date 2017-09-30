@@ -66,8 +66,8 @@ void CameraWindow::set_camera()
   frame_grabber.end_grabbing();
   frame_grabber_2.end_grabbing();
 
-  if(cap.isOpened()) {
-    cap.release();
+  if(cap_1.isOpened()) {
+    cap_1.release();
   }
 
   if(cap_2.isOpened()) {
@@ -76,10 +76,10 @@ void CameraWindow::set_camera()
 
   string device_name = ui->video_device->currentText().toStdString();
   if(QFile(QString::fromStdString(device_name)).exists()) {
-    if(!cap.open(device_name)){
+    if(!cap_1.open(device_name)){
       throw (string) "couldn't open camera";
     }
-    frame_grabber.begin_grabbing(&cap, "");
+    frame_grabber.begin_grabbing(&cap_1, "");
   }
 
 
@@ -109,9 +109,9 @@ CameraWindow::CameraWindow(QWidget *parent) :
 
   set_camera();
 
-  ui->brightness_slider->setValue(cap.get(cv::CAP_PROP_BRIGHTNESS)*100);
-  ui->contrast_slider->setValue(cap.get(cv::CAP_PROP_CONTRAST)*100);
-  ui->saturation_slider->setValue(cap.get(cv::CAP_PROP_SATURATION)*100);
+  ui->brightness_slider->setValue(cap_1.get(cv::CAP_PROP_BRIGHTNESS)*100);
+  ui->contrast_slider->setValue(cap_1.get(cv::CAP_PROP_CONTRAST)*100);
+  ui->saturation_slider->setValue(cap_1.get(cv::CAP_PROP_SATURATION)*100);
 
 
   timer.setSingleShot(false);
@@ -126,8 +126,8 @@ CameraWindow::~CameraWindow()
 {
   frame_grabber.end_grabbing();
   frame_grabber_2.end_grabbing();
-  if(cap.isOpened())
-    cap.release();
+  if(cap_1.isOpened())
+    cap_1.release();
   if(cap_2.isOpened())
     cap_2.release();
   delete ui;
@@ -139,10 +139,29 @@ void CameraWindow::on_actionExit_triggered()
 }
 
 
+void load_calibration(string camera_name, cv::Mat & camera_matrix, cv::Mat & dist_coefs) {
+  stringstream ss;
+  ss << QDir::homePath().toStdString() + "/car/camera_calibrations.json";
+  string path = ss.str();
+
+  std::ifstream json_file(path);
+  nlohmann::json calibration_json = nlohmann::json::parse(json_file);
+
+  auto j = calibration_json.find(camera_name.c_str());
+  if(j==calibration_json.end())  {
+    throw string("could not find camera in json calibration");
+  }
+  auto m=j->at("camera_matrix");
+  camera_matrix = (cv::Mat1d(3, 3) <<  m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2], m[2][0], m[2][1], m[2][2]);
+
+  auto d = j->at("dist_coefs");
+  dist_coefs = (cv::Mat1d(1, 5) << d[0][0], d[0][1], d[0][2], d[0][3], d[0][4]);
+}
+
 void CameraWindow::process_one_frame()
 {
   ui->cam_frame_count_text->setText(QString::number(frame_grabber.get_frame_count_grabbed()));
-  if(!cap.isOpened()){
+  if(!cap_1.isOpened()){
      return;
   }
   if(!frame_grabber.get_latest_frame(original_frame)) {
@@ -158,33 +177,33 @@ void CameraWindow::process_one_frame()
 
   if(ui->undistort_checkbox->isChecked()) {
     try {
-      stringstream ss;
-      ss << QDir::homePath().toStdString() + "/car/camera_calibrations.json";
-      string path = ss.str();
+      if(cap_1.isOpened()) {
+        string camera_name =
+            ui->camera_name->currentText().toStdString()
+            + "_"
+            + ui->resolutions_combo_box->currentText().toStdString();
 
-      std::ifstream json_file(path);
-      nlohmann::json calibration_json = nlohmann::json::parse(json_file);
+        cv::Mat camera_matrix, dist_coefs;
+        load_calibration(camera_name, camera_matrix, dist_coefs);
 
-      string camera_name =
-          ui->camera_name->currentText().toStdString()
-          + "_"
-          + ui->resolutions_combo_box->currentText().toStdString();
-
-      string check = calibration_json.dump();
-
-      auto j = calibration_json.find(camera_name.c_str());
-      if(j==calibration_json.end())  {
-        ui->undistort_checkbox->setChecked(false);
-        throw string("could not find camera in json calibration");
+        cv::Mat undistorted;
+        cv::undistort(frame, undistorted, camera_matrix, dist_coefs);
+        undistorted.copyTo(frame);
       }
-      auto m=j->at("camera_matrix");
-      cv::Mat intrinsic = (cv::Mat1d(3, 3) <<  m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2], m[2][0], m[2][1], m[2][2]);
 
-      auto d = j->at("dist_coefs");
-      cv::Mat distortionCoefficients = (cv::Mat1d(1, 5) << d[0][0], d[0][1], d[0][2], d[0][3], d[0][4]);
-      cv::Mat undistorted;
-      cv::undistort(frame, undistorted, intrinsic, distortionCoefficients);
-      undistorted.copyTo(frame);
+      if(cap_2.isOpened()) {
+        string camera_name =
+            ui->camera_name_2->currentText().toStdString()
+            + "_"
+            + ui->resolutions_combo_box->currentText().toStdString();
+
+        cv::Mat camera_matrix, dist_coefs;
+        load_calibration(camera_name, camera_matrix, dist_coefs);
+
+        cv::Mat undistorted;
+        cv::undistort(frame_2, undistorted, camera_matrix, dist_coefs);
+        undistorted.copyTo(frame_2);
+      }
 
     } catch (...) {
       ;
@@ -197,10 +216,19 @@ void CameraWindow::process_one_frame()
     cv::flip(frame_2,frame_2,-1);
   }
 
-  vector<cv::Point2f> corners;
   cv::Size chessboard_size(6,9);
-  bool found = cv::findChessboardCorners(frame, chessboard_size, corners);
-  cv::drawChessboardCorners(frame, chessboard_size, corners, found);
+
+  if(cap_1.isOpened()) {
+    vector<cv::Point2f> corners;
+    bool found = cv::findChessboardCorners(frame, chessboard_size, corners);
+    cv::drawChessboardCorners(frame, chessboard_size, corners, found);
+  }
+
+  if(cap_2.isOpened()) {
+    vector<cv::Point2f> corners_2;
+    bool found_2 = cv::findChessboardCorners(frame_2, chessboard_size, corners_2);
+    cv::drawChessboardCorners(frame_2, chessboard_size, corners_2, found_2);
+  }
 
 
   if(ui->find_correspondences_checkbox->isChecked()) {
@@ -296,7 +324,7 @@ void CameraWindow::on_webcamButton_clicked()
     ss << "CAP_PROP " << i << ":";
     ss << prop_names[i] << " ";
     try{
-      ss << cap.get(i);
+      ss << cap_1.get(i);
 
     } catch (...) {
       ss << "ERROR";
@@ -310,31 +338,31 @@ void CameraWindow::on_webcamButton_clicked()
 
 void CameraWindow::on_brightness_slider_valueChanged(int value)
 {
-    cap.set(cv::CAP_PROP_BRIGHTNESS,value/100.);
+    cap_1.set(cv::CAP_PROP_BRIGHTNESS,value/100.);
 }
 
 void CameraWindow::on_contrast_slider_valueChanged(int value)
 {
-    cap.set(cv::CAP_PROP_CONTRAST,value/100.);
+    cap_1.set(cv::CAP_PROP_CONTRAST,value/100.);
 }
 
 void CameraWindow::on_hue_slider_valueChanged(int value)
 {
-  cap.set(cv::CAP_PROP_HUE,value/100.);
+  cap_1.set(cv::CAP_PROP_HUE,value/100.);
 
 }
 
 void CameraWindow::on_saturation_slider_valueChanged(int value)
 {
-  cap.set(cv::CAP_PROP_SATURATION,value/100.);
+  cap_1.set(cv::CAP_PROP_SATURATION,value/100.);
 }
 
 
 void CameraWindow::on_resolutions_combo_box_currentIndexChanged(int )
 {
     QSize resolution = supported_resolutions[ui->resolutions_combo_box->currentIndex()];
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, resolution.width());
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, resolution.height());
+    cap_1.set(cv::CAP_PROP_FRAME_WIDTH, resolution.width());
+    cap_1.set(cv::CAP_PROP_FRAME_HEIGHT, resolution.height());
     cap_2.set(cv::CAP_PROP_FRAME_WIDTH, resolution.width());
     cap_2.set(cv::CAP_PROP_FRAME_HEIGHT, resolution.height());
     ui->scroll_area_contents->setFixedSize(resolution.width()*2, resolution.height());
@@ -350,7 +378,31 @@ void CameraWindow::on_video_device_currentTextChanged(const QString &)
 void CameraWindow::on_take_picture_button_clicked()
 {
   string time_string = QDateTime::currentDateTime().toString("yyyy-MM-ddThh.mm.ss.zzz").toStdString();
-  if(cap.isOpened()) {
+  string path = QDir::homePath().toStdString();
+
+  if(cap_1.isOpened() && cap_2.isOpened()) {
+    {
+      stringstream ss;
+      ss << path << "/car/data/cap_"
+           << time_string
+           << "_left.png";
+      string path = ss.str();
+      cv::imwrite(path, original_frame);
+    }
+
+    {
+    stringstream ss;
+    ss << path << "/car/data/cap_"
+         << time_string
+         << "_right.png";
+    string path = ss.str();
+    cv::imwrite(path, original_frame_2);
+    }
+
+    return;
+  }
+
+  if(cap_1.isOpened()) {
     stringstream ss;
     ss << QDir::homePath().toStdString() + "/car/data/capture_"
          << time_string
@@ -370,7 +422,7 @@ void CameraWindow::on_take_picture_button_clicked()
   }
 }
 
-void CameraWindow::on_video_device_2_currentTextChanged(const QString &arg1)
+void CameraWindow::on_video_device_2_currentTextChanged(const QString &)
 {
   set_camera();
 }

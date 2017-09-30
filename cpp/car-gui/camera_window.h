@@ -14,6 +14,8 @@
 #include "opencv2/videoio.hpp"
 #include "opencv2/calib3d.hpp"
 #include "../tracker.h"
+#include "../camera.h"
+#include <memory>
 
 #include "../frame_grabber.h"
 
@@ -63,7 +65,8 @@ private:
 
   QTimer timer;
   Ui::CameraWindow *ui;
-  cv::VideoCapture cap;
+
+  cv::VideoCapture cap_1;
   cv::VideoCapture cap_2;
   FrameGrabber frame_grabber;
   FrameGrabber frame_grabber_2;

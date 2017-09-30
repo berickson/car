@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>938</width>
-    <height>628</height>
+    <height>757</height>
    </rect>
   </property>
   <property name="baseSize">
@@ -35,10 +35,10 @@
   <widget class="QLabel" name="frame_count">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>180</x>
      <y>500</y>
-     <width>59</width>
-     <height>14</height>
+     <width>51</width>
+     <height>16</height>
     </rect>
    </property>
    <property name="text">
@@ -115,7 +115,7 @@
     <string>Show Features</string>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QCheckBox" name="match_features_checkbox">
@@ -123,7 +123,7 @@
     <rect>
      <x>180</x>
      <y>550</y>
-     <width>121</width>
+     <width>131</width>
      <height>20</height>
     </rect>
    </property>
@@ -134,12 +134,43 @@
     <bool>true</bool>
    </property>
   </widget>
+  <widget class="QCheckBox" name="undistort_checkbox">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>550</y>
+     <width>121</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>undistort</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="log_output">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>580</y>
+     <width>751</width>
+     <height>141</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>#</string>
+   </property>
+  </widget>
   <zorder>layoutWidget</zorder>
   <zorder>frame_count_label</zorder>
   <zorder>frame_count</zorder>
   <zorder>frame_slider</zorder>
   <zorder>show_features_checkbox</zorder>
   <zorder>match_features_checkbox</zorder>
+  <zorder>undistort_checkbox</zorder>
+  <zorder>log_output</zorder>
  </widget>
  <resources/>
  <connections/>

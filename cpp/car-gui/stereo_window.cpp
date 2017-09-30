@@ -1,11 +1,15 @@
 #include "stereo_window.h"
 #include "ui_stereo_window.h"
+#include <sstream>
+#include <opencv2/calib3d.hpp>
 #include <qcheckbox.h>
 #include <vector>
 
 
+using namespace cv;
+
 void show_image(cv::Mat & mat, QLabel & label ) {
-  cv::cvtColor(mat, mat, CV_RGB2BGR);
+  cv::cvtColor(mat, mat, CV_BGR2RGB);
   QImage imdisplay ((uchar*)mat.data, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
   label.setFixedSize(imdisplay.size());
 
@@ -18,7 +22,9 @@ StereoWindow::StereoWindow(QWidget *parent) :
   ui(new Ui::StereoWIndow)
 {
   ui->setupUi(this);
+  left_camera.name = "elp1_left_640_480";
   left_camera.cap.open("/home/brian/car/tracks/avc/routes/R/runs/3/video_left.avi");
+  right_camera.name = "elp1_left_640_480";
   right_camera.cap.open("/home/brian/car/tracks/avc/routes/R/runs/3/video_right.avi");
   left_camera.bound_label = ui->left_image;
   left_camera.parent = this;
@@ -43,12 +49,89 @@ void StereoWindow::on_frame_slider_valueChanged(int value)
   show_frame(value);
 }
 
+void StereoWindow::CameraUnit::detect_features(cv::Rect2d valid_rect) {
+  auto detector = cv::xfeatures2d::SURF::create();
+  cvtColor( frame, gray, CV_BGR2GRAY);
+  cv::blur( gray, gray, cv::Size(5,5));
+
+  std::vector<cv::KeyPoint> all_keypoints;
+  detector->detect(gray,all_keypoints);
+  keypoints.clear();
+  // remove keypoints outside valid rect
+  for(cv::KeyPoint & k : all_keypoints) {
+    auto pt = k.pt;
+    if(pt.x < valid_rect.x
+       || pt.x > valid_rect.x + valid_rect.width
+       || pt.y < valid_rect.y
+       || pt.y > valid_rect.y + valid_rect.height) {
+      continue;
+    }
+    keypoints.push_back(k);
+  }
+  detector->compute(gray,keypoints, descriptors);
+
+
+  if(parent->ui->show_features_checkbox->checkState() == Qt::CheckState::Checked) {
+    drawKeypoints(
+          frame,
+          keypoints,
+          frame,
+          cv::Scalar(0,255,0),
+          cv::DrawMatchesFlags::DRAW_OVER_OUTIMG );//| cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+
+  }
+}
+
+void StereoWindow::CameraUnit::undistort_frame() {
+  camera.load_calibration_from_json(name ,"/home/brian/car/camera_calibrations.json");
+  camera.undistort(frame);
+
+}
+
+// Calculates rotation matrix to euler angles
+// The result is the same as MATLAB except the order
+// of the euler angles ( x and z are swapped ).
+cv::Vec3f rotationMatrixToEulerAngles(cv::Mat &R)
+{
+  using namespace cv;
+
+    //assert(isRotationMatrix(R));
+
+    float sy = sqrt(R.at<double>(0,0) * R.at<double>(0,0) +  R.at<double>(1,0) * R.at<double>(1,0) );
+
+    bool singular = sy < 1e-6; // If
+
+    float x, y, z;
+    if (!singular)
+    {
+        x = atan2(R.at<double>(2,1) , R.at<double>(2,2));
+        y = atan2(-R.at<double>(2,0), sy);
+        z = atan2(R.at<double>(1,0), R.at<double>(0,0));
+    }
+    else
+    {
+        x = atan2(-R.at<double>(1,2), R.at<double>(1,1));
+        y = atan2(-R.at<double>(2,0), sy);
+        z = 0;
+    }
+    return Vec3f(x, y, z);
+}
+
 void StereoWindow::show_frame(int number)
 {
   ui->frame_slider->setValue(number);
 
   for(CameraUnit * camera : cameras) {
     camera->grab_frame(number);
+    if(ui->undistort_checkbox->isChecked()) {
+      camera->undistort_frame();
+    }
+    cv::Rect2i valid_rect;
+    valid_rect.x=0;
+    valid_rect.y=0;
+    valid_rect.width=640;
+    valid_rect.height=320;
+    camera->detect_features(valid_rect);
   }
 
   if(ui->match_features_checkbox->isChecked()) {
@@ -57,7 +140,7 @@ void StereoWindow::show_frame(int number)
     matcher.match(left_camera.descriptors, right_camera.descriptors, matches);
 
 
-    // sort the mathes by distance
+    // sort the matches by distance
     sort(matches.begin(), matches.end(),
         [](const cv::DMatch & a, const cv::DMatch& b) -> bool
     {
@@ -65,10 +148,67 @@ void StereoWindow::show_frame(int number)
     });
 
 
-    for(unsigned int i = 0; i < matches.size() / 5; i++ ) {
-      cv::DMatch match = matches.at(i);
-      left_camera.show_match(match.queryIdx);
-      right_camera.show_match(match.trainIdx);
+    {
+      std::vector<cv::Point2f> left_points;
+      std::vector<cv::Point2f> right_points;
+      for(unsigned int i = 0; i < matches.size()/2; i++ ) {
+        cv::DMatch match = matches.at(i);
+        left_points.push_back(left_camera.keypoints[match.queryIdx].pt);
+        right_points.push_back(right_camera.keypoints[match.trainIdx].pt);
+      }
+      // todo: find more parameters
+      cv::Size image_size(640,480);
+      double aperture_width = 1.0;
+      double aperture_height = 1.0;
+      double fov_x;
+      double fov_y;
+      double focal_length;
+      cv::Point2d principle_point;
+      double aspect_ratio;
+
+      cv::calibrationMatrixValues(
+            left_camera.camera.camera_matrix,
+            image_size,
+            aperture_width,
+            aperture_height,
+            fov_x,
+            fov_y,
+            focal_length,
+            principle_point,
+            aspect_ratio);
+
+      cv::Mat camera_matrix = left_camera.camera.camera_matrix;
+      cv::Mat E, R, t, mask;
+      double probability = 0.999;
+      double threshold = 1.0; // Maximum allowed reprojection error to treat a point pair as an inlier
+      E = cv::findEssentialMat(
+            left_points,
+            right_points,
+            camera_matrix,
+            //focal_length,
+            //principle_point,
+            cv::RANSAC,
+            probability,
+            threshold,
+            mask);
+
+      int pose_result = cv::recoverPose(E, left_points, right_points, camera_matrix, R, t, mask);
+      std::stringstream ss;
+      ss << "R:" << rotationMatrixToEulerAngles(R) * 180/M_PI << std::endl << " t:" << t << std::endl << "pose_result:" << pose_result;
+      ui->log_output->setText( QString::fromStdString(ss.str()));
+
+      for(unsigned int i = 0; i < left_points.size(); i++ ) {
+        int is_masked = mask.at<char>(i,0);
+        if(is_masked == 0) continue;
+        cv::Scalar color = cv::Scalar(rand()%255,rand()%255, rand()%255);
+        cv::circle(left_camera.frame, left_points[i], 3, color);
+        cv::circle(right_camera.frame, right_points[i], 3, color);
+
+        //left_camera.show_match(match.queryIdx, color);
+        //right_camera.show_match(match.trainIdx, color);
+      }
+
+
     }
   }
 
@@ -91,31 +231,17 @@ void StereoWindow::on_show_features_checkbox_toggled(bool )
 void StereoWindow::CameraUnit::grab_frame(int frame_number) {
   cap.set(cv::CAP_PROP_POS_FRAMES, frame_number);
   cap.read(frame);
-  auto detector = cv::xfeatures2d::SURF::create();
-  cvtColor( frame, gray, CV_RGB2GRAY );
-  cv::blur( gray, gray, cv::Size(5,5));
-  detector->detect(gray,keypoints);
-  detector->compute(gray,keypoints, descriptors);
-
-  if(parent->ui->show_features_checkbox->checkState() == Qt::CheckState::Checked) {
-    drawKeypoints(
-          frame,
-          keypoints,
-          frame,
-          cv::Scalar(0,255,0),
-          cv::DrawMatchesFlags::DRAW_OVER_OUTIMG );//| cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-
-  }
 }
+
 
 void StereoWindow::CameraUnit::show() {
   show_image(frame, *bound_label);
 }
 
 
-void StereoWindow::CameraUnit::show_match(int feature_index) {
+void StereoWindow::CameraUnit::show_match(int feature_index, cv::Scalar color) {
   cv::KeyPoint keypoint = keypoints.at(feature_index);
-  cv::circle(frame, keypoint.pt, 3, cv::Scalar(0, 0, 255));
+  cv::circle(frame, keypoint.pt, 3, color);
 
 }
 

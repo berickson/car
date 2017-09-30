@@ -8,12 +8,17 @@
 #include "logger.h"
 
 #include <opencv2/core/core.hpp>
-#include "opencv2/videoio.hpp"
+#include <opencv2/calib3d.hpp>
+#include <opencv2/videoio.hpp>
 #include <thread>
 #include <unistd.h> // usleep
 
 #include <iostream>
+#include <fstream>
 #include <chrono>
+
+#include "json.hpp"
+
 
 using namespace std;
 
@@ -196,6 +201,27 @@ void Camera::record_thread_proc() {
 void Camera::write_latest_frame() {
   output_video.write(latest_frame);
   ++frame_count_saved;
+}
+
+void Camera::undistort(cv::Mat frame) {
+  cv::Mat undistorted;
+  cv::undistort(frame, undistorted, camera_matrix, dist_coefs);
+  undistorted.copyTo(frame);
+}
+
+void Camera::load_calibration_from_json(string camera_name, string json_path) {
+  std::ifstream json_file(json_path);
+  nlohmann::json calibration_json = nlohmann::json::parse(json_file);
+
+  auto j = calibration_json.find(camera_name.c_str());
+  if(j==calibration_json.end())  {
+    throw string("could not find camera in json calibration");
+  }
+  auto m=j->at("camera_matrix");
+  camera_matrix = (cv::Mat1d(3, 3) <<  m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2], m[2][0], m[2][1], m[2][2]);
+
+  auto d = j->at("dist_coefs");
+  dist_coefs = (cv::Mat1d(1, 5) << d[0][0], d[0][1], d[0][2], d[0][3], d[0][4]);
 }
 
 

@@ -6,6 +6,7 @@
 
 #include <opencv2/core/core.hpp>
 #include "opencv2/videoio.hpp"
+#include <opencv2/imgproc/imgproc.hpp>
 #include <thread>
 #include "frame_grabber.h"
 #include <string>
@@ -35,6 +36,10 @@ public:
 
   int get_frame_count_grabbed();
   int get_frame_count_saved();
+  void load_calibration_from_json(std::string camera_name, std::string json_path);
+  void undistort(cv::Mat frame);
+  cv::Mat camera_matrix;
+  cv::Mat dist_coefs;
 
 private:
   int fps = 0;
