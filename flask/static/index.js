@@ -137,7 +137,7 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
   vm.reset_zoom = function () {
     // viewbox is a square centered at center of route
     var size = Math.max(vm.route_path_width + 0.8, vm.route_path_height);
-    vm.viewbox_left = ((vm.route_path_max_x+vm.route_path_min_x)/2 + size/2);
+    vm.viewbox_left = ((vm.route_path_max_x+vm.route_path_min_x)/2 - size/2);
     vm.viewbox_top = -((vm.route_path_max_y+vm.route_path_min_y)/2 + size/2);
     vm.viewbox_width = size;
     vm.viewbox_height = size;
