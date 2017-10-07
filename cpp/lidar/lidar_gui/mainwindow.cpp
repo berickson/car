@@ -5,7 +5,7 @@
 #include "QGraphicsScene"
 #include "QFileDialog"
 
-MainWindow::MainWindow(QWidget *parent) :
+CameraWindow::CameraWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 }
 
-MainWindow::~MainWindow()
+CameraWindow::~CameraWindow()
 {
     lidar.stop();
     delete ui;
@@ -30,7 +30,7 @@ MainWindow::~MainWindow()
 #include <eigen3/Eigen/Dense>
 
 
-QPointF MainWindow::world_to_screen(Eigen::Vector2f w) {
+QPointF CameraWindow::world_to_screen(Eigen::Vector2f w) {
     Eigen::Transform<float, 2, Eigen::Affine> t;
     t = t.Identity();
 
@@ -43,7 +43,7 @@ QPointF MainWindow::world_to_screen(Eigen::Vector2f w) {
     return QPointF(s[0], s[1]);
 }
 
-void MainWindow::process_lidar()
+void CameraWindow::process_lidar()
 {
     if(lidar.try_get_scan(1)) {
         ui->scan_count_label->setText(QString::number(lidar.completed_scan_count));
@@ -120,7 +120,7 @@ void MainWindow::process_lidar()
     }
 }
 
-void MainWindow::on_record_button_clicked()
+void CameraWindow::on_record_button_clicked()
 {
   if(is_recording) {
     out_file.close();
@@ -147,7 +147,7 @@ void MainWindow::on_record_button_clicked()
   }
 }
 
-void MainWindow::on_show_text_checkbox_clicked()
+void CameraWindow::on_show_text_checkbox_clicked()
 {
   if(ui->show_text_checkbox->isChecked()) {
     ui->lidar_output_panel->show();
@@ -158,12 +158,12 @@ void MainWindow::on_show_text_checkbox_clicked()
 }
 
 
-void MainWindow::on_show_walls_lines_checkbox_clicked()
+void CameraWindow::on_show_walls_lines_checkbox_clicked()
 {
 
 }
 
-void MainWindow::on_show_measurements_checkbox_clicked()
+void CameraWindow::on_show_measurements_checkbox_clicked()
 {
 
 }

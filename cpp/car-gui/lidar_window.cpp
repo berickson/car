@@ -14,7 +14,7 @@ LidarWindow::~LidarWindow()
     delete ui;
 }
 
-void LidarWindow::paintEvent(QPaintEvent *event) {
+void LidarWindow::paintEvent(QPaintEvent *) {
     QPainter painter;
     painter.begin(this);
     QBrush brush;

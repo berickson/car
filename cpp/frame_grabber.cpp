@@ -77,7 +77,7 @@ void FrameGrabber::grab_thread_proc()
         // only lock after frame is grabbed
         lock_guard<mutex> lock(grabber_mutex);
         ++frames_grabbed;
-        log_info((string)"grabbed " + to_string(frames_grabbed) + " frames from  " + name + " buffer size: " + to_string(buffer.size()));
+        //log_info((string)"grabbed " + to_string(frames_grabbed) + " frames from  " + name + " buffer size: " + to_string(buffer.size()));
         buffer.push(frame);
       }
     }

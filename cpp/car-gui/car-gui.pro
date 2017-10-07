@@ -14,7 +14,6 @@ TEMPLATE = app
 CONFIG += c++14
 
 SOURCES += main.cpp\
-        main_window.cpp \
     ../ackerman.cpp \
     ../car.cpp \
     ../config.cpp \
@@ -23,14 +22,9 @@ SOURCES += main.cpp\
     ../usb.cpp \
     ../work_queue.cpp \
     ../camera.cpp \
-    ../car_menu.cpp \
-    ../car_ui.cpp \
-    ../console_menu.cpp \
     ../driver.cpp \
     ../geometry.cpp \
     ../lookup_table.cpp \
-    ../menu.cpp \
-    ../pi_buttons.cpp \
     ../route.cpp \
     ../run_settings.cpp \
     ../string_utils.cpp \
@@ -45,9 +39,12 @@ SOURCES += main.cpp\
     stereo_window.cpp \
     ../kalman.cpp \
     picker_window.cpp \
-    lidar_window.cpp
+    lidar_window.cpp \
+    ../car_controller.cpp \
+    ../socket_server.cpp \
+    camera_window.cpp
 
-HEADERS  += main_window.h \
+HEADERS  += \
     ../ackerman.h \
     ../car.h \
     ../config.h \
@@ -64,17 +61,19 @@ HEADERS  += main_window.h \
     ../speedometer.h \
     stereo_window.h \
     picker_window.h \
-    lidar_window.h
+    lidar_window.h \
+    camera_window.h
 
 images.path    = $${DESTDIR}/
 
 QT += charts
 
-FORMS    += main_window.ui \
+FORMS    += \
     route_window.ui \
     stereo_window.ui \
     picker_window.ui \
-    lidar_window.ui
+    lidar_window.ui \
+    camera_window.ui
 
 unix|win32: LIBS += -L/usr/local/lib -lwiringPi -lncurses -lopencv_imgcodecs -lopencv_core -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d -lopencv_flann
 

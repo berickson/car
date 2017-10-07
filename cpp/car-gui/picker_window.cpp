@@ -21,12 +21,12 @@ void PickerWindow::on_routes_button_clicked()
 }
 
 #include "stereo_window.h"
-#include "main_window.h"
+#include "camera_window.h"
 #include "lidar_window.h"
 
 void PickerWindow::on_camera_button_clicked()
 {
-    MainWindow w;
+    CameraWindow w;
     w.show();
     w.exec();
 }
