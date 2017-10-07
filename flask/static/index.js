@@ -1,4 +1,4 @@
-angular.module("car",[]).controller("CarController", function($scope, $http, $timeout, $log, $q) {
+angular.module("car",[]).controller("CarController", function($scope, $http, $timeout, $log, $q, $filter) {
   var vm = this;
   vm.Math = Math;
   vm.JSON = JSON;
@@ -8,6 +8,13 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
   };
 
   vm.is_changed = function (field) {
+    if (field.original_value === null != field.value === null) {
+      return true;
+    }
+    if (field.original_value === null ) {
+      return false;
+    }
+
     return field.original_value.toString() !== field.value.toString();
 
   };
@@ -49,6 +56,26 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
       vm.go_error = "  (" + code + ")" + response.message;
     });
     $log.info("poweroff clicked");
+  };
+
+  vm.add_track = function() {
+    var track_name = $filter('date')(new Date(),'yyyy-MM-ddThh:mm:ss');
+    var req = {
+      url: '/tracks/'+encodeURIComponent(track_name),
+      method: 'PUT',
+      data: angular.toJson({"name":track_name}),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+    $http(req).then(function() {
+      $log.info('add track success');
+      vm.refresh_track_names();
+    }).catch(function(response, code){
+      $log.warn('add track failed');
+      $log.warn("  (" + code + ")" + response);
+    });
+
   };
 
 
@@ -249,17 +276,21 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
   });
 
 
-  vm.track_names = [];
-  vm.track_name = "";
-  $http.get('/track_names').
-    success(function ( result) {
-      vm.track_names = result.track_names;
-    }).
-    error(function () {
-      $log.error('$http failed to get track names');
-    });
-  vm.poll_ok = false;
-  vm.display_car_state = false;
+  vm.refresh_track_names = function() {
+    vm.track_names = [];
+    vm.track_name = "";
+    $http.get('/track_names').
+      success(function ( result) {
+        vm.track_names = result.track_names;
+      }).
+      error(function () {
+        $log.error('$http failed to get track names');
+      });
+    vm.poll_ok = false;
+    vm.display_car_state = false;
+  };
+
+  vm.refresh_track_names();
 
 
   var poller = function () {

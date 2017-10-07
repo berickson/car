@@ -132,9 +132,15 @@ def get_tracks():
     tracks = TRACK_STORAGE.get_tracks()
     return jsonify(tracks=[{'name': t.get_name()} for t in tracks])
 
-@app.route('/tracks/<track_name>')
+@app.route('/tracks/<track_name>', methods=['GET','PUT', 'DELETE'])
 def get_track_options(track_name):
-    return jsonify(track={'name', track_name})
+    if request.method == 'GET':
+        return jsonify(track={'name': track_name})
+    elif request.method == 'PUT':
+        TRACK_STORAGE.add_track(track_name)
+        return jsonify(track={'name': track_name})
+    elif request.method == 'DELETE':
+        pass
 
 @app.route('/tracks/<track_name>/route_names')
 def get_route_names(track_name):

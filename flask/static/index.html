@@ -197,6 +197,7 @@
         track:
         <select class='select' name='2' ng-model="car.run_settings.track_name" id="2" ng-options="track_name for track_name in car.track_names"></select>
       </div>
+      <button ng-click="car.add_track()">add</button>
 
       <div class='itembox'>
         route: <select class='select' name='1' ng-model="car.run_settings.route_name" id="1" ng-options="route_name for route_name in car.route_names"></select>

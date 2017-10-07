@@ -26,7 +26,10 @@ class Track(FolderBasedItem):
     def get_routes(self):
         ''' returns routes for this track '''
         routes_folder = os.path.join(self.folder, 'routes')
-        routes = [self.get_route(name) for name in os.listdir(routes_folder)]
+        try:
+            routes = [self.get_route(name) for name in os.listdir(routes_folder)]
+        except:
+            routes = []
         routes = sorted(routes, key=methodcaller('get_name'))
         return routes
 
@@ -45,6 +48,10 @@ class TrackStorage:
     def get_track(self, name):
         ''' returns a single track '''
         return Track(os.path.join(self.folder, name))
+
+    def add_track(self, name):
+        ''' adds a single track '''
+        os.mkdir(os.path.join(self.folder, name))
 
     def get_tracks(self):
         ''' returns list of tracks '''
