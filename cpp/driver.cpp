@@ -107,9 +107,16 @@ public:
       double a_error = a_sp - a;
 
       velocity_output += (k_v * v_error) * dt;
-      
-      // don't consider acceleration at the end of the run
-      if(v_sp != 0 || a_sp != 0)
+
+      // if going along, trying to stop
+      // velocity should be small and acceleration should be negative
+      // problem is we are going backward at a constant velocity
+      // the negative acceleration is just enough to counter the incorrect direction
+      // don't consider acceleration at the end of the run or if going the wrong direction
+      // or if we are at the end and want to be stationary
+      bool going_correct_direction  = ((v_sp > 0) == (v > 0));
+      bool should_be_stopped = (v_sp == 0 && a_sp == 0);
+      if(going_correct_direction && ! should_be_stopped)
         velocity_output += (k_a * a_error) * dt;
 
       velocity_output = clamp(velocity_output, min_v_sp, max_v_sp);
