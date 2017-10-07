@@ -102,8 +102,8 @@ void Camera::warm_up()
   
   */
   
-  cap.set(CV_CAP_PROP_FRAME_WIDTH,320);
-  cap.set(CV_CAP_PROP_FRAME_HEIGHT,240);
+  cap.set(CV_CAP_PROP_FRAME_WIDTH,640);
+  cap.set(CV_CAP_PROP_FRAME_HEIGHT,480);
   cap.set(CV_CAP_PROP_FPS,15);
   cap.set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y','U','Y','V'));
 
@@ -121,8 +121,8 @@ void Camera::prepare_video_writer(string path)
   //int fourcc = CV_FOURCC('M','J','P','G'); // files too big
   //int fourcc = CV_FOURCC('H','2','6','4'); // too slow
   int fourcc = CV_FOURCC('F','M','P','4'); // not bad
-  fps = (int) cap.get(CV_CAP_PROP_FPS);
-  //fps = 15; // if this is different from camera, we will down sample
+  //fps = (int) cap.get(CV_CAP_PROP_FPS);
+  fps = 5; // if this is different from camera, we will down sample
   bool is_color = true;
   recording_path = path;
 
@@ -271,7 +271,7 @@ void StereoCamera::record_thread_proc()
     left_camera.prepare_video_writer(left_recording_path);
     right_camera.prepare_video_writer(right_recording_path);
 
-    double fps = left_camera.get_fps();
+    double fps = 5;//left_camera.get_fps();
     auto t_start = std::chrono::high_resolution_clock::now();
     auto t_next_frame = t_start;
     std::chrono::microseconds us_per_frame((int) (1E6/fps) );
