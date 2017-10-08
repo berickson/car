@@ -51,6 +51,7 @@ void Camera::warm_up()
   if(warmed_up) return;
 
   cap.open(cam_number);
+  if(!cap.isOpened()) throw string("couldn't open camera");
   
   /*
   v4l2-ctl --list-formats-ext --device=/dev/video1
@@ -105,7 +106,7 @@ void Camera::warm_up()
   cap.set(CV_CAP_PROP_FRAME_WIDTH,640);
   cap.set(CV_CAP_PROP_FRAME_HEIGHT,480);
   cap.set(CV_CAP_PROP_FPS,15);
-  cap.set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y','U','Y','V'));
+  cap.set(CV_CAP_PROP_FOURCC, CV_FOURCC('M','J','P','G'));
 
   grabber.begin_grabbing(&cap, to_string(cam_number));
   warmed_up = true;
@@ -224,90 +225,7 @@ void Camera::load_calibration_from_json(string camera_name, string json_path) {
   dist_coefs = (cv::Mat1d(1, 5) << d[0][0], d[0][1], d[0][2], d[0][3], d[0][4]);
 }
 
-
-#include <iostream>
-
-
-
-
-StereoCamera::StereoCamera()
-{
-  left_camera.cam_number = 0;
-  right_camera.cam_number = 1;
-  cameras.push_back(&left_camera);
-  cameras.push_back(&right_camera);
-}
-
-void StereoCamera::warm_up()
-{
-  for(Camera* camera : cameras) {
-    camera->warm_up();
-  }
-}
-
-void StereoCamera::begin_recording(string left_recording_path_, string right_recording_path_)
-{
-  left_recording_path = left_recording_path_;
-  right_recording_path = right_recording_path_;
-  warm_up();
-  record_on.store(true);
-  this->record_thread = std::thread(&StereoCamera::record_thread_proc, this);
-}
-
-
-void StereoCamera::end_recording()
-{
-  record_on.store(false);
-  if(record_thread.joinable()){
-    record_thread.join();
-  }
-
-}
-
-void StereoCamera::record_thread_proc()
-{
-  try {
-    log_entry_exit w("StereoCamera::record_thread_proc");
-    left_camera.prepare_video_writer(left_recording_path);
-    right_camera.prepare_video_writer(right_recording_path);
-
-    double fps = 5;//left_camera.get_fps();
-    auto t_start = std::chrono::high_resolution_clock::now();
-    auto t_next_frame = t_start;
-    std::chrono::microseconds us_per_frame((int) (1E6/fps) );
-
-    // todo: change this to write when we get a frame ready event from camera
-
-    while(this->record_on.load()) {
-      t_next_frame += us_per_frame;
-      std::this_thread::sleep_until(t_next_frame);
-      if(right_camera.get_latest_frame()) {
-        right_camera.write_latest_frame();
-        ++frames_recorded;
-        log_info("Wrote right frame");
-      }
-      if(left_camera.get_latest_frame()) {
-        left_camera.write_latest_frame();
-        ++frames_recorded;
-        log_info("Wrote left frame");
-      }
-    }
-    log_trace("closing stereo cameras");
-    left_camera.release_video_writer();
-    right_camera.release_video_writer();
-  } catch (cv::Exception) {
-    log_error("caught cv::Exception in StereoCamera::record_thread_proc");
-  } catch (...) {
-    log_error("unknown exception caught StereoCamera::record_thread_proc");
-  }
-}
-
-
-
-
 void test_camera() {
-
-
   Camera left;
   Camera right;
   left.cam_number = 1;
@@ -329,28 +247,6 @@ void test_camera() {
     }
   }
   for(auto camera: cameras) {camera->end_capture_movie();}
-
-
 }
 
-
-void test_stereo_camera() {
-
-
-  StereoCamera camera;
-  camera.warm_up();
-  std::this_thread::sleep_for(std::chrono::seconds(1));
-
-  int seconds_to_grab = 10;
-  cout << "grabbing cameras for "<< seconds_to_grab << " seconds x 2" << endl;
-  camera.begin_recording("left.avi","right.avi");
-
-  for(int i=0;i<seconds_to_grab;++i) {
-    usleep( 1E6);
-    cout << "frames recorded: " << camera.frames_recorded << endl;
-  }
-  camera.end_recording();
-
-
-}
 

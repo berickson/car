@@ -41,12 +41,13 @@ public:
   cv::Mat camera_matrix;
   cv::Mat dist_coefs;
 
+  cv::Mat latest_frame;
+
 private:
   int fps = 0;
   bool warmed_up = false;
   std::string recording_path;
   int frame_count_saved = 0;
-  cv::Mat latest_frame;
   cv::VideoWriter output_video;
 
   std::atomic<bool> record_on; //this is lock free
@@ -60,33 +61,6 @@ private:
 
 };
 
-class StereoCamera {
-public:
-  StereoCamera();
-
-  void warm_up();
-  void begin_recording(std::string left_recording_path, std::string right_recording_path);
-  void end_recording();
-
-  std::atomic<bool> record_on;
-
-  std::thread record_thread;
-  void record_thread_proc();
-  int frames_recorded = 0;
-
-private:
-  std::string left_recording_path, right_recording_path;
-  std::vector<Camera *> cameras;
-
-  Camera left_camera;
-  Camera right_camera;
-  int left_cam_id = 1;
-  int right_cam_id = 0;
-
-
-
-
-};
 
 void test_camera();
 void test_stereo_camera();

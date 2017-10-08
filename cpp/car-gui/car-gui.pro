@@ -42,7 +42,8 @@ SOURCES += main.cpp\
     lidar_window.cpp \
     ../car_controller.cpp \
     ../socket_server.cpp \
-    camera_window.cpp
+    camera_window.cpp \
+    ../stereo_camera.cpp
 
 HEADERS  += \
     ../ackerman.h \

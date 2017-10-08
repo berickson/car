@@ -11,7 +11,7 @@
 #include "driver.h"
 #include "run_settings.h"
 #include <unistd.h> // usleep
-#include "camera.h"
+#include "stereo_camera.h"
 #include "logger.h"
 
 
