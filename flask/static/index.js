@@ -137,6 +137,7 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
   vm.stop = function () {
     $http.put('/command/stop', "1").success(function () {
       $log.info('stop success');
+      $timeout(function(){vm.refresh_routes(true);},3000); // timeout gives server time to save route
     }).error(function (response, code) {
       vm.stop_error = "  (" + code + ")" + response.message;
     });
@@ -162,7 +163,7 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
   };
 
   vm.reset_zoom = function () {
-    // viewbox is a square centered at center of route
+    // viewbox is a square centered at center of route  
     var size = Math.max(vm.route_path_width + 0.8, vm.route_path_height);
     vm.viewbox_left = ((vm.route_path_max_x+vm.route_path_min_x)/2 - size/2);
     vm.viewbox_top = -((vm.route_path_max_y+vm.route_path_min_y)/2 + size/2);
@@ -212,22 +213,37 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
     vm.viewbox_top += vm.viewbox_height * vm.pan_delta;
   };
 
+  vm.refresh_routes = function(select_latest) {
+    $log.info('select_latest' + select_latest);
+    $http.get('/tracks/' + encodeURIComponent(vm.run_settings.track_name) + "/routes").
+      success(function (result /*, status, headers, config*/) {
+        vm.routes = result.routes;
+        vm.route_names = [];
+        var max_time = '';
+        for(var i in vm.routes) {
+          var route = vm.routes[i];
+          vm.route_names.push(route.name);
+          if(select_latest && route.time > max_time) {
+            max_time = route.time;
+            vm.run_settings.route_name = route.name;
+          }
+        }
+      }).error(function (/*data, status, headers, config*/) {
+        vm.routes = [''];
+        vm.route_names = [''];
+        // log error
+      });
+  };
 
   $scope.$watch("car.run_settings.track_name", function () {
     if (vm.run_settings && vm.run_settings.track_name !== null && vm.run_settings.track_name.length > 0) {
       $log.info("selected track:", vm.run_settings.track_name);
-      $http.get('/tracks/' + vm.run_settings.track_name + "/route_names").
-        success(function (result /*, status, headers, config*/) {
-          vm.route_names = result.route_names;
-        }).error(function (/*data, status, headers, config*/) {
-          vm.route_names = ['n/a'];
-          // log error
-        });
+      vm.refresh_routes();
     }
   });
 
   vm.route_path_url = function () {
-    return '/tracks/' + vm.run_settings.track_name + "/routes/" + vm.run_settings.route_name + "/path";
+    return '/tracks/' + encodeURIComponent(vm.run_settings.track_name) + "/routes/" + encodeURIComponent(vm.run_settings.route_name) + "/path";
   };
 
   vm.has_road_sign = function(node) {

@@ -9,6 +9,7 @@ import socket
 import tracks
 import psutil
 import os
+import time
 
 TRACK_STORAGE = tracks.TrackStorage()
 
@@ -150,7 +151,7 @@ def get_route_names(track_name):
 @app.route('/tracks/<track_name>/routes')
 def get_routes(track_name):
     routes = TRACK_STORAGE.get_track(track_name).get_routes()
-    return jsonify(routes=[{'name':route.get_name()} for route in routes])
+    return jsonify(routes=[{'name':route.get_name(),'time':time.strftime('%Y-%m-%dT%H:%M:%SZ',route.get_time())} for route in routes])
 
 @app.route('/tracks/<track_name>/routes/<route_name>')
 def get_route(track_name, route_name):

@@ -3,6 +3,7 @@ access to track data
 '''
 import os
 import os.path
+import time
 from operator import methodcaller
 
 class FolderBasedItem:
@@ -13,6 +14,10 @@ class FolderBasedItem:
     def get_name(self):
         ''' track name '''
         return os.path.split(self.folder)[1]
+
+    def get_time(self):
+        ''' track modified time '''
+        return time.gmtime(os.path.getmtime(self.folder))
 
     def __str__(self):
         return self.get_name()
