@@ -2,6 +2,7 @@
 Description=Car Web Service
  
 [Service]
+User=pi
 WorkingDirectory=/home/pi/car/flask
 
 # todo: change back to anaconda
