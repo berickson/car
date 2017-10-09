@@ -167,11 +167,13 @@ void CameraWindow::process_one_frame()
   if(!frame_grabber.get_latest_frame(original_frame)) {
     return;
   }
+  cv::flip(original_frame,original_frame,-1);
   original_frame.copyTo(frame);
   if(cap_2.isOpened()) {
     if(!frame_grabber_2.get_latest_frame(original_frame_2)) {
       return;
     }
+    cv::flip(original_frame_2,original_frame_2,-1);
     original_frame_2.copyTo(frame_2);
   }
 
@@ -208,12 +210,6 @@ void CameraWindow::process_one_frame()
     } catch (...) {
       ;
     }
-
-  }
-
-  if(ui->flip_checkbox->isChecked()) {
-    cv::flip(frame,frame,-1);
-    cv::flip(frame_2,frame_2,-1);
   }
 
   cv::Size chessboard_size(6,9);

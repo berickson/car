@@ -23,9 +23,9 @@ StereoWindow::StereoWindow(QWidget *parent) :
 {
   ui->setupUi(this);
   left_camera.name = "elp1_left_640_480";
-  left_camera.cap.open("/home/brian/car/tracks/avc/routes/R/runs/3/video_left.avi");
+  left_camera.cap.open("/home/brian/car/tracks/back-yard/routes/A/runs/11/video_left.avi");
   right_camera.name = "elp1_left_640_480";
-  right_camera.cap.open("/home/brian/car/tracks/avc/routes/R/runs/3/video_right.avi");
+  right_camera.cap.open("/home/brian/car/tracks/back-yard/routes/A/runs/11/video_right.avi");
   left_camera.bound_label = ui->left_image;
   left_camera.parent = this;
   right_camera.bound_label = ui->right_image;
@@ -35,7 +35,6 @@ StereoWindow::StereoWindow(QWidget *parent) :
   ui->frame_count->setText( QString::number(frame_count));
   ui->frame_slider->setMaximum(frame_count);
   ui->frame_slider->setValue(50);
-
 }
 
 
