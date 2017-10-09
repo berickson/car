@@ -31,7 +31,7 @@ using namespace std;
 
 static void StereoCalib(vector<string> paths, int nx, int ny,
                         bool useUncalibrated) {
-  bool displayCorners = true;
+  bool displayCorners = false;
   bool showUndistorted = true;
   bool isVerticalStereo = false; // horiz or vert cams
   const int maxScale = 1;
@@ -175,8 +175,8 @@ static void StereoCalib(vector<string> paths, int nx, int ny,
                               map12);
       initUndistortRectifyMap(M2, D2, R2, P2, imageSize, CV_16SC2, map21,
                               map22);
-      cout << "roi1" <<roi1;
-      cout << "roi2" <<roi2;
+      cout << "roi1: " << roi1 << endl;
+      cout << "roi2: " << roi2 << endl;
     }
 
     // OR ELSE HARTLEY'S METHOD
@@ -210,9 +210,11 @@ static void StereoCalib(vector<string> paths, int nx, int ny,
     }
     cout << "M1 = \n" << format(M1, cv::Formatter::FMT_C) << ";" << endl << endl;
     cout << "D1 = \n" << format(D1, cv::Formatter::FMT_C) << ";" << endl << endl;
+    cout << "R1 = \n" << format(R1, cv::Formatter::FMT_C) << ";" << endl << endl;
     cout << "P1 = \n" << format(P1, cv::Formatter::FMT_C) << ";" << endl << endl;
     cout << "M2 = \n" << format(M2, cv::Formatter::FMT_C) << ";" << endl << endl;
     cout << "D2 = \n" << format(D2, cv::Formatter::FMT_C) << ";" << endl << endl;
+    cout << "R2 = \n" << format(R2, cv::Formatter::FMT_C) << ";" << endl << endl;
     cout << "P2 = \n" << format(P2, cv::Formatter::FMT_C) << ";" << endl << endl;
 
 
@@ -296,10 +298,6 @@ int main(int argc, char **argv) {
     paths.push_back(left[i]);
     paths.push_back(right[i]);
   }
-  for(int i = 0; i < paths.size(); i++) {
-    cout << paths[i] << endl;
-  }
-
 
   StereoCalib(paths, board_w, board_h, false);
   return 0;
