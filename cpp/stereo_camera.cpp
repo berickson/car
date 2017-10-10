@@ -126,17 +126,22 @@ void StereoCamera::record_thread_proc()
     while(this->record_on.load()) {
       t_next_frame += us_per_frame;
       std::this_thread::sleep_until(t_next_frame);
-      if(right_camera.get_latest_frame()) {
+      if(right_camera.frame_is_ready() && left_camera.frame_is_ready()) {
+        // since both are ready, we shouldn't have any problem reading both cameras
+        if(!right_camera.get_latest_frame()) throw string("error reading right camera");
+        if(!left_camera.get_latest_frame()) throw string("error reading left camera");
+
+        // undistort both imags
         cv::remap(right_camera.latest_frame, right_camera.latest_frame, map21, map22,CV_INTER_LINEAR);
+        cv::remap(left_camera.latest_frame, left_camera.latest_frame, map11, map12,CV_INTER_LINEAR);
+
+        // todo: call client to do additional processing
+        ++frames_processed;
+      }
+      if(frames_processed > 0) {
+        left_camera.write_latest_frame();
         right_camera.write_latest_frame();
         ++frames_recorded;
-        log_info("Wrote right frame");
-      }
-      if(left_camera.get_latest_frame()) {
-        cv::remap(left_camera.latest_frame, left_camera.latest_frame, map11, map12,CV_INTER_LINEAR);
-        left_camera.write_latest_frame();
-        ++frames_recorded;
-        log_info("Wrote left frame");
       }
     }
     log_trace("closing stereo cameras");
@@ -162,6 +167,7 @@ void test_stereo_camera() {
   for(int i=0;i<seconds_to_grab;++i) {
     usleep( 1E6);
     cout << "frames recorded: " << camera.frames_recorded << endl;
+    cout << "frames processed: " << camera.frames_processed << endl;
   }
   camera.end_recording();
 }

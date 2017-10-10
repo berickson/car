@@ -32,7 +32,6 @@ int main(int, char *[]) {
   try {
     log_info("enter main");
     // run_car_menu();
-    run_car_socket();
 
 
     //test_ackerman();
@@ -53,10 +52,12 @@ int main(int, char *[]) {
     //test_pose();
     //test_route();
     //test_split();
-    //test_stereo_camera();
+    //test_stereo_camera(); return 0;
     //test_system();
     //test_tracker();
     //test_usb();
+
+    run_car_socket();
 
   } catch (string & s) {
     log_error(s);

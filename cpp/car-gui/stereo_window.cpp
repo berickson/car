@@ -23,9 +23,12 @@ StereoWindow::StereoWindow(QWidget *parent) :
 {
   ui->setupUi(this);
   left_camera.name = "elp1_left_640_480";
-  left_camera.cap.open("/home/brian/car/tracks/back-yard/routes/A/runs/13/video_left.avi");
+  std::string base_name = "/home/brian/car/debug/";
+  left_camera.cap.open(base_name + "left.avi");
+  //left_camera.cap.open("/home/brian/car/tracks/back-yard/routes/A/runs/13/left.avi");
   right_camera.name = "elp1_left_640_480";
-  right_camera.cap.open("/home/brian/car/tracks/back-yard/routes/A/runs/13/video_right.avi");
+  right_camera.cap.open(base_name + "right.avi");
+  //right_camera.cap.open("/home/brian/car/tracks/back-yard/routes/A/runs/13/right.avi");
   left_camera.bound_label = ui->left_image;
   left_camera.parent = this;
   right_camera.bound_label = ui->right_image;
@@ -121,7 +124,8 @@ void StereoWindow::show_frame(int number)
   ui->frame_slider->setValue(number);
 
   for(CameraUnit * camera : cameras) {
-    camera->grab_frame(number);
+    if(camera->grab_frame(number) == false)
+      return;
     if(ui->undistort_checkbox->isChecked()) {
       camera->undistort_frame();
     }
@@ -242,9 +246,9 @@ void StereoWindow::on_show_features_checkbox_toggled(bool )
     show_frame(get_frame_number());
 }
 
-void StereoWindow::CameraUnit::grab_frame(int frame_number) {
+bool StereoWindow::CameraUnit::grab_frame(int frame_number) {
   cap.set(cv::CAP_PROP_POS_FRAMES, frame_number);
-  cap.read(frame);
+  return cap.read(frame);
 }
 
 

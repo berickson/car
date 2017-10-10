@@ -38,6 +38,8 @@ public:
   int get_frame_count_saved();
   void load_calibration_from_json(std::string camera_name, std::string json_path);
   void undistort(cv::Mat frame);
+  bool frame_is_ready();
+
   cv::Mat camera_matrix;
   cv::Mat dist_coefs;
 

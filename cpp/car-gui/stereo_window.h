@@ -49,7 +49,7 @@ public:
     cv::Mat descriptors;
 
 
-    void grab_frame(int frame_number);
+    bool grab_frame(int frame_number);
     void detect_features(cv::Rect2d valid_Rect);
     void undistort_frame();
     void show();

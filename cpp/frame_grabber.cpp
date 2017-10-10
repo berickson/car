@@ -61,6 +61,12 @@ int FrameGrabber::get_frame_count_grabbed() {
   return frames_grabbed;
 }
 
+int FrameGrabber::ready_frame_count()
+{
+  lock_guard<mutex> lock(grabber_mutex);
+  return buffer.size();
+}
+
 
 void FrameGrabber::grab_thread_proc()
 {

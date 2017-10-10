@@ -17,7 +17,8 @@ public:
 
   std::thread record_thread;
   void record_thread_proc();
-  int frames_recorded = 0;
+  int frames_recorded = 0;  // number of frames in avi, might include duplicates
+  int frames_processed = 0; // number of unique frames processed
 
 private:
   // rectification maps

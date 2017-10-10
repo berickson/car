@@ -25,6 +25,7 @@ public:
   bool get_one_frame(cv::Mat & frame);
   bool get_latest_frame(cv::Mat & frame);
   int  get_frame_count_grabbed();
+  int ready_frame_count();
 
   cv::VideoCapture * cap;
 

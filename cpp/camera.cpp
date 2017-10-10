@@ -210,6 +210,11 @@ void Camera::undistort(cv::Mat frame) {
   undistorted.copyTo(frame);
 }
 
+bool Camera::frame_is_ready()
+{
+  return grabber.ready_frame_count() > 0;
+}
+
 void Camera::load_calibration_from_json(string camera_name, string json_path) {
   std::ifstream json_file(json_path);
   nlohmann::json calibration_json = nlohmann::json::parse(json_file);
