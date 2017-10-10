@@ -131,7 +131,7 @@
     <string>Match Features</string>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QCheckBox" name="undistort_checkbox">
@@ -147,7 +147,7 @@
     <string>undistort</string>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QLabel" name="log_output">
@@ -163,6 +163,22 @@
     <string>#</string>
    </property>
   </widget>
+  <widget class="QCheckBox" name="depth_map_checkbox">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>550</y>
+     <width>131</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Depth Map</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
   <zorder>layoutWidget</zorder>
   <zorder>frame_count_label</zorder>
   <zorder>frame_count</zorder>
@@ -171,6 +187,7 @@
   <zorder>match_features_checkbox</zorder>
   <zorder>undistort_checkbox</zorder>
   <zorder>log_output</zorder>
+  <zorder>depth_map_checkbox</zorder>
  </widget>
  <resources/>
  <connections/>
