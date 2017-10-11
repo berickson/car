@@ -35,7 +35,8 @@ static void StereoCalib(vector<string> paths, int nx, int ny,
   bool showUndistorted = true;
   bool isVerticalStereo = false; // horiz or vert cams
   const int maxScale = 1;
-  const float squareSize = 0.02349f;
+  // const float squareSize = 0.02349f; // original
+  const float squareSize = 0.02652f; // "big"
 
   // actual square size
   int i, j, lr;
@@ -168,7 +169,7 @@ static void StereoCalib(vector<string> paths, int nx, int ny,
       double alpha = 0;
       cv::Rect roi1, roi2;
       stereoRectify(M1, D1, M2, D2, imageSize, R, T, R1, R2, P1, P2,
-                    cv::noArray(), 0, alpha, imageSize, &roi1, &roi2);
+                    cv::noArray(), CV_CALIB_ZERO_DISPARITY, alpha, imageSize, &roi1, &roi2);
       isVerticalStereo = fabs(P2.at<double>(1, 3)) > fabs(P2.at<double>(0, 3));
       // Precompute maps for cvRemap()
       initUndistortRectifyMap(M1, D1, R1, P1, imageSize, CV_16SC2, map11,
@@ -290,7 +291,7 @@ static void StereoCalib(vector<string> paths, int nx, int ny,
 
 int main(int argc, char **argv) {
   int board_w = 9, board_h = 6;
-  string folder = "/home/brian/race-vision/input/chessboard_images/stereo/elp1/640_480/";
+  string folder = "/home/brian/race-vision/input/chessboard_images/stereo/elp1bigchessboard/640_480/";
   vector<string> paths;
   vector<string> left = glob(folder+"*left.png");
   vector<string> right= glob(folder+"*right.png");

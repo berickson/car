@@ -23,7 +23,8 @@ StereoWindow::StereoWindow(QWidget *parent) :
 {
   ui->setupUi(this);
   left_camera.name = "elp1_left_640_480";
-  std::string base_name = "/home/brian/car/tracks/front-sidewalk/routes/B/runs/1/video_";
+  //std::string base_name = "/home/brian/car/tracks/front-sidewalk/routes/B/runs/1/video_";
+  std::string base_name = "/home/brian/car/debug/";
   left_camera.cap.open(base_name + "left.avi");
   right_camera.name = "elp1_left_640_480";
   right_camera.cap.open(base_name + "right.avi");
