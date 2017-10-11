@@ -21,7 +21,7 @@ public:
   Car(bool online = true);
   ~Car();
 
-  void reset_odometry();
+  void reset_odometry(double start_offset = 0.0);
 
   void add_listener(WorkQueue<Dynamics>*);
   void remove_listener(WorkQueue<Dynamics>*);

@@ -36,6 +36,7 @@ struct RunSettings{
   bool capture_video = true;
   bool crash_recovery = false;
   bool optimize_velocity = true;
+  double start_offset = 0.0;
   void write_to_file_json(string path);
   void write_to_file_txt(string path);
   void load_from_file_txt(string path);

@@ -54,6 +54,7 @@ void RunSettings::write_to_file_json(string path) {
   j["capture_video"] = capture_video;
   j["crash_recovery"] = crash_recovery;
   j["optimize_velocity"] = optimize_velocity;
+  j["start_offset"] = start_offset;
 
   const int indent = 2;
   file << std::setw(indent) << j << std::endl;
@@ -190,4 +191,5 @@ void RunSettings::load_from_file_json(string path) {
   capture_video = j["capture_video"];
   crash_recovery = j["crash_recovery"];
   optimize_velocity = j["optimize_velocity"];
+  start_offset = j["start_offset"];
 }

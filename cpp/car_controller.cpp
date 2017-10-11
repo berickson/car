@@ -67,7 +67,7 @@ void go(Car& car) {
     mkdir(run_folder);
     run_settings.write_to_file_json(f.config_file_path(track_name, route_name, run_name));
     run_settings.write_to_file_json(run_settings_path);
-    car.reset_odometry();
+    car.reset_odometry(run_settings.start_offset);
     string input_path = f.path_file_path(track_name,route_name);
     Route rte;
     log_info("loading route: " + input_path);
@@ -109,7 +109,7 @@ void go(Car& car) {
     }
 
     try {
-      Driver d(car,run_settings);
+      Driver d(car, run_settings);
       d.drive_route(rte);
       log_info("back from drive_route");
     } catch (std::string e) {
