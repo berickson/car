@@ -102,6 +102,12 @@ void go(Car& car) {
     string state_file_path = f.state_log_path(track_name, route_name, run_name);
     car.begin_recording_state(state_file_path);
     std::string error_text = "";
+
+    // wait for go signal
+    while(!car.get_go_enabled()) {
+      usleep(30000);
+    }
+
     try {
       Driver d(car,run_settings);
       d.drive_route(rte);

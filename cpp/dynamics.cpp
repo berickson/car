@@ -144,7 +144,7 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
   }
   if(fields[1] != "TD")
     return false;
-  if(fields.size() != 51) {
+  if(fields.size() != 53) {
     log_warning((string) "too many fields in TD");
     //usb_error_count++;
     return false;
@@ -198,6 +198,7 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
     d.roll = Angle::degrees(stod(fields[48]));
 
     d.battery_voltage = stod(fields[50]);
+    d.go = stod(fields[52])==1;
 
   } catch (...)
   {

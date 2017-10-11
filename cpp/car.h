@@ -121,11 +121,15 @@ public:
 
   inline Point get_front_position(){
     return ackerman.front_position();
-  };
+  }
 
   inline Point get_rear_position(){
     return ackerman.rear_position();
-  };
+  }
+
+  inline bool get_go_enabled() {
+    return current_dynamics.go;
+  }
 
   inline double get_velocity() {
       return (front_left_wheel.get_velocity() + front_right_wheel.get_velocity()) / 2;
@@ -134,6 +138,7 @@ public:
   double get_rear_velocity() {
     return (back_left_wheel.get_velocity() + back_right_wheel.get_velocity()) / 2;
   }
+
 
   double get_acceleration();
   double get_smooth_acceleration();

@@ -63,6 +63,7 @@ public:
   Angle roll;
   double battery_voltage;
   int calibration_status;
+  bool go;
 
   static std::string csv_field_headers();
   std::string csv_fields();
