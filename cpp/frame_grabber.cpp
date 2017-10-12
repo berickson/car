@@ -85,6 +85,9 @@ void FrameGrabber::grab_thread_proc()
         ++frames_grabbed;
         //log_info((string)"grabbed " + to_string(frames_grabbed) + " frames from  " + name + " buffer size: " + to_string(buffer.size()));
         buffer.push(frame);
+        while(buffer.size() > max_frames_to_buffer) {
+          buffer.pop();
+        }
       }
     }
   } catch (cv::Exception &e) {
