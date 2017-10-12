@@ -146,7 +146,7 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
     return false;
   if(fields.size() != 53) {
     stringstream error;
-    error << "too many fields in TD: " <<fields.size();
+    error << "wrong number of field in TD. Expected: 53, actual:" << fields.size() << ".";
     log_warning(error.str());
     //usb_error_count++;
     return false;

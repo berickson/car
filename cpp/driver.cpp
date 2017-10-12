@@ -104,6 +104,7 @@ const cv::Mat fast_bgr_to_gray(const cv::Mat im) {
 
 void Driver::avoid_barrels(StereoCamera & camera)
 {
+  log_entry_exit w("avoid barrles");
   int str = 1500;
   double v_sp = 0.5;
   double a_sp = 0;
