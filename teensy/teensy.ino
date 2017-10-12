@@ -337,6 +337,7 @@ void setup() {
   int int_esc = PIN_RX_SPEED;
   pinMode(PIN_RX_STEER, INPUT);
   pinMode(PIN_RX_SPEED, INPUT);
+  pinMode(PIN_GO, INPUT_PULLUP);
 
   attachInterrupt(int_str, rx_str_handler, CHANGE);
   attachInterrupt(int_esc, rx_spd_handler, CHANGE);
@@ -508,6 +509,8 @@ void loop() {
     auto br_odo_b = odometer_back_right.odometer_b;
     auto br_odo_b_us = odometer_back_right.last_odometer_b_us;
     auto br_odo_ab_us = odometer_back_right.odometer_ab_us;
+    int go = digitalRead(PIN_GO) == HIGH ? 1 : 0;
+
     interrupts();
 
     
@@ -526,6 +529,7 @@ void loop() {
        +",us,"+micros()
        +",ypr,"+ mpu9150.heading() + "," + ftos(mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
        +",vbat,"+ftos(battery_voltage)
+       +",go,"+go
        );
   }
 

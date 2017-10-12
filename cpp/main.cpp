@@ -52,7 +52,7 @@ int main(int, char *[]) {
     //test_pose();
     //test_route();
     //test_split();
-    test_stereo_camera(); return 0;
+    //test_stereo_camera(); return 0;
     //test_system();
     //test_tracker();
     //test_usb();
