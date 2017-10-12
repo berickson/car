@@ -103,6 +103,7 @@ void Driver::avoid_barrels(StereoCamera & camera)
   double v_sp = 0.5;
   double a_sp = 0;
   string direction = camera.get_clear_driving_direction();
+  log_info("steering direction: " + direction);
   if(direction == "left") {
     // steer left
     str = car.steering_for_angle(Angle::degrees(20));
