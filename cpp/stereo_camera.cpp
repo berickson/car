@@ -75,8 +75,6 @@ StereoCamera::StereoCamera()
   roi2 (0, 0, 640, 480)
   */
 
-  int flags = cv::CALIB_ZERO_DISPARITY;
-  double alpha = 0;
   cv::Rect roi1, roi2;
   //cv::stereoRectify(M1, D1, M2, D2, size, R, T, R1, R2, P1, P2, Q, flags, alpha, size, &roi1, &roi2);
 
@@ -165,13 +163,20 @@ void StereoCamera::end_recording()
 }
 
 string StereoCamera::get_clear_driving_direction() {
+  stringstream s;
+  s << "disparaties: [" << disparities[0] << ", " << disparities[1] << ", " << disparities[2] << "]";
+  log_info(s.str());
+
   if(disparities[1] <= disparities[2] && disparities[1] <= disparities[0]) {
     return "center";
   }
-  if(disparities[0] <= disparities[1]) {
+  if(disparities[0] <= disparities[1] && disparities[0] <= disparities[2]) {
     return "left";
   }
-  return "right";
+  if(disparities[2] <= disparities[0] && disparities[2] <= disparities[1]) {
+    return "right";
+  }
+  return "unknown";
 }
 
 void StereoCamera::record_thread_proc()
