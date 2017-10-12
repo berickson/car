@@ -19,6 +19,7 @@
 #include <chrono>
 
 #include "json.hpp"
+#include "image_utils.h"
 
 
 
@@ -99,6 +100,63 @@ void StereoCamera::begin_recording(string left_recording_path_, string right_rec
   this->record_thread = std::thread(&StereoCamera::record_thread_proc, this);
 }
 
+void StereoCamera::process_disparities(const cv::Mat L, const cv::Mat R)
+{
+  if(!L.empty() && !R.empty()) {
+    int max_disparity = 64;
+    int block_size = 25;
+    cv::Mat im_disparity = cv::Mat( L.rows, L.cols, CV_16S );
+
+    bool use_sgbm = false;
+    if(use_sgbm) {
+      cv::Ptr<cv::StereoSGBM> matcher = cv::StereoSGBM::create(-10, (10)*16, 11, 100, 1000, 32, 0, 15, 1000, 16, cv::StereoSGBM::MODE_HH);
+      matcher->compute(L, R, im_disparity);
+    } else {
+      auto start_time = std::chrono::system_clock::now();
+      cv::Ptr<cv::StereoBM> matcher = cv::StereoBM::create(max_disparity, block_size);
+
+      matcher->setUniquenessRatio(10);
+      const cv::Mat L_gray = fast_bgr_to_gray(L);
+      const cv::Mat R_gray = fast_bgr_to_gray(R);
+      // search the three regions
+      int w = L_gray.size[1];
+      int h = L_gray.size[0];
+      int roi_center = h/2-40;
+      int box_height = 30;
+      int min_disparity_i = 0;
+      int min_disparity = INT_MAX;
+      matcher->compute(L_gray, R_gray, im_disparity);
+
+      double min_val; double max_val;
+      cv::minMaxLoc(im_disparity, &min_val, &max_val);
+      cv::Scalar label_color = cv::Scalar(max_val,0,0);
+      int disparity_left = max_disparity + block_size/2;
+      int disparity_right = w - block_size/2;
+      int box_width = (disparity_right-disparity_left)/3;
+      for(int i : {1,0,2}) {
+        cv::Rect roi_rect = cv::Rect(disparity_left + i*box_width, roi_center-box_height/2,box_width,box_height);
+        cv::rectangle(im_disparity, roi_rect, label_color);
+        cv::Mat im_roi = cv::Mat(im_disparity,roi_rect);
+        cv::Mat mask = im_roi>0;
+        int dilation_size = 2;
+        cv::Mat element = cv::getStructuringElement( cv::MORPH_RECT,
+                                             cv::Size( 2*dilation_size + 1, 2*dilation_size+1 ),
+                                             cv::Point( dilation_size, dilation_size ) );
+        cv::erode(mask,mask,element);
+        if(0)
+        {
+          stringstream s;
+          s << i;
+          cv::imshow(s.str(), mask);
+        }
+        double mean_disparity = cv::mean(im_roi,mask)[0];
+        disparities[i] = mean_disparity;
+      }
+    }
+  }
+
+}
+
 
 void StereoCamera::end_recording()
 {
@@ -107,6 +165,16 @@ void StereoCamera::end_recording()
     record_thread.join();
   }
 
+}
+
+string StereoCamera::get_clear_driving_direction() {
+  if(disparities[1] <= disparities[2] && disparities[1] <= disparities[0]) {
+    return "center";
+  }
+  if(disparities[0] <= disparities[1]) {
+    return "left";
+  }
+  return "right";
 }
 
 void StereoCamera::record_thread_proc()

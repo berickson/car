@@ -15,6 +15,7 @@
 // based on http://answers.opencv.org/question/74255/time-delay-in-videocapture-opencv-due-to-capture-buffer/
 
 
+
 class FrameGrabber {
 public:
   FrameGrabber();

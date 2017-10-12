@@ -6,7 +6,58 @@
 #include "logger.h"
 #include "pid.h"
 #include "string_utils.h"
+#include "stereo_camera.h"
 
+
+class VelocityTracker {
+public:
+  double velocity_output = 0;
+  double k_v = 10000.0;
+  double k_a = 0.0;
+  double last_t = 0;
+  double max_v_sp = 10;
+  double min_v_sp = -10;
+
+  void reset() {
+    velocity_output = 0;
+    last_t = 0;
+  }
+
+  int get_esc(Car & car, double v_sp, double a_sp) {
+    double t = car.get_time_in_seconds();
+    if (last_t != 0) {
+      double dt = t - last_t;
+      double v = car.get_velocity();
+      double a = car.get_smooth_acceleration();
+      double v_error = v_sp - v;
+      double a_error = a_sp - a;
+
+      velocity_output += (k_v * v_error) * dt;
+
+      // if going along, trying to stop
+      // velocity should be small and acceleration should be negative
+      // problem is we are going backward at a constant velocity
+      // the negative acceleration is just enough to counter the incorrect direction
+      // don't consider acceleration at the end of the run or if going the wrong direction
+      // or if we are at the end and want to be stationary
+      bool going_correct_direction  = ((v_sp > 0) == (v > 0));
+      bool should_be_stopped = (v_sp == 0 && a_sp == 0);
+      if(going_correct_direction && ! should_be_stopped)
+        velocity_output += (k_a * a_error) * dt;
+
+      velocity_output = clamp(velocity_output, min_v_sp, max_v_sp);
+    }
+   last_t = t;
+   return car.esc_for_velocity(velocity_output);
+  }
+
+
+  int get_esc(Route &  route, Car & car) {
+    return get_esc(car, route.get_velocity(), route.get_acceleration());
+  }
+};
+
+VelocityTracker velocity_tracker;
 
 Driver::Driver(Car & car, RunSettings& settings)
   : car(car), settings(settings)
@@ -15,7 +66,7 @@ Driver::Driver(Car & car, RunSettings& settings)
 
 // returns true if crashed
 bool Driver::check_for_crash() {
-  Point position = car.get_front_position();
+  ::Point position = car.get_front_position();
   unsigned int ms = car.current_dynamics.ms;
 
   // if we don't have a checkpoint, get one and return
@@ -43,6 +94,33 @@ bool Driver::check_for_crash() {
     return true;
   }
   return false;
+}
+
+const cv::Mat fast_bgr_to_gray(const cv::Mat im) {
+  cv::Mat channels[3];
+  cv::split(im, channels);
+  return channels[1]; // green
+}
+
+void Driver::avoid_barrels(StereoCamera & camera)
+{
+  int str = 1500;
+  double v_sp = 0.5;
+  double a_sp = 0;
+  string direction = camera.get_clear_driving_direction();
+  if(direction == "left") {
+    // steer left
+    str = car.steering_for_angle(Angle::degrees(20));
+  }
+  if(direction == "right") {
+    // steer right
+    str = car.steering_for_angle(Angle::degrees(-20));
+  }
+  if(direction == "straight") {
+    str = car.steering_for_angle(Angle::degrees(0));
+  }
+  int esc = velocity_tracker.get_esc(car, v_sp, a_sp );
+  car.set_esc_and_str(esc,str);
 }
 
 
@@ -80,63 +158,7 @@ int Driver::esc_for_velocity(PID & velocity_pid, double goal_velocity, double go
   return car.esc_for_velocity(velocity_output);
 }
 
-
-class VelocityTracker {
-public:
-  double velocity_output = 0;
-  double k_v = 10000.0;
-  double k_a = 0.0;
-  double last_t = 0;
-  double max_v_sp = 10;
-  double min_v_sp = -10;
-
-  void reset() {
-    velocity_output = 0;
-    last_t = 0;
-  }
-
-  int get_esc(Route &  route, Car & car) {
-    double t = car.get_time_in_seconds();
-    if (last_t != 0) {
-      double dt = t - last_t;
-      double v = car.get_velocity();
-      double a = car.get_smooth_acceleration();
-      double v_sp = route.get_velocity();
-      double a_sp = route.get_acceleration();
-      double v_error = v_sp - v;
-      double a_error = a_sp - a;
-
-      velocity_output += (k_v * v_error) * dt;
-
-      // if going along, trying to stop
-      // velocity should be small and acceleration should be negative
-      // problem is we are going backward at a constant velocity
-      // the negative acceleration is just enough to counter the incorrect direction
-      // don't consider acceleration at the end of the run or if going the wrong direction
-      // or if we are at the end and want to be stationary
-      bool going_correct_direction  = ((v_sp > 0) == (v > 0));
-      bool should_be_stopped = (v_sp == 0 && a_sp == 0);
-      if(going_correct_direction && ! should_be_stopped)
-        velocity_output += (k_a * a_error) * dt;
-
-      velocity_output = clamp(velocity_output, min_v_sp, max_v_sp);
-
-      if(false) {
-        stringstream ss;
-        ss.precision(1);
-        ss <<  "rt.v:" << route.get_velocity() << "  car.v:" << v;
-        ss <<  "rt.a:" << route.get_acceleration() << "  car.a:" << a << "  velocity_output:" << velocity_output;
-        log_info(ss.str());
-      }
-    }
-   last_t = t;
-   return car.esc_for_velocity(velocity_output);
-  }
-};
-
-VelocityTracker velocity_tracker;
-
-void Driver::continue_along_route(Route& route)
+void Driver::continue_along_route(Route& route, StereoCamera &camera)
 {
   auto p_front = car.get_front_position();
   auto p_rear = car.get_rear_position();
@@ -150,6 +172,11 @@ void Driver::continue_along_route(Route& route)
       if(route.nodes[i].road_sign_command == "beep") {
         log_info("car commanded to beep");
         car.beep();
+      }
+      if(route.nodes[i].road_sign_command == "avoid_barrels") {
+        log_info("car commanded to avoid barrels");
+        mode = "avoid_barrels";
+        camera.process_clearances_enabled = true;
       }
     }
   }
@@ -182,9 +209,9 @@ void Driver::continue_along_route(Route& route)
 
 // tries to stop at stop_node
 // returns true if done
-bool Driver::continue_to_stop(Route& route)
+bool Driver::continue_to_stop(Route& route, StereoCamera & camera)
 {
-  continue_along_route(route);
+  continue_along_route(route, camera);
   return fabs(car.get_velocity()) < 0.01;
 }
 
@@ -239,7 +266,7 @@ void Driver::set_evasive_actions_for_crash(Route& route)
   last_crash_correction = correction;
 }
 
-void Driver::drive_route(Route & route) {
+void Driver::drive_route(Route & route, StereoCamera & camera) {
   log_entry_exit w("drive_route");
   route.nodes[route.nodes.size()-1].road_sign_command = "stop";
 
@@ -269,7 +296,7 @@ void Driver::drive_route(Route & route) {
     recovering_from_crash = false;
     //int crash_count = 0;
     system_clock::time_point wait_end_time = system_clock::now();
-    string mode = "follow_route";
+    mode = "follow_route";
     while(!route_complete) {
       Dynamics d;
       if(!queue.try_pop(d,1000)) {
@@ -279,8 +306,12 @@ void Driver::drive_route(Route & route) {
       // execute route flow, based on
       // https://docs.google.com/drawings/d/1S2gPPzPD42xvuomWY12pHNqIRDZXRV040nHIy7_USxc/edit?usp=sharing
 
+      if(mode=="avoid_barrels") {
+        avoid_barrels(camera);
+      }
+
       if(mode == "follow_route") {
-        continue_along_route(route);
+        continue_along_route(route, camera);
         if(route.is_stop_ahead()) {
           mode = "stop_at_point";
           log_info("stopping");
@@ -289,7 +320,7 @@ void Driver::drive_route(Route & route) {
 
       if(mode=="stop_at_point") {
         RouteNode * stop_node = route.get_target_node();
-        bool stop_complete  = continue_to_stop(route);
+        bool stop_complete  = continue_to_stop(route, camera);
         if (stop_complete) {
           route.advance_to_next_segment();
           if(route.done) {

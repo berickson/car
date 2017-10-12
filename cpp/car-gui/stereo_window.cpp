@@ -4,6 +4,7 @@
 #include <opencv2/calib3d.hpp>
 #include <qcheckbox.h>
 #include <vector>
+#include "../image_utils.h"
 
 
 using namespace cv;
@@ -119,12 +120,6 @@ cv::Vec3f rotationMatrixToEulerAngles(cv::Mat &R)
     return Vec3f(x, y, z);
 }
 
-const cv::Mat fast_bgr_to_gray(const cv::Mat im) {
-  cv::Mat channels[3];
-  cv::split(im, channels);
-  return channels[1]; // green
-}
-
 void StereoWindow::show_frame(int number)
 {
   ui->frame_slider->setValue(number);
@@ -155,26 +150,29 @@ void StereoWindow::show_frame(int number)
       cv::Ptr<StereoSGBM> matcher = cv::StereoSGBM::create(-10, (10)*16, 11, 100, 1000, 32, 0, 15, 1000, 16, cv::StereoSGBM::MODE_HH);
       matcher->compute(L, R, im_disparity);
     } else {
+      auto start_time = std::chrono::system_clock::now();
       cv::Ptr<StereoBM> matcher = cv::StereoBM::create(max_disparity, block_size);
+
       matcher->setUniquenessRatio(10);
       const cv::Mat L_gray = fast_bgr_to_gray(L);
       const cv::Mat R_gray = fast_bgr_to_gray(R);
-      matcher->compute(L_gray, R_gray, im_disparity);
       // search the three regions
       int w = L_gray.size[1];
       int h = L_gray.size[0];
-      int cy = h/2-40;
+      int roi_center = h/2-40;
       int box_height = 30;
       int min_disparity_i = 0;
       int min_disparity = INT_MAX;
+      matcher->compute(L_gray, R_gray, im_disparity);
+
       double min_val; double max_val;
       cv::minMaxLoc(im_disparity, &min_val, &max_val);
       Scalar label_color = Scalar(max_val,0,0);
       int disparity_left = max_disparity + block_size/2;
       int disparity_right = w - block_size/2;
       int box_width = (disparity_right-disparity_left)/3;
-      for(int i=0; i<3; i++) {
-        cv::Rect roi_rect = cv::Rect(disparity_left + i*box_width, cy-box_height/2,box_width,box_height);
+      for(int i : {1,0,2}) {
+        cv::Rect roi_rect = cv::Rect(disparity_left + i*box_width, roi_center-box_height/2,box_width,box_height);
         cv::rectangle(im_disparity, roi_rect, label_color);
         cv::Mat im_roi = cv::Mat(im_disparity,roi_rect);
         Mat mask = im_roi>0;
@@ -183,6 +181,7 @@ void StereoWindow::show_frame(int number)
                                              Size( 2*dilation_size + 1, 2*dilation_size+1 ),
                                              Point( dilation_size, dilation_size ) );
         cv::erode(mask,mask,element);
+        if(0)
         {
           stringstream s;
           s << i;
@@ -197,7 +196,13 @@ void StereoWindow::show_frame(int number)
           min_disparity_i = i;
         }
       }
-      cv::Rect best_rect = cv::Rect(disparity_left + min_disparity_i*box_width, cy-box_height/2,box_width,box_height);
+      {
+        chrono::duration<double> elapsed_seconds = (chrono::system_clock::now() - start_time);
+        stringstream label;
+        label << "elapsed: " << elapsed_seconds.count();
+        cv::putText(im_disparity, label.str(), Point(30,30),  cv::FONT_HERSHEY_DUPLEX, 1, label_color);
+      }
+      cv::Rect best_rect = cv::Rect(disparity_left + min_disparity_i*box_width, roi_center-box_height/2,box_width,box_height);
       cv::rectangle(im_disparity, best_rect, label_color,5);
     }
 
@@ -212,7 +217,8 @@ void StereoWindow::show_frame(int number)
     //b = 0.062;
     //f=592;
     //distance = b*f/d
-    cv::Mat im_display = im_disparity > (min_val*16+50);
+    //cv::Mat im_display = im_disparity > (min_val*16+50);
+    Mat im_display = im_disparity;
 
     std::stringstream caption;
     caption << "min_val:" << min_val;

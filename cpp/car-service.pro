@@ -29,7 +29,8 @@ SOURCES += main.cpp \
     kalman.cpp \
     socket_server.cpp \
     car_controller.cpp \
-    stereo_camera.cpp
+    stereo_camera.cpp \
+    image_utils.cpp
 
 HEADERS += \
     geometry.h \
@@ -63,7 +64,8 @@ HEADERS += \
     async_buf.h \
     socket_server.h \
     car_controller.h \
-    stereo_camera.h
+    stereo_camera.h \
+    image_utils.h
 
 
 
