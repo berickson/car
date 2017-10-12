@@ -115,6 +115,10 @@ void Driver::avoid_barrels(StereoCamera & camera)
   if(direction == "straight") {
     str = car.steering_for_angle(Angle::degrees(0));
   }
+  if(direction== "unknown") {
+    str = car.steering_for_angle(Angle::degrees(0));
+    v_sp = 0;
+  }
   int esc = velocity_tracker.get_esc(car, v_sp, a_sp );
   car.set_esc_and_str(esc,str);
 }
