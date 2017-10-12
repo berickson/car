@@ -23,7 +23,7 @@ public:
     last_t = 0;
   }
 
-  int get_esc(Car & car, double v_sp, double a_sp) {
+  int get_esc(Car & car, double v_sp, double a_sp, bool is_rear_slipping) {
     double t = car.get_time_in_seconds();
     if (last_t != 0) {
       double dt = t - last_t;
@@ -48,12 +48,14 @@ public:
       velocity_output = clamp(velocity_output, min_v_sp, max_v_sp);
     }
    last_t = t;
-   return car.esc_for_velocity(velocity_output);
+   return is_rear_slipping ? 1500 : car.esc_for_velocity(velocity_output);
   }
 
 
-  int get_esc(Route &  route, Car & car) {
-    return get_esc(car, route.get_velocity(), route.get_acceleration());
+  int get_esc(Route &  route, Car & car, bool is_rear_slipping) {
+    if(is_rear_slipping)
+      return 1500;
+    return get_esc(car, route.get_velocity(), route.get_acceleration(), is_rear_slipping);
   }
 };
 
@@ -98,7 +100,7 @@ bool Driver::check_for_crash() {
 
 void Driver::avoid_barrels(StereoCamera & camera)
 {
-  log_entry_exit w("avoid barrles");
+  log_entry_exit w("avoid barrels");
   int str = 1500;
   double v_sp = 0.5;
   double a_sp = 0;
@@ -119,7 +121,7 @@ void Driver::avoid_barrels(StereoCamera & camera)
     str = car.steering_for_angle(Angle::degrees(0));
     v_sp = 0;
   }
-  int esc = velocity_tracker.get_esc(car, v_sp, a_sp );
+  int esc = velocity_tracker.get_esc(car, v_sp, a_sp, rear_slipping() );
   car.set_esc_and_str(esc,str);
 }
 
@@ -193,10 +195,8 @@ void Driver::continue_along_route(Route& route, StereoCamera &camera)
 
   unsigned str = route.done ? 1500 : car.steering_for_curvature(curvature) + p_adjust + d_adjust;
   //unsigned esc = route.done? esc_for_velocity(velocity_pid, 0, 0) : esc_for_velocity(velocity_pid, route.get_velocity(), route.get_acceleration());
-  unsigned esc = velocity_tracker.get_esc(route, car);
+  unsigned esc = velocity_tracker.get_esc(route, car, rear_slipping());
 
-  if(rear_slipping() && 0)
-    esc = 1500;
 
   if(route.done && fabs(car.get_velocity()) < 0.01) {
     log_info("route completed normally");
@@ -342,7 +342,6 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
           velocity_tracker.reset(); // otherwise, excessive accel after waiting
           log_info("done waiting");
         }
-
       }
 
       if(mode == "done") {
