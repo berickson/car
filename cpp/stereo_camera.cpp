@@ -112,7 +112,6 @@ void StereoCamera::process_disparities(const cv::Mat L, const cv::Mat R)
       cv::Ptr<cv::StereoSGBM> matcher = cv::StereoSGBM::create(-10, (10)*16, 11, 100, 1000, 32, 0, 15, 1000, 16, cv::StereoSGBM::MODE_HH);
       matcher->compute(L, R, im_disparity);
     } else {
-      auto start_time = std::chrono::system_clock::now();
       cv::Ptr<cv::StereoBM> matcher = cv::StereoBM::create(max_disparity, block_size);
 
       matcher->setUniquenessRatio(10);
@@ -123,8 +122,6 @@ void StereoCamera::process_disparities(const cv::Mat L, const cv::Mat R)
       int h = L_gray.size[0];
       int roi_center = h/2-40;
       int box_height = 30;
-      int min_disparity_i = 0;
-      int min_disparity = INT_MAX;
       matcher->compute(L_gray, R_gray, im_disparity);
 
       double min_val; double max_val;
@@ -204,6 +201,10 @@ void StereoCamera::record_thread_proc()
         cv::remap(left_camera.latest_frame, left_camera.latest_frame, map11, map12,CV_INTER_LINEAR);
 
         // todo: call client to do additional processing
+        if(process_disparities_enabled) {
+          process_disparities(left_camera.latest_frame, right_camera.latest_frame);
+        }
+
         ++frames_processed;
       }
       if(frames_processed > 0) {

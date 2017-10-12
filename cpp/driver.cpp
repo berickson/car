@@ -96,12 +96,6 @@ bool Driver::check_for_crash() {
   return false;
 }
 
-const cv::Mat fast_bgr_to_gray(const cv::Mat im) {
-  cv::Mat channels[3];
-  cv::split(im, channels);
-  return channels[1]; // green
-}
-
 void Driver::avoid_barrels(StereoCamera & camera)
 {
   log_entry_exit w("avoid barrles");
@@ -177,7 +171,7 @@ void Driver::continue_along_route(Route& route, StereoCamera &camera)
       if(route.nodes[i].road_sign_command == "avoid_barrels") {
         log_info("car commanded to avoid barrels");
         mode = "avoid_barrels";
-        camera.process_clearances_enabled = true;
+        camera.process_disparities_enabled = true;
       }
     }
   }

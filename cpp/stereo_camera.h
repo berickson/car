@@ -24,7 +24,7 @@ public:
   void record_thread_proc();
   int frames_recorded = 0;  // number of frames in avi, might include duplicates
   int frames_processed = 0; // number of unique frames processed
-  bool process_clearances_enabled = false;
+  bool process_disparities_enabled = false;
 
   // rectification maps
   cv::Mat map11,map12, map21, map22;
