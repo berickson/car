@@ -76,7 +76,7 @@ FORMS    += \
     lidar_window.ui \
     camera_window.ui
 
-unix|win32: LIBS += -L/usr/local/lib -lwiringPi -lncurses -lopencv_imgcodecs -lopencv_core -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d -lopencv_flann
+unix|win32: LIBS += -L/usr/local/lib -lopencv_imgcodecs -lopencv_core -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d -lopencv_flann
 
 RESOURCES += \
     ../resources.qrc

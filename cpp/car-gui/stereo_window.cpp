@@ -23,7 +23,7 @@ StereoWindow::StereoWindow(QWidget *parent) :
 {
   ui->setupUi(this);
   left_camera.name = "elp1_left_640_480";
-  std::string base_name = "/home/brian/car/tracks/front-sidewalk/routes/B/runs/2/video_";
+  std::string base_name = "/home/brian/car/tracks/back-yard/routes/A/runs/19/video_";
   //std::string base_name = "/home/brian/car/debug/";
   left_camera.cap.open(base_name + "left.avi");
   right_camera.name = "elp1_left_640_480";
@@ -139,10 +139,10 @@ void StereoWindow::show_frame(int number)
   cv::Mat L = left_camera.frame;
   cv::Mat R = right_camera.frame;
   if(ui->depth_map_checkbox->isChecked() && !L.empty() && !R.empty()) {
-    int max_disparity = 320;
+    int max_disparity = 64;
     int block_size = 5;
     Mat im_disparity = Mat( L.rows, L.cols, CV_16S );
-    cv::Ptr<StereoSGBM> matcher = cv::StereoSGBM::create(0, (10)*16, 11, 100, 1000, 32, 0, 15, 1000, 16, cv::StereoSGBM::MODE_HH);
+    cv::Ptr<StereoSGBM> matcher = cv::StereoSGBM::create(0, max_disparity, 11, 100, 1000, 32, 0, 15, 1000, 16, cv::StereoSGBM::MODE_HH);
     matcher->compute(L, R, im_disparity);
     double min_val; double max_val;
     cv::minMaxLoc(im_disparity, &min_val, &max_val);
