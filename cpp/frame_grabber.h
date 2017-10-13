@@ -15,6 +15,7 @@
 // based on http://answers.opencv.org/question/74255/time-delay-in-videocapture-opencv-due-to-capture-buffer/
 
 
+
 class FrameGrabber {
 public:
   FrameGrabber();
@@ -33,7 +34,7 @@ public:
   std::mutex grabber_mutex;
   std::atomic<bool> grab_on; //this is lock free
   int frames_grabbed = 0;
-  int max_frames_to_buffer = 1;
+  unsigned int max_frames_to_buffer = 1;
 
   std::thread grab_thread;
   void grab_thread_proc();

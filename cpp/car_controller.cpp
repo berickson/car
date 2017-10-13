@@ -110,7 +110,7 @@ void go(Car& car) {
 
     try {
       Driver d(car, run_settings);
-      d.drive_route(rte);
+      d.drive_route(rte, camera);
       log_info("back from drive_route");
     } catch (std::string e) {
       error_text = e;

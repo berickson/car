@@ -43,7 +43,8 @@ SOURCES += main.cpp\
     ../car_controller.cpp \
     ../socket_server.cpp \
     camera_window.cpp \
-    ../stereo_camera.cpp
+    ../stereo_camera.cpp \
+    ../image_utils.cpp
 
 HEADERS  += \
     ../ackerman.h \
