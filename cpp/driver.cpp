@@ -289,8 +289,8 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
     velocity_pid.k_i = settings.v_k_i * voltage_factor;
     velocity_pid.k_d = settings.v_k_d * voltage_factor;
 
-    velocity_tracker.k_v = settings.v_k_p;
-    velocity_tracker.k_a = settings.v_k_d;
+    velocity_tracker.k_v = settings.v_k_p * voltage_factor;
+    velocity_tracker.k_a = settings.v_k_d * voltage_factor;
     velocity_tracker.reset();
 
     route_complete = false;
