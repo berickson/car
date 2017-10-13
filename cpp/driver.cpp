@@ -102,7 +102,7 @@ void Driver::avoid_barrels(StereoCamera & camera)
 {
   log_entry_exit w("avoid barrels");
   int str = 1500;
-  double v_sp = 0.5;
+  double v_sp = 0.25;
   double a_sp = 0;
   string direction = camera.get_clear_driving_direction();
   log_info("steering direction: " + direction);
