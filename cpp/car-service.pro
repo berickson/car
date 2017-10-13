@@ -44,13 +44,10 @@ HEADERS += \
     trim.h \
     ends_with.h \
     fake_car.h \
-    menu.h \
     system.h \
-    pi_buttons.h \
     route.h \
     string_utils.h \
     driver.h \
-    car_ui.h \
     lookup_table.h \
     run_settings.h \
     camera.h \

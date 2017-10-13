@@ -337,7 +337,7 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
       }
 
       if(mode == "wait") {
-        car.set_esc_and_str(1500,1500);
+        car.set_esc_and_str(1500, 1500);
         if(system_clock::now() > wait_end_time) {
           mode = "follow_route";
           velocity_tracker.reset(); // otherwise, excessive accel after waiting
