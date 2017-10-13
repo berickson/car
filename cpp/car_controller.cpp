@@ -7,7 +7,6 @@
 #include <fstream>
 #include <sstream>
 #include <bitset>
-#include "car_ui.h"
 #include "driver.h"
 #include "run_settings.h"
 #include <unistd.h> // usleep

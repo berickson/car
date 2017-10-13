@@ -1,7 +1,6 @@
 #include "driver.h"
 #include "car.h"
 #include "math.h"
-#include "car_ui.h"
 #include <unistd.h> // usleep
 #include "logger.h"
 #include "pid.h"
