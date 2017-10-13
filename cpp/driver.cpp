@@ -283,7 +283,7 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
     steering_pid.k_d = settings.steering_k_d;
 
     PID velocity_pid;
-    double voltage = car.get_voltage()*car.get_voltage();
+    double voltage = car.get_voltage();
     double voltage_factor = (voltage != NAN && voltage > 0) ? 100/(voltage*voltage) : 1.0;
     velocity_pid.k_p = settings.v_k_p * voltage_factor;
     velocity_pid.k_i = settings.v_k_i * voltage_factor;
