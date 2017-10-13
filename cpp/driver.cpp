@@ -348,6 +348,11 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
         car.set_esc_and_str(1500,1500);
         car.set_manual_mode();
       }
+
+      if(settings.crash_recovery == true && check_for_crash()) {
+        log_warning("crash detected, aborting run");
+        route_complete = true;
+      }
       /*
 
       if(settings.crash_recovery == true && !recovering_from_crash) {
