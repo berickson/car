@@ -118,6 +118,10 @@ bool Route::is_stop_ahead() {
   return done || nodes[index+1].road_sign_command == "stop";
 }
 
+RouteNode * Route::get_source_node() {
+    return & nodes[index];
+}
+
 RouteNode * Route::get_target_node()
 {
   if (done) {
