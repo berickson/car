@@ -546,10 +546,10 @@ void Route::optimize_velocity(double max_velocity, double max_lateral_accelerati
   }
 
   // apply speed limits for curves
-  for(int i=0; i < (int)nodes.size()-3; i++) {
+  for(int i=0; i < (int)nodes.size()-11; i++) {
     RouteNode & p0 = nodes[i];
-    RouteNode & p1 = nodes[i+1];
-    RouteNode & p2 = nodes[i+2];
+    RouteNode & p1 = nodes[i+5];
+    RouteNode & p2 = nodes[i+10];
 
     // find two vectors for this and next segment
     Point v1(p1.front_x-p0.front_x, p1.front_y-p0.front_y);

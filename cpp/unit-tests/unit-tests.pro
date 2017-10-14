@@ -26,16 +26,12 @@ SOURCES += \
     ../ackerman.cpp \
     ../camera.cpp \
     ../car.cpp \
-    ../car_menu.cpp \
-    ../car_ui.cpp \
     ../config.cpp \
-    ../console_menu.cpp \
     ../driver.cpp \
     ../fake_car.cpp \
     ../file_names.cpp \
     ../frame_grabber.cpp \
     ../kalman.cpp \
-    ../menu.cpp \
     ../pid.cpp \
     ../route.cpp \
     ../run_settings.cpp \
@@ -47,7 +43,9 @@ SOURCES += \
     ../work_queue.cpp \
     ../logger.cpp \
     ../lookup_table.cpp \
-    ../pi_buttons.cpp \
+    ../socket_server.cpp \
+    ../stereo_camera.cpp \
+    ../image_utils.cpp \
     ackerman_test.cpp \
     work_queue_test.cpp \
     async_buf_tests.cpp \
@@ -55,7 +53,7 @@ SOURCES += \
     geometry_tests.cpp
 
 
-LIBS += -L/usr/local/lib -lncurses -lwiringPi -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d
+LIBS += -L/usr/local/lib -lopencv_core -lopencv_videoio -lopencv_highgui -lopencv_imgproc -lopencv_features2d -lopencv_xfeatures2d -lopencv_calib3d
 
 TEMPLATE = app
 CONFIG += console
