@@ -538,6 +538,9 @@ void Route::optimize_velocity(double max_velocity, double max_lateral_accelerati
     if(node.road_sign_command == "stop") {
       node.velocity = 0.0;
     }
+    if(node.road_sign_command == "avoid_barrels") {
+      node.velocity = 0.0;
+    }
   }
 
   // apply speed limit of zero for switching direction
