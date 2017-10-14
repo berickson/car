@@ -308,7 +308,7 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
       // https://docs.google.com/drawings/d/1S2gPPzPD42xvuomWY12pHNqIRDZXRV040nHIy7_USxc/edit?usp=sharing
 
       if(mode=="avoid_barrels") {
-        RouteNode * avoid_start_node = route.get_target_node();
+        RouteNode * avoid_start_node = route.get_source_node();
         double avoid_meters = stod(avoid_start_node->arg1);
         double distance_travelled = distance(car.get_front_position(), avoid_start_node->get_front_position());
         if(distance_travelled < avoid_meters){
