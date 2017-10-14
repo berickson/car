@@ -539,7 +539,7 @@ void Route::optimize_velocity(double max_velocity, double max_lateral_accelerati
       node.velocity = 0.0;
     }
     if(node.road_sign_command == "avoid_barrels") {
-      node.velocity = 0.0;
+      node.velocity = 0.5;
     }
   }
 
