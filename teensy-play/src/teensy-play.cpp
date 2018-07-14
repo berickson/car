@@ -33,7 +33,7 @@ void setup(){
   Serial.println("inside setup");
   mpu9150.setup();
   Serial.println("setup complete");
-  mpu9150.enable_interrupts(33);
+  mpu9150.enable_interrupts(17);
 
 }
 
