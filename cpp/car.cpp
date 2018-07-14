@@ -74,6 +74,7 @@ void Car::process_socket() {
       j["fr"] = get_front_right_wheel().get_json_state();
       j["front_x"] = get_front_position().x;
       j["front_y"] = get_front_position().y;
+      j["go_enabled"] = get_go_enabled();
       
 
       socket_server.send_response(j.dump());

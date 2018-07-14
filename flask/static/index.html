@@ -120,6 +120,7 @@
 <body class='main'>
   <h1 class='orange'>Orange Crash</h1>
   <div class='itembox'  ><div ng-class='car.poll_ok?"":"error-background"'>{{car.poll_ok ? "online - " + car.car_state.mode : "offline"}}</div></div>
+  <div class='itembox'  ><div ng-class='car.car_state.go_enabled?"":"error-background"'>{{car.car_state.go_enabled ? "go enabled" : "go enabled"}}</div></div>
   <div class="groupbox row">
     <div class='itembox'>
       <div class='bigtext data'>{{ car.rjust((car.car_state.velocity * 2.23694).toFixed(1),5) }}</div>
