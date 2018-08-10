@@ -120,7 +120,7 @@
 <body class='main'>
   <h1 class='orange'>Orange Crash</h1>
   <div class='itembox'  ><div ng-class='car.poll_ok?"":"error-background"'>{{car.poll_ok ? "online - " + car.car_state.mode : "offline"}}</div></div>
-  <div class='itembox'  ><div ng-class='car.car_state.go_enabled?"":"error-background"'>{{car.car_state.go_enabled ? "go enabled" : "go enabled"}}</div></div>
+  <div class='itembox'  ><div ng-class='car.car_state.go_enabled?"":"error-background"'>{{car.car_state.go_enabled ? "go enabled" : "go disabled"}}</div></div>
   <div class="groupbox row">
     <div class='itembox'>
       <div class='bigtext data'>{{ car.rjust((car.car_state.velocity * 2.23694).toFixed(1),5) }}</div>
@@ -131,7 +131,7 @@
       <div>{{car.car_state.v_bat | number:1}}V</div>
       <svg width="64" height="32">
         <rect x="2" y="2" width="60" height="28" style="fill:lightgray;stroke:gray;stroke-width:2" />
-        <rect ng-if="battery_percent" x="4" y="4" ng-attr-width="{{car.Math.max(56*car.battery_percent/100,0)}}" height="24" style="fill:black;stroke:black" />
+        <rect ng-if="car.battery_percent" x="4" y="4" ng-attr-width="{{car.Math.max(56*car.battery_percent/100,0)}}" height="24" style="fill:black;stroke:black" />
 
       </svg>
     </div>
