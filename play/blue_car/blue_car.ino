@@ -9,14 +9,14 @@ const int pin_esc_aux = 10;
 const int pin_rx_str = 11;
 const int pin_rx_esc = 12;
 
-#include <Servo.h>
+#include "Servo2.h"
 #include "PwmInput.h"
 
 PwmInput rx_str;
 PwmInput rx_esc;
 
-Servo str;
-Servo esc;
+Servo2 str;
+Servo2 esc;
 
 ///////////////////////////////////////////////
 // Interrupt handlers
