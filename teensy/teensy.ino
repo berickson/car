@@ -1,5 +1,5 @@
 //#include <I2Cdev.h>
-#include <Servo.h>
+#include "Servo2.h"
 #include "Pins.h"
 #include "QuadratureEncoder.h"
 #include "Logger.h"
@@ -43,8 +43,8 @@
 //////////////////////////
 // Globals
 
-Servo steering;
-Servo speed;
+Servo2 steering;
+Servo2 speed;
 Esc esc;
 
 PwmInput rx_steer;

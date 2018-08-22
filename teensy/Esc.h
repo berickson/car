@@ -1,6 +1,6 @@
 #pragma once
 #include "Arduino.h"
-#include "Servo.h"
+#include "Servo2.h"
 
 
 class Esc {
