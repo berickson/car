@@ -1,14 +1,14 @@
 #include "RemoteMode.h"
 #include "Arduino.h"
-#include "Servo.h"
+#include "Servo2.h"
 #include "PwmInput.h"
 
 
 
 const int timeout_ms = 1000; // minimum interval to receive commands before ending from timeout
 
-extern Servo speed;
-extern Servo steering;
+extern Servo2 speed;
+extern Servo2 steering;
 
 void RemoteMode::begin() {
   Serial.println("begin of remote mode");

@@ -1,10 +1,10 @@
 #include "ManualMode.h"
 #include "Arduino.h"
-#include "Servo.h"
+#include "Servo2.h"
 #include "PwmInput.h"
 
-extern Servo speed;
-extern Servo steering;
+extern Servo2 speed;
+extern Servo2 steering;
 extern PwmInput rx_steer;
 extern PwmInput rx_speed;
 

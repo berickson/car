@@ -3,8 +3,8 @@
 #include "Ping.h"
 
 extern Esc esc;
-extern Servo speed;
-extern Servo steering;
+extern Servo2 speed;
+extern Servo2 steering;
 extern Ping ping;
 
 

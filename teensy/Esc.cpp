@@ -21,7 +21,7 @@ void Esc::set_neutral_pwm_us(unsigned long us) {
   calibration_us = us - neutral_us;
 }
 
-void Esc::init(Servo * speed) {
+void Esc::init(Servo2 * speed) {
   this->speed = speed;
   set_pwm_us(neutral_us);
 }

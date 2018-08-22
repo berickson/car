@@ -6,7 +6,7 @@
 class Esc {
 public:
 
-  Servo * speed;
+  Servo2 * speed;
 
   const int min_forward_us = 1560;
   const int max_forward_us = 1600;
@@ -41,7 +41,7 @@ public:
   // neutral
   void set_neutral_pwm_us(unsigned long us);
 
-  void init(Servo * speed);
+  void init(Servo2 * speed);
 
   // sets pulse width, adjusted by calibration if any
   void set_pwm_us(int us);
