@@ -1,4 +1,9 @@
 #include "Arduino.h"
+#include "Task.h"
+#include "Fsm.h"
+#include "ManualMode.h"
+#include "RemoteMode.h"
+#include "CommandInterpreter.h"
 
 const int pin_motor_a = 24;
 const int pin_motor_b = 25;
@@ -38,6 +43,12 @@ Mpu9150 mpu9150;
 #include "PwmInput.h"
 
 ///////////////////////////////////////////////
+// helpers
+
+#define count_of(a) (sizeof(a)/sizeof(a[0]))
+
+
+///////////////////////////////////////////////
 // globals
 
 QuadratureEncoder odo_fl(pin_odo_fl_a, pin_odo_fl_b);
@@ -50,6 +61,82 @@ Servo2 str;
 Servo2 esc;
 
 MotorEncoder motor(pin_motor_a, pin_motor_b, pin_motor_c);
+
+///////////////////////////////////////////////
+// modes
+
+ManualMode manual_mode;
+RemoteMode remote_mode;
+
+Task * tasks[] = {&manual_mode, &remote_mode};
+
+Fsm::Edge edges[] = {
+  {"manual", "remote", "remote"},
+  {"remote", "manual", "manual"},
+  {"remote", "non-neutral", "manual"},
+  {"remote", "done", "manual"}
+};
+
+Fsm modes(tasks, count_of(tasks), edges, count_of(edges));
+
+///////////////////////////////////////////////
+// commands
+
+CommandInterpreter interpreter;
+
+void command_pulse_steer_and_esc() {
+  String & args = interpreter.command_args;
+  log(LOG_TRACE,"pse args" + args);
+  int i = args.indexOf(",");
+  if(i == -1) {
+    log(LOG_ERROR,"invalid args to pse " + args);
+    return;
+  }
+  String s_str = args.substring(0, i);
+  String s_esc = args.substring(i+1);
+
+  remote_mode.command_steer_and_esc(s_str.toInt(),  s_esc.toInt());
+}
+
+void command_manual() {
+  modes.set_event("manual");
+}
+
+void command_remote_control() {
+  modes.set_event("remote");
+}
+
+void help(); // forward decl for commands
+
+const Command commands[] = {
+  {"?", "help", help},
+//  {"td+", "trace dynamics on", trace_dynamics_on},
+//  {"td-", "trace dynamics off", trace_dynamics_off},
+//  {"tp+", "trace ping on", trace_ping_on},
+//  {"tp-", "trace ping off", trace_ping_off},
+//  {"te+", "trace esc on", trace_esc_on},
+//  {"te-", "trace esc off", trace_esc_off},
+//  {"tm+", "trace mpu on", trace_mpu_on},
+//  {"tm-", "trace mpu off", trace_mpu_off},
+//  {"tl+", "trace loop speed on", trace_loop_speed_on},
+//  {"tl-", "trace loop speed off", trace_loop_speed_off},
+//  {"c", "circle", command_circle},
+//  {"m", "manual", command_manual},
+//  {"f", "follow", command_follow},
+  {"rc", "remote control", command_remote_control},
+  {"pse", "pulse steer, esc", command_pulse_steer_and_esc},
+//  {"beep", "beep", command_beep},
+  
+};
+
+void help() {
+  for(unsigned int i = 0; i < count_of(commands); i++) {
+    const Command &c = commands[i];
+    Serial.println(String(c.name)+ " - " + c.description);
+  }
+}
+
+
 
 ///////////////////////////////////////////////
 // Interrupt handlers
@@ -98,6 +185,10 @@ bool every_n_ms(unsigned long last_loop_ms, unsigned long loop_ms, unsigned long
 
 
 void setup() {
+  Serial.begin(250000);
+  while(!Serial); // wait for serial to become ready
+  //delay(1000);
+  interpreter.init(commands, count_of(commands));
   // put your setup code here, to run once:
   rx_str.attach(pin_rx_str);
   rx_esc.attach(pin_rx_esc);
@@ -112,6 +203,9 @@ void setup() {
   attachInterrupt(pin_odo_fl_b, odo_fl_b_changed, CHANGE);
   attachInterrupt(pin_odo_fr_a, odo_fr_a_changed, CHANGE);
   attachInterrupt(pin_odo_fr_b, odo_fr_b_changed, CHANGE);
+
+  // pinMode(pin_motor_temp, INPUT_PULLUP);
+
 
 
   attachInterrupt(pin_rx_str, rx_str_handler, CHANGE);
@@ -147,6 +241,8 @@ void loop() {
   loop_time_ms = millis();
 
   mpu9150.execute();
+  interpreter.execute();
+  modes.execute();
 
   if (every_n_ms(last_loop_time_ms, loop_time_ms, 1)) {
     if(rx_str.pulse_us() > 0 && rx_esc.pulse_us() > 0) {
@@ -159,10 +255,16 @@ void loop() {
   }
 
   if (every_n_ms(last_loop_time_ms, loop_time_ms, 500)) {
-    Serial.print((String) "a: " + motor.a_count + " b: " + motor.b_count + " c: " + motor.c_count + " odo:" + motor.odometer + " temp: " + analogRead(pin_motor_temp));
-    Serial.print((String) " heading: " + mpu9150.heading());
-    Serial.print((String) " fl: (" + odo_fl.odometer_a + ","+odo_fl.odometer_b+")");
-    Serial.print((String) " fr: (" + odo_fr.odometer_a + ","+odo_fr.odometer_b+")");
-    Serial.println();
+    Serial.println(
+      (String) "a: " + motor.a_count 
+      + " b: " + motor.b_count 
+      + " c: " + motor.c_count 
+      + " odo:" + motor.odometer 
+      + " temp: " + analogRead(pin_motor_temp)
+      + " heading: " + mpu9150.heading()
+      + " fl: (" + odo_fl.odometer_a + ","+odo_fl.odometer_b+")"
+      + " fr: (" + odo_fr.odometer_a + ","+odo_fr.odometer_b+")"
+    );
+    
   }
 }
