@@ -5,7 +5,6 @@ bool LOG_INFO = true;
 bool LOG_TRACE = false;
 bool TRACE_RX = false;
 bool TRACE_PINGS = false;
-bool TRACE_ESC = false;
 bool TRACE_MPU = false;
 bool TRACE_LOOP_SPEED = false;
 bool TD = false;

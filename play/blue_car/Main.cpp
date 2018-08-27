@@ -98,13 +98,12 @@ void command_pulse_steer_and_esc() {
   remote_mode.command_steer_and_esc(s_str.toInt(),  s_esc.toInt());
 }
 
-
-void trace_dynamics_on() {
-  TD = true;
+void trace_mpu_on() {
+  TRACE_MPU = true;
 }
 
-void trace_dynamics_off() {
-  TD = false;
+void trace_mpu_off() {
+  TRACE_MPU = false;
 }
 
 void trace_loop_speed_on() {
@@ -114,6 +113,15 @@ void trace_loop_speed_on() {
 void trace_loop_speed_off() {
   TRACE_LOOP_SPEED = false;
 }
+
+void trace_dynamics_on() {
+  TD = true;
+}
+
+void trace_dynamics_off() {
+  TD = false;
+}
+
 
 
 
@@ -126,18 +134,22 @@ void command_remote_control() {
   Serial.println("remote event");
 }
 
+void calibrate_mpu() {
+  mpu9150.start_calibrate_at_rest(0, 60);
+}
+
 void help(); // forward decl for commands
 
 const Command commands[] = {
   {"?", "help", help},
+  {"help", "help", help},
+  {"calibrate", "calibrate at rest mpu", calibrate_mpu},
   {"td+", "trace dynamics on", trace_dynamics_on},
   {"td-", "trace dynamics off", trace_dynamics_off},
 //  {"tp+", "trace ping on", trace_ping_on},
 //  {"tp-", "trace ping off", trace_ping_off},
-//  {"te+", "trace esc on", trace_esc_on},
-//  {"te-", "trace esc off", trace_esc_off},
-//  {"tm+", "trace mpu on", trace_mpu_on},
-//  {"tm-", "trace mpu off", trace_mpu_off},
+  {"tm+", "trace mpu on", trace_mpu_on},
+  {"tm-", "trace mpu off", trace_mpu_off},
   {"tl+", "trace loop speed on", trace_loop_speed_on},
   {"tl-", "trace loop speed off", trace_loop_speed_off},
 //  {"c", "circle", command_circle},
@@ -251,7 +263,7 @@ void setup() {
   mpu9150.rest_a_mag = 0; // 7893.51;
   mpu9150.zero_adjust = Quaternion(0.0, 0.0, 0.0, 1);// Quaternion(-0.07, 0.67, -0.07, 0.73);
   // was ((-13.823402+4.9) / (1000 * 60 * 60)) * PI/180;
-  mpu9150.yaw_slope_rads_per_ms  = (2.7 / (10 * 60 * 1000)) * PI / 180;
+  mpu9150.yaw_slope_rads_per_ms  = -0.0000000680;// (2.7 / (10 * 60 * 1000)) * PI / 180;
   mpu9150.yaw_actual_per_raw = 1; //(3600. / (3600 - 29.0 )); //1.0; // (360.*10.)/(360.*10.-328);// 1.00; // 1.004826221;
 
   mpu9150.zero_heading();
@@ -299,7 +311,7 @@ void loop() {
 
   if(every_second && TRACE_LOOP_SPEED) {
     unsigned long loops_since_report = loop_count - last_report_loop_count;
-    double seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
+    float seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
 
     log(TRACE_LOOP_SPEED, "loops per second: "+ (loops_since_report / seconds_since_report ) + " microseconds per loop "+ (1E6 * seconds_since_report / loops_since_report) );
 
