@@ -2,14 +2,19 @@
 #include "Arduino.h"
 #include "Servo2.h"
 #include "PwmInput.h"
+#include "Logger.h"
 
 extern Servo2 esc;
 extern Servo2 str;
 extern PwmInput rx_str;
 extern PwmInput rx_esc;
 
+ManualMode::ManualMode() {
+  name = "manual";
+}
+
 void ManualMode::begin() {
-  Serial.println("begin of manual mode");
+  log(LOG_INFO, "begin of manual mode");
 }
 
 void ManualMode::end() {

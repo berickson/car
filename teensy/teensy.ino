@@ -306,6 +306,7 @@ void setup() {
   LOG_ERROR = true;
   Serial.begin(250000);
   Wire.begin();
+  modes.begin();
 
   interpreter.init(commands,count_of(commands));
   for(int i = 0; i < 5; i++) {

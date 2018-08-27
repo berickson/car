@@ -34,7 +34,7 @@ void CommandInterpreter::process_command(String s) {
     String name = commands[i].name;
     if(s.startsWith(name)) {
       command_args = s.substring(name.length());
-      log(LOG_INFO, "Executing command " + name + " with args (" + command_args + ")");
+      log(LOG_TRACE, "Executing command " + name + " with args (" + command_args + ")");
       commands[i].f();
       return;
     }

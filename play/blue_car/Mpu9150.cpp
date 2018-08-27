@@ -64,14 +64,13 @@ void Mpu9150::start_calibrate_at_rest(float pause_seconds, float test_seconds)
 }
 
 void Mpu9150::set_zero_orientation(Quaternion zero) {
-    Serial.println("re-oriented zero on MPU");
+    log(LOG_INFO,"re-oriented zero on MPU");
     zero_adjust = zero;
 }
 
 void Mpu9150::enable_interrupts(int interrupt_pin) {
     // enable Arduino interrupt detection
     log(TRACE_MPU,F("Enabling interrupt detection (Arduino external interrupt "));
-    Serial.println(interrupt_pin);
     pinMode(interrupt_pin, INPUT);
     attachInterrupt(interrupt_pin,dmpDataReady, RISING);
     interrupt_pending = mpu.getIntStatus();
@@ -89,7 +88,6 @@ void Mpu9150::setup() {
     yaw_raw_total = 0;
 
     // initialize device
-    Serial.println("9150 setup");
     log(TRACE_MPU,"Initializing I2C MPU devices...");
     mpu.initialize();
     log(TRACE_MPU,"Done Initializing I2C MPU devices...");
@@ -111,7 +109,7 @@ void Mpu9150::setup() {
         // turn on the DMP, now that it's ready
         log(TRACE_MPU,F("Enabling DMP..."));
         mpu.setDMPEnabled(true);
-        Serial.println(F("DMP ready!"));
+        log(TRACE_MPU,F("DMP ready"));
 
         // get expected DMP packet size for later comparison
         packetSize = mpu.dmpGetFIFOPacketSize();

@@ -1,7 +1,7 @@
 #include "Logger.h"
 
 bool LOG_ERROR = true;
-bool LOG_INFO = false;
+bool LOG_INFO = true;
 bool LOG_TRACE = false;
 bool TRACE_RX = false;
 bool TRACE_PINGS = false;

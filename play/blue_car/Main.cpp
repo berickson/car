@@ -98,30 +98,50 @@ void command_pulse_steer_and_esc() {
   remote_mode.command_steer_and_esc(s_str.toInt(),  s_esc.toInt());
 }
 
+
+void trace_dynamics_on() {
+  TD = true;
+}
+
+void trace_dynamics_off() {
+  TD = false;
+}
+
+void trace_loop_speed_on() {
+  TRACE_LOOP_SPEED = true;
+}
+
+void trace_loop_speed_off() {
+  TRACE_LOOP_SPEED = false;
+}
+
+
+
 void command_manual() {
   modes.set_event("manual");
 }
 
 void command_remote_control() {
   modes.set_event("remote");
+  Serial.println("remote event");
 }
 
 void help(); // forward decl for commands
 
 const Command commands[] = {
   {"?", "help", help},
-//  {"td+", "trace dynamics on", trace_dynamics_on},
-//  {"td-", "trace dynamics off", trace_dynamics_off},
+  {"td+", "trace dynamics on", trace_dynamics_on},
+  {"td-", "trace dynamics off", trace_dynamics_off},
 //  {"tp+", "trace ping on", trace_ping_on},
 //  {"tp-", "trace ping off", trace_ping_off},
 //  {"te+", "trace esc on", trace_esc_on},
 //  {"te-", "trace esc off", trace_esc_off},
 //  {"tm+", "trace mpu on", trace_mpu_on},
 //  {"tm-", "trace mpu off", trace_mpu_off},
-//  {"tl+", "trace loop speed on", trace_loop_speed_on},
-//  {"tl-", "trace loop speed off", trace_loop_speed_off},
+  {"tl+", "trace loop speed on", trace_loop_speed_on},
+  {"tl-", "trace loop speed off", trace_loop_speed_off},
 //  {"c", "circle", command_circle},
-//  {"m", "manual", command_manual},
+  {"m", "manual", command_manual},
 //  {"f", "follow", command_follow},
   {"rc", "remote control", command_remote_control},
   {"pse", "pulse steer, esc", command_pulse_steer_and_esc},
@@ -185,8 +205,15 @@ bool every_n_ms(unsigned long last_loop_ms, unsigned long loop_ms, unsigned long
 
 
 void setup() {
+
   Serial.begin(250000);
   while(!Serial); // wait for serial to become ready
+
+  manual_mode.name = "manual";
+  // follow_mode.name = "follow";
+  remote_mode.name = "remote";
+  modes.begin();
+
   //delay(1000);
   interpreter.init(commands, count_of(commands));
   // put your setup code here, to run once:
@@ -206,20 +233,18 @@ void setup() {
 
   // pinMode(pin_motor_temp, INPUT_PULLUP);
 
-
-
   attachInterrupt(pin_rx_str, rx_str_handler, CHANGE);
   attachInterrupt(pin_rx_esc, rx_esc_handler, CHANGE);
 
-  Serial.println("starting wire");
+  log(LOG_TRACE,"starting wire");
   Wire.begin();
 
-  Serial.println("starting mpu");
+  log(LOG_TRACE, "starting mpu");
 
   mpu9150.enable_interrupts(pin_mpu_interrupt);
   log(LOG_INFO, "Interrupts enabled for mpu9150");
   mpu9150.setup();
-  log(LOG_INFO, "MPU9150 setup complete");
+  
   mpu9150.ax_bias = 0; // 7724.52;
   mpu9150.ay_bias = 0; // -1458.47;
   mpu9150.az_bias = 0; // 715.62;
@@ -230,41 +255,56 @@ void setup() {
   mpu9150.yaw_actual_per_raw = 1; //(3600. / (3600 - 29.0 )); //1.0; // (360.*10.)/(360.*10.-328);// 1.00; // 1.004826221;
 
   mpu9150.zero_heading();
-  Serial.println("mpu setup complete");  
+  log(LOG_INFO, "setup complete");
+  
 
 }
+
+// diagnostics for reporting loop speeds
+unsigned long loop_count = 0;
 unsigned long loop_time_ms = 0;
 unsigned long last_loop_time_ms = 0;
+unsigned long last_report_ms = 0;
+unsigned long last_report_loop_count = 0;
 
 void loop() {
+  loop_count++;
   last_loop_time_ms = loop_time_ms;
   loop_time_ms = millis();
 
+  bool every_second = every_n_ms(last_loop_time_ms, loop_time_ms, 1000);
+  bool every_10_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 10);
+
+
   mpu9150.execute();
   interpreter.execute();
-  modes.execute();
 
-  if (every_n_ms(last_loop_time_ms, loop_time_ms, 1)) {
-    if(rx_str.pulse_us() > 0 && rx_esc.pulse_us() > 0) {
-      str.writeMicroseconds(rx_str.pulse_us());
-      esc.writeMicroseconds(rx_esc.pulse_us());
-    } else {
-      str.writeMicroseconds(1500);
-      esc.writeMicroseconds(1500);
-    }
+  if (every_10_ms) {
+    modes.execute();
   }
 
-  if (every_n_ms(last_loop_time_ms, loop_time_ms, 500)) {
-    Serial.println(
-      (String) "a: " + motor.a_count 
-      + " b: " + motor.b_count 
-      + " c: " + motor.c_count 
-      + " odo:" + motor.odometer 
-      + " temp: " + analogRead(pin_motor_temp)
-      + " heading: " + mpu9150.heading()
-      + " fl: (" + odo_fl.odometer_a + ","+odo_fl.odometer_b+")"
-      + " fr: (" + odo_fr.odometer_a + ","+odo_fr.odometer_b+")"
-    );
-    
+
+  if (every_10_ms && TD) {
+      Serial.println(
+        (String) "a: " + motor.a_count 
+        + " b: " + motor.b_count 
+        + " c: " + motor.c_count 
+        + " odo:" + motor.odometer 
+        + " temp: " + analogRead(pin_motor_temp)
+        + " heading: " + mpu9150.heading()
+        + " fl: (" + odo_fl.odometer_a + ","+odo_fl.odometer_b+")"
+        + " fr: (" + odo_fr.odometer_a + ","+odo_fr.odometer_b+")"
+      );
+  }
+
+  if(every_second && TRACE_LOOP_SPEED) {
+    unsigned long loops_since_report = loop_count - last_report_loop_count;
+    double seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
+
+    log(TRACE_LOOP_SPEED, "loops per second: "+ (loops_since_report / seconds_since_report ) + " microseconds per loop "+ (1E6 * seconds_since_report / loops_since_report) );
+
+    // remember stats for next report
+    last_report_ms = loop_time_ms;
+    last_report_loop_count = loop_count;
   }
 }
