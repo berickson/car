@@ -98,6 +98,14 @@ void command_pulse_steer_and_esc() {
   remote_mode.command_steer_and_esc(s_str.toInt(),  s_esc.toInt());
 }
 
+void trace_telemetry_on() {
+  TRACE_TELEMETRY = true;
+}
+
+void trace_telemetry_off() {
+  TRACE_TELEMETRY = false;
+}
+
 void trace_mpu_on() {
   TRACE_MPU = true;
 }
@@ -148,6 +156,8 @@ const Command commands[] = {
   {"td-", "trace dynamics off", trace_dynamics_off},
 //  {"tp+", "trace ping on", trace_ping_on},
 //  {"tp-", "trace ping off", trace_ping_off},
+  {"tt+", "trace telemetry on", trace_telemetry_on},
+  {"tt-", "trace telemetry on", trace_mpu_off},
   {"tm+", "trace mpu on", trace_mpu_on},
   {"tm-", "trace mpu off", trace_mpu_off},
   {"tl+", "trace loop speed on", trace_loop_speed_on},
@@ -296,12 +306,13 @@ void loop() {
   }
 
 
-  if (every_10_ms && TD) {
-      Serial.println(
-        (String) "a: " + motor.a_count 
+  if (every_second && TRACE_TELEMETRY) {
+      log(TRACE_TELEMETRY,
+        (String) "odo:" + motor.odometer 
+        + " odo_us: " + motor.last_change_us
+        + " a: " + motor.a_count 
         + " b: " + motor.b_count 
         + " c: " + motor.c_count 
-        + " odo:" + motor.odometer 
         + " temp: " + analogRead(pin_motor_temp)
         + " heading: " + mpu9150.heading()
         + " fl: (" + odo_fl.odometer_a + ","+odo_fl.odometer_b+")"
@@ -309,11 +320,76 @@ void loop() {
       );
   }
 
+  if(every_10_ms && TD) {
+    // constants below based on 220k and 1M resistor, 1023 steps and 3.3 reference voltage
+    // HACK: no battery voltage yet
+    float battery_voltage = 0; //analogRead(PIN_BATTERY_VOLTAGE_DIVIDER) * ((3.3/1023.) / 220.)*(220.+1000.);
+    
+    noInterrupts();
+    auto fl_odo_a = odo_fl.odometer_a;
+    auto fl_odo_a_us = odo_fl.last_odometer_a_us;
+    auto fl_odo_b = odo_fl.odometer_b;
+    auto fl_odo_b_us = odo_fl.last_odometer_b_us;
+    auto fl_odo_ab_us = odo_fl.odometer_ab_us;
+    interrupts();
+
+    noInterrupts();
+    auto fr_odo_a = odo_fr.odometer_a;
+    auto fr_odo_a_us = odo_fr.last_odometer_a_us;
+    auto fr_odo_b = odo_fr.odometer_b;
+    auto fr_odo_b_us = odo_fr.last_odometer_b_us;
+    auto fr_odo_ab_us = odo_fr.odometer_ab_us;
+    interrupts();
+    
+    // HACK, motor being reported as bl
+    noInterrupts();
+    auto bl_odo_a = motor.odometer;
+    auto bl_odo_a_us = motor.last_change_us;
+    interrupts();
+
+
+    auto bl_odo_b = bl_odo_a;
+    auto bl_odo_b_us = bl_odo_a_us;
+    auto bl_odo_ab_us = 0;
+    
+    auto br_odo_a = bl_odo_a;
+    auto br_odo_a_us = bl_odo_a_us;
+    auto br_odo_b = bl_odo_b;
+    auto br_odo_b_us = bl_odo_b_us;
+    auto br_odo_ab_us = bl_odo_ab_us;
+
+    // HACK: go button not enabled
+    int go = 1;
+
+
+    
+    log(TD,
+       "str," + str.readMicroseconds()
+       + ",esc," + esc.readMicroseconds()
+       //+ ",aa,"+ ftos(mpu9150.ax) + "," + ftos(mpu9150.ay)+","+ ftos(mpu9150.az)
+       + ",aa,"+ 0 + "," + 0+","+ 0
+       +",spur_us,"+   0 + "," + 0
+       +",spur_odo," + mpu9150.temperature // spur_pulse_count
+       +",mode,"+modes.current_task->name
+       +",odo_fl,"+ fl_odo_a +"," +  fl_odo_a_us + "," + fl_odo_b +"," + fl_odo_b_us + "," + fl_odo_ab_us
+       +",odo_fr,"+ fr_odo_a +"," +  fr_odo_a_us + "," + fr_odo_b +"," + fr_odo_b_us + "," + fr_odo_ab_us
+       +",odo_bl,"+ bl_odo_a +"," +  bl_odo_a_us + "," + bl_odo_b +"," + bl_odo_b_us + "," + bl_odo_ab_us
+       +",odo_br,"+ br_odo_a +"," +  br_odo_a_us + "," + br_odo_b +"," + br_odo_b_us + "," + br_odo_ab_us
+       +",ms,"+millis()
+       +",us,"+micros()
+       +",ypr,"+ mpu9150.heading() + "," + ftos(mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
+       +",vbat,"+ftos(battery_voltage)
+       +",go,"+go
+       );
+  }
+
   if(every_second && TRACE_LOOP_SPEED) {
     unsigned long loops_since_report = loop_count - last_report_loop_count;
     float seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
 
-    log(TRACE_LOOP_SPEED, "loops per second: "+ (loops_since_report / seconds_since_report ) + " microseconds per loop "+ (1E6 * seconds_since_report / loops_since_report) );
+    log(TRACE_LOOP_SPEED, 
+      "loops per second: "+ (loops_since_report / seconds_since_report ) 
+      + " microseconds per loop "+ (1E6 * seconds_since_report / loops_since_report) );
 
     // remember stats for next report
     last_report_ms = loop_time_ms;
