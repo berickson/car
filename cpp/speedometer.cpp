@@ -43,9 +43,6 @@ nlohmann::json Speedometer::get_json_state() const
 
 double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigned int a_us, int odo_b, unsigned int b_us, int ab_us) {
   double last_v = velocity;
-  std::stringstream ss;
-  ss << clock_us << ", " << odo_a << ", " << a_us + ", " << odo_b << ", " << b_us << ", "  << ab_us;
-  log_info(ss.str());
 
   if (a_us != last_a_us) {
     v_a =  (odo_a-last_odo_a)*2*meters_per_tick / (a_us - last_a_us) *1E6;
