@@ -255,7 +255,7 @@ void Car::apply_dynamics(Dynamics & d) {
   back_left_wheel.update_from_sensor(current.us, current.odometer_back_left_a, current.odometer_back_left_a_us, current.odometer_back_left_b, current.odometer_back_left_b_us, current.odometer_back_left_ab_us);
   back_right_wheel.update_from_sensor(current.us, current.odometer_back_right_a, current.odometer_back_right_a_us, current.odometer_back_right_b, current.odometer_back_right_b_us, current.odometer_back_right_ab_us);
   front_left_wheel.update_from_sensor(current.us, current.odometer_front_left_a, current.odometer_front_left_a_us, current.odometer_front_left_b, current.odometer_front_left_b_us, current.odometer_front_left_ab_us);
-  motor.update_from_sensor(current.us, current.spur_odo, current.spur_last_us, 0, 0, 0);
+  motor.update_from_sensor(current.us, current.spur_odo, current.spur_last_us, current.us, current.spur_odo, current.spur_last_us, 0);
   double wheel_distance_meters = front_right_wheel.update_from_sensor(current.us, current.odometer_front_right_a, current.odometer_front_right_a_us, current.odometer_front_right_b, current.odometer_front_right_b_us, current.odometer_front_right_ab_us);
 
   if (reading_count > 2 && fabs(wheel_distance_meters) > 0.) { // adding 2 keeps out the big jump after a reset
