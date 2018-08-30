@@ -4,6 +4,8 @@
 #include "ManualMode.h"
 #include "RemoteMode.h"
 #include "CommandInterpreter.h"
+#include "RxEvents.h"
+
 
 const int pin_motor_a = 24;
 const int pin_motor_b = 25;
@@ -56,6 +58,8 @@ QuadratureEncoder odo_fr(pin_odo_fr_a, pin_odo_fr_b);
 
 PwmInput rx_str;
 PwmInput rx_esc;
+RxEvents rx_events;
+
 
 Servo2 str;
 Servo2 esc;
@@ -300,6 +304,16 @@ void loop() {
 
   mpu9150.execute();
   interpreter.execute();
+
+  rx_events.process_pulses(rx_str.pulse_us(), rx_str.pulse_us());
+  bool new_rx_event = rx_events.get_event();
+  // send events through modes state machine
+  if(new_rx_event) {
+    if(!rx_events.current.equals(RxEvent('C','N'))) {
+      modes.set_event("non-neutral");
+    }
+  }  
+
 
   if (every_10_ms) {
     modes.execute();
