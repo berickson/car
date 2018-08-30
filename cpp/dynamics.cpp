@@ -164,8 +164,8 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
     d.ay = stod(fields[8]);
     d.az = stod(fields[9]);
 
-    d.spur_delta_us = stoul(fields[11]);
-    d.spur_last_us = stoul(fields[12]);
+    d.spur_last_us = stoul(fields[11]);
+    d.spur_delta_us = stoul(fields[12]);
     d.spur_odo = stoi(fields[14]);
     d.control_mode = fields[16][0];
 
