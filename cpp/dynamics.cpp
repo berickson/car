@@ -122,8 +122,7 @@ std::string Dynamics::csv_fields() {
   ss << az << ",";
 
   // "imu_calib";
-  ss << calibration_status << ",";
-  ss << "go" << endl;
+  ss << calibration_status;
 
 
   return ss.str();

@@ -531,7 +531,7 @@ void Route::optimize_velocity(double max_velocity, double max_lateral_accelerati
   }
 
   // final velocity must be near zero (was zero but leads to slow starts)
-  nodes[nodes.size()-1].velocity = 0.5;
+  nodes[nodes.size()-1].velocity = 0.0;
 
   // all "stop" node velocities must be zero
   for(RouteNode & node : nodes) {
