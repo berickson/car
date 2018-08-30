@@ -48,6 +48,7 @@ public:
   // calibrated measurements
   double meters_per_odometer_tick;
   double rear_meters_per_odometer_tick;
+  double motor_meters_per_odometer_tick;
   double gyro_adjustment_factor;
   int center_steering_us;
   int min_forward_esc;
