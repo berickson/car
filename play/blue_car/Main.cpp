@@ -357,7 +357,7 @@ void loop() {
     
     noInterrupts();
     auto motor_odo = motor.odometer;
-    auto motor_us = motor.last_change_us
+    auto motor_us = motor.last_change_us;
     interrupts();
 
 
