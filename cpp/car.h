@@ -112,7 +112,7 @@ public:
   };
 
   double get_temperature() {
-    return current_dynamics.spur_odo;
+    return current_dynamics.mpu_temperature;
   }
 
   int get_spur_odo() {

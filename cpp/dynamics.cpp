@@ -146,9 +146,9 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
   }
   if(fields[1] != "TD")
     return false;
-  if(fields.size() != 53) {
+  if(fields.size() != 55) {
     stringstream error;
-    error << "wrong number of field in TD. Expected: 53, actual:" << fields.size() << ".";
+    error << "wrong number of field in TD. Expected: 55, actual:" << fields.size() << ".";
     log_warning(error.str());
     //usb_error_count++;
     return false;
@@ -203,6 +203,7 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
 
     d.battery_voltage = stod(fields[50]);
     d.go = stod(fields[52])==1;
+    d.mpu_temperature = stod(fields[54]);
 
   } catch (...)
   {

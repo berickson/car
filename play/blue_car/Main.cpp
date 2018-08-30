@@ -355,13 +355,15 @@ void loop() {
     auto fr_odo_ab_us = odo_fr.odometer_ab_us;
     interrupts();
     
-    // HACK, motor being reported as bl
     noInterrupts();
-    auto bl_odo_a = motor.odometer;
-    auto bl_odo_a_us = motor.last_change_us;
+    auto motor_odo = motor.odometer;
+    auto motor_us = motor.last_change_us
     interrupts();
 
 
+    // HACK, motor being reported as bl
+    auto bl_odo_a = motor_odo;
+    auto bl_odo_a_us = motor_us;
     auto bl_odo_b = bl_odo_a;
     auto bl_odo_b_us = bl_odo_a_us;
     auto bl_odo_ab_us = 0;
@@ -382,8 +384,8 @@ void loop() {
        + ",esc," + esc.readMicroseconds()
        //+ ",aa,"+ ftos(mpu9150.ax) + "," + ftos(mpu9150.ay)+","+ ftos(mpu9150.az)
        + ",aa,"+ 0 + "," + 0+","+ 0
-       +",spur_us,"+   0 + "," + 0
-       +",spur_odo," + mpu9150.temperature // spur_pulse_count
+       +",spur_us,"+   motor_us + "," + 0
+       +",spur_odo," + motor_odo // spur_pulse_count
        +",mode,"+modes.current_task->name
        +",odo_fl,"+ fl_odo_a +"," +  fl_odo_a_us + "," + fl_odo_b +"," + fl_odo_b_us + "," + fl_odo_ab_us
        +",odo_fr,"+ fr_odo_a +"," +  fr_odo_a_us + "," + fr_odo_b +"," + fr_odo_b_us + "," + fr_odo_ab_us
@@ -394,6 +396,7 @@ void loop() {
        +",ypr,"+ mpu9150.heading() + "," + ftos(mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
        +",vbat,"+ftos(battery_voltage)
        +",go,"+go
+       +",temp,"+mpu9150.temperature
        );
   }
 

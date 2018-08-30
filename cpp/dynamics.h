@@ -64,6 +64,7 @@ public:
   double battery_voltage;
   int calibration_status;
   bool go;
+  double mpu_temperature = NAN;
 
   static std::string csv_field_headers();
   std::string csv_fields();

@@ -68,7 +68,7 @@ double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigne
     ds = 0;
   }
   if (ds != 0 ) {
-    velocity = float(ds)/dt*1600;  // 1,000,000 nanos / sec * 1m  /1000 mm * 1.6 wheel ratioinner / outer wheel ratio
+    velocity = float(ds)/dt*1600;  // 1,000,000 nanos / sec * 1m  /1000 mm * 1.6 wheel ratio inner / outer wheel ratio
   }
 #endif
   unsigned tick_us = std::max(a_us,b_us);
