@@ -41,7 +41,7 @@ nlohmann::json Speedometer::get_json_state() const
   return j;
 }
 
-double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigned int a_us, int odo_b, unsigned int b_us, int ab_us) {
+double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigned int a_us, int odo_b, unsigned int b_us) {
   double last_v = velocity;
 
   if (a_us != last_a_us) {
@@ -53,24 +53,6 @@ double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigne
   velocity = (v_a + v_b) / 2.;
 
 
-#if 0
-  // calculate velocity based int ab time in hall sensor (1mm gap)
-  // this is more accuratel that using distance measure below for velocity
-  auto dt = ab_us - last_ab_us;
-  auto ds = 0;
-
-  // if forward use a to be time, reverse use b to a time
-  if (odo_b > last_odo_b) {
-    ds = odo_b - last_odo_b; // forward
-  } else if (odo_a < last_odo_a) {
-    ds = odo_a - last_odo_a;
-  } else {
-    ds = 0;
-  }
-  if (ds != 0 ) {
-    velocity = float(ds)/dt*1600;  // 1,000,000 nanos / sec * 1m  /1000 mm * 1.6 wheel ratio inner / outer wheel ratio
-  }
-#endif
   unsigned tick_us = std::max(a_us,b_us);
   unsigned last_tick_us = std::max(last_a_us, last_b_us);
   double meters_moved = ((odo_a - last_odo_a) + (odo_b - last_odo_b))*meters_per_tick;
@@ -109,7 +91,6 @@ double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigne
   last_odo_b = odo_b;
   last_a_us  = a_us;
   last_b_us  = b_us;
-  last_ab_us = ab_us;
   last_clock_us = clock_us;
 
   return meters_moved;

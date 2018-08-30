@@ -19,35 +19,30 @@ string Dynamics::to_string() {
      << "ay:" << ay << endl
      << "az:" << az << endl
 
-     << "spur_delta_us:" << spur_delta_us << endl
      << "spur_last_us:" << spur_last_us << endl
      << "spur_odo:" << spur_odo << endl
 
      << "mode:" << control_mode << endl
 
-     << "odometer_front_left_a:" << odometer_front_left_a << endl
-     << "odometer_front_left_a_us:" << odometer_front_left_a_us << endl
-     << "odometer_front_left_b:" << odometer_front_left_b << endl
-     << "odometer_front_left_b_us:" << odometer_front_left_b_us << endl
-     << "odometer_front_left_ab_us:" << odometer_front_left_ab_us << endl
+     << "odo_fl_a:" << odo_fl_a << endl
+     << "odo_fl_a_us:" << odo_fl_a_us << endl
+     << "odo_fl_b:" << odo_fl_b << endl
+     << "odo_fl_b_us:" << odo_fl_b_us << endl
 
-     << "odometer_front_right_a:" << odometer_front_right_a << endl
-     << "odometer_front_right_a_us:" << odometer_front_right_a_us << endl
-     << "odometer_front_right_b:" << odometer_front_right_b << endl
-     << "odometer_front_right_b_us:" << odometer_front_right_b_us << endl
-     << "odometer_front_right_ab_us:" << odometer_front_right_ab_us << endl
+     << "odo_fr_a:" << odo_fr_a << endl
+     << "odo_fr_a_us:" << odo_fr_a_us << endl
+     << "odo_fr_b:" << odo_fr_b << endl
+     << "odo_fr_b_us:" << odo_fr_b_us << endl
 
-     << "odometer_back_left_a:" << odometer_back_left_a << endl
-     << "odometer_back_left_a_us:" << odometer_back_left_a_us << endl
-     << "odometer_back_left_b:" << odometer_back_left_b << endl
-     << "odometer_back_left_b_us:" << odometer_back_left_b_us << endl
-     << "odometer_back_left_ab_us:" << odometer_back_left_ab_us << endl
+     << "odo_bl_a:" << odo_bl_a << endl
+     << "odo_bl_a_us:" << odo_bl_a_us << endl
+     << "odo_bl_b:" << odo_bl_b << endl
+     << "odo_bl_b_us:" << odo_bl_b_us << endl
 
-     << "odometer_back_right_a:" << odometer_back_right_a << endl
-     << "odometer_back_right_a_us:" << odometer_back_right_a_us << endl
-     << "odometer_back_right_b:" << odometer_back_right_b << endl
-     << "odometer_back_right_b_us:" << odometer_back_right_b_us << endl
-     << "odometer_back_right_ab_us:" << odometer_back_right_ab_us << endl
+     << "odo_br_a:" << odo_br_a << endl
+     << "odo_br_a_us:" << odo_br_a_us << endl
+     << "odo_br_b:" << odo_br_b << endl
+     << "odo_br_b_us:" << odo_br_b_us << endl
 
      << "ms:" << ms << endl
      << "us:" << us << endl
@@ -64,10 +59,10 @@ std::string Dynamics::csv_field_headers() {
   return
      "timestamp,ms,us,"
      "str,esc,battery_voltage,"
-     "odo_fl_a,odo_fl_a_us,odo_fl_b,odo_fl_b_us,odo_fl_ab_us,"
-     "odo_fr_a,odo_fr_a_us,odo_fr_b,odo_fr_b_us,odo_fr_ab_us,"
-     "odo_bl_a,odo_bl_a_us,odo_bl_b,odo_bl_b_us,odo_bl_ab_us,"
-     "odo_br_a,odo_br_a_us,odo_br_b,odo_br_b_us,odo_br_ab_us,"
+     "odo_fl_a,odo_fl_a_us,odo_fl_b,odo_fl_b_us,"
+     "odo_fr_a,odo_fr_a_us,odo_fr_b,odo_fr_b_us,"
+     "odo_bl_a,odo_bl_a_us,odo_bl_b,odo_bl_b_us,"
+     "odo_br_a,odo_br_a_us,odo_br_b,odo_br_b_us,"
      "odo_spur,odo_spur_us,"
      "yaw,pitch,roll,"
      "ax,ay,az,"
@@ -88,32 +83,28 @@ std::string Dynamics::csv_fields() {
   ss << battery_voltage << ",";
 
   // "odo_fl,odo_fl_us,"
-  ss << odometer_front_left_a << ",";
-  ss << odometer_front_left_a_us << ",";
-  ss << odometer_front_left_b << ",";
-  ss << odometer_front_left_b_us << ",";
-  ss << odometer_front_left_ab_us << ",";
+  ss << odo_fl_a << ",";
+  ss << odo_fl_a_us << ",";
+  ss << odo_fl_b << ",";
+  ss << odo_fl_b_us << ",";
 
   // "odo_fr,odo_fr_us,"
-  ss << odometer_front_right_a << ",";
-  ss << odometer_front_right_a_us << ",";
-  ss << odometer_front_right_b << ",";
-  ss << odometer_front_right_b_us << ",";
-  ss << odometer_front_right_ab_us << ",";
+  ss << odo_fr_a << ",";
+  ss << odo_fr_a_us << ",";
+  ss << odo_fr_b << ",";
+  ss << odo_fr_b_us << ",";
 
   // "odo_fl,odo_fl_us,"
-  ss << odometer_back_left_a << ",";
-  ss << odometer_back_left_a_us << ",";
-  ss << odometer_back_left_b << ",";
-  ss << odometer_back_left_b_us << ",";
-  ss << odometer_back_left_ab_us << ",";
+  ss << odo_bl_a << ",";
+  ss << odo_bl_a_us << ",";
+  ss << odo_bl_b << ",";
+  ss << odo_bl_b_us << ",";
 
   // "odo_fr,odo_fr_us,"
-  ss << odometer_back_right_a << ",";
-  ss << odometer_back_right_a_us << ",";
-  ss << odometer_back_right_b << ",";
-  ss << odometer_back_right_b_us << ",";
-  ss << odometer_back_right_ab_us << ",";
+  ss << odo_br_a << ",";
+  ss << odo_br_a_us << ",";
+  ss << odo_br_b << ",";
+  ss << odo_br_b_us << ",";
 
 
   // "odo_spur,odo_spur_us,"
@@ -165,33 +156,33 @@ bool Dynamics::from_log_string(Dynamics & d, string &s) {
     d.az = stod(fields[9]);
 
     d.spur_last_us = stoul(fields[11]);
-    d.spur_delta_us = stoul(fields[12]);
+    // d.spur_delta_us = stoul(fields[12]); unused
     d.spur_odo = stoi(fields[14]);
     d.control_mode = fields[16][0];
 
-    d.odometer_front_left_a =  stoi(fields[18]);
-    d.odometer_front_left_a_us =  stoul(fields[19]);
-    d.odometer_front_left_b =  stoi(fields[20]);
-    d.odometer_front_left_b_us =  stoul(fields[21]);
-    d.odometer_front_left_ab_us =  stoul(fields[22]);
+    d.odo_fl_a =  stoi(fields[18]);
+    d.odo_fl_a_us =  stoul(fields[19]);
+    d.odo_fl_b =  stoi(fields[20]);
+    d.odo_fl_b_us =  stoul(fields[21]);
+    // d.odo_fl_ab_us =  stoul(fields[22]); // unused
 
-    d.odometer_front_right_a =  stoi(fields[24]);
-    d.odometer_front_right_a_us =  stoul(fields[25]);
-    d.odometer_front_right_b =  stoi(fields[26]);
-    d.odometer_front_right_b_us =  stoul(fields[27]);
-    d.odometer_front_right_ab_us =  stoul(fields[28]);
+    d.odo_fr_a =  stoi(fields[24]);
+    d.odo_fr_a_us =  stoul(fields[25]);
+    d.odo_fr_b =  stoi(fields[26]);
+    d.odo_fr_b_us =  stoul(fields[27]);
+    // d.odo_fr_ab_us =  stoul(fields[28]); // unused
 
-    d.odometer_back_left_a =  stoi(fields[30]);
-    d.odometer_back_left_a_us =  stoul(fields[31]);
-    d.odometer_back_left_b =  stoi(fields[32]);
-    d.odometer_back_left_b_us =  stoul(fields[33]);
-    d.odometer_back_left_ab_us =  stoul(fields[34]);
+    d.odo_bl_a =  stoi(fields[30]);
+    d.odo_bl_a_us =  stoul(fields[31]);
+    d.odo_bl_b =  stoi(fields[32]);
+    d.odo_bl_b_us =  stoul(fields[33]);
+    // d.odo_bl_ab_us =  stoul(fields[34]); // unused
 
-    d.odometer_back_right_a =  stoi(fields[36]);
-    d.odometer_back_right_a_us =  stoul(fields[37]);
-    d.odometer_back_right_b =  stoi(fields[38]);
-    d.odometer_back_right_b_us =  stoul(fields[39]);
-    d.odometer_back_right_ab_us =  stoul(fields[40]);
+    d.odo_br_a =  stoi(fields[36]);
+    d.odo_br_a_us =  stoul(fields[37]);
+    d.odo_br_b =  stoi(fields[38]);
+    d.odo_br_b_us =  stoul(fields[39]);
+    // d.odo_br_ab_us =  stoul(fields[40]); // unused
 
     d.ms = stoul(fields[42]);
 

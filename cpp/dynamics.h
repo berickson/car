@@ -25,37 +25,31 @@ public:
   double ax;
   double ay;
   double az;
-
-  unsigned int spur_delta_us;
-
+  
   unsigned int spur_last_us;
   int spur_odo;
   char control_mode;
 
-  int odometer_front_left_a;
-  unsigned int odometer_front_left_a_us;
-  int odometer_front_left_b;
-  unsigned int odometer_front_left_b_us;
-  int odometer_front_left_ab_us;
-
-  int odometer_front_right_a;
-  unsigned int odometer_front_right_a_us;
-  int odometer_front_right_b;
-  unsigned int odometer_front_right_b_us;
-  int odometer_front_right_ab_us;
-
-  int odometer_back_left_a;
-  unsigned int odometer_back_left_a_us;
-  int odometer_back_left_b;
-  unsigned int odometer_back_left_b_us;
-  int odometer_back_left_ab_us;
-
-  int odometer_back_right_a;
-  unsigned int odometer_back_right_a_us;
-  int odometer_back_right_b;
-  unsigned int odometer_back_right_b_us;
-  int odometer_back_right_ab_us;
-
+  int odo_fl_a;
+  unsigned int odo_fl_a_us;
+  int odo_fl_b;
+  unsigned int odo_fl_b_us;
+  
+  int odo_fr_a;
+  unsigned int odo_fr_a_us;
+  int odo_fr_b;
+  unsigned int odo_fr_b_us;
+  
+  int odo_bl_a;
+  unsigned int odo_bl_a_us;
+  int odo_bl_b;
+  unsigned int odo_bl_b_us;
+  
+  int odo_br_a;
+  unsigned int odo_br_a_us;
+  int odo_br_b;
+  unsigned int odo_br_b_us;
+  
   unsigned int ms;
   unsigned int us;
   Angle yaw;

@@ -241,22 +241,21 @@ void Car::apply_dynamics(Dynamics & d) {
   }
 
   // update state
-  Dynamics & current = current_dynamics;
-  if (current.control_mode == 'm' && previous.control_mode!='m') {
+  if (d.control_mode == 'm' && previous.control_mode!='m') {
      rc_mode_enabled = false;
   }
 
   // correct heading with adjustment factor
-  Angle d_theta = (current.yaw - previous.yaw);
+  Angle d_theta = (d.yaw - previous.yaw);
   d_theta.standardize();
   //heading_adjustment += Angle::radians(d_theta.radians() * gyro_adjustment_factor);
 
   // if wheels have moved, update ackerman
-  back_left_wheel.update_from_sensor(current.us, current.odometer_back_left_a, current.odometer_back_left_a_us, current.odometer_back_left_b, current.odometer_back_left_b_us, current.odometer_back_left_ab_us);
-  back_right_wheel.update_from_sensor(current.us, current.odometer_back_right_a, current.odometer_back_right_a_us, current.odometer_back_right_b, current.odometer_back_right_b_us, current.odometer_back_right_ab_us);
-  front_left_wheel.update_from_sensor(current.us, current.odometer_front_left_a, current.odometer_front_left_a_us, current.odometer_front_left_b, current.odometer_front_left_b_us, current.odometer_front_left_ab_us);
-  motor.update_from_sensor(current.us, current.spur_odo, current.spur_last_us, 0, 0, 0);
-  double wheel_distance_meters = front_right_wheel.update_from_sensor(current.us, current.odometer_front_right_a, current.odometer_front_right_a_us, current.odometer_front_right_b, current.odometer_front_right_b_us, current.odometer_front_right_ab_us);
+  back_left_wheel.update_from_sensor(d.us, d.odo_bl_a, d.odo_bl_a_us, d.odo_bl_b, d.odo_bl_b_us);
+  back_right_wheel.update_from_sensor(d.us, d.odo_br_a, d.odo_br_a_us, d.odo_br_b, d.odo_br_b_us);
+  front_left_wheel.update_from_sensor(d.us, d.odo_fl_a, d.odo_fl_a_us, d.odo_fl_b, d.odo_fl_b_us);
+  motor.update_from_sensor(d.us, d.spur_odo, d.spur_last_us);
+  double wheel_distance_meters = front_right_wheel.update_from_sensor(d.us, d.odo_fr_a, d.odo_fr_a_us, d.odo_fr_b, d.odo_fr_b_us);
 
   if (reading_count > 2 && fabs(wheel_distance_meters) > 0.) { // adding 2 keeps out the big jump after a reset
     Angle outside_wheel_angle = angle_for_steering(previous.str);
