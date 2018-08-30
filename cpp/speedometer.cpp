@@ -46,7 +46,7 @@ double Speedometer::update_from_sensor(unsigned int clock_us, int odo_a, unsigne
   if (a_us > last_a_us) {
     v_a =  (odo_a-last_odo_a)*2*meters_per_tick / (a_us - last_a_us) *1E6;
   } 
-  if(odo_b != last_odo_b) {
+  if(b_us > last_b_us) {
     v_b =  (odo_b-last_odo_b)*2*meters_per_tick / (b_us - last_b_us) *1E6;
   }
   velocity = (v_a + v_b) / 2.;
