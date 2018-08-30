@@ -273,7 +273,7 @@ void setup() {
   
   mpu9150.ax_bias = 0; // 7724.52;
   mpu9150.ay_bias = 0; // -1458.47;
-  mpu9150.az_bias = 0; // 715.62;
+  mpu9150.az_bias = 7893.51; // 715.62;
   mpu9150.rest_a_mag =  7893.51;
   mpu9150.zero_adjust = Quaternion(0.0, 0.0, 0.0, 1);// Quaternion(-0.07, 0.67, -0.07, 0.73);
   // was ((-13.823402+4.9) / (1000 * 60 * 60)) * PI/180;

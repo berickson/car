@@ -164,7 +164,7 @@
           <td>ticks</td>
         </thead>
         <tbody class='data small_text'>
-          <tr ng-repeat='wheel in ["fl","fr","bl","br"]'>
+          <tr ng-repeat='wheel in ["fl","fr","bl","br","motor"]'>
             <td>{{wheel}}</td>
             <td>{{car.rjust(car.car_state[wheel].v.toFixed(2),7)}}</td>
             <td>{{car.rjust(car.car_state[wheel].v_smooth.toFixed(1),6)}}</td>

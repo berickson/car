@@ -97,7 +97,7 @@ void Mpu9150::setup() {
     if(mpu.testConnection()) {
         log(TRACE_MPU, "MPU9150 connection successful");
     } else {
-        log(LOG_ERROR, "MPU9150 connection successful");
+        log(LOG_ERROR, "MPU9150 connection failed");
     }
 
 

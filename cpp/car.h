@@ -41,7 +41,7 @@ public:
   Dynamics original_dynamics;
   int reading_count = 0;
 
-  Speedometer front_right_wheel, front_left_wheel, back_left_wheel, back_right_wheel;
+  Speedometer front_right_wheel, front_left_wheel, back_left_wheel, back_right_wheel, motor;
   Angle heading_adjustment;
   Angle zero_heading_angle;
 
@@ -77,6 +77,11 @@ public:
   const Speedometer & get_front_right_wheel() const {
     return front_right_wheel;
   }
+
+  const Speedometer & get_motor() const {
+    return motor;
+  }
+
 
   /*
   int get_odometer_front_left() {

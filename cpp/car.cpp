@@ -24,6 +24,7 @@ Car::Car(bool online) {
   front_left_wheel.meters_per_tick = this->meters_per_odometer_tick;
   back_left_wheel.meters_per_tick = this->rear_meters_per_odometer_tick;
   back_right_wheel.meters_per_tick = this->rear_meters_per_odometer_tick;
+  motor.meters_per_tick = this->motor_meters_per_odometer_tick;
   log_info("all wheels set");
   this->online = online;
   reset_odometry();
@@ -72,6 +73,7 @@ void Car::process_socket() {
       j["br"] = get_back_right_wheel().get_json_state();
       j["fl"] = get_front_left_wheel().get_json_state();
       j["fr"] = get_front_right_wheel().get_json_state();
+      j["motor"]= get_motor().get_json_state();
       j["front_x"] = get_front_position().x;
       j["front_y"] = get_front_position().y;
       j["go_enabled"] = get_go_enabled();
@@ -279,6 +281,7 @@ void Car::read_configuration(string path){
   // odometery
   meters_per_odometer_tick = config.get_double("meters_per_odometer_tick");
   rear_meters_per_odometer_tick = config.get_double("rear_meters_per_odometer_tick");
+  motor_meters_per_odometer_tick = config.get_double("motor_meters_per_odometer_tick");
   gyro_adjustment_factor = config.get_double("gyro_adjustment_factor");
 
   // esc and steering
