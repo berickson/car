@@ -382,8 +382,8 @@ void loop() {
     log(TD,
        "str," + str.readMicroseconds()
        + ",esc," + esc.readMicroseconds()
-       //+ ",aa,"+ ftos(mpu9150.ax) + "," + ftos(mpu9150.ay)+","+ ftos(mpu9150.az)
-       + ",aa,"+ 0 + "," + 0+","+ 0
+       + ",aa,"+ ftos(mpu9150.ax) + "," + ftos(mpu9150.ay)+","+ ftos(mpu9150.az)
+       //+ ",aa,"+ 0 + "," + 0+","+ 0
        +",spur_us,"+   motor_us + "," + 0
        +",spur_odo," + motor_odo // spur_pulse_count
        +",mode,"+modes.current_task->name
