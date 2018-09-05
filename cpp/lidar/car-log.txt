@@ -1,0 +1,12 @@
+2018-09-01T00:06:06.897Z,INFO,begining usb monitor thread
+2018-09-01T00:07:42.388Z,INFO,begining usb monitor thread
+2018-09-01T00:10:11.197Z,INFO,begining usb monitor thread
+2018-09-01T00:11:11.158Z,INFO,begining usb monitor thread
+2018-09-01T00:11:48.966Z,INFO,begining usb monitor thread
+2018-09-01T00:12:19.781Z,INFO,exiting usb monitor thread normally
+2018-09-01T00:20:39.141Z,INFO,begining usb monitor thread
+2018-09-01T00:21:05.964Z,INFO,exiting usb monitor thread normally
+2018-09-01T00:21:25.492Z,INFO,begining usb monitor thread
+2018-09-01T00:21:51.437Z,INFO,exiting usb monitor thread normally
+2018-09-01T00:24:19.414Z,INFO,begining usb monitor thread
+2018-09-01T00:24:39.566Z,INFO,begining usb monitor thread

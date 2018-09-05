@@ -267,6 +267,24 @@ bool LidarUnit::get_scan() {
   return true;
 }
 
+
+// min: 180, max: 349
+void LidarUnit::set_rpm(int rpm) {
+  stringstream ss;
+  ss << "SetRPM " << rpm;
+  usb2.write_line(ss.str());
+}
+
+
+void LidarUnit::motor_on() {
+  usb2.write_line("MotorOn");
+}
+
+void LidarUnit::motor_off() {
+  usb2.write_line("MotorOff");
+}
+
+
 void LidarUnit::run() {
   usb2.write_on_connect("");
   usb2.run();

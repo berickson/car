@@ -43,6 +43,8 @@ struct LidarScan {
     string display_string();
 };
 
+// contrls lidar based on 
+// https://github.com/getSurreal/XV_Lidar_Controller
 class LidarUnit {
 public:
     Usb usb2;
@@ -53,6 +55,10 @@ public:
     LidarScan & next_scan = scan2;
     WorkQueue<string> usb_queue;
     int completed_scan_count = 0;
+
+    void set_rpm(int rpm);
+    void motor_on();
+    void motor_off();
 
     string get_scan_csv_header();
     string get_scan_csv();
