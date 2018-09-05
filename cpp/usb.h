@@ -16,6 +16,7 @@ public:
   void remove_line_listener(WorkQueue<string>*);
   void write_on_connect(string s);
   void flush();
+  //std::string path ;
   
 private:
   string _write_on_connect = "\ntd+\n";

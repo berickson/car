@@ -121,7 +121,7 @@ void Usb::monitor_incoming_data() {
   auto fd = fd_error;
   while(!quit) {
     // find and open usb
-    for(string usb_path : glob("/dev/ttyACM*")) {
+    for(string usb_path : glob("/dev/ttyACM1")) {
       echo_off(usb_path);
       fd = open(usb_path.c_str(), O_RDWR | O_NONBLOCK | O_SYNC | O_APPEND | O_NOCTTY);
       if(fd != fd_error) {
