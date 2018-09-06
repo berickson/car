@@ -2,14 +2,21 @@
 .*
 !/.gitignore
 
+
 test/test
 build-*
 #output folders
+**/CMakeCache.txt
+CMakeFiles/
 output/
 Debug/
 Release/
 build/
-
+**/*.save
+**/*.save.*
+**/*.avi*
+**/*.bak
+**/*.sav
 **/*.user
 **/*.user*
 
