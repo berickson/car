@@ -1,0 +1,7 @@
+cmake_minimum_required (VERSION 2.8.11)
+project (lidar)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+include_directories("~/include")
+add_executable (lidar main.cpp lidar.cpp ../usb.cpp ../logger.cpp ../system.cpp ../geometry.cpp)
+target_link_libraries(lidar pthread)
