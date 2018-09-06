@@ -19,6 +19,9 @@ build/
 **/*.sav
 **/*.user
 **/*.user*
+**/*.cmake
+**/car-log.txt
+**/Makefile
 
 #recordings
 tracks/
