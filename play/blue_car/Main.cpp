@@ -14,7 +14,7 @@ const int pin_led = 13;
 const int pin_motor_a = 14;
 const int pin_motor_b = 12;
 const int pin_motor_c = 11;
-const int pin_motor_temp = A13;
+//const int pin_motor_temp = A13;
 
 const int pin_odo_fl_a = 23;
 const int pin_odo_fl_b = 22;
@@ -30,11 +30,12 @@ const int pin_rx_esc = 24;
 
 const int pin_mpu_interrupt = 17;
 
-const int pin_vbat_sense = 32;
-const int pin_cell1_sense = 33;
-const int pin_cell2_sense = 34;
-const int pin_cell3_sense = 35;
-const int pin_cell4_sense = 36;
+const int pin_vbat_sense = A13;
+const int pin_cell1_sense = A14;
+const int pin_cell2_sense = A15;
+const int pin_cell3_sense = A16;
+const int pin_cell4_sense = A17;
+const int pin_cell0_sense = A18;
 
 #else
 const int pin_motor_a = 24; // 12
@@ -224,11 +225,13 @@ public:
 
   void execute() {
     auto v_bat = analogRead(pin_vbat_sense);
+    auto v_cell0 = analogRead(pin_cell0_sense);
     auto v_cell1 = analogRead(pin_cell1_sense);
     auto v_cell2 = analogRead(pin_cell2_sense);
     auto v_cell3 = analogRead(pin_cell3_sense);
     auto v_cell4 = analogRead(pin_cell4_sense);
     String s = (String) "vbat: " + v_bat 
+                    + " v_cell0: " +  v_cell0 
                     + " v_cell1: " +  v_cell1 
                     + " v_cell2: "+  v_cell2 
                     + " v_cell3: "+  v_cell3 
@@ -390,7 +393,7 @@ void loop() {
         + " a: " + motor.a_count 
         + " b: " + motor.b_count 
         + " c: " + motor.c_count 
-        + " temp: " + analogRead(pin_motor_temp)
+//        + " temp: " + analogRead(pin_motor_temp)
         + " heading: " + mpu9150.heading()
         + " fl: (" + odo_fl.odometer_a + ","+odo_fl.odometer_b+")"
         + " fr: (" + odo_fr.odometer_a + ","+odo_fr.odometer_b+")"
