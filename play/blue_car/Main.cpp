@@ -220,7 +220,7 @@ void help() {
 class BatterySensor {
 public:
 
-  int resolution_bits = 12;
+  int resolution_bits = 10;
   float r1 = 102;
   float r2 = 422;
   float max_reading = 1024;
