@@ -7,23 +7,45 @@
 #include "RxEvents.h"
 
 
-const int pin_motor_a = 24;
-const int pin_motor_b = 25;
-const int pin_motor_c = 26;
+
+#if not defined(old_board)
+const int pin_motor_a = 12;
+const int pin_motor_b = 11;
+const int pin_motor_c = 10;
 const int pin_motor_temp = A13;
 
-const int pin_odo_fl_a = 0;
-const int pin_odo_fl_b = 1;
-const int pin_odo_fr_a = 3;
-const int pin_odo_fr_b = 2;
+const int pin_odo_fl_a = 22;
+const int pin_odo_fl_b = 23;
+const int pin_odo_fr_a = 20;
+const int pin_odo_fr_b = 21;
 
-const int pin_str = 8;
-const int pin_esc = 9;
-const int pin_esc_aux = 10;
-const int pin_rx_str = 11;
-const int pin_rx_esc = 12;
+const int pin_str = 27;
+const int pin_esc = 26;
+//const int pin_esc_aux = 10; // dnc
+const int pin_rx_str = 24;
+const int pin_rx_esc = 25;
 
 const int pin_mpu_interrupt = 17;
+
+#else
+const int pin_motor_a = 24; // 12
+const int pin_motor_b = 25; // 11
+const int pin_motor_c = 26; // 10
+const int pin_motor_temp = A13;
+
+const int pin_odo_fl_a = 0; // 22
+const int pin_odo_fl_b = 1; // 23
+const int pin_odo_fr_a = 3; // 20
+const int pin_odo_fr_b = 2; // 21
+
+const int pin_str = 8; // 27
+const int pin_esc = 9; // 26
+const int pin_esc_aux = 10;
+const int pin_rx_str = 11; // 24
+const int pin_rx_esc = 12; // 25
+
+const int pin_mpu_interrupt = 17; // 17
+#endif
 
 // all these ugly pushes are because the 9150 has a lot of warnings
 // the .h file must be included in one time in a source file
