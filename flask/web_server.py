@@ -70,6 +70,7 @@ def get_car_state():
 
 @app.route('/command/reset_odometer', methods=['PUT'])
 def command_reset_odometer():
+    recv_string = "error"
     try:
         connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         connection.connect(('localhost', 5571))

@@ -39,5 +39,5 @@ void CommandInterpreter::process_command(String s) {
       return;
     }
   }
-  log(LOG_ERROR, "Unknown command: ");
+  log(LOG_ERROR, (String) "Unknown command: " + s);
 }
