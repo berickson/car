@@ -9,15 +9,15 @@
 
 
 #if not defined(old_board)
-const int pin_motor_a = 13; // todo: move so LED can be used?
+const int pin_motor_a = 14;
 const int pin_motor_b = 12;
 const int pin_motor_c = 11;
 const int pin_motor_temp = A13;
 
-const int pin_odo_fl_a = 22;
-const int pin_odo_fl_b = 23;
-const int pin_odo_fr_a = 20;
-const int pin_odo_fr_b = 21;
+const int pin_odo_fl_a = 23;
+const int pin_odo_fl_b = 22;
+const int pin_odo_fr_a = 21;
+const int pin_odo_fr_b = 20;
 
 const int pin_str = 27;
 const int pin_esc = 26;
