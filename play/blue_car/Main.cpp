@@ -359,7 +359,6 @@ void loop() {
   blinker.execute();
   mpu9150.execute();
   interpreter.execute();
-  battery_sensor.execute();
 
   rx_events.process_pulses(rx_str.pulse_us(), rx_str.pulse_us());
   bool new_rx_event = rx_events.get_event();
@@ -375,8 +374,12 @@ void loop() {
     modes.execute();
   }
 
+  if(every_second) {
+    battery_sensor.execute();
+  }
 
   if (every_second && TRACE_TELEMETRY) {
+
       log(TRACE_TELEMETRY,
         (String) "odo:" + motor.odometer 
         + " odo_us: " + motor.last_change_us
