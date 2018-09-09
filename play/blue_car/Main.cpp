@@ -23,11 +23,18 @@ const int pin_odo_fr_b = 20;
 
 const int pin_str = 26;
 const int pin_esc = 27;
-//const int pin_esc_aux = 10; // dnc
+const int pin_esc_aux = 15;
+
 const int pin_rx_str = 25;
 const int pin_rx_esc = 24;
 
 const int pin_mpu_interrupt = 17;
+
+const int pin_vbat_sense = 32;
+const int pin_cell1_sense = 33;
+const int pin_cell2_sense = 34;
+const int pin_cell3_sense = 35;
+const int pin_cell4_sense = 36;
 
 #else
 const int pin_motor_a = 24; // 12
@@ -209,6 +216,27 @@ void help() {
 }
 
 
+class BatterySensor {
+public:
+
+  void init() {
+  }
+
+  void execute() {
+    auto v_bat = analogRead(pin_vbat_sense);
+    auto v_cell1 = analogRead(pin_cell1_sense);
+    auto v_cell2 = analogRead(pin_cell1_sense);
+    auto v_cell3 = analogRead(pin_cell1_sense);
+    auto v_cell4 = analogRead(pin_cell1_sense);
+    String s = (String) "vbat: " + v_bat + " v_cell1: "+  v_cell1 + " v_cell1: "+  v_cell1 + " v_cell1: "+  v_cell1 + " v_cell1: "+  v_cell1;
+    log(LOG_INFO, s);
+  }
+
+
+};
+
+BatterySensor battery_sensor;
+
 
 ///////////////////////////////////////////////
 // Interrupt handlers
@@ -308,6 +336,7 @@ void setup() {
 
   mpu9150.zero_heading();
   blinker.init(pin_led);
+  battery_sensor.init();
   log(LOG_INFO, "setup complete");
 }
 
@@ -330,6 +359,7 @@ void loop() {
   blinker.execute();
   mpu9150.execute();
   interpreter.execute();
+  battery_sensor.execute();
 
   rx_events.process_pulses(rx_str.pulse_us(), rx_str.pulse_us());
   bool new_rx_event = rx_events.get_event();
