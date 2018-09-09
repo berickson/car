@@ -32,7 +32,7 @@ public:
 
   bool online = false;
   bool quit = false;
-  bool usb_error_count = 0;
+  unsigned long usb_error_count = 0;
 
   Ackerman ackerman;
 
