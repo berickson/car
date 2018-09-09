@@ -230,7 +230,7 @@ public:
   void init() {
     analogReadResolution(resolution_bits);	
     max_reading = pow(2, resolution_bits);
-    scale = (r1+r2) * 3.3 / (max_reading * r2);
+    scale = (r1+r2) * 3.3 / (max_reading * r1);
   }
 
   void execute() {
