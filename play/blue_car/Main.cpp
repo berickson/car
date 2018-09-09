@@ -5,10 +5,12 @@
 #include "RemoteMode.h"
 #include "CommandInterpreter.h"
 #include "RxEvents.h"
+#include "Blinker.h"
 
 
 
 #if not defined(old_board)
+const int pin_led = 13;
 const int pin_motor_a = 14;
 const int pin_motor_b = 12;
 const int pin_motor_c = 11;
@@ -87,6 +89,8 @@ Servo2 str;
 Servo2 esc;
 
 MotorEncoder motor(pin_motor_a, pin_motor_b, pin_motor_c);
+
+Blinker blinker;
 
 ///////////////////////////////////////////////
 // modes
@@ -303,9 +307,8 @@ void setup() {
   mpu9150.yaw_actual_per_raw = 1; //(3600. / (3600 - 29.0 )); //1.0; // (360.*10.)/(360.*10.-328);// 1.00; // 1.004826221;
 
   mpu9150.zero_heading();
+  blinker.init(pin_led);
   log(LOG_INFO, "setup complete");
-  
-
 }
 
 // diagnostics for reporting loop speeds
@@ -324,6 +327,7 @@ void loop() {
   bool every_10_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 10);
 
 
+  blinker.execute();
   mpu9150.execute();
   interpreter.execute();
 
