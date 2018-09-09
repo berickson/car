@@ -19,11 +19,11 @@ const int pin_odo_fl_b = 22;
 const int pin_odo_fr_a = 21;
 const int pin_odo_fr_b = 20;
 
-const int pin_str = 27;
-const int pin_esc = 26;
+const int pin_str = 26;
+const int pin_esc = 27;
 //const int pin_esc_aux = 10; // dnc
-const int pin_rx_str = 24;
-const int pin_rx_esc = 25;
+const int pin_rx_str = 25;
+const int pin_rx_esc = 24;
 
 const int pin_mpu_interrupt = 17;
 
