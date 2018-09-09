@@ -26,7 +26,8 @@ public:
     double t = car.get_time_in_seconds();
     if (last_t != 0) {
       double dt = t - last_t;
-      double v = car.get_velocity();
+      // double v = car.get_velocity();
+      double v = car.get_rear_velocity();
       double a = car.get_smooth_acceleration();
       double v_error = v_sp - v;
       double a_error = a_sp - a;
