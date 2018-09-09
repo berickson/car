@@ -11,7 +11,7 @@
 class VelocityTracker {
 public:
   double velocity_output = 0;
-  double k_v = 10000.0;
+  double k_v = 1.0;
   double k_a = 0.0;
   double last_t = 0;
   double max_v_sp = 10;
@@ -129,7 +129,7 @@ bool Driver::rear_slipping() {
   double v_front = car.get_velocity();
   double v_back = (car.get_back_left_wheel().get_velocity()+ car.get_back_right_wheel().get_velocity()) / 2.0;
 
-  bool spinning = fabs(v_front - v_back) > (settings.slip_slop + (settings.slip_rate * v_front));
+  bool spinning = fabs(v_front - v_back) > (settings.slip_slop + (settings.slip_rate * fabs(v_front)));
   return spinning;
 
 }
