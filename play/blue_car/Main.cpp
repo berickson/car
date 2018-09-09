@@ -225,10 +225,14 @@ public:
   void execute() {
     auto v_bat = analogRead(pin_vbat_sense);
     auto v_cell1 = analogRead(pin_cell1_sense);
-    auto v_cell2 = analogRead(pin_cell1_sense);
-    auto v_cell3 = analogRead(pin_cell1_sense);
-    auto v_cell4 = analogRead(pin_cell1_sense);
-    String s = (String) "vbat: " + v_bat + " v_cell1: "+  v_cell1 + " v_cell1: "+  v_cell1 + " v_cell1: "+  v_cell1 + " v_cell1: "+  v_cell1;
+    auto v_cell2 = analogRead(pin_cell2_sense);
+    auto v_cell3 = analogRead(pin_cell3_sense);
+    auto v_cell4 = analogRead(pin_cell4_sense);
+    String s = (String) "vbat: " + v_bat 
+                    + " v_cell1: " +  v_cell1 
+                    + " v_cell2: "+  v_cell2 
+                    + " v_cell3: "+  v_cell3 
+                    + " v_cell4: "+  v_cell4;
     log(LOG_INFO, s);
   }
 
