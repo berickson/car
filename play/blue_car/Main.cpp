@@ -234,7 +234,7 @@ public:
   }
 
   void execute() {
-    float v_bat = analogRead(pin_vbat_sense) * scale * 12.25/12.41;
+    float v_bat = analogRead(pin_vbat_sense) * scale * 12.41 / 12.25;
     float v_cell0 = analogRead(pin_cell0_sense) * scale * 3.343/3.28;
     float v_cell1 = analogRead(pin_cell1_sense)  * scale * 3.343/3.29;
     float v_cell2 = analogRead(pin_cell2_sense)  * scale * 3.343/3.33;
