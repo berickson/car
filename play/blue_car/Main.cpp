@@ -226,6 +226,13 @@ public:
   float max_reading = 1024;
   float scale = (r1+r2) * 3.3 / (max_reading * r2);
 
+  float v_bat;
+  float v_cell0;
+  float v_cell1;
+  float v_cell2;
+  float v_cell3;
+  float v_cell4;
+
 
   void init() {
     analogReadResolution(resolution_bits);	
@@ -234,12 +241,12 @@ public:
   }
 
   void execute() {
-    float v_bat = analogRead(pin_vbat_sense) * scale * 12.41 / 12.25;
-    float v_cell0 = analogRead(pin_cell0_sense) * scale * 3.343/3.28;
-    float v_cell1 = analogRead(pin_cell1_sense)  * scale * 3.343/3.29;
-    float v_cell2 = analogRead(pin_cell2_sense)  * scale * 3.343/3.33;
-    float v_cell3 = analogRead(pin_cell3_sense) * scale * 3.343/3.29;
-    float v_cell4 = analogRead(pin_cell4_sense) * scale * 3.343/3.29;
+    v_bat = analogRead(pin_vbat_sense) * scale * 12.41 / 12.25;
+    v_cell0 = analogRead(pin_cell0_sense) * scale * 3.343/3.28;
+    v_cell1 = analogRead(pin_cell1_sense)  * scale * 3.343/3.29;
+    v_cell2 = analogRead(pin_cell2_sense)  * scale * 3.343/3.33;
+    v_cell3 = analogRead(pin_cell3_sense) * scale * 3.343/3.29;
+    v_cell4 = analogRead(pin_cell4_sense) * scale * 3.343/3.29;
     String s = (String) "vbat: " + v_bat 
                     + " v_cell0: " +  v_cell0 
                     + " v_cell1: " +  v_cell1 
@@ -411,9 +418,7 @@ void loop() {
   }
 
   if(every_10_ms && TD) {
-    // constants below based on 220k and 1M resistor, 1023 steps and 3.3 reference voltage
-    // HACK: no battery voltage yet
-    float battery_voltage = 0; //analogRead(PIN_BATTERY_VOLTAGE_DIVIDER) * ((3.3/1023.) / 220.)*(220.+1000.);
+    float battery_voltage = battery_sensor.v_bat;
     
     noInterrupts();
     auto fl_odo_a = odo_fl.odometer_a;
