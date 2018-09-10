@@ -234,12 +234,12 @@ public:
   }
 
   void execute() {
-    float v_bat = analogRead(pin_vbat_sense) * scale;
-    float v_cell0 = analogRead(pin_cell0_sense) * scale;
-    float v_cell1 = analogRead(pin_cell1_sense)  * scale;
-    float v_cell2 = analogRead(pin_cell2_sense)  * scale;
-    float v_cell3 = analogRead(pin_cell3_sense) * scale;
-    float v_cell4 = analogRead(pin_cell4_sense) * scale;
+    float v_bat = analogRead(pin_vbat_sense) * scale * 12.25/12.41;
+    float v_cell0 = analogRead(pin_cell0_sense) * scale * 3.343/3.28;
+    float v_cell1 = analogRead(pin_cell1_sense)  * scale * 3.343/3.29;
+    float v_cell2 = analogRead(pin_cell2_sense)  * scale * 3.343/3.33;
+    float v_cell3 = analogRead(pin_cell3_sense) * scale * 3.343/3.29;
+    float v_cell4 = analogRead(pin_cell4_sense) * scale * 3.343/3.29;
     String s = (String) "vbat: " + v_bat 
                     + " v_cell0: " +  v_cell0 
                     + " v_cell1: " +  v_cell1 
