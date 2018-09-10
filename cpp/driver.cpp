@@ -127,6 +127,7 @@ void Driver::avoid_barrels(StereoCamera & camera)
 
 
 bool Driver::rear_slipping() {
+  return false;
   double v_front = car.get_velocity();
   double v_back = (car.get_back_left_wheel().get_velocity()+ car.get_back_right_wheel().get_velocity()) / 2.0;
 
