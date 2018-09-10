@@ -12,7 +12,10 @@ void CommandInterpreter::execute() {
     if( c==-1) break;
     if( c==0) break;
     if( c == '\n' || c =='\r') {
-      process_command(String(buffer));
+      String s(buffer);
+      if (s.length() > 0) {
+        process_command(s);
+      }
       buffer[0] = 0;
       buf_size = 0;
     } else {
