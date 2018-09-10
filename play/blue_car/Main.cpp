@@ -384,7 +384,7 @@ void loop() {
   mpu9150.execute();
   interpreter.execute();
 
-  rx_events.process_pulses(rx_str.pulse_us(), rx_str.pulse_us());
+  rx_events.process_pulses(rx_str.pulse_us(), rx_esc.pulse_us());
   bool new_rx_event = rx_events.get_event();
   // send events through modes state machine
   if(new_rx_event) {
