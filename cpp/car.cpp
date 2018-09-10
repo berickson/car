@@ -149,10 +149,8 @@ bool Car::process_line_from_log(string line) {
     }
   }
   else {
-    log_info("a");
     ++usb_error_count;
     log_warning((string) "bad dynamics: " + line);
-//    cerr << "dynamics not ok for " << line << endl;
   }
   return ok;
 }
