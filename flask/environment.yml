@@ -1,0 +1,5 @@
+name: car
+channels:
+  - defaults
+prefix: /home/brian/anaconda3/envs/car
+
