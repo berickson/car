@@ -3,8 +3,9 @@ var example = (function(){
 
     var scene = new THREE.Scene(),
     renderer = new THREE.WebGLRenderer({antialias:true}),
-    light = new THREE.AmbientLight(0x888888),
-    sun = new THREE.DirectionalLight(0xffffff,0.75),
+    light = new THREE.AmbientLight(0x555555),
+    point_light,
+    sun = new THREE.DirectionalLight(0xffffff,0.3),
     ground,
     camera,
     path,
@@ -14,11 +15,21 @@ var example = (function(){
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMa
 
+    // color, intensity, distance, decay;
+    point_light = new THREE.PointLight( 0xffffff, 5, 50, 2 );
+    point_light.position.set( 5, -5, 30 );
+    scene.add( point_light );
+
+    var grid = new THREE.GridHelper( 200, 200, 0x888888, 0xdddddd );
+    grid.geometry.rotateX( Math.PI / 2 );
+    grid.position.z = 0.001;
+    scene.add(grid);
+
     //Set up shadow properties for the light
-    sun.shadow.mapSize.width = 5512;  // default
-    sun.shadow.mapSize.height = 5512; // default
+    sun.shadow.mapSize.width = 512;  // default
+    sun.shadow.mapSize.height = 512; // default
     sun.shadow.camera.near = 0.5;    // default
-    sun.shadow.camera.far = 5500;     // default
+    sun.shadow.camera.far = 500;     // default
 
     sun.position.z = 1000; // shine down from z
     sun.castShadow = true;
@@ -27,8 +38,8 @@ var example = (function(){
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById("webgl-container").appendChild(renderer.domElement);
         scene.add(light);
+        scene.add(point_light)
         scene.add(sun);
-        //scene.add(new THREE.GridHelper(1000,1000,0x555555,0x005500));
         camera = new THREE.PerspectiveCamera(
             35, // FOV, degrees
             window.innerWidth / window.innerHeight, // aspect ratio
@@ -46,6 +57,7 @@ var example = (function(){
         controls.target.set( 0, 0, 0 ); // view direction perpendicular to XY-plane
         controls.enableRotate = true;
         controls.enableZoom = true; // optional
+        controls.maxPolarAngle = 85 * Math.PI/180;  // keep above ground
 
 
         scene.add(camera);
@@ -59,7 +71,7 @@ var example = (function(){
             );
             car.add(body);
             var edges = new THREE.EdgesHelper( body, 0x000000);
-            edges.material.linewidth = 2;
+            edges.material.linewidth = 1;
             car.add(edges);
             car.position.z = h/2 + 0.03;
             car.position.x = -l/2;
@@ -72,7 +84,7 @@ var example = (function(){
         
 
         ground = new THREE.Mesh(
-            new THREE.PlaneGeometry(1000,1000),
+            new THREE.PlaneGeometry(200,200,200,200),
             new THREE.MeshLambertMaterial({color:0xF5F5DC, side:THREE.DoubleSide}));
         ground.receiveShadow = true;
         ground.castShadow = false;
