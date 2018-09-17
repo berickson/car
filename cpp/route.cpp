@@ -133,7 +133,7 @@ RouteNode * Route::get_target_node()
 void Route::set_position(Point front, Point rear, double velocity)
 {
   const double stopped_velocity = 0.01;
-  while(!done) {
+  while(1) {
     RouteNode & p1 = nodes[index];
     RouteNode & p2 = nodes[index+1];
     double dx = NAN;
@@ -174,14 +174,12 @@ void Route::set_position(Point front, Point rear, double velocity)
 
     if (progress < 1.0)
       break;
-
-    // can advance nodes only if next node isn't a stop sign
-    // to advance that, we need to mark as stopped
-    if(p2.road_sign_command != "stop") {
-      advance_to_next_segment();
-    } else {
+    if (done)
       break;
-    }
+    if(p2.road_sign_command == "stop")
+      break;
+
+    advance_to_next_segment();
   }
 }
 
