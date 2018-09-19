@@ -13,8 +13,8 @@ var example = (function(){
     path,
     car,
     controls;
-
-    ground_texture = THREE.ImageUtils.loadTexture("TexturesCom_WoodPlanksBare0498_5_seamless_S.png");
+    var loader = new THREE.TextureLoader();
+    ground_texture = loader.load("TexturesCom_WoodPlanksBare0498_5_seamless_S.png");
     ground_texture.repeat.set(5000, 5000);
     //ground_texture = THREE.ImageUtils.loadTexture("TexturesCom_ConcreteFloors0054_1_seamless_S.jpg");
     //ground_texture.repeat.set(4000, 4000);
@@ -32,18 +32,12 @@ var example = (function(){
     point_light.position.set( 5, -5, 30 );
     scene.add( point_light );
 
-    var sky_texture = THREE.ImageUtils.loadTexture("TexturesCom_Skies0306_M.jpg");
+    var sky_texture = loader.load("TexturesCom_Skies0306_M.jpg");
     var sky_geometry =  new THREE.SphereGeometry(100000,25,25);
     var sky = new THREE.Mesh(sky_geometry,
               new THREE.MeshBasicMaterial({map:sky_texture}));
     sky.material.side = THREE.BackSide;
     scene.add(sky);
-
-
-    var grid = new THREE.GridHelper( 200, 200, 0x888888, 0xdddddd );
-    grid.geometry.rotateX( Math.PI / 2 );
-    grid.position.z = 0.001;
-    //scene.add(grid);
 
     //Set up shadow properties for the light
     sun.shadow.mapSize.width = 512;  // default
@@ -88,8 +82,9 @@ var example = (function(){
                 new THREE.MeshLambertMaterial({color:0xFF8C00})
             );
             car.add(body);
-            var edges = new THREE.EdgesHelper( body, 0x000000);
-            edges.material.linewidth = 1;
+            var edges = new THREE.LineSegments( 
+                new THREE.EdgesGeometry(body.geometry), 
+                new THREE.LineBasicMaterial( { color: 0xffffff } ));
             car.add(edges);
             car.position.z = h/2 + 0.03;
             car.position.x = -l/2;
@@ -110,7 +105,7 @@ var example = (function(){
             var node = test_path[i];
             var waypoint = new THREE.Mesh(
                 new THREE.SphereGeometry(0.015,10,10),
-                new THREE.MeshLambertMaterial({color: 0x0000FF, transparent:false, opacity:1, side:THREE.DoubleSide})
+                new THREE.MeshLambertMaterial({color: 0x0000FF, transparent:false, opacity:1})
             );
             waypoint.position.x = node.x;
             waypoint.position.y = node.y;
@@ -123,10 +118,40 @@ var example = (function(){
 
         scene.add(path);
 
+        var lidar_template = new THREE.Mesh(
+            new THREE.BoxGeometry(0.03,0.03,0.5),
+            new THREE.MeshLambertMaterial({color: 0x00ff00}));
+        this.lidar_elements = [];
+        for(let i = 0; i < 10000; i++) {
+            var lidar_element = lidar_template.clone();
+            var l = Math.random() * 50 + 1;
+            lidar_element.position.x = l * Math.cos(i*Math.PI/180.);
+            lidar_element.position.y = l * Math.sin(i*Math.PI/180.);
+            lidar_element.position.z = 0.25;
+            lidar_element.l = l;
+            lidar_elements.push(lidar_element)
+            scene.add(lidar_element);
+        }
+
+        this.stats = new Stats();
+        stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+        document.body.appendChild( stats.dom );
+
         render();
     }
 
     function render() {
+        stats.begin();
+        for(let i = 0; i < lidar_elements.length; i++)  {
+            var lidar_element = lidar_elements[i];
+            lidar_element.l = lidar_element.l - 0.01;
+            if(lidar_element.l < 1) {
+                lidar_element.l = 50;
+            }
+            lidar_element.position.x = lidar_element.l * Math.cos(i*Math.PI/180.);
+            lidar_element.position.y = lidar_element.l * Math.sin(i*Math.PI/180.);
+        }
+        stats.end();
         renderer.render(scene, camera);
         requestAnimationFrame(render);  // force to call again at next repaint
     }
