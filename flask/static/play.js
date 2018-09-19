@@ -7,10 +7,22 @@ var example = (function(){
     point_light,
     sun = new THREE.DirectionalLight(0xffffff,0.3),
     ground,
+    ground_texture,
+    ground_material,
     camera,
     path,
     car,
     controls;
+
+    ground_texture = THREE.ImageUtils.loadTexture("TexturesCom_WoodPlanksBare0498_5_seamless_S.png");
+    ground_texture.repeat.set(5000, 5000);
+    //ground_texture = THREE.ImageUtils.loadTexture("TexturesCom_ConcreteFloors0054_1_seamless_S.jpg");
+    //ground_texture.repeat.set(4000, 4000);
+    //ground_texture = THREE.ImageUtils.loadTexture("TexturesCom_AsphaltCloseups0081_1_seamless_S.jpg");
+    //ground_texture.repeat.set(200, 200);
+    ground_texture.wrapS = THREE.RepeatWrapping;
+    ground_texture.wrapT = THREE.RepeatWrapping;
+    ground_material = new THREE.MeshLambertMaterial({map: ground_texture});
 
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMa
@@ -20,16 +32,24 @@ var example = (function(){
     point_light.position.set( 5, -5, 30 );
     scene.add( point_light );
 
+    var sky_texture = THREE.ImageUtils.loadTexture("TexturesCom_Skies0306_M.jpg");
+    var sky_geometry =  new THREE.SphereGeometry(100000,25,25);
+    var sky = new THREE.Mesh(sky_geometry,
+              new THREE.MeshBasicMaterial({map:sky_texture}));
+    sky.material.side = THREE.BackSide;
+    scene.add(sky);
+
+
     var grid = new THREE.GridHelper( 200, 200, 0x888888, 0xdddddd );
     grid.geometry.rotateX( Math.PI / 2 );
     grid.position.z = 0.001;
-    scene.add(grid);
+    //scene.add(grid);
 
     //Set up shadow properties for the light
     sun.shadow.mapSize.width = 512;  // default
     sun.shadow.mapSize.height = 512; // default
     sun.shadow.camera.near = 0.5;    // default
-    sun.shadow.camera.far = 500;     // default
+    sun.shadow.camera.far = 500; // default
 
     sun.position.z = 1000; // shine down from z
     sun.castShadow = true;
@@ -44,14 +64,12 @@ var example = (function(){
             35, // FOV, degrees
             window.innerWidth / window.innerHeight, // aspect ratio
             .1,   // near cutoff
-            1000 // far cutoff
+            1000000 // far cutoff
         );
         camera.position.z = 2;
         camera.position.y = -0;
         camera.position.x = -5;
         camera.up = new THREE.Vector3(0,0,1);
-//        camera.lookAt(0,0,0);
-//        camera.rotation.x = - Math.PI/2;
 
         controls = new THREE.OrbitControls( camera, renderer.domElement );
         controls.target.set( 0, 0, 0 ); // view direction perpendicular to XY-plane
@@ -79,13 +97,10 @@ var example = (function(){
             body.receiveShadow = false;
         }
         scene.add(car);
-        
-
-        
 
         ground = new THREE.Mesh(
-            new THREE.PlaneGeometry(200,200,200,200),
-            new THREE.MeshLambertMaterial({color:0xF5F5DC, side:THREE.DoubleSide}));
+            new THREE.PlaneGeometry(20000,20000,200,200),
+            ground_material); //new THREE.MeshLambertMaterial({color:0xF5F5DC, side:THREE.DoubleSide}));
         ground.receiveShadow = true;
         ground.castShadow = false;
         scene.add(ground);
@@ -104,10 +119,7 @@ var example = (function(){
             waypoint.receiveShadow = false;
             path.add(waypoint);
         }
-        //path.rotateOnAxis(new THREE.Vector3(1,0,0), Math.PI/2);
         path.position.z = 0.1;
-
-
 
         scene.add(path);
 
