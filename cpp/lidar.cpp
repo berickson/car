@@ -3,8 +3,9 @@
 #include <chrono>
 #include <sstream>
 #include <vector>
-#include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/SVD>
+#include "../../include/eigen3/Eigen/Dense"
+#include "../../include/eigen3/Eigen/SVD"
+#include "json.hpp"
 using namespace Eigen;
 Eigen::IOFormat HeavyFormat(FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");
 
@@ -28,6 +29,24 @@ std::__cxx11::string LidarScan::display_string() {
   }
   return s.str();
 }
+
+nlohmann::json LidarScan::get_json() {
+  nlohmann::json scan_json;
+  auto angles = nlohmann::json::array();
+  auto distances = nlohmann::json::array();
+  auto strengths = nlohmann::json::array();
+
+  for(LidarMeasurement & m : measurements) {
+      angles.push_back(m.angle.radians());
+      distances.push_back(m.distance_meters);
+      strengths.push_back(m.signal_strength);
+  }
+  scan_json["angle"] = angles;
+  scan_json["distance_meters"] = distances;
+  scan_json["signal_strength"] = strengths;
+  return scan_json;
+}
+
 
 Vector2f homogeneous_to_2d(const Vector3f & v) {
   return {v[0]/v[2], v[1]/v[2]};
@@ -287,7 +306,7 @@ void LidarUnit::motor_off() {
 
 void LidarUnit::run() {
   usb2.write_on_connect("");
-  usb2.run("/dev/ttyACM1");
+  usb2.run("/dev/ttyACM0");
   usb2.write_line("ResetConfig");
   usb2.write_line("HideRaw");
   usb2.write_line("HideAll");
@@ -296,6 +315,7 @@ void LidarUnit::run() {
   //usb2.write_line("SetAngle 0, 15-30, 45-50, 10 ");
   usb2.write_line("ShowAll");
   usb2.write_line("MotorOn");
+  set_rpm(349);
 
   usb2.add_line_listener(&usb_queue);
 }

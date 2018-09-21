@@ -113,7 +113,7 @@ void Car::usb_thread_start() {
   socket_server.open_socket(5571);
   usb.add_line_listener(&usb_queue);
   usb.write_on_connect("\ntd+\n");
-  usb.run("/dev/ttyACM0");
+  usb.run("/dev/ttyACM1");
   lidar.run();
   while(!quit) {
     try {

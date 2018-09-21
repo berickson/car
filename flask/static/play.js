@@ -12,6 +12,7 @@ var example = (function(){
     camera,
     path,
     car,
+    scan = null,
     controls;
     var loader = new THREE.TextureLoader();
     ground_texture = loader.load("TexturesCom_WoodPlanksBare0498_5_seamless_S.png");
@@ -129,6 +130,7 @@ var example = (function(){
             lidar_element.position.y = l * Math.sin(i*Math.PI/180.);
             lidar_element.position.z = 0.25;
             lidar_element.l = l;
+            lidar_element.visible = false;
             lidar_elements.push(lidar_element)
             scene.add(lidar_element);
         }
@@ -138,20 +140,37 @@ var example = (function(){
         document.body.appendChild( stats.dom );
 
         render();
+        get_scan();
+    }
+
+    function get_scan() {
+        var xmlhttp = new XMLHttpRequest();
+        var url = "car/get_scan";
+
+        xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                try {
+                scan = JSON.parse(this.responseText);
+                } catch (e) {}
+                console.log("the scan is here");
+                window.setTimeout(get_scan, 0);
+            }
+        };
+        xmlhttp.open("GET", url, true);
+        xmlhttp.send();
     }
 
     function render() {
         stats.begin();
-        for(let i = 0; i < lidar_elements.length; i++)  {
-            var lidar_element = lidar_elements[i];
-            lidar_element.l = lidar_element.l - 0.01;
-            if(lidar_element.l < 1) {
-                lidar_element.l = 50;
+        if(scan !== null ) {
+            for(let i = 0; i < scan.angle.length; i++)  {
+                var lidar_element = lidar_elements[i];
+                lidar_element.visible = true;
+                lidar_element.position.x = Math.cos(scan.angle[i]) * scan.distance_meters[i];
+                lidar_element.position.y = Math.sin(scan.angle[i]) * scan.distance_meters[i];
             }
-            lidar_element.position.x = lidar_element.l * Math.cos(i*Math.PI/180.);
-            lidar_element.position.y = lidar_element.l * Math.sin(i*Math.PI/180.);
         }
-        stats.end();
+            stats.end();
         renderer.render(scene, camera);
         requestAnimationFrame(render);  // force to call again at next repaint
     }
