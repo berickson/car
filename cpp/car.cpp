@@ -30,6 +30,7 @@ Car::Car(bool online) {
   reset_odometry();
   if(online) {
     connect_usb();
+    connect_lidar();
   }
 }
 
@@ -37,6 +38,12 @@ Car::~Car() {
   quit=true;
   if(usb_thread.joinable())
     usb_thread.join();
+  if(lidar_thread.joinable())
+    lidar_thread.join();
+}
+
+void Car::connect_lidar() {
+  lidar_thread = thread(&Car::lidar_thread_start, this);
 }
 
 void Car::connect_usb() {
@@ -58,7 +65,7 @@ void Car::process_socket() {
     string request = socket_server.get_request();
     if(request.length()==0) return;
     if(request=="get_scan") {
-      lidar.get_scan();
+      //lidar.get_scan();
       socket_server.send_response(lidar.current_scan.get_json().dump());
     }
     else if(request=="get_state"){
@@ -108,13 +115,34 @@ void Car::process_socket() {
   }
 }
 
+void Car::lidar_thread_start() {
+  log_entry_exit w("lidar thread");
+  lidar.run();
+  while(!quit) {
+    try {
+      bool got_scan = lidar.try_get_scan(1);
+      if(got_scan) {
+        recent_scans.emplace_front(lidar.current_scan);
+        while(recent_scans.size() > 10) {
+          recent_scans.pop_back();
+        }
+      }
+    }
+    catch (string error_string) {
+      log_error("error caught in lidar_thread_start"+error_string);
+    }
+    catch (...) {
+      log_error("error caught in lidar_thread_start");
+    }
+  }
+}
+
 void Car::usb_thread_start() {
   log_entry_exit w("usb thread");
   socket_server.open_socket(5571);
   usb.add_line_listener(&usb_queue);
   usb.write_on_connect("\ntd+\n");
   usb.run("/dev/ttyACM1");
-  lidar.run();
   while(!quit) {
     try {
       string line;

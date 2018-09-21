@@ -202,6 +202,11 @@ private:
   unique_ptr<async_buf> state_buf;
   unique_ptr<ostream> state_recording_file;
 
+  void lidar_thread_start();
+  thread lidar_thread;
+  std::list<LidarScan> recent_scans;
+  void connect_lidar();
+
   void usb_thread_start();
   WorkQueue<string> usb_queue;
   thread usb_thread;
