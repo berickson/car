@@ -123,7 +123,7 @@ var example = (function(){
             new THREE.BoxGeometry(0.03,0.03,0.5),
             new THREE.MeshLambertMaterial({color: 0x00ff00}));
         this.lidar_elements = [];
-        for(let i = 0; i < 10000; i++) {
+        for(let i = 0; i < 360; i++) {
             var lidar_element = lidar_template.clone();
             var l = Math.random() * 50 + 1;
             lidar_element.position.x = l * Math.cos(i*Math.PI/180.);
@@ -150,9 +150,23 @@ var example = (function(){
         xmlhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 try {
-                scan = JSON.parse(this.responseText);
+                    scan = JSON.parse(this.responseText);
+                    if(scan !== null ) {
+                        for(let i = 0; i < scan.angle.length; i++)  {
+                            var l = scan.distance_meters[i];
+                            var theta = scan.angle[i];
+                            var lidar_element = lidar_elements[i];
+                            if(l>0) {
+                                lidar_element.visible = true;
+                                lidar_element.position.x = Math.cos(theta) * l;
+                                lidar_element.position.y = Math.sin(theta) * l;
+                            }
+                            else {
+                                lidar_element.visible = false;
+                            }
+                        }
+                    }
                 } catch (e) {}
-                console.log("the scan is here");
                 window.setTimeout(get_scan, 0);
             }
         };
@@ -162,15 +176,7 @@ var example = (function(){
 
     function render() {
         stats.begin();
-        if(scan !== null ) {
-            for(let i = 0; i < scan.angle.length; i++)  {
-                var lidar_element = lidar_elements[i];
-                lidar_element.visible = true;
-                lidar_element.position.x = Math.cos(scan.angle[i]) * scan.distance_meters[i];
-                lidar_element.position.y = Math.sin(scan.angle[i]) * scan.distance_meters[i];
-            }
-        }
-            stats.end();
+        stats.end();
         renderer.render(scene, camera);
         requestAnimationFrame(render);  // force to call again at next repaint
     }
