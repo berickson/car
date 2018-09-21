@@ -12,6 +12,7 @@
 #include "speedometer.h"
 #include "async_buf.h"
 #include "socket_server.h"
+#include "lidar.h"
 
 using namespace std;
 
@@ -187,6 +188,10 @@ public:
   bool process_line_from_log(string s);
   void apply_dynamics(Dynamics & d);
   Usb usb;
+
+  // lidar
+  LidarUnit lidar;
+
 
   string command_from_socket = "";
 private:

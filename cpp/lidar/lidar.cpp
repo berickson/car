@@ -287,7 +287,7 @@ void LidarUnit::motor_off() {
 
 void LidarUnit::run() {
   usb2.write_on_connect("");
-  usb2.run();
+  usb2.run("/dev/ttyACM1");
   usb2.write_line("ResetConfig");
   usb2.write_line("HideRaw");
   usb2.write_line("HideAll");

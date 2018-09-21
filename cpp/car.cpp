@@ -57,7 +57,11 @@ void Car::process_socket() {
   while(true){
     string request = socket_server.get_request();
     if(request.length()==0) return;
-    if(request=="get_state"){
+    if(request=="get_scan") {
+      lidar.get_scan();
+      socket_server.send_response(lidar.current_scan.get_json().dump());
+    }
+    else if(request=="get_state"){
       nlohmann::json j;
       
       
@@ -109,7 +113,8 @@ void Car::usb_thread_start() {
   socket_server.open_socket(5571);
   usb.add_line_listener(&usb_queue);
   usb.write_on_connect("\ntd+\n");
-  usb.run();
+  usb.run("/dev/ttyACM0");
+  lidar.run();
   while(!quit) {
     try {
       string line;

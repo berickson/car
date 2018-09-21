@@ -9,7 +9,7 @@
 class Usb {
 public:
   ~Usb();
-  void run();
+  void run(string device_path);
   void stop();
   void write_line(string text);
   void add_line_listener(WorkQueue<string>*);
@@ -19,6 +19,7 @@ public:
   //std::string path ;
   
 private:
+  string _device_path;
   string _write_on_connect = "\ntd+\n";
   string string_pending_write;
   std::mutex usb_mutex;
