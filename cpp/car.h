@@ -205,6 +205,7 @@ private:
   void lidar_thread_start();
   thread lidar_thread;
   std::list<LidarScan> recent_scans;
+  std::mutex recent_scans_mutex;
   void connect_lidar();
 
   void usb_thread_start();

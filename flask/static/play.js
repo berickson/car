@@ -148,25 +148,27 @@ var example = (function(){
         var url = "car/get_scan";
 
         xmlhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                try {
-                    scan = JSON.parse(this.responseText);
-                    if(scan !== null ) {
-                        for(let i = 0; i < scan.angle.length; i++)  {
-                            var l = scan.distance_meters[i];
-                            var theta = scan.angle[i];
-                            var lidar_element = lidar_elements[i];
-                            if(l>0) {
-                                lidar_element.visible = true;
-                                lidar_element.position.x = Math.cos(theta) * l;
-                                lidar_element.position.y = Math.sin(theta) * l;
-                            }
-                            else {
-                                lidar_element.visible = false;
+            if (this.readyState == 4)  { // done
+                if ( this.status == 200) { // ok
+                    try {
+                        scan = JSON.parse(this.responseText);
+                        if(scan !== null ) {
+                            for(let i = 0; i < scan.angle.length; i++)  {
+                                var l = scan.distance_meters[i];
+                                var theta = scan.angle[i];
+                                var lidar_element = lidar_elements[i];
+                                if(l>0) {
+                                    lidar_element.visible = true;
+                                    lidar_element.position.x = Math.cos(theta) * l;
+                                    lidar_element.position.y = Math.sin(theta) * l;
+                                }
+                                else {
+                                    lidar_element.visible = false;
+                                }
                             }
                         }
-                    }
-                } catch (e) {}
+                    } catch (e) {}
+                }
                 window.setTimeout(get_scan, 0);
             }
         };

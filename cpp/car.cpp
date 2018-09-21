@@ -66,7 +66,13 @@ void Car::process_socket() {
     if(request.length()==0) return;
     if(request=="get_scan") {
       //lidar.get_scan();
-      socket_server.send_response(lidar.current_scan.get_json().dump());
+      if(recent_scans.size()>0) {
+        lock_guard<mutex>(recent_scans_mutex);
+        socket_server.send_response(recent_scans.front().get_json().dump());
+      } else {
+        LidarScan fake;
+        socket_server.send_response(fake.get_json());
+      }
     }
     else if(request=="get_state"){
       nlohmann::json j;
@@ -122,6 +128,7 @@ void Car::lidar_thread_start() {
     try {
       bool got_scan = lidar.try_get_scan(1);
       if(got_scan) {
+        lock_guard<mutex>(recent_scans_mutex);
         recent_scans.emplace_front(lidar.current_scan);
         while(recent_scans.size() > 10) {
           recent_scans.pop_back();
