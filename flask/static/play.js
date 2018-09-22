@@ -1,44 +1,63 @@
-var example = (function(){
+let example = (function(){
     "use strict";
 
-    var scene = new THREE.Scene(),
+    let scene = new THREE.Scene(),
     renderer = new THREE.WebGLRenderer({antialias:true}),
     light = new THREE.AmbientLight(0x555555),
     point_light,
     sun = new THREE.DirectionalLight(0xffffff,0.3),
     ground,
-    ground_texture,
-    ground_material,
     camera,
     path,
     car,
+    sky,
     scan = null,
-    controls;
-    var loader = new THREE.TextureLoader();
-    ground_texture = loader.load("TexturesCom_WoodPlanksBare0498_5_seamless_S.png");
-    ground_texture.repeat.set(5000, 5000);
-    //ground_texture = THREE.ImageUtils.loadTexture("TexturesCom_ConcreteFloors0054_1_seamless_S.jpg");
-    //ground_texture.repeat.set(4000, 4000);
-    //ground_texture = THREE.ImageUtils.loadTexture("TexturesCom_AsphaltCloseups0081_1_seamless_S.jpg");
-    //ground_texture.repeat.set(200, 200);
-    ground_texture.wrapS = THREE.RepeatWrapping;
-    ground_texture.wrapT = THREE.RepeatWrapping;
-    ground_material = new THREE.MeshLambertMaterial({map: ground_texture});
+    stats = new Stats(),
+    controls,
+    loader = new THREE.TextureLoader(),
+    lidar_elements;
 
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMa
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    // ground
+    {
+        let ground_texture = loader.load("TexturesCom_WoodPlanksBare0498_5_seamless_S.png");
+    ground_texture.repeat.set(5000, 5000);
+    ground_texture.wrapS = THREE.RepeatWrapping;
+    ground_texture.wrapT = THREE.RepeatWrapping;
+        let ground_material = new THREE.MeshLambertMaterial({map: ground_texture});
+        ground = new THREE.Mesh(
+            new THREE.PlaneGeometry(20000,20000,200,200),
+            ground_material); //new THREE.MeshLambertMaterial({color:0xF5F5DC, side:THREE.DoubleSide}));
+        ground.receiveShadow = true;
+        ground.castShadow = false;
+    }
+    scene.add(ground);
+
 
     // color, intensity, distance, decay;
     point_light = new THREE.PointLight( 0xffffff, 5, 50, 2 );
     point_light.position.set( 5, -5, 30 );
     scene.add( point_light );
 
-    var sky_texture = loader.load("TexturesCom_Skies0306_M.jpg");
-    var sky_geometry =  new THREE.SphereGeometry(100000,25,25);
-    var sky = new THREE.Mesh(sky_geometry,
-              new THREE.MeshBasicMaterial({map:sky_texture}));
-    sky.material.side = THREE.BackSide;
-    scene.add(sky);
+    {
+        let materialArray = [];
+        //let images = ['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg'];
+        //let images = ['dawnmountain-xpos.png', 'dawnmountain-xneg.png', 'dawnmountain-ypos.png', 'dawnmountain-yneg.png','dawnmountain-zpos.png', 'dawnmountain-zneg.png'];
+        let images = ['Daylight Box_Right.bmp', 'Daylight Box_Left.bmp', 'Daylight Box_Top.bmp', 'Daylight Box_Bottom.bmp', 'Daylight Box_Front.bmp','Daylight Box_Back.bmp'];
+        for(let i=0; i < 6; ++i) {
+            materialArray.push(new THREE.MeshBasicMaterial( { map: loader.load( images[i] ) }));            
+            materialArray[i].side = THREE.BackSide;
+         }
+
+        let skybox = new THREE.Mesh( 
+            new THREE.CubeGeometry( 5000, 5000, 5000, 1, 1, 1 ), 
+            materialArray);
+
+        skybox.geometry.rotateX(Math.PI/2);
+        scene.add( skybox );
+    }
 
     //Set up shadow properties for the light
     sun.shadow.mapSize.width = 512;  // default
@@ -70,23 +89,37 @@ var example = (function(){
         controls.target.set( 0, 0, 0 ); // view direction perpendicular to XY-plane
         controls.enableRotate = true;
         controls.enableZoom = true; // optional
-        controls.maxPolarAngle = 85 * Math.PI/180;  // keep above ground
+        controls.maxPolarAngle = 89.5 * Math.PI/180;  // keep above ground
 
 
         scene.add(camera);
 
         car = new THREE.Object3D();
         {
-            var l=0.65, w=0.3, h=0.15;
-            var body = new THREE.Mesh(
+            let l=0.65, w=0.3, h=0.15;
+            let body = new THREE.Mesh(
                 new THREE.BoxGeometry(l, w, h),
                 new THREE.MeshLambertMaterial({color:0xFF8C00})
             );
             car.add(body);
-            var edges = new THREE.LineSegments( 
+            let edges = new THREE.LineSegments( 
                 new THREE.EdgesGeometry(body.geometry), 
                 new THREE.LineBasicMaterial( { color: 0xffffff } ));
-            car.add(edges);
+            //car.add(edges);
+            
+            
+            // arrow on car
+            {
+                let length = l-0.01;
+                let arrow = new THREE.Mesh(
+                  new THREE.ConeBufferGeometry(  w/4, length, 20 ),
+                  new THREE.MeshLambertMaterial({color: 0x777777}),
+                );
+                arrow.position.x = 0;
+                arrow.position.z = h/2;
+                arrow.geometry.rotateZ(-Math.PI/2);
+                car.add( arrow );
+            }
             car.position.z = h/2 + 0.03;
             car.position.x = -l/2;
             body.castShadow = true;
@@ -94,17 +127,12 @@ var example = (function(){
         }
         scene.add(car);
 
-        ground = new THREE.Mesh(
-            new THREE.PlaneGeometry(20000,20000,200,200),
-            ground_material); //new THREE.MeshLambertMaterial({color:0xF5F5DC, side:THREE.DoubleSide}));
-        ground.receiveShadow = true;
-        ground.castShadow = false;
-        scene.add(ground);
+
 
         path = new THREE.Object3D();
         for(let i = 0; i < test_path.length; ++i) {
-            var node = test_path[i];
-            var waypoint = new THREE.Mesh(
+            let node = test_path[i];
+            let waypoint = new THREE.Mesh(
                 new THREE.SphereGeometry(0.015,10,10),
                 new THREE.MeshLambertMaterial({color: 0x0000FF, transparent:false, opacity:1})
             );
@@ -119,13 +147,13 @@ var example = (function(){
 
         scene.add(path);
 
-        var lidar_template = new THREE.Mesh(
+        let lidar_template = new THREE.Mesh(
             new THREE.BoxGeometry(0.03,0.03,0.5),
             new THREE.MeshLambertMaterial({color: 0x00ff00}));
-        this.lidar_elements = [];
+        lidar_elements = [];
         for(let i = 0; i < 360; i++) {
-            var lidar_element = lidar_template.clone();
-            var l = Math.random() * 50 + 1;
+            let lidar_element = lidar_template.clone();
+            let l = Math.random() * 50 + 1;
             lidar_element.position.x = l * Math.cos(i*Math.PI/180.);
             lidar_element.position.y = l * Math.sin(i*Math.PI/180.);
             lidar_element.position.z = 0.25;
@@ -135,7 +163,6 @@ var example = (function(){
             scene.add(lidar_element);
         }
 
-        this.stats = new Stats();
         stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
         document.body.appendChild( stats.dom );
 
@@ -144,8 +171,8 @@ var example = (function(){
     }
 
     function get_scan() {
-        var xmlhttp = new XMLHttpRequest();
-        var url = "car/get_scan";
+        let xmlhttp = new XMLHttpRequest();
+        let url = "car/get_scan";
 
         xmlhttp.onreadystatechange = function() {
             if (this.readyState == 4)  { // done
@@ -154,9 +181,9 @@ var example = (function(){
                         scan = JSON.parse(this.responseText);
                         if(scan !== null ) {
                             for(let i = 0; i < scan.angle.length; i++)  {
-                                var l = scan.distance_meters[i];
-                                var theta = scan.angle[i];
-                                var lidar_element = lidar_elements[i];
+                                let l = scan.distance_meters[i];
+                                let theta = scan.angle[i];
+                                let lidar_element = lidar_elements[i];
                                 if(l>0) {
                                     lidar_element.visible = true;
                                     lidar_element.position.x = Math.cos(theta) * l;
