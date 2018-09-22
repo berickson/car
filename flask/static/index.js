@@ -389,5 +389,5 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
   };
   poller3();
 
-  panzoom(document.getElementById('svg_g'));
+  //panzoom(document.getElementById('svg_g'));
 });
