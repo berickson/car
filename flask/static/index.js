@@ -270,6 +270,7 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
     if (vm.run_settings && vm.run_settings.route_name !== null && vm.run_settings.route_name.length > 0) {
       $http.get(vm.route_path_url()).
         success(function (route_path /*, status, headers, config*/) {
+          viewer.set_path(route_path);
           vm.route_path = route_path;
           var route_x = route_path.map(function (v) { return v.x; });
           var route_y = route_path.map(function (v) { return v.y; });
@@ -312,7 +313,9 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
   var poller = function () {
     $http({ method: 'GET', timeout: 5000, url: '/car/get_state' })
       .then(function (r) {
-        vm.car_state = r.data;
+        let car_state = r.data;
+        viewer.set_car_state(car_state);
+        vm.car_state = car_state;
         var v_bat = vm.car_state.v_bat;
         var min_bat = 3.5 * 3;
         var max_bat = 4.2 * 3;
