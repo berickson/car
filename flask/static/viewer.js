@@ -179,11 +179,6 @@ let viewer = (function () {
         lidar_elements = [];
         for (let i = 0; i < 360; i++) {
             let lidar_element = lidar_template.clone();
-            let l = Math.random() * 50 + 1;
-            lidar_element.position.x = l * Math.cos(i * Math.PI / 180.);
-            lidar_element.position.y = l * Math.sin(i * Math.PI / 180.);
-            lidar_element.position.z = 0.25;
-            lidar_element.l = l;
             lidar_element.visible = false;
             lidar_elements.push(lidar_element)
             scan_mesh.add(lidar_element);
@@ -220,8 +215,8 @@ let viewer = (function () {
                                     lidar_element.visible = false;
                                 }
                             }
-                            scan_mesh.position.x = car.position.x + lidar_x_pos * Math.cos(theta);
-                            scan_mesh.position.y = car.position.y + lidar_y_pos * Math.cos(theta);
+                            scan_mesh.position.x = car.position.x + lidar_x_pos * Math.cos(car.rotation.z);
+                            scan_mesh.position.y = car.position.y + lidar_x_pos * Math.sin(car.rotation.z);
                             scan_mesh.rotation.z = car.rotation.z;
                         }
                     } catch (e) { }
