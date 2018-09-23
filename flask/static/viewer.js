@@ -10,13 +10,13 @@ let viewer = (function () {
         camera,
         car = new THREE.Object3D(),
         scan_mesh = new THREE.Object3D(),
-        sky,
         scan = null,
         stats = new Stats(),
         controls,
         loader = new THREE.TextureLoader(),
         lidar_elements,
-        ready = false;
+        lidar_x_pos = 0.57 / 2 - 0.0635;
+
 
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -129,7 +129,7 @@ let viewer = (function () {
         scene.add(camera);
         
         {
-            let l = 0.65, w = 0.3, h = 0.15;
+            let l = 0.57, w = 0.305, h = 0.19; // todo: move to car related structure
             let body = new THREE.Mesh(
                 new THREE.BoxGeometry(l, w, h),
                 new THREE.MeshLambertMaterial({ color: 0xFF8C00 })
@@ -139,6 +139,19 @@ let viewer = (function () {
                 new THREE.EdgesGeometry(body.geometry),
                 new THREE.LineBasicMaterial({ color: 0xffffff }));
             //car.add(edges);
+
+            {
+                let lidar_h = 0.02;
+                let lidar_w = 0.06;
+                let lidar_unit = new THREE.Mesh(
+                    new THREE.CylinderGeometry( lidar_w, lidar_w, lidar_h, 20, 3  ),
+                    new THREE.LineBasicMaterial({ color: 0x333333 }));
+                lidar_unit.rotateX(Math.PI/2);
+                lidar_unit.position.x = lidar_x_pos;
+                lidar_unit.position.z = (h+lidar_h)/2;
+                car.add(lidar_unit);
+            }
+            
 
 
             // arrow on car
@@ -207,10 +220,9 @@ let viewer = (function () {
                                     lidar_element.visible = false;
                                 }
                             }
-                            scan_mesh.position.x = car.position.x;
-                            scan_mesh.position.y = car.position.y;
+                            scan_mesh.position.x = car.position.x + lidar_x_pos * Math.cos(theta);
+                            scan_mesh.position.y = car.position.y + lidar_y_pos * Math.cos(theta);
                             scan_mesh.rotation.z = car.rotation.z;
-                            //scan_mesh.rotation.set(car.rotation);
                         }
                     } catch (e) { }
                 }
@@ -230,7 +242,6 @@ let viewer = (function () {
 
     window.onload = initScene;
 
-    ready = true;
     return {
         car: car,
         scene: scene,
