@@ -67,6 +67,25 @@ def get_car_state():
         pass
     return Response(recv_string,mimetype='application/json')
 
+@app.route('/car/get_scan')
+def get_car_scan():
+#    recv_string = '{"vbat":3}'
+    rv = ""
+    try:
+        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        connection.connect(('localhost', 5571))
+        connection.send(("get_scan\x00").encode())
+        done = False
+        while not done:
+            recv_string = connection.recv(4096).decode("utf-8")
+            done = recv_string.endswith('\0')
+            rv = rv+recv_string.rstrip('\0')
+
+        connection.close()
+    except:
+        pass
+    return Response(rv,mimetype='application/json')    
+
 
 @app.route('/command/reset_odometer', methods=['PUT'])
 def command_reset_odometer():

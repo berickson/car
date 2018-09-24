@@ -12,6 +12,7 @@
 #include "speedometer.h"
 #include "async_buf.h"
 #include "socket_server.h"
+#include "lidar.h"
 
 using namespace std;
 
@@ -188,6 +189,10 @@ public:
   void apply_dynamics(Dynamics & d);
   Usb usb;
 
+  // lidar
+  LidarUnit lidar;
+
+
   string command_from_socket = "";
 private:
   bool rc_mode_enabled = false;
@@ -196,6 +201,12 @@ private:
 
   unique_ptr<async_buf> state_buf;
   unique_ptr<ostream> state_recording_file;
+
+  void lidar_thread_start();
+  thread lidar_thread;
+  std::list<LidarScan> recent_scans;
+  std::mutex recent_scans_mutex;
+  void connect_lidar();
 
   void usb_thread_start();
   WorkQueue<string> usb_queue;
