@@ -138,6 +138,7 @@ let viewer = (function () {
             waypoint.castShadow = true;
             waypoint.receiveShadow = false;
             waypoint.node = node;
+            waypoint.cursor = 'pointer';
             waypoint.on('click', function(ev) {
                 car_vm.node_clicked(ev, ev.currentTarget.node);
             });
