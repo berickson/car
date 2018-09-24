@@ -1,3 +1,5 @@
+var car_vm;
+
 angular.module("car",[]).controller("CarController", function($scope, $http, $timeout, $log, $q, $filter) {
   var vm = this;
   vm.Math = Math;
@@ -257,6 +259,9 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
   };
 
   vm.populate_road_sign_nodes = function () {
+    try {
+      viewer.set_path(vm.route_path);
+    } catch {} // in case not defined
     vm.road_sign_nodes = [];
     for (var i in vm.route_path) {
       var node = vm.route_path[i];
@@ -391,6 +396,5 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
       });
   };
   poller3();
-
-  //panzoom(document.getElementById('svg_g'));
+  car_vm = vm; // expose this angular stuff to viewer
 });

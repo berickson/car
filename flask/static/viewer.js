@@ -1,47 +1,48 @@
-function makeTextSprite(message, opts) {
-    var parameters = opts || {};
-    var fontface = parameters.fontface || 'Courier New';
-    var fontsize = parameters.fontsize || 24;
-    var canvas = document.createElement('canvas');
-    var context = canvas.getContext('2d');
-    context.font = fontsize+" " + fontface;
-  
-    // get size data (height depends only on font size)
-    var metrics = context.measureText(message);
-    var text_width = metrics.width;
-    var text_height = fontsize;
-    canvas.width = text_width+40;
-    canvas.height = 25;
-    // background
-    context.fillStyle = 'rgba(255, 255, 255, 0.7)';
-    context.rect(0,0,canvas.width-1,canvas.height-1);
-    context.fill();
-    context.stroke();
-    // text color
-    context.fillStyle = 'rgba(0, 0, 0, 1.0)';
-    context.fillText(message,20,15);
-
-  
-    // canvas contents will be used for a texture
-    var texture = new THREE.Texture(canvas)
-    texture.minFilter = THREE.LinearFilter;
-    texture.needsUpdate = true;
-  
-    var spriteMaterial = new THREE.SpriteMaterial({
-        map: texture//,
-        //useScreenCoordinates: false
-    });
-    var sprite = new THREE.Sprite(spriteMaterial);
-    sprite.center.set(0.5,0);
-    //sprite.scale.set(0.3,0.3,0.3);
-    var scale = 0.25;
-    sprite.scale.set(scale * text_width/text_height, scale, scale);
-    return sprite;
-  }
 
 let viewer = (function () {
     "use strict";
 
+    function makeTextSprite(message, opts) {
+        var parameters = opts || {};
+        var fontface = parameters.fontface || 'Courier New';
+        var fontsize = parameters.fontsize || 24;
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+        context.font = fontsize + " " + fontface;
+        
+        // get size data (height depends only on font size)
+        var metrics = context.measureText(message);
+        var text_width = metrics.width;
+        var text_height = fontsize;
+        canvas.width = text_width + 40;
+        canvas.height = 25;
+        // background
+        context.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        context.rect(0, 0, canvas.width - 1, canvas.height - 1);
+        context.fill();
+        context.stroke();
+        // text color
+        context.fillStyle = 'rgba(0, 0, 0, 1.0)';
+        context.fillText(message, 20, 15);
+    
+    
+        // canvas contents will be used for a texture
+        var texture = new THREE.Texture(canvas)
+        texture.minFilter = THREE.LinearFilter;
+        texture.needsUpdate = true;
+    
+        var spriteMaterial = new THREE.SpriteMaterial({
+            map: texture//,
+            //useScreenCoordinates: false
+        });
+        var sprite = new THREE.Sprite(spriteMaterial);
+        sprite.center.set(0.5, 0);
+        //sprite.scale.set(0.3,0.3,0.3);
+        var scale = 0.25;
+        sprite.scale.set(scale * text_width / text_height, scale, scale);
+        return sprite;
+    }
+    
     let scene = new THREE.Scene(),
         renderer = new THREE.WebGLRenderer({ antialias: true }),
         light = new THREE.AmbientLight(0x555555),
@@ -53,6 +54,7 @@ let viewer = (function () {
         scan_mesh = new THREE.Object3D(),
         scan = null,
         stats = new Stats(),
+        interaction,
         controls,
         loader = new THREE.TextureLoader(),
         lidar_elements,
@@ -135,32 +137,28 @@ let viewer = (function () {
             waypoint.name = "waypoint" + i;
             waypoint.castShadow = true;
             waypoint.receiveShadow = false;
+            waypoint.node = node;
+            waypoint.on('click', function(ev) {
+                car_vm.node_clicked(ev, ev.currentTarget.node);
+            });
             path_mesh.add(waypoint);
-            if(node.road_sign_command && node.road_sign_command.length > 0 || node.road_sign_label && node.road_sign_label.length > 0) {
+            let t = car_vm.has_road_sign(node);
+            //if(node.road_sign_command && node.road_sign_command.length > 0 || node.road_sign_label && node.road_sign_label.length > 0) {
+            if(t) {
                 let road_sign = new THREE.Mesh(
                     new THREE.SphereGeometry(0.03,10,10),
                     new THREE.MeshLambertMaterial({ color: 0xff0000})
                 );
                 let post = new THREE.Mesh(
                     new THREE.BoxGeometry(0.015,0.015, 0.4),
-                    new THREE.MeshStandardMaterial({ color: 0x444444})
+                    new THREE.MeshStandardMaterial({ color: 0x888888})
                 );
                 post.position.z = 0.2
-                let label = makeTextSprite('STOP');
+                let label = makeTextSprite(node.road_sign_label + ": " + node.road_sign_command);
                 road_sign.add(label);
                 road_sign.position.z = 0.4;
                 waypoint.add(post);
                 waypoint.add(road_sign);
-                /*
-                let label_text = node.road_sign_label + ": " + node.road_sign_command;
-                let label_div =  document.createElement( 'div' );
-				label_div.className = 'label';
-				label_div.textContent = label_text;
-				label_div.style.marginTop = '-1em';
-				//let label = new THREE.CSS2DObject( label_div );
-                label.position.set( 0, 0.2, 0 );
-                */
-                //waypoint.add( label );
             }
         }
         path_mesh.position.z = 0.1;
@@ -195,6 +193,7 @@ let viewer = (function () {
 
 
         scene.add(camera);
+        interaction = new THREE.Interaction(renderer, scene, camera);
         
         {
             let l = 0.57, w = 0.305, h = 0.19; // todo: move to car related structure
@@ -203,11 +202,6 @@ let viewer = (function () {
                 new THREE.MeshStandardMaterial({ color: 0xFF8C00, metalness:0.1, roughness: 0.9 })
             );
             car.add(body);
-            let edges = new THREE.LineSegments(
-                new THREE.EdgesGeometry(body.geometry),
-                new THREE.LineBasicMaterial({ color: 0xffffff }));
-            //car.add(edges);
-
             {
                 let lidar_h = 0.02;
                 let lidar_w = 0.06;
@@ -227,7 +221,7 @@ let viewer = (function () {
                 let length = l - 0.01;
                 let arrow = new THREE.Mesh(
                     new THREE.ConeBufferGeometry(w / 4, length, 20),
-                    new THREE.MeshLambertMaterial({ color: 0x777777 }),
+                    new THREE.MeshStandardMaterial({ color: 0x777777 }),
                 );
                 arrow.position.x = 0;
                 arrow.position.z = h / 2;
@@ -315,3 +309,8 @@ let viewer = (function () {
 
 
 })();
+
+function get_car_scope() {
+    var scope = angular.element(document.getElementById("html")).scope();
+    return scope;
+}
