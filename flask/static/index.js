@@ -262,6 +262,7 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
     try {
       viewer.set_path(vm.route_path);
     } catch {} // in case not defined
+    
     vm.road_sign_nodes = [];
     for (var i in vm.route_path) {
       var node = vm.route_path[i];
@@ -269,6 +270,7 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
         vm.road_sign_nodes.push(node);
       }
     }
+    
   };
 
   $scope.$watch("car.run_settings.route_name", function () {
@@ -277,6 +279,7 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
         success(function (route_path /*, status, headers, config*/) {
           viewer.set_path(route_path);
           vm.route_path = route_path;
+          /*
           var route_x = route_path.map(function (v) { return v.x; });
           var route_y = route_path.map(function (v) { return v.y; });
 
@@ -287,8 +290,9 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
           vm.route_path_width = vm.route_path_max_x - vm.route_path_min_x;
           vm.route_path_height = vm.route_path_max_y - vm.route_path_min_y;
           vm.reset_zoom();
-
+          
           vm.populate_road_sign_nodes();
+          */
 
         }).error(function (/*data, status, headers, config*/) {
           vm.route_names = ['n/a'];
