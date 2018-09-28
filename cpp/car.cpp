@@ -67,7 +67,7 @@ void Car::process_socket() {
     if(request=="get_scan") {
       //lidar.get_scan();
       if(recent_scans.size()>0) {
-        lock_guard<mutex>(recent_scans_mutex);
+        lock_guard<mutex> lock(recent_scans_mutex);
         socket_server.send_response(recent_scans.front().get_json().dump());
       } else {
         LidarScan fake;
@@ -94,7 +94,7 @@ void Car::process_socket() {
       j["front_x"] = get_front_position().x;
       j["front_y"] = get_front_position().y;
       j["go_enabled"] = get_go_enabled();
-      
+
 
       socket_server.send_response(j.dump());
     } else if(request=="go") {
@@ -128,7 +128,8 @@ void Car::lidar_thread_start() {
     try {
       bool got_scan = lidar.try_get_scan(1);
       if(got_scan) {
-        lock_guard<mutex>(recent_scans_mutex);
+        log_info("got scan");
+        lock_guard<std::mutex> lock(recent_scans_mutex);
         recent_scans.emplace_front(lidar.current_scan);
         while(recent_scans.size() > 10) {
           recent_scans.pop_back();
@@ -298,6 +299,12 @@ void Car::apply_dynamics(Dynamics & d) {
   if (reading_count > 2 && fabs(wheel_distance_meters) > 0.) { // adding 2 keeps out the big jump after a reset
     Angle outside_wheel_angle = angle_for_steering(previous.str);
     ackerman.move_right_wheel(outside_wheel_angle, wheel_distance_meters, get_heading().radians());
+  }
+
+  // tell lidar we have moved
+  {
+    Point p = get_front_position();
+    lidar.set_pose(p.x, p.y, get_heading().radians());
   }
   write_state();
 }

@@ -14,6 +14,12 @@
 
 using namespace std;
 
+struct Pose2d {
+    float x = NAN;
+    float y = NAN;
+    float theta = NAN;
+};
+
 
 struct LidarMeasurement {
     Angle angle;
@@ -36,6 +42,7 @@ struct LidarScan {
       Eigen::Vector2f p2;
     };
 
+    vector<Pose2d> poses;
     vector<LidarMeasurement> measurements;
     vector<ScanSegment> find_lines(double tolerance, int min_point_count = 8);
 
@@ -51,6 +58,7 @@ class LidarUnit {
 public:
     Usb usb2;
     WorkQueue<LidarMeasurement> measurement_queue;
+    Pose2d pose;
     LidarScan scan1;
     LidarScan scan2;
     LidarScan & current_scan = scan1;
@@ -58,6 +66,7 @@ public:
     WorkQueue<string> usb_queue;
     int completed_scan_count = 0;
 
+    void set_pose(float x, float y, float theta);
     void set_rpm(int rpm);
     void motor_on();
     void motor_off();

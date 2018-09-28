@@ -269,20 +269,22 @@ let viewer = (function () {
                         if (scan !== null) {
                             for (let i = 0; i < scan.angle.length; i++) {
                                 let l = scan.distance_meters[i];
-                                let theta = scan.angle[i];
+                                let theta = scan.angle[i] + scan.pose_theta[i];
+                                let x = scan.pose_x[i];
+                                let y = scan.pose_y[i];
                                 let lidar_element = lidar_elements[i];
                                 if (l > 0) {
                                     lidar_element.visible = true;
-                                    lidar_element.position.x = Math.cos(theta) * l;
-                                    lidar_element.position.y = Math.sin(theta) * l;
+                                    lidar_element.position.x = x + Math.cos(theta) * l;
+                                    lidar_element.position.y = y + Math.sin(theta) * l;
                                 }
                                 else {
                                     lidar_element.visible = false;
                                 }
                             }
-                            scan_mesh.position.x = car.position.x + lidar_x_pos * Math.cos(car.rotation.z);
-                            scan_mesh.position.y = car.position.y + lidar_x_pos * Math.sin(car.rotation.z);
-                            scan_mesh.rotation.z = car.rotation.z;
+                            scan_mesh.position.x = 0;//car.position.x + lidar_x_pos * Math.cos(car.rotation.z);
+                            scan_mesh.position.y = 0;//car.position.y + lidar_x_pos * Math.sin(car.rotation.z);
+                            scan_mesh.rotation.z = 0;//car.rotation.z;
                         }
                     } catch (e) { }
                 }

@@ -20,6 +20,7 @@ std::__cxx11::string LidarMeasurement::display_string() {
 
 LidarScan::LidarScan() {
   measurements.resize(360);
+  poses.resize(360);
 }
 
 std::__cxx11::string LidarScan::display_string() {
@@ -35,15 +36,26 @@ nlohmann::json LidarScan::get_json() {
   auto angles = nlohmann::json::array();
   auto distances = nlohmann::json::array();
   auto strengths = nlohmann::json::array();
+  auto poses_x = nlohmann::json::array();
+  auto poses_y = nlohmann::json::array();
+  auto poses_theta = nlohmann::json::array();
 
   for(LidarMeasurement & m : measurements) {
       angles.push_back(m.angle.radians());
       distances.push_back(m.distance_meters);
       strengths.push_back(m.signal_strength);
   }
+  for(Pose2d & p : poses) {
+      poses_x.push_back(p.x);
+      poses_y.push_back(p.y);
+      poses_theta.push_back(p.theta);
+  }
   scan_json["angle"] = angles;
   scan_json["distance_meters"] = distances;
   scan_json["signal_strength"] = strengths;
+  scan_json["pose_x"] = poses_x;
+  scan_json["pose_y"] = poses_y;
+  scan_json["pose_theta"] = poses_theta;
   return scan_json;
 }
 
@@ -254,6 +266,7 @@ bool LidarUnit::try_get_scan(int ms_to_wait = 1)
         m.status = LidarMeasurement::measure_status::ok;
       }
       next_scan.measurements[degrees] = m;
+      next_scan.poses[degrees] = pose;
       if(degrees == 359) {
         swap(current_scan, next_scan);
         completed_scan_count++;
@@ -286,6 +299,12 @@ bool LidarUnit::get_scan() {
   return true;
 }
 
+
+void LidarUnit::set_pose(float x, float y, float theta) {
+  pose.x = x;
+  pose.y = y;
+  pose.theta = theta;
+}
 
 // min: 180, max: 349
 void LidarUnit::set_rpm(int rpm) {

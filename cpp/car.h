@@ -4,6 +4,7 @@
 #include <list>
 #include <string>
 #include <fstream>
+#include <mutex>
 #include "ackerman.h"
 #include "geometry.h"
 #include "dynamics.h"
