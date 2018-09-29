@@ -1,3 +1,5 @@
+var car_vm;
+
 angular.module("car",[]).controller("CarController", function($scope, $http, $timeout, $log, $q, $filter) {
   var vm = this;
   vm.Math = Math;
@@ -257,6 +259,10 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
   };
 
   vm.populate_road_sign_nodes = function () {
+    try {
+      viewer.set_path(vm.route_path);
+    } catch {} // in case not defined
+    
     vm.road_sign_nodes = [];
     for (var i in vm.route_path) {
       var node = vm.route_path[i];
@@ -264,13 +270,16 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
         vm.road_sign_nodes.push(node);
       }
     }
+    
   };
 
   $scope.$watch("car.run_settings.route_name", function () {
     if (vm.run_settings && vm.run_settings.route_name !== null && vm.run_settings.route_name.length > 0) {
       $http.get(vm.route_path_url()).
         success(function (route_path /*, status, headers, config*/) {
+          viewer.set_path(route_path);
           vm.route_path = route_path;
+          /*
           var route_x = route_path.map(function (v) { return v.x; });
           var route_y = route_path.map(function (v) { return v.y; });
 
@@ -281,8 +290,9 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
           vm.route_path_width = vm.route_path_max_x - vm.route_path_min_x;
           vm.route_path_height = vm.route_path_max_y - vm.route_path_min_y;
           vm.reset_zoom();
-
+          
           vm.populate_road_sign_nodes();
+          */
 
         }).error(function (/*data, status, headers, config*/) {
           vm.route_names = ['n/a'];
@@ -312,7 +322,9 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
   var poller = function () {
     $http({ method: 'GET', timeout: 5000, url: '/car/get_state' })
       .then(function (r) {
-        vm.car_state = r.data;
+        let car_state = r.data;
+        viewer.set_car_state(car_state);
+        vm.car_state = car_state;
         var v_bat = vm.car_state.v_bat;
         var min_bat = 3.5 * 3;
         var max_bat = 4.2 * 3;
@@ -388,6 +400,5 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
       });
   };
   poller3();
-
-  panzoom(document.getElementById('svg_g'));
+  car_vm = vm; // expose this angular stuff to viewer
 });

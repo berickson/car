@@ -208,7 +208,7 @@ vector<Corner>  find_corners(const vector<LidarScan::ScanSegment> & walls) {
   return corners;
 }
 
-bool LidarUnit::try_get_scan(int ms_to_wait = 5000)
+bool LidarUnit::try_get_scan(int ms_to_wait = 1)
 {
   string l;
   while(true) {
@@ -287,7 +287,7 @@ void LidarUnit::motor_off() {
 
 void LidarUnit::run() {
   usb2.write_on_connect("");
-  usb2.run();
+  usb2.run("/dev/ttyACM1");
   usb2.write_line("ResetConfig");
   usb2.write_line("HideRaw");
   usb2.write_line("HideAll");

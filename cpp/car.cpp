@@ -30,6 +30,7 @@ Car::Car(bool online) {
   reset_odometry();
   if(online) {
     connect_usb();
+    connect_lidar();
   }
 }
 
@@ -37,6 +38,12 @@ Car::~Car() {
   quit=true;
   if(usb_thread.joinable())
     usb_thread.join();
+  if(lidar_thread.joinable())
+    lidar_thread.join();
+}
+
+void Car::connect_lidar() {
+  lidar_thread = thread(&Car::lidar_thread_start, this);
 }
 
 void Car::connect_usb() {
@@ -55,9 +62,42 @@ string Car::get_mode() {
 
 void Car::process_socket() {
   while(true){
-    string request = socket_server.get_request();
-    if(request.length()==0) return;
-    if(request=="get_state"){
+    string full_request = socket_server.get_request();
+    if(full_request.length()==0) return;
+    log_info("socket full request: \"" + full_request + "\"");
+    auto params = split(full_request, ',');
+    string request = params[0];
+    //log_info("got socket request: \"" + request + "\"");
+    if(request=="get_scan") {
+      int scan_to_skip = -1;
+      if(params.size() > 1) {
+        try {
+          scan_to_skip = atoi(params[1].c_str());
+        } catch (...) {
+          log_warning("invalid scan number requested");
+        }
+      }
+
+      //lidar.get_scan();
+      if(recent_scans.size()>0) {
+        auto wait_end_time = system_clock::now() + milliseconds(20000);
+        while ( system_clock::now()  < wait_end_time) {
+          {
+            lock_guard<mutex> lock(recent_scans_mutex);
+            LidarScan & scan = recent_scans.front();
+            if(scan.scan_number != scan_to_skip) {
+              socket_server.send_response(recent_scans.front().get_json().dump());
+              break;
+            }
+          }
+          this_thread::sleep_for(chrono::milliseconds(1));
+        }
+      } else {
+        LidarScan fake;
+        socket_server.send_response(fake.get_json());
+      }
+    }
+    else if(request=="get_state"){
       nlohmann::json j;
       
       
@@ -77,7 +117,7 @@ void Car::process_socket() {
       j["front_x"] = get_front_position().x;
       j["front_y"] = get_front_position().y;
       j["go_enabled"] = get_go_enabled();
-      
+
 
       socket_server.send_response(j.dump());
     } else if(request=="go") {
@@ -104,12 +144,40 @@ void Car::process_socket() {
   }
 }
 
+void Car::lidar_thread_start() {
+  log_entry_exit w("lidar thread");
+  lidar.run();
+  while(!quit) {
+    try {
+      bool got_scan = lidar.try_get_scan(1);
+      if(got_scan) {
+        int scan_number;
+        {
+          lock_guard<std::mutex> lock(recent_scans_mutex);
+          recent_scans.emplace_front(lidar.current_scan);
+          scan_number = lidar.current_scan.scan_number;
+          while(recent_scans.size() > 10) {
+            recent_scans.pop_back();
+          }
+        log_info("got scan " + to_string(scan_number));
+        }
+      }
+    }
+    catch (string error_string) {
+      log_error("error caught in lidar_thread_start"+error_string);
+    }
+    catch (...) {
+      log_error("error caught in lidar_thread_start");
+    }
+  }
+}
+
 void Car::usb_thread_start() {
   log_entry_exit w("usb thread");
   socket_server.open_socket(5571);
   usb.add_line_listener(&usb_queue);
   usb.write_on_connect("\ntd+\n");
-  usb.run();
+  usb.run("/dev/ttyACM1");
   while(!quit) {
     try {
       string line;
@@ -258,6 +326,12 @@ void Car::apply_dynamics(Dynamics & d) {
   if (reading_count > 2 && fabs(wheel_distance_meters) > 0.) { // adding 2 keeps out the big jump after a reset
     Angle outside_wheel_angle = angle_for_steering(previous.str);
     ackerman.move_right_wheel(outside_wheel_angle, wheel_distance_meters, get_heading().radians());
+  }
+
+  // tell lidar we have moved
+  {
+    Point p = get_front_position();
+    lidar.set_pose(p.x, p.y, get_heading().radians());
   }
   write_state();
 }

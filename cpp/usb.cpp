@@ -121,7 +121,7 @@ void Usb::monitor_incoming_data() {
   auto fd = fd_error;
   while(!quit) {
     // find and open usb
-    for(string usb_path : glob("/dev/ttyACM*")) {
+    for(string usb_path : glob(_device_path)) {
       echo_off(usb_path);
       fd = open(usb_path.c_str(), O_RDWR | O_NONBLOCK | O_SYNC | O_APPEND | O_NOCTTY);
       if(fd != fd_error) {
@@ -183,7 +183,9 @@ void Usb::monitor_incoming_data() {
 }
 
 
-void Usb::run(){
+void Usb::run(std::string device_path){
+  _device_path = device_path;
+
   run_thread = thread(&Usb::monitor_incoming_data_thread,this);
 }
 
@@ -225,7 +227,7 @@ void test_usb() {
   WorkQueue<string> q;
   usb.add_line_listener(&q);
   cout << "about to run usb " << endl;
-  usb.run();
+  usb.run("/dev/ttyACM1");
   string s;
   int i = 0;
 
