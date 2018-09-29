@@ -98,7 +98,7 @@ void Car::process_socket() {
   while(true){
     string full_request = socket_server.get_request();
     if(full_request.length()==0) return;
-    log_info("socket full request: \"" + full_request + "\"");
+    //log_info("socket full request: \"" + full_request + "\"");
     auto params = split(full_request, ',');
     string request = params[0];
     //log_info("got socket request: \"" + request + "\"");
