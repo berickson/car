@@ -252,7 +252,7 @@ let viewer = (function () {
 
         //stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
         //document.body.appendChild(stats.dom);
-
+        on_resize();
         render();
         get_scan();
     }
@@ -295,6 +295,25 @@ let viewer = (function () {
         xmlhttp.send();
     }
 
+    function on_resize() {
+        let element = document.getElementById("webgl-container");
+
+        // set the container height small so it isn't considered while
+        // calculating height of the rest of the document
+        element.style.height= 3+"px";
+
+        // get full document height / width
+        let html = document.getElementById("html");
+        let h = Math.max(window.innerHeight, html.scrollHeight);
+        let w = Math.max(window.innerWidth, html.scrollWidth);
+
+        // set element to that size, and update rendering objects
+        element.style.height= h+"px";
+        camera.aspect = w/h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+    }
+
     function render() {
         stats.begin();
         stats.end();
@@ -302,6 +321,7 @@ let viewer = (function () {
         requestAnimationFrame(render);  // force to call again at next repaint
     }
 
+    window.addEventListener("resize", on_resize);
     window.onload = initScene;
 
     return {
