@@ -220,6 +220,7 @@ private:
 
   SocketServer socket_server;
   void process_socket();
+  void socket_get_scan(vector<string> & params);
 };
 
 

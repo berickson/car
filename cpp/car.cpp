@@ -60,6 +60,40 @@ string Car::get_mode() {
   return "manual";
 }
 
+void Car::socket_get_scan(vector<string> & params) {
+    int scan_to_skip = -1;
+    if(params.size() > 1) {
+      try {
+        scan_to_skip = atoi(params[1].c_str());
+      } catch (...) {
+        log_warning("invalid scan number requested");
+      }
+    }
+
+    bool found = false;
+
+    //lidar.get_scan();
+    if(recent_scans.size()>0) {
+      auto wait_end_time = system_clock::now() + milliseconds(200);
+      while ( !found && system_clock::now()  < wait_end_time) {
+        {
+          lock_guard<mutex> lock(recent_scans_mutex);
+          LidarScan & scan = recent_scans.front();
+          if(scan.scan_number != scan_to_skip) {
+            found = true;
+            socket_server.send_response(recent_scans.front().get_json().dump());
+            break;
+          }
+        }
+        this_thread::sleep_for(chrono::milliseconds(1));
+      }
+    }
+    if (!found) {
+      LidarScan fake;
+      socket_server.send_response(fake.get_json());
+    }
+}
+
 void Car::process_socket() {
   while(true){
     string full_request = socket_server.get_request();
@@ -69,33 +103,7 @@ void Car::process_socket() {
     string request = params[0];
     //log_info("got socket request: \"" + request + "\"");
     if(request=="get_scan") {
-      int scan_to_skip = -1;
-      if(params.size() > 1) {
-        try {
-          scan_to_skip = atoi(params[1].c_str());
-        } catch (...) {
-          log_warning("invalid scan number requested");
-        }
-      }
-
-      //lidar.get_scan();
-      if(recent_scans.size()>0) {
-        auto wait_end_time = system_clock::now() + milliseconds(20000);
-        while ( system_clock::now()  < wait_end_time) {
-          {
-            lock_guard<mutex> lock(recent_scans_mutex);
-            LidarScan & scan = recent_scans.front();
-            if(scan.scan_number != scan_to_skip) {
-              socket_server.send_response(recent_scans.front().get_json().dump());
-              break;
-            }
-          }
-          this_thread::sleep_for(chrono::milliseconds(1));
-        }
-      } else {
-        LidarScan fake;
-        socket_server.send_response(fake.get_json());
-      }
+      socket_get_scan(params);
     }
     else if(request=="get_state"){
       nlohmann::json j;

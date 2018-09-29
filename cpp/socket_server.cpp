@@ -51,7 +51,7 @@ string SocketServer::get_request() {
       buffer_next = 0;
       buffer_end = 0;
       timeout.tv_sec = 0;
-      timeout.tv_usec = 0;
+      timeout.tv_usec = 10000;
       FD_ZERO(&readset);
       FD_SET(client_socket_fd, &readset);
       int result = select(client_socket_fd + 1, &readset, NULL, NULL, &timeout);
