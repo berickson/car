@@ -72,9 +72,10 @@ def get_car_scan():
 #    recv_string = '{"vbat":3}'
     rv = ""
     try:
+        since = request.args.get('since', '-1')
         connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         connection.connect(('localhost', 5571))
-        connection.send(("get_scan\x00").encode())
+        connection.send(("get_scan,"+str(since) +"\x00").encode())
         done = False
         while not done:
             recv_string = connection.recv(4096).decode("utf-8")

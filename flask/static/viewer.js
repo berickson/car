@@ -56,6 +56,7 @@ let viewer = (function () {
         stats = new Stats(),
         interaction,
         controls,
+        last_scan_number = -1,
         loader = new THREE.TextureLoader(),
         lidar_elements,
         lidar_x_pos = 0.57 / 2 - 0.0635;
@@ -259,7 +260,7 @@ let viewer = (function () {
 
     function get_scan() {
         let xmlhttp = new XMLHttpRequest();
-        let url = "car/get_scan";
+        let url = "car/get_scan?since="+last_scan_number;
 
         xmlhttp.onreadystatechange = function () {
             if (this.readyState == 4) { // done
@@ -267,6 +268,7 @@ let viewer = (function () {
                     try {
                         scan = JSON.parse(this.responseText);
                         if (scan !== null) {
+                            last_scan_number = scan.number;
                             for (let i = 0; i < scan.angle.length; i++) {
                                 let l = scan.distance_meters[i];
                                 let theta = scan.angle[i] + scan.pose_theta[i];

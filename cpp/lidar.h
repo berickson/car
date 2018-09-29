@@ -42,6 +42,7 @@ struct LidarScan {
       Eigen::Vector2f p2;
     };
 
+    int scan_number = 0;
     vector<Pose2d> poses;
     vector<LidarMeasurement> measurements;
     vector<ScanSegment> find_lines(double tolerance, int min_point_count = 8);

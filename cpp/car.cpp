@@ -62,13 +62,36 @@ string Car::get_mode() {
 
 void Car::process_socket() {
   while(true){
-    string request = socket_server.get_request();
-    if(request.length()==0) return;
+    string full_request = socket_server.get_request();
+    if(full_request.length()==0) return;
+    log_info("socket full request: \"" + full_request + "\"");
+    auto params = split(full_request, ',');
+    string request = params[0];
+    //log_info("got socket request: \"" + request + "\"");
     if(request=="get_scan") {
+      int scan_to_skip = -1;
+      if(params.size() > 1) {
+        try {
+          scan_to_skip = atoi(params[1].c_str());
+        } catch (...) {
+          log_warning("invalid scan number requested");
+        }
+      }
+
       //lidar.get_scan();
       if(recent_scans.size()>0) {
-        lock_guard<mutex> lock(recent_scans_mutex);
-        socket_server.send_response(recent_scans.front().get_json().dump());
+        auto wait_end_time = system_clock::now() + milliseconds(20000);
+        while ( system_clock::now()  < wait_end_time) {
+          {
+            lock_guard<mutex> lock(recent_scans_mutex);
+            LidarScan & scan = recent_scans.front();
+            if(scan.scan_number != scan_to_skip) {
+              socket_server.send_response(recent_scans.front().get_json().dump());
+              break;
+            }
+          }
+          this_thread::sleep_for(chrono::milliseconds(1));
+        }
       } else {
         LidarScan fake;
         socket_server.send_response(fake.get_json());
@@ -128,11 +151,15 @@ void Car::lidar_thread_start() {
     try {
       bool got_scan = lidar.try_get_scan(1);
       if(got_scan) {
-        log_info("got scan");
-        lock_guard<std::mutex> lock(recent_scans_mutex);
-        recent_scans.emplace_front(lidar.current_scan);
-        while(recent_scans.size() > 10) {
-          recent_scans.pop_back();
+        int scan_number;
+        {
+          lock_guard<std::mutex> lock(recent_scans_mutex);
+          recent_scans.emplace_front(lidar.current_scan);
+          scan_number = lidar.current_scan.scan_number;
+          while(recent_scans.size() > 10) {
+            recent_scans.pop_back();
+          }
+        log_info("got scan " + to_string(scan_number));
         }
       }
     }

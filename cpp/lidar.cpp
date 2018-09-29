@@ -50,6 +50,7 @@ nlohmann::json LidarScan::get_json() {
       poses_y.push_back(p.y);
       poses_theta.push_back(p.theta);
   }
+  scan_json["number"] = scan_number;
   scan_json["angle"] = angles;
   scan_json["distance_meters"] = distances;
   scan_json["signal_strength"] = strengths;
@@ -269,6 +270,7 @@ bool LidarUnit::try_get_scan(int ms_to_wait = 1)
       next_scan.poses[degrees] = pose;
       if(degrees == 359) {
         swap(current_scan, next_scan);
+        current_scan.scan_number = completed_scan_count;
         completed_scan_count++;
         return true;
       }
