@@ -1,4 +1,5 @@
 #include "dynamics.h"
+#include "work_queue.h"
 #include <string.h> // for memset of all things
 #include <iostream>
 #include "system.h"
@@ -129,71 +130,71 @@ std::string Dynamics::csv_fields() {
 }
 
 
-bool Dynamics::from_log_string(Dynamics & d, string &s) {
-  auto fields = split(s,',');
+bool Dynamics::from_log_string(Dynamics & d, const StampedString & s) {
+  auto fields = split(s.message,',');
   if(fields.size() <2) {
     return false;
   }
-  if(fields[1] != "TD")
+  if(fields[0] != "TD")
     return false;
-  if(fields.size() != 55) {
+  if(fields.size() != 54) {
     stringstream error;
     error << "wrong number of field in TD. Expected: 55, actual:" << fields.size() << ".";
     log_warning(error.str());
     //usb_error_count++;
     return false;
   }
-//    self.datetime = dateutil.parser.parse(fields[0])
+  //self.datetime = s.timestamp;
 
   try {
-    d.datetime = time_from_string(fields[0]);
-    d.str = stoi(fields[3]);
-    d.esc = stoi(fields[5]);
+    //d.datetime = time_from_string(fields[0]);
+    d.str = stoi(fields[2]);
+    d.esc = stoi(fields[4]);
 
-    d.ax = stod(fields[7]);
-    d.ay = stod(fields[8]);
-    d.az = stod(fields[9]);
+    d.ax = stod(fields[6]);
+    d.ay = stod(fields[7]);
+    d.az = stod(fields[8]);
 
-    d.spur_last_us = stoul(fields[11]);
-    // d.spur_delta_us = stoul(fields[12]); unused
-    d.spur_odo = stoi(fields[14]);
-    d.control_mode = fields[16][0];
+    d.spur_last_us = stoul(fields[10]);
+    // d.spur_delta_us = stoul(fields[11]); unused
+    d.spur_odo = stoi(fields[13]);
+    d.control_mode = fields[15][0];
 
-    d.odo_fl_a =  stoi(fields[18]);
-    d.odo_fl_a_us =  stoul(fields[19]);
-    d.odo_fl_b =  stoi(fields[20]);
-    d.odo_fl_b_us =  stoul(fields[21]);
-    // d.odo_fl_ab_us =  stoul(fields[22]); // unused
+    d.odo_fl_a =  stoi(fields[17]);
+    d.odo_fl_a_us =  stoul(fields[18]);
+    d.odo_fl_b =  stoi(fields[19]);
+    d.odo_fl_b_us =  stoul(fields[20]);
+    // d.odo_fl_ab_us =  stoul(fields[21]); // unused
 
-    d.odo_fr_a =  stoi(fields[24]);
-    d.odo_fr_a_us =  stoul(fields[25]);
-    d.odo_fr_b =  stoi(fields[26]);
-    d.odo_fr_b_us =  stoul(fields[27]);
-    // d.odo_fr_ab_us =  stoul(fields[28]); // unused
+    d.odo_fr_a =  stoi(fields[23]);
+    d.odo_fr_a_us =  stoul(fields[24]);
+    d.odo_fr_b =  stoi(fields[25]);
+    d.odo_fr_b_us =  stoul(fields[26]);
+    // d.odo_fr_ab_us =  stoul(fields[27]); // unused
 
-    d.odo_bl_a =  stoi(fields[30]);
-    d.odo_bl_a_us =  stoul(fields[31]);
-    d.odo_bl_b =  stoi(fields[32]);
-    d.odo_bl_b_us =  stoul(fields[33]);
-    // d.odo_bl_ab_us =  stoul(fields[34]); // unused
+    d.odo_bl_a =  stoi(fields[29]);
+    d.odo_bl_a_us =  stoul(fields[30]);
+    d.odo_bl_b =  stoi(fields[31]);
+    d.odo_bl_b_us =  stoul(fields[32]);
+    // d.odo_bl_ab_us =  stoul(fields[33]); // unused
 
-    d.odo_br_a =  stoi(fields[36]);
-    d.odo_br_a_us =  stoul(fields[37]);
-    d.odo_br_b =  stoi(fields[38]);
-    d.odo_br_b_us =  stoul(fields[39]);
-    // d.odo_br_ab_us =  stoul(fields[40]); // unused
+    d.odo_br_a =  stoi(fields[35]);
+    d.odo_br_a_us =  stoul(fields[36]);
+    d.odo_br_b =  stoi(fields[37]);
+    d.odo_br_b_us =  stoul(fields[38]);
+    // d.odo_br_ab_us =  stoul(fields[39]); // unused
 
-    d.ms = stoul(fields[42]);
+    d.ms = stoul(fields[41]);
 
-    d.us = stoul(fields[44]);
+    d.us = stoul(fields[43]);
 
-    d.yaw = Angle::degrees(stod(fields[46]));
-    d.pitch = Angle::degrees(stod(fields[47]));
-    d.roll = Angle::degrees(stod(fields[48]));
+    d.yaw = Angle::degrees(stod(fields[45]));
+    d.pitch = Angle::degrees(stod(fields[46]));
+    d.roll = Angle::degrees(stod(fields[47]));
 
-    d.battery_voltage = stod(fields[50]);
-    d.go = stod(fields[52])==1;
-    d.mpu_temperature = stod(fields[54]);
+    d.battery_voltage = stod(fields[49]);
+    d.go = stod(fields[51])==1;
+    d.mpu_temperature = stod(fields[53]);
 
   } catch (...)
   {
@@ -212,7 +213,7 @@ void test_dynamics() {
   string s = "2016-05-22 16:25:13.331951,TD,str,1478,esc,1487,aa,-0.02,0.04,0.08,spur_us,0,0,spur_odo,0,ping_mm,0,odo_fl,-3764,330458839,odo_fr,0,0,odo_bl,-87,334189373,odo_br,54,316680087,ms,334351,us,334351946,ypr,-114.40,8.73,-1.43,vbat,7.71";
   //string s = "0,TD,str,1451,esc,1492,aa,-0.07,0.07,0.09,spur_us,131800,420675479,spur_odo,687,ping_mm,0,odo_fl,-35,427389363,odo_fr,0,0,odo_bl,7TD,str,1451,esc,1491,aa,-0.08,0.05,0.08,spur_us,131800,420675479,spur_odo,687,ping_mm,0,odo_fl,-35,427389363,odo_fr,0,0,odo_bl,73070,427898122,odo_br,76178,540125596,ms,663100,us,663100483,ypr,16.33,7.23,-1.37,vbat,8.23";
 
-  bool ok = Dynamics::from_log_string(d,s);
+  bool ok = Dynamics::from_log_string(d,StampedString::from_string(s));
   cout << "ok:" << ok;
   cout << "log string: " << s << endl;
   cout << "d.tostring(): " << d.to_string() << endl;

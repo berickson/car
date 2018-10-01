@@ -14,6 +14,48 @@
 using namespace std;
 using namespace std::chrono;
 
+struct PerformanceData {
+  PerformanceData(const char * name) : name(name) {
+    _construct_time = system_clock::now();
+  }
+  system_clock::time_point _construct_time;
+  std::string name = "unnamed";
+  long call_count = 0;
+  long report_every_n_calls = 1000;
+  system_clock::duration total_duration;
+};
+
+class MethodTracker {
+public:
+  PerformanceData &_data;
+  system_clock::time_point _start_time;
+
+  MethodTracker(PerformanceData & data) : _data(data) {
+    _start_time = system_clock::now();
+  }
+
+  ~MethodTracker() {
+    auto end_time = system_clock::now();
+    _data.total_duration += (end_time-_start_time);
+    ++(_data.call_count);
+    if((_data.call_count % _data.report_every_n_calls) == 0) {
+      auto clock_elapsed = system_clock::now() - _data._construct_time;
+      float percent_wall = 100. * _data.total_duration.count() / clock_elapsed.count();
+      log_info(
+        _data.name 
+        + " call_count: " 
+        + to_string(_data.call_count) 
+        + " total_duration: " 
+        + to_string(_data.total_duration.count() / 1E6) + " ms"
+        + " average_duratioN: " 
+        + to_string((_data.total_duration.count() / 1E6) / _data.call_count)+ " ms"
+        + "% wall: " + to_string(percent_wall)
+      );
+    }
+  }
+};
+
+
 Usb::~Usb() {
   stop();
 }
@@ -22,60 +64,67 @@ void Usb::write_on_connect(string s) {
   _write_on_connect = s;
 }
 
-void Usb::add_line_listener(WorkQueue<string>*listener){
+void Usb::add_line_listener(WorkQueue<StampedString>*listener){
   line_listeners.push_back(listener);
 }
 
-void Usb::remove_line_listener(WorkQueue<string>*listener){
+void Usb::remove_line_listener(WorkQueue<StampedString>*listener){
   line_listeners.remove(listener);
 }
 
 void Usb::send_to_listeners(string s) {
-  string stamped = time_string()+","+s;
-  for(WorkQueue<string>* listener : line_listeners) {
-    listener->push(stamped);
+  // 9/30 - about 8.0%  clock wall time
+  //      - time_string to int - about 2.6 % wall time
+  //static PerformanceData perf_data("Usb::send_to_listeners");
+  //MethodTracker t(perf_data);
+  static long count = 0;
+
+  StampedString payload(s, system_clock::now());
+
+
+  //string stamped = to_string(++count)+","+s;
+  for(auto listener : line_listeners) {
+      // 9/30 - over 1.0%  clock wall time
+      //static PerformanceData perf_data("Usb::send_to_listeners.push");
+      //MethodTracker t(perf_data);
+      listener->push(payload);
   }
 }
 
-bool data_available(int fd) {
+bool wait_for_data(int fd, __time_t tv_sec = 1, __suseconds_t tv_usec = 0) {
   struct timeval timeout;
   /* Initialize the file descriptor set. */
-  fd_set read_fds, write_fds, except_fds;
+  fd_set read_fds;
   FD_ZERO(&read_fds);
-  FD_ZERO(&write_fds);
-  FD_ZERO(&except_fds);
   FD_SET(fd, &read_fds);
 
   /* Initialize the timeout data structure. */
-  timeout.tv_sec = 0;
-  timeout.tv_usec = 15000;
+  timeout.tv_sec = tv_sec;
+  timeout.tv_usec = tv_usec;
   return select(fd+1,&read_fds,NULL,NULL,&timeout) > 0;
 }
 
 
-void Usb::process_data(string data) {
+void Usb::process_data(const char * data) {
+    // 9/30 - greater than 8.8% wall time .23 ms duration
+    static PerformanceData perf_data("Usb::process_data");
+    MethodTracker t(perf_data);
+
   // this can be called with any amount of data, so we might have leftover data,
   // many lines, or no lines at all.  Handle all cases and send only complete lines
   // to listeners.
-  bool has_newline = ends_with(data, "\n");
-  auto lines = split(data, '\n');
-
-  // add leftover data from last time
-  lines[0] = leftover_data + lines[0];
-  leftover_data = "";
-
-  // each array entry except the last is a complete line
-  // so send them
-  int last_index = lines.size() - 1;
-  for(int i=0; i<last_index; i++) {
-    send_to_listeners(lines[i]);
-  }
-
-  // send last line if it is complete, otherwise save it for later
-  if(has_newline && lines[last_index].size() >1){
-    send_to_listeners(lines[last_index]);
-  } else {
-    leftover_data = lines[last_index];
+  for(const char * incoming = data; *incoming; ++incoming) {
+    if(*incoming == '\n') {
+      string s = ss.str();
+      send_to_listeners(s);;
+      // reset the stream
+      ss.str("");
+      ss.clear();
+      ss.seekp(0); // for outputs: seek put ptr to start
+      ss.seekg(0); // for inputs: seek get ptr to start
+    } else {
+      ss.put(*incoming);
+    }
   }
 }
 
@@ -150,7 +199,7 @@ void Usb::monitor_incoming_data() {
       bool did_work = false;
       ssize_t count = 0;
 
-      if(fd != fd_error && data_available(fd)) {
+      if(fd != fd_error && wait_for_data(fd)) {
         count = read(fd, buf, buf_size-1); // read(2)
         if(count==fd_error) {
           count = 0;
@@ -160,16 +209,7 @@ void Usb::monitor_incoming_data() {
         buf[count]=0;
       }
       if(count > 0) {
-        did_work = true;
-        us_waited = 0;
         process_data(buf);
-      }
-      if(!did_work) {
-        us_waited += poll_us;
-        if(us_waited > max_wait_us) // one second
-          break;
-        usleep(poll_us);
-        us_waited += poll_us;
       }
     }
 
@@ -187,6 +227,7 @@ void Usb::run(std::string device_path){
   _device_path = device_path;
 
   run_thread = thread(&Usb::monitor_incoming_data_thread,this);
+  pthread_setname_np(run_thread.native_handle(), "car_usb_run");
 }
 
 void Usb::flush()
@@ -224,11 +265,11 @@ void test_usb() {
   cout << "test usb" << endl;
   Usb usb;
   usb.write_on_connect("\ntd+\n");
-  WorkQueue<string> q;
+  WorkQueue<StampedString> q;
   usb.add_line_listener(&q);
   cout << "about to run usb " << endl;
   usb.run("/dev/ttyACM1");
-  string s;
+  StampedString s;
   int i = 0;
 
   auto t_start = high_resolution_clock::now();

@@ -140,7 +140,7 @@ std::vector<std::string> glob(const string& pat){
 
 
 // Returns an ISO 8601 datetime in UTC to milliseconds resolution
-string time_string(std::chrono::system_clock::time_point &tp)
+string time_string(std::chrono::system_clock::time_point tp)
 {
   time_t tt = chrono::system_clock::to_time_t (tp);
   chrono::system_clock::duration d = tp.time_since_epoch();

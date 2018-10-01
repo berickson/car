@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include "geometry.h"
+#include "work_queue.h"
 
 
 
@@ -14,7 +15,7 @@ using namespace std::chrono;
 struct Dynamics {
 public:
   Dynamics();
-  static bool from_log_string(Dynamics &d, string &s);
+  static bool from_log_string(Dynamics &d, const StampedString &s);
   string to_string();
 
   system_clock::time_point datetime;

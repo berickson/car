@@ -33,7 +33,7 @@ bool FakeCar::step() {
   bool got_td = false;
   while(got_td == false) {
     if(getline(dynamics_file,s,'\n')) {
-      got_td = process_line_from_log(s);
+      got_td = process_line_from_log(StampedString::from_string(s));
     } else {
       return false;
     }
@@ -50,7 +50,7 @@ void write_dynamics_csv_from_recording_file(string recording_path, string outpat
   string line;
   while(getline(infile, line)) {
     Dynamics d;
-    if(Dynamics::from_log_string(d,line)) {
+    if(Dynamics::from_log_string(d,StampedString::from_string(line))) {
       csv << d.csv_fields() << endl;
     }
   }

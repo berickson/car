@@ -186,7 +186,7 @@ public:
 
 
   // infrastructure
-  bool process_line_from_log(string s);
+  bool process_line_from_log(const StampedString & s);
   void apply_dynamics(Dynamics & d);
   Usb usb;
 
@@ -210,7 +210,7 @@ private:
   void connect_lidar();
 
   void usb_thread_start();
-  WorkQueue<string> usb_queue;
+  WorkQueue<StampedString> usb_queue;
   thread usb_thread;
   void connect_usb();
 

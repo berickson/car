@@ -5,6 +5,8 @@
 #include "trim.h"
 #include "json.hpp"
 
+#include <iomanip>
+
 
 RunSettings::RunSettings(){
   auto f = FileNames();

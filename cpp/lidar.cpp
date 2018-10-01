@@ -242,19 +242,20 @@ vector<Corner>  find_corners(const vector<LidarScan::ScanSegment> & walls) {
 
 bool LidarUnit::try_get_scan(int ms_to_wait = 1)
 {
-  string l;
+  StampedString stamped_l;
   while(true) {
-    if(! usb_queue.try_pop(l, ms_to_wait)) {
+    if(! usb_queue.try_pop(stamped_l, ms_to_wait)) {
       return false;
     }
+    string & l = stamped_l.message;
     trim(l);
     vector<string> fields = split(l);
     // see if this is an angle measurment
-    if(fields.size() > 2 && fields[1] == "A") {
+    if(fields.size() == 4 && fields[0] == "A") {
       LidarMeasurement m;
-      int degrees = atoi(fields[2].c_str());
+      int degrees = atoi(fields[1].c_str());
       m.angle.set_degrees(degrees);
-      string v = fields[3];
+      string v = fields[2];
       if(v=="S") {
         m.status = LidarMeasurement::measure_status::low_signal;
       } else if (v=="I") {
@@ -263,7 +264,7 @@ bool LidarUnit::try_get_scan(int ms_to_wait = 1)
         m.status = LidarMeasurement::measure_status::crc_error;
       } else {
         m.distance_meters = atoi(v.c_str())/1000.;
-        m.signal_strength = atoi(fields[4].c_str());
+        m.signal_strength = atoi(fields[3].c_str());
         m.status = LidarMeasurement::measure_status::ok;
       }
       next_scan.measurements[degrees] = m;

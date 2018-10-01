@@ -64,7 +64,7 @@ public:
     LidarScan scan2;
     LidarScan & current_scan = scan1;
     LidarScan & next_scan = scan2;
-    WorkQueue<string> usb_queue;
+    WorkQueue<StampedString> usb_queue;
     int completed_scan_count = 0;
 
     void set_pose(float x, float y, float theta);

@@ -9,6 +9,7 @@
 #include "async_buf.h"
 #include "socket_server.h"
 #include "json.hpp"
+#include <pthread.h>
 
 using namespace std;
 using namespace std::chrono;
@@ -18,6 +19,7 @@ using namespace std::chrono_literals;
 
 
 Car::Car(bool online) {
+  log_entry_exit("Car::Car");
   log_info("reading configuration");
   read_configuration(config_path);
   front_right_wheel.meters_per_tick = this->meters_per_odometer_tick;
@@ -44,10 +46,12 @@ Car::~Car() {
 
 void Car::connect_lidar() {
   lidar_thread = thread(&Car::lidar_thread_start, this);
+  pthread_setname_np(lidar_thread.native_handle(), "car_lidar");
 }
 
 void Car::connect_usb() {
   usb_thread = thread(&Car::usb_thread_start, this);
+  pthread_setname_np(usb_thread.native_handle(), "car_usb");
 }
 
 string Car::get_mode() {
@@ -98,7 +102,7 @@ void Car::process_socket() {
   while(true){
     string full_request = socket_server.get_request();
     if(full_request.length()==0) return;
-    //log_info("socket full request: \"" + full_request + "\"");
+    log_info("socket full request: \"" + full_request + "\"");
     auto params = split(full_request, ',');
     string request = params[0];
     //log_info("got socket request: \"" + request + "\"");
@@ -167,8 +171,8 @@ void Car::lidar_thread_start() {
           while(recent_scans.size() > 10) {
             recent_scans.pop_back();
           }
-        log_info("got scan " + to_string(scan_number));
         }
+        log_info("got scan " + to_string(scan_number));
       }
     }
     catch (string error_string) {
@@ -178,43 +182,54 @@ void Car::lidar_thread_start() {
       log_error("error caught in lidar_thread_start");
     }
   }
+  if(quit) {
+    log_info("lidar_thread exiting because quit == true");
+  }
 }
 
 void Car::usb_thread_start() {
-  log_entry_exit w("usb thread");
-  socket_server.open_socket(5571);
-  usb.add_line_listener(&usb_queue);
-  usb.write_on_connect("\ntd+\n");
-  usb.run("/dev/ttyACM1");
-  while(!quit) {
-    try {
-      string line;
-      if(usb_queue.try_pop(line,1)) {
-        log_warning_if_duration_exceeded w("processing usb line", 10ms);
-        process_line_from_log(line);
+  try {
+    log_entry_exit w("usb thread");
+    socket_server.open_socket(5571);
+    usb.add_line_listener(&usb_queue);
+    usb.write_on_connect("\ntd+\n");
+    usb.run("/dev/ttyACM1");
+    while(!quit) {
+      try {
+        StampedString line;
+        if(usb_queue.try_pop(line,1)) {
+          log_warning_if_duration_exceeded w("processing usb line", 10ms);
+          process_line_from_log(line);
+        }
+        process_socket();
       }
-      process_socket();
+      catch (string error_string) {
+        log_error("error caught in usb loop"+error_string);
+      }
+      catch (...) {
+        log_error("error caught in usb loop");
+      }
     }
-    catch (string error_string) {
-      log_error("error caught in usb_thread_start"+error_string);
-    }
-    catch (...) {
-      log_error("error caught in usb_thread_start");
-    }
+  }
+  catch (string error_string) {
+    log_error("error caught in usb_thread_start"+error_string);
+  }
+  catch (...) {
+    log_error("error caught in usb_thread_start");
   }
 }
 
 // returns true if the line is a valid TD
-bool Car::process_line_from_log(string line) {
+bool Car::process_line_from_log(const StampedString & msg) {
   if(input_recording_file) {
     log_warning_if_duration_exceeded w("write input_recording_file",2ms);
-    *input_recording_file << line << '\n'; //todo: make non-blocking
+    *input_recording_file << msg.to_string() << '\n'; //todo: make non-blocking
   }
-  if(split(line)[1]!="TD") {
+  if(split(msg.message)[0]!="TD") {
     return false;
   }
   Dynamics d;
-  bool ok = Dynamics::from_log_string(d,line);
+  bool ok = Dynamics::from_log_string(d,msg);
   if(ok) {
     apply_dynamics(d);
     {
@@ -226,7 +241,7 @@ bool Car::process_line_from_log(string line) {
   }
   else {
     ++usb_error_count;
-    log_warning((string) "bad dynamics: " + line);
+    log_warning((string) "bad dynamics: " + msg.to_string());
   }
   return ok;
 }
