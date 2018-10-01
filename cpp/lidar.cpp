@@ -6,6 +6,8 @@
 #include "../../include/eigen3/Eigen/Dense"
 #include "../../include/eigen3/Eigen/SVD"
 #include "json.hpp"
+#include "logger.h"
+
 using namespace Eigen;
 Eigen::IOFormat HeavyFormat(FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");
 
@@ -243,11 +245,12 @@ vector<Corner>  find_corners(const vector<LidarScan::ScanSegment> & walls) {
 bool LidarUnit::try_get_scan(int ms_to_wait = 1)
 {
   StampedString stamped_l;
+  try {
   while(true) {
     if(! usb_queue.try_pop(stamped_l, ms_to_wait)) {
       return false;
     }
-    stringstream ss(stamped_l.message);
+    stringstream ss(trimmed(stamped_l.message));
     string token;
 
     // first must be "A"
@@ -256,12 +259,12 @@ bool LidarUnit::try_get_scan(int ms_to_wait = 1)
 
     // angle
     LidarMeasurement m;
-    if(!std::getline(ss,token,',')) break;
+    if(!std::getline(ss,token,',')) throw string("error reading angle"); // todo: throw
     int degrees = atoi(token.c_str());
     m.angle.set_degrees(degrees);
 
     // status
-    if(!std::getline(ss,token,',')) break;
+    if(!std::getline(ss,token,',')) throw string("error reading status");
     if(token=="S") {
       m.status = LidarMeasurement::measure_status::low_signal;
     } else if (token=="I") {
@@ -272,7 +275,7 @@ bool LidarUnit::try_get_scan(int ms_to_wait = 1)
       m.distance_meters = atoi(token.c_str())/1000.;
       m.status = LidarMeasurement::measure_status::ok;
       
-      if(!std::getline(ss,token,',')) break;
+      if(!std::getline(ss,token,',')) throw string("error reading signal strength");
       m.signal_strength = atoi(token.c_str());
     }
     next_scan.measurements[degrees] = m;
@@ -284,6 +287,13 @@ bool LidarUnit::try_get_scan(int ms_to_wait = 1)
       completed_scan_count++;
       return true;
     }
+  }
+  } catch (string error) {
+    log_error("Exception caught in lidar.cpp: "+ error);
+    log_error("processing message:" + stamped_l.message);
+  } catch (...) {
+    log_error("Exception caught in lidar.cpp");
+    log_error("processing message:" + stamped_l.message);
   }
   return false;
 
