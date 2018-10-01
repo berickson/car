@@ -144,7 +144,7 @@ bool Dynamics::from_log_string(Dynamics & d, const StampedString & s) {
     //usb_error_count++;
     return false;
   }
-  //self.datetime = s.timestamp;
+  d.datetime = s.timestamp;
 
   try {
     //d.datetime = time_from_string(fields[0]);
@@ -213,7 +213,9 @@ void test_dynamics() {
   string s = "2016-05-22 16:25:13.331951,TD,str,1478,esc,1487,aa,-0.02,0.04,0.08,spur_us,0,0,spur_odo,0,ping_mm,0,odo_fl,-3764,330458839,odo_fr,0,0,odo_bl,-87,334189373,odo_br,54,316680087,ms,334351,us,334351946,ypr,-114.40,8.73,-1.43,vbat,7.71";
   //string s = "0,TD,str,1451,esc,1492,aa,-0.07,0.07,0.09,spur_us,131800,420675479,spur_odo,687,ping_mm,0,odo_fl,-35,427389363,odo_fr,0,0,odo_bl,7TD,str,1451,esc,1491,aa,-0.08,0.05,0.08,spur_us,131800,420675479,spur_odo,687,ping_mm,0,odo_fl,-35,427389363,odo_fr,0,0,odo_bl,73070,427898122,odo_br,76178,540125596,ms,663100,us,663100483,ypr,16.33,7.23,-1.37,vbat,8.23";
 
-  bool ok = Dynamics::from_log_string(d,StampedString::from_string(s));
+  StampedString ss;
+  ss.set_from_string(s);
+  bool ok = Dynamics::from_log_string(d,ss);
   cout << "ok:" << ok;
   cout << "log string: " << s << endl;
   cout << "d.tostring(): " << d.to_string() << endl;

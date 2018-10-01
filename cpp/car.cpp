@@ -100,6 +100,7 @@ void Car::socket_get_scan(vector<string> & params) {
 
 void Car::process_socket() {
   while(true){
+    log_warning_if_duration_exceeded _("Car::process_socket",1s);
     string full_request = socket_server.get_request();
     if(full_request.length()==0) return;
     log_info("socket full request: \"" + full_request + "\"");
@@ -226,7 +227,8 @@ bool Car::process_line_from_log(const StampedString & msg) {
     log_warning_if_duration_exceeded w("write input_recording_file",2ms);
     *input_recording_file << msg.to_string() << '\n'; //todo: make non-blocking
   }
-  if(split(msg.message)[0]!="TD") {
+  auto split_message = split(msg.message);
+  if(split_message.size() == 0 || split_message[0]!="TD") {
     return false;
   }
   Dynamics d;

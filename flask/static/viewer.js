@@ -264,6 +264,7 @@ let viewer = (function () {
 
         xmlhttp.onreadystatechange = function () {
             if (this.readyState == 4) { // done
+                let timeout_ms = 1000;
                 if (this.status == 200) { // ok
                     try {
                         scan = JSON.parse(this.responseText);
@@ -288,9 +289,11 @@ let viewer = (function () {
                             scan_mesh.position.y = 0;//car.position.y + lidar_x_pos * Math.sin(car.rotation.z);
                             scan_mesh.rotation.z = 0;//car.rotation.z;
                         }
-                    } catch (e) { }
-                }
-                window.setTimeout(get_scan, 0);
+                        timeout_ms = 0; // force fast update for next scan
+                    } catch (e) {}
+                } 
+                window.setTimeout(get_scan, timeout_ms);
+                
             }
         };
         xmlhttp.open("GET", url, true);

@@ -54,17 +54,38 @@ def get_pi_state():
     except:
         return jsonify(error='error reading cpu_percent')
 
+# implements constructor / destructor semantics to help socket lifetime
+class get_car_socket:
+    def __enter__(self):
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+        self.socket.settimeout(5);
+        self.socket.connect(('localhost', 5571));
+        return self
+
+    def __exit__(self, type, value, traceback):
+        try:
+            self.socket.close();
+        except:
+            pass
+
+    def send(self, s):
+        self.socket.send((s+"\x00").encode());
+
+    def receive(self):
+        rv = ""
+        done = False
+        while not done:
+            s = self.socket.recv(4096).decode("utf-8")
+            done = s.endswith('\0')
+            rv = rv + s.rstrip('\0')
+        return rv
+
 @app.route('/car/get_state')
 def get_car_state():
-#    recv_string = '{"vbat":3}'
-    try:
-        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        connection.connect(('localhost', 5571))
-        connection.send(("get_state\x00").encode())
-        recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
-        connection.close()
-    except:
-        pass
+    recv_string = "error"
+    with get_car_socket() as socket:
+        socket.send("get_state");
+        recv_string = socket.receive()
     return Response(recv_string,mimetype='application/json')
 
 @app.route('/car/get_scan')
@@ -73,16 +94,9 @@ def get_car_scan():
     rv = ""
     try:
         since = request.args.get('since', '-1')
-        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        connection.connect(('localhost', 5571))
-        connection.send(("get_scan,"+str(since) +"\x00").encode())
-        done = False
-        while not done:
-            recv_string = connection.recv(4096).decode("utf-8")
-            done = recv_string.endswith('\0')
-            rv = rv+recv_string.rstrip('\0')
-
-        connection.close()
+        with get_car_socket() as socket:
+            socket.send("get_scan,"+str(since))
+            rv = socket.receive()
     except:
         pass
     return Response(rv,mimetype='application/json')    
@@ -92,11 +106,9 @@ def get_car_scan():
 def command_reset_odometer():
     recv_string = "error"
     try:
-        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        connection.connect(('localhost', 5571))
-        connection.send(("reset_odometer\x00").encode())
-        recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
-        connection.close()
+        with get_car_socket() as socket:
+            socket.send("reset_odometer")
+            recv_string = socket.receive()
     except:
         pass
     return jsonify(result=recv_string)
@@ -104,13 +116,11 @@ def command_reset_odometer():
 
 @app.route('/command/go', methods=['PUT'])
 def command_go():
-#    recv_string = '{"vbat":3}'
+    recv_string = "error"
     try:
-        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        connection.connect(('localhost', 5571))
-        connection.send(("go\x00").encode())
-        recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
-        connection.close()
+        with get_car_socket() as socket:
+            socket.send("go")
+            recv_string = socket.receive()
     except:
         pass
     return jsonify(result=recv_string)
@@ -118,11 +128,9 @@ def command_go():
 @app.route('/command/stop', methods=['PUT'])
 def command_stop():
     try:
-        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        connection.connect(('localhost', 5571))
-        connection.send(("stop\x00").encode())
-        recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
-        connection.close()
+        with get_car_socket() as socket:
+            socket.send("stop")
+            recv_string = socket.receive()
     except:
         pass
     return jsonify(result=recv_string)
@@ -130,11 +138,9 @@ def command_stop():
 @app.route('/command/record', methods=['PUT'])
 def command_record():
     try:
-        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        connection.connect(('localhost', 5571))
-        connection.send(("record\x00").encode())
-        recv_string = connection.recv(1000).decode("utf-8").rstrip('\0')
-        connection.close()
+        with get_car_socket() as socket:
+            socket.send("record")
+            recv_string = socket.receive()
     except:
         pass
     return jsonify(result=recv_string)
@@ -190,9 +196,9 @@ def get_path(track_name, route_name):
         s = df.to_json(orient=orient)
         return s
     elif request.method == 'PUT':
-        app.logger.error("saving path")
+        #app.logger.error("saving path")
         route = json.dumps(request.json)
-        app.logger.error("route" + route)
+        #app.logger.error("route" + route)
         df = pd.read_json(route)
         df.to_csv(
             path_path,

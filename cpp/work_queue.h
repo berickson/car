@@ -15,18 +15,8 @@ struct StampedString {
   }
   StampedString(){}
   
-  string to_string() const{
-    return (string) time_string(timestamp)+","+message;
-  }
-
-  static StampedString from_string(string s) {
-    StampedString rv;
-    size_t i = s.find(",");
-    string time_string = s.substr(0,i-1);
-    rv.timestamp = time_from_string(time_string);
-    rv.message = s.substr(i);
-
-  }
+  string to_string() const;
+  bool set_from_string(string s);
 
   system_clock::time_point timestamp;
   string message;

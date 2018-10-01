@@ -4,6 +4,23 @@
 
 using namespace std;
 
+
+  
+string StampedString::to_string() const{
+  return (string) time_string(timestamp)+","+message;
+}
+
+bool StampedString::set_from_string(string s) {
+  size_t i = s.find(",");
+  if(i != 24) {
+    return false;
+  }
+  string time_string = s.substr(0,i);
+  timestamp = time_from_string(time_string);
+  message = s.substr(i+1);
+  return true;
+}
+
 void test_work_queue() {
   WorkQueue<string> q;
   string t = "hello";

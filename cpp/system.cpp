@@ -21,6 +21,7 @@
 
 
 using namespace std;
+using namespace std::chrono;
 
 
 System::System()
@@ -110,6 +111,8 @@ string path_join(string x, string y) {
 }
 
 void mkdir(string folder) {
+  if(file_exists(folder))
+    return;
   string cmd = "mkdir \""+folder+"\"";
   system(cmd.c_str());
   if(!file_exists(folder)) {
@@ -158,6 +161,10 @@ string time_string(std::chrono::system_clock::time_point tp)
 }
 
 chrono::system_clock::time_point time_from_string(string s) {
+  if(s.length() != 24) {
+    system_clock::time_point empty;
+    return empty;
+  }
 
   string s_without_ms = s.substr(0,19)+"Z";
   string s_ms = s.substr(20,3);

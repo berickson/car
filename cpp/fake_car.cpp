@@ -31,9 +31,13 @@ void FakeCar::reset() {
 bool FakeCar::step() {
   string s;
   bool got_td = false;
+  StampedString ss;
   while(got_td == false) {
     if(getline(dynamics_file,s,'\n')) {
-      got_td = process_line_from_log(StampedString::from_string(s));
+      if(! ss.set_from_string (s)) {
+        continue;
+      }
+      got_td = process_line_from_log(ss);
     } else {
       return false;
     }
@@ -50,8 +54,11 @@ void write_dynamics_csv_from_recording_file(string recording_path, string outpat
   string line;
   while(getline(infile, line)) {
     Dynamics d;
-    if(Dynamics::from_log_string(d,StampedString::from_string(line))) {
-      csv << d.csv_fields() << endl;
+    StampedString ss;
+    if(ss.set_from_string(line)) {
+      if(Dynamics::from_log_string(d,ss)) {
+        csv << d.csv_fields() << endl;
+      }
     }
   }
 }
