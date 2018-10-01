@@ -23,7 +23,7 @@ public:
   //std::string path ;
   
 private:
-  std::stringstream ss;
+  vector<char> read_buffer;
   string _device_path;
   string _write_on_connect = "\ntd+\n";
   string string_pending_write;

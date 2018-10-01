@@ -157,6 +157,7 @@ void Car::process_socket() {
 }
 
 void Car::lidar_thread_start() {
+  // was 6% cpu time
   log_entry_exit w("lidar thread");
   lidar.run();
   while(!quit) {

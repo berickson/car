@@ -247,6 +247,48 @@ bool LidarUnit::try_get_scan(int ms_to_wait = 1)
     if(! usb_queue.try_pop(stamped_l, ms_to_wait)) {
       return false;
     }
+    stringstream ss(stamped_l.message);
+    string token;
+
+    // first must be "A"
+    if(!std::getline(ss,token,',')) break;
+    if(token != "A") break;
+
+    // angle
+    LidarMeasurement m;
+    if(!std::getline(ss,token,',')) break;
+    int degrees = atoi(token.c_str());
+    m.angle.set_degrees(degrees);
+
+    // status
+    if(!std::getline(ss,token,',')) break;
+    if(token=="S") {
+      m.status = LidarMeasurement::measure_status::low_signal;
+    } else if (token=="I") {
+      m.status = LidarMeasurement::measure_status::invalid_data;
+    } else if (token=="CRC") {
+      m.status = LidarMeasurement::measure_status::crc_error;
+    } else {
+      m.distance_meters = atoi(token.c_str())/1000.;
+      m.status = LidarMeasurement::measure_status::ok;
+      
+      if(!std::getline(ss,token,',')) break;
+      m.signal_strength = atoi(token.c_str());
+    }
+    next_scan.measurements[degrees] = m;
+    next_scan.poses[degrees] = pose;
+
+    if(degrees == 359) {
+      swap(current_scan, next_scan);
+      current_scan.scan_number = completed_scan_count;
+      completed_scan_count++;
+      return true;
+    }
+  }
+  return false;
+
+    
+/*    
     string & l = stamped_l.message;
     trim(l);
     vector<string> fields = split(l);
@@ -278,6 +320,7 @@ bool LidarUnit::try_get_scan(int ms_to_wait = 1)
     }
   }
   return false;
+  */
 }
 
 string LidarUnit::get_scan_csv_header()

@@ -75,16 +75,15 @@ void Usb::remove_line_listener(WorkQueue<StampedString>*listener){
 void Usb::send_to_listeners(string s) {
   // 9/30 - about 8.0%  clock wall time
   //      - time_string to int - about 2.6 % wall time
+  //      - time StampedString 1.373905 % wall time
   //static PerformanceData perf_data("Usb::send_to_listeners");
   //MethodTracker t(perf_data);
-  static long count = 0;
 
   StampedString payload(s, system_clock::now());
 
-
-  //string stamped = to_string(++count)+","+s;
   for(auto listener : line_listeners) {
       // 9/30 - over 1.0%  clock wall time
+      // removed time_string, 0.94%
       //static PerformanceData perf_data("Usb::send_to_listeners.push");
       //MethodTracker t(perf_data);
       listener->push(payload);
@@ -107,23 +106,18 @@ bool wait_for_data(int fd, __time_t tv_sec = 1, __suseconds_t tv_usec = 0) {
 
 void Usb::process_data(const char * data) {
     // 9/30 - greater than 8.8% wall time .23 ms duration
-    static PerformanceData perf_data("Usb::process_data");
-    MethodTracker t(perf_data);
+    // removed time_string - 2.86% wall time
+    // static PerformanceData perf_data("Usb::process_data");
+    // MethodTracker t(perf_data);
 
-  // this can be called with any amount of data, so we might have leftover data,
-  // many lines, or no lines at all.  Handle all cases and send only complete lines
-  // to listeners.
+  // send only complete lines to listeners
   for(const char * incoming = data; *incoming; ++incoming) {
     if(*incoming == '\n') {
-      string s = ss.str();
-      send_to_listeners(s);;
-      // reset the stream
-      ss.str("");
-      ss.clear();
-      ss.seekp(0); // for outputs: seek put ptr to start
-      ss.seekg(0); // for inputs: seek get ptr to start
+      read_buffer.push_back(0);
+      send_to_listeners(read_buffer.data());
+      read_buffer.clear();
     } else {
-      ss.put(*incoming);
+      read_buffer.push_back(*incoming);
     }
   }
 }
