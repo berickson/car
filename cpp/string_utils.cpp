@@ -28,3 +28,56 @@ string format(double d, int width, int precision) {
    <<  d;
   return ss.str();
 }
+
+vector<string> split(const string& s, char delim_char) {
+  string delim = string(1, delim_char);
+  vector<string> items;
+  string::const_iterator substart = s.begin(), subend;
+  while (true) {
+    subend = search(substart, s.end(), delim.begin(), delim.end());
+    string temp(substart, subend);
+    items.push_back(temp);
+    if (subend == s.end()) {
+      break;
+    }
+    substart = subend + delim.size();
+  }
+  return items;
+}
+
+// http://stackoverflow.com/a/217605/383967
+
+// trim from start (in place)
+void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+}
+
+// trim from end (in place)
+void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+}
+
+// trim from both ends (in place)
+void trim(std::string &s) {
+    ltrim(s);
+    rtrim(s);
+}
+
+// trim from start (copying)
+string ltrimmed(std::string s) {
+    ltrim(s);
+    return s;
+}
+
+// trim from end (copying)
+string rtrimmed(std::string s) {
+    rtrim(s);
+    return s;
+}
+
+// trim from both ends (copying)
+string trimmed(std::string s) {
+    trim(s);
+    return s;
+}
+

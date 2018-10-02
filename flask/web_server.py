@@ -4,7 +4,7 @@
 started from tutorial at https://www.tutorialspoint.com/flask/flask_application.htm
 '''
 import pandas as pd # must import BEFORE flask or high CPU on PI
-from flask import Flask, request, send_from_directory, jsonify, json, Response
+from flask import Flask, request, send_from_directory, jsonify, json, Response, abort
 import socket
 import tracks
 import psutil
@@ -52,15 +52,19 @@ def get_pi_state():
         cpu = psutil.cpu_percent(percpu=True)
         return jsonify(cpu=cpu)
     except:
-        return jsonify(error='error reading cpu_percent')
+        abort(500, 'error reading cpu_percent')
 
 # implements constructor / destructor semantics to help socket lifetime
 class get_car_socket:
     def __enter__(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
-        self.socket.settimeout(5);
-        self.socket.connect(('localhost', 5571));
-        return self
+        try:
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+            self.socket.settimeout(5);
+            self.socket.connect(('localhost', 5571));
+            return self
+        except:
+            pass
+        abort(500, 'error getting car socket')
 
     def __exit__(self, type, value, traceback):
         try:
@@ -69,16 +73,23 @@ class get_car_socket:
             pass
 
     def send(self, s):
-        self.socket.send((s+"\x00").encode());
+        try:
+            self.socket.send((s+"\x00").encode());
+        except:
+            abort(500, 'error sending to car socket')
 
     def receive(self):
-        rv = ""
-        done = False
-        while not done:
-            s = self.socket.recv(4096).decode("utf-8")
-            done = s.endswith('\0')
-            rv = rv + s.rstrip('\0')
-        return rv
+        try:
+            rv = ""
+            done = False
+            while not done:
+                s = self.socket.recv(4096).decode("utf-8")
+                done = s.endswith('\0')
+                rv = rv + s.rstrip('\0')
+            return rv
+        except:
+            pass
+        abort(500, 'error reading car socket')
 
 @app.route('/car/get_state')
 def get_car_state():

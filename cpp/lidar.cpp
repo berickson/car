@@ -7,6 +7,7 @@
 #include "../../include/eigen3/Eigen/SVD"
 #include "json.hpp"
 #include "logger.h"
+#include "string_utils.h"
 
 using namespace Eigen;
 Eigen::IOFormat HeavyFormat(FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");

@@ -2,11 +2,9 @@
 #include <map>
 #include <iostream>
 #include <fstream>
-#include "split.h"
 #include <string>
+#include "string_utils.h"
 #include "logger.h"
-
-#include "trim.h"
 
 using namespace std;
 

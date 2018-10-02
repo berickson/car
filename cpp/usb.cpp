@@ -7,53 +7,13 @@
 #include <string>
 #include <thread>
 #include "ends_with.h"
-#include "split.h"
+#include "string_utils.h"
 #include "system.h"
 #include "logger.h"
+#include "diagnostics.h"
 
 using namespace std;
 using namespace std::chrono;
-
-struct PerformanceData {
-  PerformanceData(const char * name) : name(name) {
-    _construct_time = system_clock::now();
-  }
-  system_clock::time_point _construct_time;
-  std::string name = "unnamed";
-  long call_count = 0;
-  long report_every_n_calls = 1000;
-  system_clock::duration total_duration;
-};
-
-class MethodTracker {
-public:
-  PerformanceData &_data;
-  system_clock::time_point _start_time;
-
-  MethodTracker(PerformanceData & data) : _data(data) {
-    _start_time = system_clock::now();
-  }
-
-  ~MethodTracker() {
-    auto end_time = system_clock::now();
-    _data.total_duration += (end_time-_start_time);
-    ++(_data.call_count);
-    if((_data.call_count % _data.report_every_n_calls) == 0) {
-      auto clock_elapsed = system_clock::now() - _data._construct_time;
-      float percent_wall = 100. * _data.total_duration.count() / clock_elapsed.count();
-      log_info(
-        _data.name 
-        + " call_count: " 
-        + to_string(_data.call_count) 
-        + " total_duration: " 
-        + to_string(_data.total_duration.count() / 1E6) + " ms"
-        + " average_duratioN: " 
-        + to_string((_data.total_duration.count() / 1E6) / _data.call_count)+ " ms"
-        + "% wall: " + to_string(percent_wall)
-      );
-    }
-  }
-};
 
 
 Usb::~Usb() {

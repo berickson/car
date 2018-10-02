@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include "lookup_table.h"
-#include "split.h"
+#include "string_utils.h"
 #include "logger.h"
 #include <chrono>
 #include "async_buf.h"

@@ -3,7 +3,7 @@
 #include <string.h> // for memset of all things
 #include <iostream>
 #include "system.h"
-#include "split.h"
+#include "string_utils.h"
 #include "logger.h"
 
 Dynamics::Dynamics() {

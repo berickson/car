@@ -1,8 +1,7 @@
 #include "run_settings.h"
 #include "file_names.h"
 #include "iostream"
-#include "split.h"
-#include "trim.h"
+#include "string_utils.h"
 #include "json.hpp"
 
 #include <iomanip>
