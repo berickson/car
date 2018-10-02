@@ -76,6 +76,12 @@ void Car::socket_get_scan(vector<string> & params) {
 
     bool found = false;
 
+    // turn on lidar if required
+    if(!lidar.is_running) {
+      lidar.motor_on();
+    }
+    last_scan_request_time = system_clock::now();
+
     //lidar.get_scan();
     if(recent_scans.size()>0) {
       auto wait_end_time = system_clock::now() + milliseconds(200);
@@ -85,7 +91,16 @@ void Car::socket_get_scan(vector<string> & params) {
           LidarScan & scan = recent_scans.front();
           if(scan.scan_number != scan_to_skip) {
             found = true;
-            socket_server.send_response(recent_scans.front().get_json().dump());
+            string result;
+            try {
+              LidarScan scan = recent_scans.front();
+              result = scan.get_json().dump();
+            } catch (...)
+            {
+              log_error("exception caught getting scan json");
+            }
+
+            socket_server.send_response(result);
             break;
           }
         }
@@ -204,6 +219,9 @@ void Car::usb_thread_start() {
           process_line_from_log(line);
         }
         process_socket();
+        if(online && lidar.is_running && last_scan_request_time + 10s < system_clock::now()) {
+          lidar.motor_off();
+        }
       }
       catch (string error_string) {
         log_error("error caught in usb loop"+error_string);

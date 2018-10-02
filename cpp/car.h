@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 #include <mutex>
+#include <chrono>
 #include "ackerman.h"
 #include "geometry.h"
 #include "dynamics.h"
@@ -16,6 +17,7 @@
 #include "lidar.h"
 
 using namespace std;
+using namespace std::chrono;
 
 class Car
 {
@@ -42,6 +44,7 @@ public:
   Dynamics current_dynamics;
   Dynamics original_dynamics;
   int reading_count = 0;
+  system_clock::time_point last_scan_request_time;
 
   Speedometer front_right_wheel, front_left_wheel, back_left_wheel, back_right_wheel, motor;
   Angle heading_adjustment;

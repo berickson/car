@@ -66,6 +66,7 @@ public:
     LidarScan & next_scan = scan2;
     WorkQueue<StampedString> usb_queue;
     int completed_scan_count = 0;
+    bool is_running = true;
 
     void set_pose(float x, float y, float theta);
     void set_rpm(int rpm);

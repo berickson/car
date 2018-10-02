@@ -24,6 +24,10 @@ std::__cxx11::string LidarMeasurement::display_string() {
 LidarScan::LidarScan() {
   measurements.resize(360);
   poses.resize(360);
+  for(int i=0; i<360; ++i){
+    measurements[i].angle.set_degrees(i);
+    poses[i].theta = 0;
+  }
 }
 
 std::__cxx11::string LidarScan::display_string() {
@@ -373,10 +377,12 @@ void LidarUnit::set_rpm(int rpm) {
 
 void LidarUnit::motor_on() {
   usb2.write_line("MotorOn");
+  is_running = true;
 }
 
 void LidarUnit::motor_off() {
   usb2.write_line("MotorOff");
+  is_running = false;
 }
 
 
@@ -392,6 +398,7 @@ void LidarUnit::run() {
   usb2.write_line("ShowAll");
   usb2.write_line("MotorOn");
   set_rpm(349);
+  is_running = true;
 
   usb2.add_line_listener(&usb_queue);
 }
