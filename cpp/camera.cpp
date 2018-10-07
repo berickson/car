@@ -103,10 +103,10 @@ void Camera::warm_up()
   
   */
   
-  cap.set(CV_CAP_PROP_FRAME_WIDTH,640);
-  cap.set(CV_CAP_PROP_FRAME_HEIGHT,480);
-  cap.set(CV_CAP_PROP_FPS,15);
-  cap.set(CV_CAP_PROP_FOURCC, CV_FOURCC('M','J','P','G'));
+  cap.set(cv::CAP_PROP_FRAME_WIDTH,640);
+  cap.set(cv::CAP_PROP_FRAME_HEIGHT,480);
+  cap.set(cv::CAP_PROP_FPS,15);
+  cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M','J','P','G'));
 
   grabber.begin_grabbing(&cap, to_string(cam_number));
   warmed_up = true;
@@ -116,12 +116,12 @@ void Camera::warm_up()
 
 void Camera::prepare_video_writer(string path)
 {
-  cv::Size frame_size = cv::Size((int) cap.get(CV_CAP_PROP_FRAME_WIDTH),    // Acquire input size
-                (int) cap.get(CV_CAP_PROP_FRAME_HEIGHT));
+  cv::Size frame_size = cv::Size((int) cap.get(cv::CAP_PROP_FRAME_WIDTH),    // Acquire input size
+                (int) cap.get(cv::CAP_PROP_FRAME_HEIGHT));
   //int fourcc = (int) cap.get(CV_CAP_PROP_FOURCC);
   //int fourcc = CV_FOURCC('M','J','P','G'); // files too big
   //int fourcc = CV_FOURCC('H','2','6','4'); // too slow
-  int fourcc = CV_FOURCC('F','M','P','4'); // not bad
+  int fourcc = cv::VideoWriter::fourcc('F','M','P','4'); // not bad
   //fps = (int) cap.get(CV_CAP_PROP_FPS);
   fps = 5; // if this is different from camera, we will down sample
   bool is_color = true;
@@ -136,7 +136,7 @@ void Camera::prepare_video_writer(string path)
     recording_path = ss.str();
   }
 
-  output_video.open(recording_path , fourcc, fps, frame_size, is_color);
+  output_video.open(recording_path , fourcc, (double)fps, frame_size, is_color);
 }
 
 void Camera::begin_capture_movie() {

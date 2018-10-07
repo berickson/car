@@ -190,8 +190,8 @@ void StereoCamera::record_thread_proc()
         if(!left_camera.get_latest_frame()) throw string("error reading left camera");
 
         // undistort both imags
-        cv::remap(right_camera.latest_frame, right_camera.latest_frame, map21, map22,CV_INTER_LINEAR);
-        cv::remap(left_camera.latest_frame, left_camera.latest_frame, map11, map12,CV_INTER_LINEAR);
+        cv::remap(right_camera.latest_frame, right_camera.latest_frame, map21, map22, cv::INTER_LINEAR);
+        cv::remap(left_camera.latest_frame, left_camera.latest_frame, map11, map12, cv::INTER_LINEAR);
 
         if(process_disparities_enabled) {
           process_disparities(left_camera.latest_frame, right_camera.latest_frame);
