@@ -33,7 +33,14 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
 endif()
 
 # Now simply link against gtest or gtest_main as needed. Eg
-set(SOURCES main.cpp geometry_tests.cpp ../geometry.cpp)
+set(SOURCES 
+  main.cpp 
+  async_buf_tests.cpp
+  geometry_tests.cpp 
+  ackerman_test.cpp 
+  ../geometry.cpp 
+  ../ackerman.cpp 
+  ../string_utils.cpp)
 
 add_executable(car-tests ${SOURCES})
 target_link_libraries(car-tests gtest_main)

@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <gmock/gmock-matchers.h>
 #include "../async_buf.h"
 
 using namespace testing;
