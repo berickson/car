@@ -186,7 +186,7 @@ TEST(collision, get_path_angles) {
 }
 
 template <class T>
-void test_collisions() {
+void test_collisions(int repeat = 1) {
   // set up path path_x, path_y
   vector<T> path_x = linspace<T>(0,10,30);
   vector<T> path_y;
@@ -207,15 +207,19 @@ void test_collisions() {
   // calculate path angles
   vector<T> path_angles = get_path_angles(path_x, path_y);
 
-  set<int> collisions = lidar_path_intersections(path_x, path_y, path_angles, lidar_theta, lidar_l, car_corners_x, car_corners_y);
+  set<int> collisions;
+  for(int i = 0; i < repeat; ++i ) {
+    collisions = lidar_path_intersections(path_x, path_y, path_angles, lidar_theta, lidar_l, car_corners_x, car_corners_y);
+  }
+
   for(auto i : collisions) {
-    cout << "collision detected at lidar" 
-         << " index: " << i
-         << " theta: " <<  Angle::radians(lidar_theta[i]).to_string() 
-         << " lidar_l: " << lidar_l[i] 
-         << " lidar_x: " << lidar_l[i] * cos(lidar_theta[i]) 
-         << " lidar_y: " << lidar_l[i] * sin(lidar_theta[i]) 
-         << endl;
+    // cout << "collision detected at lidar" 
+    //      << " index: " << i
+    //      << " theta: " <<  Angle::radians(lidar_theta[i]).to_string() 
+    //      << " lidar_l: " << lidar_l[i] 
+    //      << " lidar_x: " << lidar_l[i] * cos(lidar_theta[i]) 
+    //      << " lidar_y: " << lidar_l[i] * sin(lidar_theta[i]) 
+    //      << endl;
   }
 
   EXPECT_EQ(collisions.size(),2);
@@ -227,6 +231,11 @@ void test_collisions() {
 TEST(collision,test_collision_float) {
   test_collisions<float>();
 }
+
+TEST(collision,test_collision_float_1000) {
+  test_collisions<float>(1000);
+}
+
 
 TEST(collision,test_collision_double) {
   test_collisions<double>();
