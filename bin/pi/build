@@ -1,1 +1,1 @@
-make -j4
+cmake ~/car/cpp && make -j4
