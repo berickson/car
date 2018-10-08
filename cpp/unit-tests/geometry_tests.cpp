@@ -38,7 +38,7 @@ template<class T> string to_string(const vector<T> & v) {
 
 template <class T> 
 vector<T> get_path_angles(const vector<T> & path_x, const vector<T> & path_y) {
-  const int count = path_x.size();
+  const size_t count = path_x.size();
 
   // sanity checks
   if(path_y.size() != count) {
@@ -49,7 +49,7 @@ vector<T> get_path_angles(const vector<T> & path_x, const vector<T> & path_y) {
 
   vector<T> path_angles(count);
 
-  for(int i = 0; i+1 < count; ++i) {
+  for(size_t i = 0; i+1 < count; ++i) {
     path_angles[i] = atan2(path_y[i+1]-path_y[i], path_x[i+1]-path_x[i]);
   }
   if(count > 1) {
@@ -76,14 +76,14 @@ bool is_inside_convex_shape (
     // distance inside, if negative, must be outside
     T distance_inside = 0 ) 
 {
-  int count = obstacle_x.size();
+  size_t count = obstacle_x.size();
   if(obstacle_y.size() != count) {
     string e = "shape_x and shape_y must be same size";
     cerr << e << endl;
     throw(e);
   }
     // use cross products to ensure that point is to "left" of every line in obstacle
-    for (int i = 1; i < count; ++i) {
+    for (size_t i = 1; i < count; ++i) {
       
       T x1 = obstacle_x[i-1];
       T x2 = obstacle_x[i];
@@ -100,14 +100,14 @@ bool is_inside_convex_shape (
 
 template <typename T>
 void transform_shape(const vector<T> & old_x, const vector<T> & old_y, T delta_x, T delta_y, T delta_theta, vector<T> & new_x, vector<T> & new_y) {
-  int count = old_x.size();
+  size_t count = old_x.size();
   if(old_y.size() != count || new_x.size() != count || new_y.size() != count) {
     string s = "all vectors must be the same size";
     cerr << s << endl;
     throw s;
   }
 
-  for (int i = 0; i < count; ++i) {
+  for (size_t i = 0; i < count; ++i) {
     T x = old_x[i];
     T y = old_y[i];
 
@@ -131,9 +131,9 @@ set<int> lidar_path_intersections(
     const vector<T> & car_shape_y,
     T minimum_gap = 0.0) 
 {
-  int path_count = path_x.size();
-  int lidar_count = lidar_theta.size();
-  int car_shape_count = car_shape_x.size();
+  size_t path_count = path_x.size();
+  size_t lidar_count = lidar_theta.size();
+  size_t car_shape_count = car_shape_x.size();
 
   set<int> lidar_collision_indexes;
 
@@ -156,16 +156,25 @@ set<int> lidar_path_intersections(
     throw s;
   }
 
+  // pre-calculate trig
+  vector<T> lidar_sin_theta(lidar_theta.size());
+  vector<T> lidar_cos_theta(lidar_theta.size());
+  for (size_t i = 0; i < lidar_count; ++i) {
+    auto theta = lidar_theta[i];
+    lidar_sin_theta[i] = sin(theta);
+    lidar_cos_theta[i] = cos(theta);
+  }
+
 
   // pre allocate corners
   vector<T> new_corners_x(car_shape_x.size());
   vector<T> new_corners_y(car_shape_y.size());
 
-  for(int i = 0; i < path_count; ++i) {
+  for(size_t i = 0; i < path_count; ++i) {
     transform_shape(car_shape_x, car_shape_y, path_x[i], path_y[i], path_theta[i], new_corners_x, new_corners_y);
-    for(int j = 0; j < lidar_count; ++j) {
-      T lidar_x = lidar_l[j] * cos(lidar_theta[j]);
-      T lidar_y = lidar_l[j] * sin(lidar_theta[j]);
+    for(size_t j = 0; j < lidar_count; ++j) {
+      T lidar_x = lidar_l[j] * lidar_cos_theta[j];
+      T lidar_y = lidar_l[j] * lidar_sin_theta[j];
       if(is_inside_convex_shape(lidar_x, lidar_y, new_corners_x, new_corners_y, -minimum_gap)) {
         lidar_collision_indexes.emplace(j);
       }
@@ -212,7 +221,7 @@ void test_collisions(int repeat = 1) {
     collisions = lidar_path_intersections(path_x, path_y, path_angles, lidar_theta, lidar_l, car_corners_x, car_corners_y);
   }
 
-  for(auto i : collisions) {
+  //for(auto i : collisions) {
     // cout << "collision detected at lidar" 
     //      << " index: " << i
     //      << " theta: " <<  Angle::radians(lidar_theta[i]).to_string() 
@@ -220,7 +229,7 @@ void test_collisions(int repeat = 1) {
     //      << " lidar_x: " << lidar_l[i] * cos(lidar_theta[i]) 
     //      << " lidar_y: " << lidar_l[i] * sin(lidar_theta[i]) 
     //      << endl;
-  }
+  //}
 
   EXPECT_EQ(collisions.size(),2);
   EXPECT_TRUE(collisions.count(14));
@@ -234,6 +243,10 @@ TEST(collision,test_collision_float) {
 
 TEST(collision,test_collision_float_1000) {
   test_collisions<float>(1000);
+}
+
+TEST(collision,test_collision_double_1000) {
+  test_collisions<double>(1000);
 }
 
 
@@ -254,6 +267,21 @@ TEST(collision,is_inside_convex_shape) {
   EXPECT_TRUE(is_inside_convex_shape<float>(1.9, 0.1, shape_x, shape_y, -0.2));
   EXPECT_TRUE(is_inside_convex_shape<float>(2.1, -0.1, shape_x, shape_y, -0.2));
   EXPECT_FALSE(is_inside_convex_shape<float>(2.1, -0.1, shape_x, shape_y, 0.2));
+}
+
+TEST(linspace,linspace) {
+  auto v0 = linspace<float>(2,3,0);
+  EXPECT_EQ(v0.size(),0);
+
+  auto v1 = linspace<float>(2,3,1);
+  EXPECT_EQ(v1.size(), 1);
+  EXPECT_FLOAT_EQ(v1[0], 2);
+
+  auto v2 = linspace<float>(2,3,3);
+  EXPECT_EQ(v2.size(), 3);
+  EXPECT_FLOAT_EQ(v2[0], 2);
+  EXPECT_FLOAT_EQ(v2[1], 2.5);
+  EXPECT_FLOAT_EQ(v2[2], 3);
 
 }
 

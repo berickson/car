@@ -43,5 +43,6 @@ set(SOURCES
   ../string_utils.cpp)
 
 add_executable(car-tests ${SOURCES})
+target_compile_options(car-tests PRIVATE -o3 -Wall -Wextra -pedantic)
 target_link_libraries(car-tests gtest_main)
 add_test(NAME car-tests COMMAND car-tests)

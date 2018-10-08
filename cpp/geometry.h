@@ -119,11 +119,12 @@ vector<T> linspace(T from, T to, int count) {
   if(count == 0) {
      return v;
   }
-  if(count == 1) {
-    v[0] == from;
+  if(count == 0) {
+    v[0] = from;
+    return v;
   }
-  T step = (to-from)/(count-1.);
   T d = from;
+  T step = (to-from)/(count-1.);
   for(int i = 0; i < count; ++i) {
     v[i] = d;
     d+= step;
