@@ -113,8 +113,23 @@ double interpolate(double x, double x1, double y1, double x2, double y2);
 
 double clamp(double value, double min_value, double max_value);
 
-vector<double> linspace(double from, double to, double step);
-
+template <typename T>
+vector<T> linspace(T from, T to, int count) {
+  vector<T> v(count);
+  if(count == 0) {
+     return v;
+  }
+  if(count == 1) {
+    v[0] == from;
+  }
+  T step = (to-from)/(count-1.);
+  T d = from;
+  for(int i = 0; i < count; ++i) {
+    v[i] = d;
+    d+= step;
+  }
+  return v;
+}
 
 void test_geometry();
 

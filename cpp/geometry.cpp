@@ -201,14 +201,6 @@ double clamp(double value, double min_value, double max_value) {
   return value;
 }
 
-vector<double> linspace(double from, double to, double step) {
-  vector<double> v;
-  for(double d = from; d <= to; d+= step) {
-    v.push_back(d);
-  }
-  return v;
-}
-
 double acceleration_for_distance_and_velocities(double d, double v1, double v2) {
   bool same_signs = (v2 >= 0) == (v1 >= 0);
 
