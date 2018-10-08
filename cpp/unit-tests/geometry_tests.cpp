@@ -22,7 +22,7 @@ TEST(geometry,geometry) {
   EXPECT_EQ(acceleration_for_distance_and_velocities(1,-3,3),9);
 }
 
-template<class t> string to_string(vector<t> v) {
+template<class T> string to_string(const vector<T> & v) {
   if(v.size()==0) {
     return "";
   }
@@ -71,8 +71,8 @@ template <typename T>
 bool is_inside_convex_shape (
     T x, 
     T y, 
-    vector<T> obstacle_x, 
-    vector<T> obstacle_y, 
+    const vector<T> & obstacle_x, 
+    const vector<T> & obstacle_y, 
     // distance inside, if negative, must be outside
     T distance_inside = 0 ) 
 {
