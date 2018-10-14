@@ -72,7 +72,7 @@ public:
   void reset_position_to_start();
 
   double get_velocity();
-  RouteNode get_position_ahead(double get_length);
+  RouteNode get_position_ahead (double get_length) const;
 
   static vector<string> columns;
   vector<RouteNode> nodes;

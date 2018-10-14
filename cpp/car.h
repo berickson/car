@@ -142,7 +142,7 @@ public:
     return current_dynamics.go;
   }
 
-  inline double get_velocity() {
+  inline double get_velocity() const {
       return (front_left_wheel.get_velocity() + front_right_wheel.get_velocity()) / 2;
   }
 

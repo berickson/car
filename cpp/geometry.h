@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <set>
 
 
 using namespace std;
@@ -131,6 +132,146 @@ vector<T> linspace(T from, T to, int count) {
   }
   return v;
 }
+
+template <class T>
+vector<T> get_path_angles(const vector<T> &path_x, const vector<T> &path_y) {
+  const size_t count = path_x.size();
+
+  // sanity checks
+  if (path_y.size() != count) {
+    string e("path_x and path_y must be same size");
+    throw e;
+  }
+
+  vector<T> path_angles(count);
+
+  for (size_t i = 0; i + 1 < count; ++i) {
+    path_angles[i] =
+        atan2(path_y[i + 1] - path_y[i], path_x[i + 1] - path_x[i]);
+  }
+  if (count > 1) {
+    path_angles[count - 1] = path_angles[count - 2];
+  }
+  return path_angles;
+}
+
+template <typename T>
+T cross_product_2d(T x1, T y1, T x2, T y2) {
+  return x1 * y2 - y1 * x2;
+}
+
+/*
+returns true if x, y is inside the closed, convex, counterclockwise
+curve given by points in the lists obstacle_x, obstacle_y
+*/
+template <typename T>
+bool is_inside_convex_shape(T x, T y, const vector<T> &obstacle_x,
+                            const vector<T> &obstacle_y,
+                            // distance inside, if negative, must be outside
+                            T distance_inside = 0) {
+  size_t count = obstacle_x.size();
+  if (obstacle_y.size() != count) {
+    string e = "shape_x and shape_y must be same size";
+    throw(e);
+  }
+  // use cross products to ensure that point is to "left" of every line in
+  // obstacle
+  for (size_t i = 1; i < count; ++i) {
+    T x1 = obstacle_x[i - 1];
+    T x2 = obstacle_x[i];
+    T y1 = obstacle_y[i - 1];
+    T y2 = obstacle_y[i];
+    T v = cross_product_2d(x2 - x1, y2 - y1, x - x1, y - y1);
+
+    if (v < distance_inside) {
+      return false;
+    }
+  }
+  return true;
+}
+
+template <typename T>
+void transform_shape(const vector<T> &old_x, const vector<T> &old_y, T delta_x,
+                     T delta_y, T delta_theta, vector<T> &new_x,
+                     vector<T> &new_y) {
+  size_t count = old_x.size();
+  if (old_y.size() != count || new_x.size() != count || new_y.size() != count) {
+    string s = "all vectors must be the same size";
+    throw s;
+  }
+
+  for (size_t i = 0; i < count; ++i) {
+    T x = old_x[i];
+    T y = old_y[i];
+
+    T sin_theta = sin(delta_theta);
+    T cos_theta = cos(delta_theta);
+
+    new_x[i] = x * cos_theta - y * sin_theta + delta_x;
+    new_y[i] = y * cos_theta + x * sin_theta + delta_y;
+  }
+}
+
+template <typename T>
+set<int> lidar_path_intersections(
+    const vector<T> &path_x, const vector<T> &path_y,
+    const vector<T> &path_theta, const vector<T> &lidar_theta,
+    const vector<T> &lidar_l, const vector<T> &car_shape_x,
+    const vector<T> &car_shape_y, T minimum_gap = 0.0) {
+  size_t path_count = path_x.size();
+  size_t lidar_count = lidar_theta.size();
+  size_t car_shape_count = car_shape_x.size();
+
+  set<int> lidar_collision_indexes;
+
+  // sanity checks
+  if (path_y.size() != path_count) {
+    string s = "size of path_x and path_y must be the same";
+    throw s;
+  }
+
+  if (lidar_l.size() != lidar_count) {
+    string s = "size of lidar_theta and lidar_l must be the same";
+    throw s;
+  }
+
+  if (car_shape_y.size() != car_shape_count) {
+    string s = "size of car_shape_x and car_shape_y must be the same";
+    throw s;
+  }
+
+  // pre-calculate trig
+  vector<T> lidar_sin_theta(lidar_theta.size());
+  vector<T> lidar_cos_theta(lidar_theta.size());
+  for (size_t i = 0; i < lidar_count; ++i) {
+    auto theta = lidar_theta[i];
+    lidar_sin_theta[i] = sin(theta);
+    lidar_cos_theta[i] = cos(theta);
+  }
+
+  // pre allocate new shape
+  vector<T> new_shape_x(car_shape_x.size());
+  vector<T> new_shape_y(car_shape_y.size());
+
+  for (size_t i = 0; i < path_count; ++i) {
+    transform_shape(car_shape_x, car_shape_y, path_x[i], path_y[i],
+                    path_theta[i], new_shape_x, new_shape_y);
+    for (size_t j = 0; j < lidar_count; ++j) {
+      T l = lidar_l[j];
+      if(isnan(l)) {
+        continue;
+      }
+      T lidar_x = l * lidar_cos_theta[j];
+      T lidar_y = l * lidar_sin_theta[j];
+      if (is_inside_convex_shape(lidar_x, lidar_y, new_shape_x, new_shape_y,
+                                 -minimum_gap)) {
+        lidar_collision_indexes.emplace(j);
+      }
+    }
+  }
+  return lidar_collision_indexes;
+}
+
 
 void test_geometry();
 

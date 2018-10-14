@@ -267,6 +267,79 @@ void Driver::set_evasive_actions_for_crash(Route& route)
   last_crash_correction = correction;
 }
 
+// returns distance to nearest obstacle within safe
+// stopping range ahead of car.
+//
+// returns NAN if no obstacle or car going in reverse
+double nearest_obstacle_distance_on_route(const Car & car, const Route & route, const RunSettings & settings) {
+
+  // meters to stop before obstacle
+  double stop_margin = 0.25;
+
+  // meters between car positions to check
+  double check_increment = 0.1;
+
+  // meters air cushion to have between car and obstacles
+  double air_cushion = 0.03;
+
+  const auto & scan = car.lidar.current_scan;
+  double v = car.get_velocity();
+
+  // only check in front for now
+  if(v < 0) {
+    return NAN;
+  }
+
+  double max_decel = settings.max_decel;
+  double decel_time = v / max_decel;
+  double safe_distance = 0.5 * max_decel * decel_time * decel_time + stop_margin;
+
+  // get vectors for path and theta to check
+
+  vector<double> path_x;
+  vector<double> path_y;
+  vector<double> path_theta;
+
+  for(double ahead = 0; ahead < safe_distance + check_increment; ahead += check_increment) {
+    RouteNode position = route.get_position_ahead(ahead); // todo: check for effiency
+    path_x.push_back(position.rear_x);
+    path_y.push_back(position.rear_y);
+    path_theta.push_back(position.heading);
+  }
+
+  // get vectors for lidar
+  vector<double> lidar_theta;
+  vector<double> lidar_l;
+  for(const LidarMeasurement & measurement : scan.measurements) {
+    lidar_theta.emplace_back(measurement.angle.radians());
+    lidar_l.emplace_back(measurement.distance_meters);
+  }
+
+  // get car shape
+  double l = car.wheelbase_length;
+  double w = car.front_wheelbase_width;
+  vector<double> car_shape_x{0, 0, l, l, 0};
+  vector<double> car_shape_y{w/2,-w/2,-w/2,w/2,w/2};
+
+  // get intersections
+  set<int> intersections =  lidar_path_intersections(
+    path_x, path_y, path_theta, lidar_theta, lidar_l, car_shape_x, car_shape_y, air_cushion);
+  
+  // return closest
+  if(intersections.size() == 0) {
+    return NAN;
+  }
+  double min_d = std::numeric_limits<double>::max();
+  for(int intersection : intersections) {
+    double d = lidar_l[intersection];
+    log_info((string) "intersection distance: " + to_string(d));
+    min_d = std::min(d, min_d);
+  }
+  log_info((string)"Nearest obstacle detected at distance " + to_string(min_d) + " meters.");
+  return min_d;
+}
+
+
 void Driver::drive_route(Route & route, StereoCamera & camera) {
   log_entry_exit w("drive_route");
   route.nodes[route.nodes.size()-1].road_sign_command = "stop";
@@ -306,6 +379,8 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
         log_error("timed out reading dynamics in drive_route");
         throw (string) "timed out waiting to read dynamics";
       }
+
+      nearest_obstacle_distance_on_route(car, route, settings);
       // execute route flow, based on
       // https://docs.google.com/drawings/d/1S2gPPzPD42xvuomWY12pHNqIRDZXRV040nHIy7_USxc/edit?usp=sharing
 

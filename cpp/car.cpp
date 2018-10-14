@@ -86,23 +86,28 @@ void Car::socket_get_scan(vector<string> & params) {
     if(recent_scans.size()>0) {
       auto wait_end_time = system_clock::now() + milliseconds(200);
       while ( !found && system_clock::now()  < wait_end_time) {
+        int scan_number;
         {
           lock_guard<mutex> lock(recent_scans_mutex);
-          LidarScan & scan = recent_scans.front();
-          if(scan.scan_number != scan_to_skip) {
-            found = true;
-            string result;
-            try {
-              LidarScan scan = recent_scans.front();
-              result = scan.get_json().dump();
-            } catch (...)
+          scan_number = recent_scans.front().scan_number;
+        }
+        if(scan_number != scan_to_skip) {
+          found = true;
+          string result;
+          try {
+            LidarScan scan;
             {
-              log_error("exception caught getting scan json");
+              lock_guard<mutex> lock(recent_scans_mutex);
+              scan = recent_scans.front();
             }
-
-            socket_server.send_response(result);
-            break;
+            result = scan.get_json().dump();
+          } catch (...)
+          {
+            log_error("exception caught getting scan json");
           }
+
+          socket_server.send_response(result);
+          break;
         }
         this_thread::sleep_for(chrono::milliseconds(1));
       }
@@ -182,14 +187,16 @@ void Car::lidar_thread_start() {
       if(got_scan) {
         int scan_number;
         {
-          lock_guard<std::mutex> lock(recent_scans_mutex);
+          //lock_guard<std::mutex> lock(recent_scans_mutex);
           recent_scans.emplace_front(lidar.current_scan);
           scan_number = lidar.current_scan.scan_number;
           while(recent_scans.size() > 10) {
             recent_scans.pop_back();
           }
         }
-        log_info("got scan " + to_string(scan_number));
+        // bug: omitting this line, or log_info crashes startup
+        //this_thread::sleep_for(chrono::milliseconds(1));
+        //log_info("got scan " + to_string(scan_number));
       }
     }
     catch (string error_string) {

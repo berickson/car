@@ -231,7 +231,7 @@ double Route::get_velocity()
   return v ;
 }
 
-RouteNode Route::get_position_ahead(double d)
+RouteNode Route::get_position_ahead(double d) const
 {
   unsigned i = index;
   double segment_progress = progress;
