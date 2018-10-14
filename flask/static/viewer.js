@@ -1,66 +1,30 @@
 
 let viewer = (function () {
     "use strict";
-
-    function makeTextSprite(message, opts) {
-        var parameters = opts || {};
-        var fontface = parameters.fontface || 'Courier New';
-        var fontsize = parameters.fontsize || 24;
-        var canvas = document.createElement('canvas');
-        var context = canvas.getContext('2d');
-        context.font = fontsize + " " + fontface;
-        
-        // get size data (height depends only on font size)
-        var metrics = context.measureText(message);
-        var text_width = metrics.width;
-        var text_height = fontsize;
-        canvas.width = text_width + 40;
-        canvas.height = 25;
-        // background
-        context.fillStyle = 'rgba(255, 255, 255, 0.7)';
-        context.rect(0, 0, canvas.width - 1, canvas.height - 1);
-        context.fill();
-        context.stroke();
-        // text color
-        context.fillStyle = 'rgba(0, 0, 0, 1.0)';
-        context.fillText(message, 20, 15);
-    
-    
-        // canvas contents will be used for a texture
-        var texture = new THREE.Texture(canvas)
-        texture.minFilter = THREE.LinearFilter;
-        texture.needsUpdate = true;
-    
-        var spriteMaterial = new THREE.SpriteMaterial({
-            map: texture//,
-            //useScreenCoordinates: false
-        });
-        var sprite = new THREE.Sprite(spriteMaterial);
-        sprite.center.set(0.5, 0);
-        //sprite.scale.set(0.3,0.3,0.3);
-        var scale = 0.25;
-        sprite.scale.set(scale * text_width / text_height, scale, scale);
-        return sprite;
-    }
-    
     let scene = new THREE.Scene(),
         renderer = new THREE.WebGLRenderer({ antialias: true }),
-        light = new THREE.AmbientLight(0x555555),
+        ambient_light = new THREE.AmbientLight(0x555555),
         point_light,
         sun = new THREE.DirectionalLight(0xffffff, 0.3),
         ground,
         camera,
         car = new THREE.Object3D(),
         scan_mesh = new THREE.Object3D(),
+        interaction,
         scan = null,
         stats = new Stats(),
-        interaction,
         controls,
         last_scan_number = -1,
         loader = new THREE.TextureLoader(),
         lidar_elements,
-        lidar_x_pos = 0.57 / 2 - 0.0635;
+        lidar_x_pos = 0.57 / 2 - 0.0635,
+        label_renderer = new THREE.CSS2DRenderer();
 
+    label_renderer.setSize( window.innerWidth, window.innerHeight );
+    label_renderer.domElement.style.position = 'absolute';
+    label_renderer.domElement.style.top = 0;
+    
+    
 
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -83,8 +47,14 @@ let viewer = (function () {
 
     // color, intensity, distance, decay;
     point_light = new THREE.PointLight(0xffffff, 5, 50, 2);
-    point_light.position.set(5, -5, 30);
+    point_light.castShadow = true;
     scene.add(point_light);
+    point_light.position.set(5, -5, 30);
+    point_light.shadow.mapSize.width = 512;  // default
+    point_light.shadow.mapSize.height = 512; // default
+    point_light.shadow.camera.near = 0.;
+    point_light.shadow.camera.far = 500; // default
+
 
     {
         let materialArray = [];
@@ -101,13 +71,14 @@ let viewer = (function () {
             materialArray);
 
         skybox.geometry.rotateX(Math.PI / 2);
+        skybox.castShadow = false;
         scene.add(skybox);
     }
 
     //Set up shadow properties for the light
     sun.shadow.mapSize.width = 512;  // default
     sun.shadow.mapSize.height = 512; // default
-    sun.shadow.camera.near = 0.5;    // default
+    sun.shadow.camera.near = 0.;
     sun.shadow.camera.far = 500; // default
 
     sun.position.z = 1000; // shine down from z
@@ -134,6 +105,11 @@ let viewer = (function () {
         waypoint_template.castShadow = true;
         waypoint_template.receiveShadow = false;
 
+        // delete or they show in background
+        while (label_renderer.domElement.firstChild) {
+            label_renderer.domElement.removeChild(label_renderer.domElement.firstChild);
+        }
+
         for (let i = 0; i < path.length; ++i) {
             let node = path[i];
             let waypoint = waypoint_template.clone();
@@ -157,8 +133,21 @@ let viewer = (function () {
                     new THREE.MeshStandardMaterial({ color: 0x888888})
                 );
                 post.position.z = 0.2
-                let label = makeTextSprite(node.road_sign_label + ": " + node.road_sign_command);
-                road_sign.add(label);
+                //let label = makeTextSprite(node.road_sign_label + ": " + node.road_sign_command);
+
+                let earthDiv = document.createElement( 'div' );
+				earthDiv.textContent = node.road_sign_label + ": " + node.road_sign_command;
+                earthDiv.style.marginTop = '-1em';
+                earthDiv.className="label2d";
+                document.body.appendChild(earthDiv);
+                let earthLabel = new THREE.CSS2DObject( earthDiv );
+				earthLabel.position.set( 0, 0, 0.42 );
+                //earth.add( earthLabel );
+                //earthLabel.setSize(100,100);
+                waypoint.add(earthLabel)
+                
+
+                //road_sign.add(label);
                 road_sign.position.z = 0.4;
                 waypoint.add(post);
                 waypoint.add(road_sign);
@@ -170,11 +159,14 @@ let viewer = (function () {
     }
 
     function initScene() {
+        label_renderer.domElement.className = "noclick";
+
         let element = document.getElementById("webgl-container");
         renderer.setSize(element.offsetWidth, element.offsetHeight);
         element.appendChild(renderer.domElement);
-        scene.add(light);
-        scene.add(point_light)
+        element.appendChild( label_renderer.domElement );
+        scene.add(ambient_light);
+        //scene.add(point_light)
         scene.add(sun);
         scene.add(scan_mesh);
         camera = new THREE.PerspectiveCamera(
@@ -251,8 +243,8 @@ let viewer = (function () {
         }
         scene.add(scan_mesh);
 
-        //stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-        //document.body.appendChild(stats.dom);
+        stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+        document.body.appendChild(stats.dom);
         on_resize();
         render();
         get_scan();
@@ -323,6 +315,7 @@ let viewer = (function () {
         stats.begin();
         stats.end();
         renderer.render(scene, camera);
+        label_renderer.render(scene, camera);
         requestAnimationFrame(render);  // force to call again at next repaint
     }
 

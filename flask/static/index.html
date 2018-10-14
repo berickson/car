@@ -40,6 +40,23 @@
       background-color: rgb(255,30,30);
     }
 
+    .noclick {
+      pointer-events:none;
+    }
+
+    .label2d {
+      font-family: Consolas, monaco, monospace;
+      border-radius: 5px;
+      border-color: black;
+      background-color: #C3C7BACC;
+      
+      /* background-color: rgba(210, 210, 210, 0.8);*/
+      padding-left: 3px;
+      padding-right: 3px;
+      padding-bottom: 2px;
+
+    }
+
     .select {
       background-color: rgb(220, 220, 220);
       /*height: 34px;*/
@@ -127,6 +144,7 @@
   <script src="three.min.js"></script>
   <script src="three.interaction.js"></script>
   <script src="OrbitControls.js"></script>
+  <script src="CSS2DRenderer.js"></script>
   <script src="stats.js"></script>
   <script src="viewer.js"></script>
   <link rel="favicon" href="favicon.png" />
@@ -239,6 +257,7 @@
             <button class='button' ng-click="car.record()">Record</button>
             <button class='button' ng-click="car.reset_odometer()">Reset</button>
           </div>
+          <div class='itembox'>
           <table>
             <tbody>
               <tr ng-repeat="item in car.run_settings_array" ng.key="item.key">
@@ -249,6 +268,7 @@
                 </td>
               <tr>
           </table>
+        </div>
           <div style='display: inline; '></div>
           <div >
             <div ng-repeat="node in car.road_sign_nodes">
