@@ -123,7 +123,7 @@ void Car::process_socket() {
     log_warning_if_duration_exceeded _("Car::process_socket",1s);
     string full_request = socket_server.get_request();
     if(full_request.length()==0) return;
-    log_info("socket full request: \"" + full_request + "\"");
+    //log_info("socket full request: \"" + full_request + "\"");
     auto params = split(full_request, ',');
     string request = params[0];
     //log_info("got socket request: \"" + request + "\"");
@@ -133,8 +133,6 @@ void Car::process_socket() {
     else if(request=="get_state"){
       nlohmann::json j;
       
-      
-      stringstream reply;
       j["velocity"] = get_velocity();
       j["v_bat"] = get_voltage();
       // https://www.invensense.com/wp-content/uploads/2015/02/MPU-9150-Register-Map.pdf p.6
@@ -232,6 +230,9 @@ void Car::usb_thread_start() {
       }
       catch (string error_string) {
         log_error("error caught in usb loop"+error_string);
+      }
+      catch(std::exception & e) {
+        log_error((string)"std::exception caught in usb loop"+e.what());
       }
       catch (...) {
         log_error("error caught in usb loop");

@@ -2,6 +2,7 @@
 #include <fstream>
 #include "system.h"
 #include <sstream>
+#include <execinfo.h> // backtrace
 
 using namespace std;
 
@@ -66,4 +67,25 @@ log_entry_exit::log_entry_exit(string scope_label)
 log_entry_exit::~log_entry_exit()
 {
   log_info("exiting " + scope_label);
+}
+
+
+void log_backtrace() {
+  size_t max_count = 25;
+  void * array[max_count];
+
+  // get void*'s for all entries on the stack
+  size_t count = backtrace(array, max_count);
+  char **strings = backtrace_symbols(array, count);
+
+  // print out all the frames to stderr
+  for(int i = 0; i < count; ++i) {
+    log_error(strings[i]);
+  }
+  free(strings);
+}
+
+void throw_and_log(string error) {
+  log_error((string)"Throwing: " + error);
+  log_backtrace();
 }

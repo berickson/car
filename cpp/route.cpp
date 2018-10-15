@@ -134,7 +134,7 @@ RouteNode * Route::get_target_node()
 void Route::set_position(Point front, Point rear, double velocity)
 {
   const double stopped_velocity = 0.01;
-  while(1) {
+  while(index + 1 < nodes.size()) {
     RouteNode & p1 = nodes[index];
     RouteNode & p2 = nodes[index+1];
     double dx = NAN;

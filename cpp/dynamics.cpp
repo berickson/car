@@ -137,9 +137,10 @@ bool Dynamics::from_log_string(Dynamics & d, const StampedString & s) {
   }
   if(fields[0] != "TD")
     return false;
-  if(fields.size() != 54) {
+  size_t expected_count = 54;
+  if(fields.size() != expected_count) {
     stringstream error;
-    error << "wrong number of field in TD. Expected: 55, actual:" << fields.size() << ".";
+    error << "wrong number of field in TD. Expected: " << expected_count << ", actual:" << fields.size() << ".";
     log_warning(error.str());
     //usb_error_count++;
     return false;

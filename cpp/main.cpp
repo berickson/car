@@ -25,24 +25,13 @@
 #include "car_controller.h"
 #include "logger.h"
 
-#include <execinfo.h> // backtrace
 #include <signal.h>
 
 using namespace std;
 
 void handler(int sig) {
-  void *array[10];
-  size_t size;
-
-  // get void*'s for all entries on the stack
-  size = backtrace(array, 10);
-  char **strings = backtrace_symbols(array, size);
-
-  // print out all the frames to stderr
-  log_error("Error: signal "+sig);
-  for(int i = 0; i < size; ++i) {
-    log_error(strings[i]);
-  }
+  log_error((string) "Error: signal " + to_string(sig));
+  log_backtrace();
   exit(1);
 }
 

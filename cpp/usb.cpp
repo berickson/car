@@ -101,11 +101,17 @@ void make_raw(int fd) {
   tcsetattr(fd, TCSANOW, &settings);
 }
 
+
+
 void Usb::monitor_incoming_data_thread() {
   log_info("begining usb monitor thread");
   try {
     monitor_incoming_data();
     log_info("exiting usb monitor thread normally");
+  }
+  catch(std::exception & e) {
+    log_error("usb monitoring thread exiting because of standard exception");
+    log_error(e.what());
   }
   catch(...) {
     log_error("usb monitoring thread exiting because of unknown exception");

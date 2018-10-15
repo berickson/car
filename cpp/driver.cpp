@@ -332,10 +332,10 @@ double nearest_obstacle_distance_on_route(const Car & car, const Route & route, 
   double min_d = std::numeric_limits<double>::max();
   for(int intersection : intersections) {
     double d = lidar_l[intersection];
-    log_info((string) "intersection distance: " + to_string(d));
+    // log_info((string) "intersection distance: " + to_string(d));
     min_d = std::min(d, min_d);
   }
-  log_info((string)"Nearest obstacle detected at distance " + to_string(min_d) + " meters.");
+  //log_info((string)"Nearest obstacle detected at distance " + to_string(min_d) + " meters.");
   return min_d;
 }
 
@@ -380,7 +380,26 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
         throw (string) "timed out waiting to read dynamics";
       }
 
-      nearest_obstacle_distance_on_route(car, route, settings);
+      //double obstacle_distance = nearest_obstacle_distance_on_route(car, route, settings);
+      double obstacle_distance = NAN;
+      Route * chosen_route = & route;
+      Route short_term_route;
+      if(!isnan(obstacle_distance)) {
+        double step = 0.05;
+        double stop_margin = 0.25;
+        for(double ahead = 0; ahead < obstacle_distance + step; ahead += step) {
+          RouteNode n = route.get_position_ahead(ahead);
+          double obstacle_v = velocity_at_position(obstacle_distance - ahead - stop_margin, settings.max_decel, 0);
+          obstacle_v = max(obstacle_v, 0.0);
+          double obstacle_a = -settings.max_decel;
+          n.velocity = min(n.velocity, obstacle_v);
+          short_term_route.add_node(n);
+          short_term_route.set_position(car.get_front_position(), car.get_rear_position(), car.get_velocity());
+        }
+        chosen_route = & short_term_route;
+        //log_info(short_term_route.to_string());
+      }
+
       // execute route flow, based on
       // https://docs.google.com/drawings/d/1S2gPPzPD42xvuomWY12pHNqIRDZXRV040nHIy7_USxc/edit?usp=sharing
 
@@ -398,18 +417,18 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
       }
 
       if(mode == "follow_route") {
-        continue_along_route(route, camera);
-        if(route.is_stop_ahead()) {
+        continue_along_route(*chosen_route, camera);
+        if(chosen_route->is_stop_ahead()) {
           mode = "stop_at_point";
           log_info("stopping");
         }
       }
 
       if(mode=="stop_at_point") {
-        RouteNode * stop_node = route.get_target_node();
-        bool stop_complete  = continue_to_stop(route, camera);
+        RouteNode * stop_node = chosen_route->get_target_node();
+        bool stop_complete  = continue_to_stop(*chosen_route, camera);
         if (stop_complete) {
-          route.advance_to_next_segment();
+          chosen_route->advance_to_next_segment();
           if(route.done) {
             mode = "done";
             route_complete = true;

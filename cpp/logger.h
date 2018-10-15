@@ -31,6 +31,8 @@ private:
   std::string scope_label;
 };
 
+void log_backtrace();
+void throw_and_log(std::string message);
 
 
 #endif // LOGGER_H
