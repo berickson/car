@@ -37,6 +37,9 @@ set(CPP_FILES
     work_queue.cpp
 )
 
+# use a generator expression to silence a spurious warning from gcc
+
 find_package(OpenCV REQUIRED)
 add_executable(car-service ${CPP_FILES})
+target_compile_options(car-service PRIVATE -Wno-psabi)
 target_link_libraries(car-service ${OpenCV_LIBS} pthread)

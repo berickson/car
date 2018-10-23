@@ -19,7 +19,21 @@ TEST(WorkQueue, force_time_out) {
   EXPECT_FALSE(q.try_pop(s, 500));
 }
 
-
+TEST(WorkQueue, limited_queue_size) {
+  WorkQueue<string> q(2);
+  string v = "1";
+  q.push(v);
+  v = "2";
+  q.push(v);
+  v = "3";
+  q.push(v);
+  string s;
+  EXPECT_TRUE(q.try_pop(s,500));
+  EXPECT_EQ(s,"2");
+  EXPECT_TRUE(q.try_pop(s,500));
+  EXPECT_EQ(s,"3");
+  EXPECT_FALSE(q.try_pop(s, 500));
+}
 
 void consumer(WorkQueue<string> * queue, int service_time, int expected_message_count) {
   int messages_received = 0;
@@ -61,7 +75,7 @@ TEST(WorkQueue, fast_and_slow_consumers) {
 
 TEST(WorkQueue, as_fast_as_possible) {
   int message_count = 1000000; // one million
-  WorkQueue<string> queue;
+  WorkQueue<string> queue(message_count);
   std::thread t(consumer, &queue, 0, message_count);
   string s = "hello";
   for(int i=0; i < message_count; i++) {

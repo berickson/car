@@ -335,7 +335,6 @@ double nearest_obstacle_distance_on_route(const Car & car, const Route & route, 
     // log_info((string) "intersection distance: " + to_string(d));
     min_d = std::min(d, min_d);
   }
-  //log_info((string)"Nearest obstacle detected at distance " + to_string(min_d) + " meters.");
   return min_d;
 }
 
@@ -347,7 +346,7 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
   // we will set error text if something goes wrong
   string error_text = "";
 
-  WorkQueue<Dynamics> queue;
+  WorkQueue<Dynamics> queue(1); // limit to 1 to only get latest
   car.add_listener(&queue);
 
   try {
@@ -380,23 +379,33 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
         throw (string) "timed out waiting to read dynamics";
       }
 
-      //double obstacle_distance = nearest_obstacle_distance_on_route(car, route, settings);
-      double obstacle_distance = NAN;
+      double obstacle_distance = nearest_obstacle_distance_on_route(car, route, settings);
+      // if(isnan(obstacle_distance)) {
+      //   log_info((string)"No obstacle detected");
+      // } else {
+      //   log_info((string)"Nearest obstacle detected at distance " + to_string(obstacle_distance) + " meters.");
+      // }
+
+      //double obstacle_distance = NAN;
       Route * chosen_route = & route;
       Route short_term_route;
       if(!isnan(obstacle_distance)) {
         double step = 0.05;
-        double stop_margin = 0.25;
+        double stop_margin = 1.25;
         for(double ahead = 0; ahead < obstacle_distance + step; ahead += step) {
           RouteNode n = route.get_position_ahead(ahead);
-          double obstacle_v = velocity_at_position(obstacle_distance - ahead - stop_margin, settings.max_decel, 0);
+          double obstacle_v = velocity_at_position(ahead - obstacle_distance - stop_margin, settings.max_decel, 0);
+          if(isnan(obstacle_v)) {
+            obstacle_v = 0;
+          }
           obstacle_v = max(obstacle_v, 0.0);
           double obstacle_a = -settings.max_decel;
           n.velocity = min(n.velocity, obstacle_v);
+          n.velocity = 0;
           short_term_route.add_node(n);
-          short_term_route.set_position(car.get_front_position(), car.get_rear_position(), car.get_velocity());
         }
-        chosen_route = & short_term_route;
+        short_term_route.set_position(car.get_front_position(), car.get_rear_position(), car.get_velocity());
+        //chosen_route = & short_term_route;
         //log_info(short_term_route.to_string());
       }
 
@@ -434,7 +443,7 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
             route_complete = true;
           } else {
             mode = "wait";
-            double wait_seconds = stod(stop_node->arg1);
+            double wait_seconds = stop_node->arg1.length() > 0 ?  stod(stop_node->arg1) : 1;
             wait_end_time = system_clock::now() + milliseconds((long)(wait_seconds * 1000));
             log_info("waiting");
           }

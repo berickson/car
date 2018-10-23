@@ -194,7 +194,7 @@ void Route::reset_position_to_start()
 }
 
 double Route::get_acceleration() {
-  if(done)
+  if(done || index  + 2 > nodes.size())
     return 0;
 
   const RouteNode & p0 = nodes[index];

@@ -18,20 +18,27 @@ struct StampedString {
   string to_string() const;
   bool set_from_string(string s);
 
-  system_clock::time_point timestamp;
   string message;
+  system_clock::time_point timestamp;
 };
 
 template <class T>
 class WorkQueue {
+  size_t max_size;
   std::mutex q_mutex;
   std::queue<T> q;
   std::condition_variable cv;
 
 public:
+  WorkQueue(size_t max_size = 10) : max_size(max_size) {
+  }
+
   void push(T& s) {
     {
       std::lock_guard<std::mutex> lock(q_mutex);
+      while(max_size && q.size() >= max_size) {
+        q.pop();
+      }
       q.emplace(s);
     }
 
@@ -44,6 +51,9 @@ public:
       chrono::milliseconds timeout(milliseconds);
       if (!cv.wait_for(lock, timeout,[this](){return !q.empty(); }))
         return false;
+    }
+    if(q.empty()) {
+      return false;
     }
     s = q.front();
     q.pop();

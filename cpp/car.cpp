@@ -114,7 +114,7 @@ void Car::socket_get_scan(vector<string> & params) {
     }
     if (!found) {
       LidarScan fake;
-      socket_server.send_response(fake.get_json());
+      socket_server.send_response(fake.get_json().dump());
     }
 }
 
@@ -260,6 +260,7 @@ bool Car::process_line_from_log(const StampedString & msg) {
   Dynamics d;
   bool ok = Dynamics::from_log_string(d,msg);
   if(ok) {
+    // log_info((string)"got td ms: " + to_string(d.ms));
     apply_dynamics(d);
     {
       lock_guard<mutex> lock(listeners_mutex);

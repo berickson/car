@@ -38,6 +38,8 @@ set(SOURCES
   async_buf_tests.cpp
   geometry_tests.cpp 
   ackerman_test.cpp 
+  work_queue_tests.cpp
+  ../work_queue.h
   ../geometry.cpp 
   ../ackerman.cpp 
   ../string_utils.cpp)
