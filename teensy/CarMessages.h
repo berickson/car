@@ -15,7 +15,12 @@ class ITransfer {
 public:
     virtual void transfer(NativeString &) = 0;
     virtual void transfer(int &) = 0;
+    virtual void transfer(unsigned long &) = 0;
+    virtual void transfer(long &) = 0;
     virtual void complete() {};
+    bool ok = true;
+    NativeString error_message;
+
 };
 
 class StringOutTransfer : public ITransfer {
@@ -43,6 +48,14 @@ public:
     virtual void transfer(int & v) {
          add_field(to_string(v).c_str());
     }
+
+    virtual void transfer(unsigned long & v) {
+         add_field(to_string(v).c_str());
+    }
+
+    virtual void transfer(long & v) {
+         add_field(to_string(v).c_str());
+    }
 };
 
 
@@ -55,7 +68,8 @@ class StringInTransfer : public ITransfer {
 
     inline NativeString & get_field() {
         if(done) {
-            throw NativeString("not enough fields");
+            ok = false;
+            error_message = "not enough fields";
         }
         // find delim or end of string
         field = "";
@@ -86,21 +100,87 @@ public:
     virtual void transfer(int & v) {
         v = atoi(get_field().c_str());
     }
+    
+    virtual void transfer(long & v) {
+        v = atol(get_field().c_str());
+    }
+
+    virtual void transfer(unsigned long & v) {
+        v = strtoul(get_field().c_str(),NULL,10);
+    }
 
     virtual void complete() {
         if(!done) {
-            throw NativeString("too many fields");
+            ok = false;
+            error_message = "too many fields";
         }
     }
 
 };
 
 
-
-
 struct TraceDynamics {
+    long odo_fl_a;
+    unsigned long odo_fl_a_us;
+    long odo_fl_b;
+    unsigned long odo_fl_b_us;
+    unsigned long odo_fl_ab_us;
+
+    long odo_fr_a;
+    unsigned long odo_fr_a_us;
+    long odo_fr_b;
+    unsigned long odo_fr_b_us;
+    unsigned long odo_fr_ab_us;
+    
+    long odo_bl_a;
+    unsigned long odo_bl_a_us;
+    long odo_bl_b;
+    unsigned long odo_bl_b_us;
+    unsigned long odo_bl_ab_us;
+    
+    long odo_br_a;
+    unsigned long odo_br_a_us;
+    long odo_br_b;
+    unsigned long odo_br_b_us;
+    unsigned long odo_br_ab_us;
+
+    bool go;
+
+    void transfer(ITransfer & document) {
+        document.transfer(odo_fl_a);
+        document.transfer(odo_fl_a_us);
+        document.transfer(odo_fl_b);
+        document.transfer(odo_fl_b_us);
+        document.transfer(odo_fl_ab_us);
+
+        document.transfer(odo_fr_a);
+        document.transfer(odo_fr_a_us);
+        document.transfer(odo_fr_b);
+        document.transfer(odo_fr_b_us);
+        document.transfer(odo_fr_ab_us);
+
+        document.transfer(odo_bl_a);
+        document.transfer(odo_bl_a_us);
+        document.transfer(odo_bl_b);
+        document.transfer(odo_bl_b_us);
+        document.transfer(odo_bl_ab_us);
+
+        document.transfer(odo_br_a);
+        document.transfer(odo_br_a_us);
+        document.transfer(odo_br_b);
+        document.transfer(odo_br_b_us);
+        document.transfer(odo_br_ab_us);
+
+
+        document.complete();
+    }
+
+};
+
+struct SimpleMessage {
     int number = 0;
     NativeString label = "";
+    
     void transfer(ITransfer & document) {
         document.transfer(number);
         document.transfer(label);

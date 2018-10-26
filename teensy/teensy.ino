@@ -484,13 +484,36 @@ void loop() {
   }
 
   if(every_10_ms && TD) {
-    TraceDynamics v;
-    v.number = 3;
-    v.label = "32";
     // constants below based on 220k and 1M resistor, 1023 steps and 3.3 reference voltage
     float battery_voltage = analogRead(PIN_BATTERY_VOLTAGE_DIVIDER) * ((3.3/1023.) / 220.)*(220.+1000.);
     
     noInterrupts();
+    static TraceDynamics v;
+    v.odo_fl_a = odometer_front_left.odometer_a;
+    v.odo_fl_a_us = odometer_front_left.last_odometer_a_us;
+    v.odo_fl_b = odometer_front_left.odometer_b;
+    v.odo_fl_b_us = odometer_front_left.last_odometer_b_us;
+    v.odo_fl_ab_us = odometer_front_left.odometer_ab_us;
+
+    v.odo_fr_a = odometer_front_right.odometer_a;
+    v.odo_fr_a_us = odometer_front_right.last_odometer_a_us;
+    v.odo_fr_b = odometer_front_right.odometer_b;
+    v.odo_fr_b_us = odometer_front_right.last_odometer_b_us;
+    v.odo_fr_ab_us = odometer_front_right.odometer_ab_us;
+    
+    v.odo_bl_a = odometer_back_left.odometer_a;
+    v.odo_bl_a_us = odometer_back_left.last_odometer_a_us;
+    v.odo_bl_b = odometer_back_left.odometer_b;
+    v.odo_bl_b_us = odometer_back_left.last_odometer_b_us;
+    v.odo_bl_ab_us = odometer_back_left.odometer_ab_us;
+    
+    v.odo_br_a = odometer_back_right.odometer_a;
+    v.odo_br_a_us = odometer_back_right.last_odometer_a_us;
+    v.odo_br_b = odometer_back_right.odometer_b;
+    v.odo_br_b_us = odometer_back_right.last_odometer_b_us;
+    v.odo_br_ab_us = odometer_back_right.odometer_ab_us;
+    v.go = digitalRead(PIN_GO) == HIGH ? 1 : 0;
+
     auto fl_odo_a = odometer_front_left.odometer_a;
     auto fl_odo_a_us = odometer_front_left.last_odometer_a_us;
     auto fl_odo_b = odometer_front_left.odometer_b;
@@ -517,6 +540,10 @@ void loop() {
     int go = digitalRead(PIN_GO) == HIGH ? 1 : 0;
 
     interrupts();
+    StringOutTransfer doc;
+    v.transfer(doc);
+    bool TD2=true;
+    log(TD2, doc.str());
 
     
     log(TD,
