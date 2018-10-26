@@ -5,12 +5,18 @@
 #include "system.h"
 #include "string_utils.h"
 #include "logger.h"
+#include "../teensy/CarMessages.h"
+
 
 Dynamics::Dynamics() {
    memset(this,0,sizeof(*this));
 }
 
 string Dynamics::to_string() {
+  TraceDynamics td;
+  td.number = 5;
+  string s = td.label;
+
   stringstream ss;
 
   ss << "str:" << str << endl

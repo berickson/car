@@ -7,8 +7,8 @@
 using namespace testing;
 using namespace std;
 
-void test_acceleration_for_distance_and_velocities(double d, double v1,
-                                                   double v2) {
+void test_acceleration_for_distance_and_velocities(
+  double d, double v1,double v2) {
   cout << "from " << v1 << "m/s to " << v2 << "m/s in " << d
        << "m requires a of "
        << acceleration_for_distance_and_velocities(d, v1, v2) << "m/s^2"

@@ -15,6 +15,7 @@
 #include "FollowMode.h"
 #include "RemoteMode.h"
 #include "Fsm.h"
+#include "CarMessages.h"
 
 //#include "BNO055.h"
 
@@ -483,6 +484,9 @@ void loop() {
   }
 
   if(every_10_ms && TD) {
+    TraceDynamics v;
+    v.number = 3;
+    v.label = "32";
     // constants below based on 220k and 1M resistor, 1023 steps and 3.3 reference voltage
     float battery_voltage = analogRead(PIN_BATTERY_VOLTAGE_DIVIDER) * ((3.3/1023.) / 220.)*(220.+1000.);
     

@@ -37,12 +37,14 @@ set(SOURCES
   main.cpp 
   async_buf_tests.cpp
   geometry_tests.cpp 
-  ackerman_test.cpp 
+  ackerman_tests.cpp 
   work_queue_tests.cpp
+  car_messages_tests.cpp
   ../work_queue.h
   ../geometry.cpp 
   ../ackerman.cpp 
-  ../string_utils.cpp)
+  ../string_utils.cpp
+  ../../teensy/CarMessages.h)
 
 add_executable(car-tests ${SOURCES})
 target_compile_options(car-tests PRIVATE -o3 -Wall -Wextra -pedantic)
