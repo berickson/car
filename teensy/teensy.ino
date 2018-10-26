@@ -542,8 +542,8 @@ void loop() {
     interrupts();
     StringOutTransfer doc;
     v.transfer(doc);
-    bool TD2=true;
-    log(TD2, doc.str());
+    bool T2=true;
+    log(T2, doc.str());
 
     
     log(TD,
