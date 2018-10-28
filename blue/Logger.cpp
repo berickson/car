@@ -16,8 +16,3 @@ void log_line(String s) {
   Serial.send_now();
 }
 
-
-
-String ftos(float f,int n) {
-  return String(f,n);
-}

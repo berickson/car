@@ -4,6 +4,9 @@
 #ifdef ARDUINO
     #define NativeString String
     #define to_native_string NativeString
+    String ftos(float f,int n) {
+        return String(f,n);
+    }
 #else
     #define NativeString std::string
     #define to_native_string std::to_string
@@ -113,7 +116,7 @@ public:
 
     virtual void transfer(char & v) {
         auto f = get_field();
-        if(f.size()==0) {
+        if(f.length()==0) {
             v = ' ';
         } else {
             v = f[0];
