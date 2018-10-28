@@ -10,7 +10,7 @@
 #include "socket_server.h"
 #include "json.hpp"
 #include <pthread.h>
-
+#include "../blue/CarMessages.h"
 using namespace std;
 using namespace std::chrono;
 using namespace std::chrono_literals;
@@ -215,7 +215,14 @@ void Car::usb_thread_start() {
     socket_server.open_socket(5571);
     usb.add_line_listener(&usb_queue);
     usb.write_on_connect("\ntd+\n");
-    usb.run("/dev/ttyACM1");
+    
+    // simlink to /dev/ttyA* enabled by adding the 
+    // following to the end of /etc/udev/rules.d/49-teensy.rules
+    // ATTRS{idVendor}=="16c0", , ATTRS{idProduct}=="04[789B]?", SYMLINK+="teensy$attr{serial}"
+
+
+
+    usb.run("/dev/teensy4317960");
     while(!quit) {
       try {
         StampedString line;
@@ -253,11 +260,22 @@ bool Car::process_line_from_log(const StampedString & msg) {
     log_warning_if_duration_exceeded w("write input_recording_file",2ms);
     *input_recording_file << msg.to_string() << '\n'; //todo: make non-blocking
   }
-  auto split_message = split(msg.message);
+  auto split_message = split(msg.message, ',', false);
+  if(split_message.size() < 2) return false;
+
   string message_type = split_message[0];
-  if(split_message.size() == 0 || message_type !="TD" && message_type != "TD2") {
+  string body = split_message[1];
+  if(message_type !="TD" && message_type != "TD2") {
     return false;
   }
+
+  if(message_type == "TD2") {
+    TraceDynamics td2;
+    StringInTransfer stream(body.c_str());
+    td2.transfer(stream);
+    return false;
+  }
+
   Dynamics d;
   bool ok = Dynamics::from_log_string(d,msg);
   if(ok) {
