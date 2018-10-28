@@ -25,6 +25,13 @@ TEST(SimpleMessage, transfer) {
 }
 
 
+TEST(TraceDynamics, defaults_zero) {
+    TraceDynamics d;
+    EXPECT_EQ(d.odo_fl_a_us, 0);
+    EXPECT_EQ(d.go, false);
+}
+
+
 TEST(TraceDynamics, transfer) {
     TraceDynamics in, out;
     StringOutTransfer t;
@@ -42,7 +49,6 @@ TEST(SimpleMessage, not_enough_fields) {
     EXPECT_EQ(false, t.ok);
     EXPECT_TRUE(t.error_message.length() > 0);
     cout << "expected error: " << t.error_message << endl;
-
 }
 
 TEST(SimpleMessage, too_many_fields) {

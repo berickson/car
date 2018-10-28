@@ -14,7 +14,7 @@ using namespace std;
 string join(vector<string> strings, string separator = ",");
 string format(double d);
 string format(double d, int width, int precision);
-vector<string> split(const string& s, char delim_char=',');
+vector<string> split(const string& s, char delim_char=',', bool all = true);
 
 
 // trim from start (in place)

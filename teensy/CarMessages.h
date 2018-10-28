@@ -122,31 +122,31 @@ public:
 
 
 struct TraceDynamics {
-    long odo_fl_a;
-    unsigned long odo_fl_a_us;
-    long odo_fl_b;
-    unsigned long odo_fl_b_us;
-    unsigned long odo_fl_ab_us;
+    long odo_fl_a = 0;
+    unsigned long odo_fl_a_us = 0;
+    long odo_fl_b = 0;
+    unsigned long odo_fl_b_us = 0;
+    unsigned long odo_fl_ab_us = 0;
 
-    long odo_fr_a;
-    unsigned long odo_fr_a_us;
-    long odo_fr_b;
-    unsigned long odo_fr_b_us;
-    unsigned long odo_fr_ab_us;
+    long odo_fr_a = 0;
+    unsigned long odo_fr_a_us = 0;
+    long odo_fr_b = 0;
+    unsigned long odo_fr_b_us = 0;
+    unsigned long odo_fr_ab_us = 0;
     
-    long odo_bl_a;
-    unsigned long odo_bl_a_us;
-    long odo_bl_b;
-    unsigned long odo_bl_b_us;
-    unsigned long odo_bl_ab_us;
+    long odo_bl_a = 0;
+    unsigned long odo_bl_a_us = 0;
+    long odo_bl_b = 0;
+    unsigned long odo_bl_b_us = 0;
+    unsigned long odo_bl_ab_us = 0;
     
-    long odo_br_a;
-    unsigned long odo_br_a_us;
-    long odo_br_b;
-    unsigned long odo_br_b_us;
-    unsigned long odo_br_ab_us;
+    long odo_br_a = 0;
+    unsigned long odo_br_a_us = 0;
+    long odo_br_b = 0;
+    unsigned long odo_br_b_us = 0;
+    unsigned long odo_br_ab_us = 0;
 
-    bool go;
+    bool go = false;
 
     void transfer(ITransfer & document) {
         document.transfer(odo_fl_a);

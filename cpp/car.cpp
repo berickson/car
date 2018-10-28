@@ -254,7 +254,8 @@ bool Car::process_line_from_log(const StampedString & msg) {
     *input_recording_file << msg.to_string() << '\n'; //todo: make non-blocking
   }
   auto split_message = split(msg.message);
-  if(split_message.size() == 0 || split_message[0]!="TD") {
+  string message_type = split_message[0];
+  if(split_message.size() == 0 || message_type !="TD" && message_type != "TD2") {
     return false;
   }
   Dynamics d;

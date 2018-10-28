@@ -40,6 +40,8 @@ set(SOURCES
   ackerman_tests.cpp 
   work_queue_tests.cpp
   car_messages_tests.cpp
+  string_utils_tests.cpp
+  ../string_utils.h
   ../work_queue.h
   ../geometry.cpp 
   ../ackerman.cpp 

@@ -29,7 +29,9 @@ string format(double d, int width, int precision) {
   return ss.str();
 }
 
-vector<string> split(const string& s, char delim_char) {
+// setting all to true splits all occurances
+// setting to false only splits on first occurance of delim_char - if any
+vector<string> split(const string& s, char delim_char, bool all) {
   string delim = string(1, delim_char);
   vector<string> items;
   string::const_iterator substart = s.begin(), subend;
@@ -41,6 +43,11 @@ vector<string> split(const string& s, char delim_char) {
       break;
     }
     substart = subend + delim.size();
+    if (!all) {
+      string temp(substart, s.end());
+      items.push_back(temp);
+      break;
+    }
   }
   return items;
 }
