@@ -1,11 +1,9 @@
 // messages that will be sent
 // to the outside world
 
-// note, either <string> or arduino.h must be included before this file
-
 #ifdef ARDUINO
     #define NativeString String
-    #define to_string NativeString
+    #define to_native_string NativeString
 #else
     #define NativeString std::string
     #define to_native_string std::to_string

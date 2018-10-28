@@ -6,6 +6,7 @@
 #include "CommandInterpreter.h"
 #include "RxEvents.h"
 #include "Blinker.h"
+#include "CarMessages.h"
 
 
 
@@ -457,6 +458,12 @@ void loop() {
 
     // HACK: go button not enabled
     int go = 1;
+    
+    TraceDynamics td2;
+    StringOutTransfer stream;
+    td2.transfer(stream);
+
+    log(TD2, stream.str());
 
 
     

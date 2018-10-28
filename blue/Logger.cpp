@@ -9,6 +9,7 @@ bool TRACE_MPU = false;
 bool TRACE_LOOP_SPEED = false;
 bool TRACE_TELEMETRY = false;
 bool TD = false;
+bool TD2 = true;
 
 void log_line(String s) {
   Serial.println(s);

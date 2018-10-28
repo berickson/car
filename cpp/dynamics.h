@@ -16,7 +16,7 @@ struct Dynamics {
 public:
   Dynamics();
   static bool from_log_string(Dynamics &d, const StampedString &s);
-  string to_string();
+  string display_string();
 
   system_clock::time_point datetime;
   int str; // steering
