@@ -22,6 +22,12 @@ string format(double d) {
   return ss.str();
 }
 
+string ftos(double d, int precision) {
+  stringstream ss;
+  ss << std::fixed << std::setprecision( precision ) << d;
+  return ss.str();
+}
+
 string format(double d, int width, int precision) {
   stringstream ss;
   ss<< std::fixed << std::setw( width ) << std::setprecision( precision )

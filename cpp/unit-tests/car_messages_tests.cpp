@@ -2,26 +2,30 @@
 
 #include <iostream>
 #include <string>
-#include "../../teensy/CarMessages.h"
+#include "../string_utils.h"
+#include "../../blue/CarMessages.h"
 
 using namespace std;
 
 
 TEST(SimpleMessage, transfer) {
     SimpleMessage in, out;
-    in.label = "hello";
-    in.number = 42;
+    in.string_value = "hello";
+    in.int_value = 42;
+    in.float_value = 3.1415;
+    in.char_value = 'p';
     StringOutTransfer t;
     in.transfer(t);
     cout << t.str() << endl;
 
+    float tolerance = 1E-6;
+
     StringInTransfer t2(t.str().c_str());
     out.transfer(t2);
-    EXPECT_EQ(in.number, out.number);
-    EXPECT_EQ(in.label, out.label);
-
-    cout << "Label was: " << out.label << endl;
-    cout << "number was: " << out.number << endl;
+    EXPECT_EQ(in.string_value, out.string_value);
+    EXPECT_EQ(in.int_value, out.int_value);
+    EXPECT_EQ(in.char_value, out.char_value);
+    EXPECT_NEAR(3.14, out.float_value, tolerance); // fixed digits to 2
 }
 
 

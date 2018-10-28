@@ -46,7 +46,7 @@ set(SOURCES
   ../geometry.cpp 
   ../ackerman.cpp 
   ../string_utils.cpp
-  ../../teensy/CarMessages.h)
+  ../../blue/CarMessages.h)
 
 add_executable(car-tests ${SOURCES})
 target_compile_options(car-tests PRIVATE -o3 -Wall -Wextra -pedantic)

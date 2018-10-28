@@ -10,10 +10,13 @@
 #endif
 #include <cstring>
 #include <cstdlib>
+#include <cmath> // for NAN
 
 class ITransfer {
 public:
+    virtual void transfer(float &, u_int8_t decimal_digits = 2) = 0;
     virtual void transfer(NativeString &) = 0;
+    virtual void transfer(char &) = 0;
     virtual void transfer(int &) = 0;
     virtual void transfer(unsigned long &) = 0;
     virtual void transfer(long &) = 0;
@@ -41,8 +44,19 @@ public:
     NativeString str() {
         return s;
     }
+
+    virtual void transfer(float & v, u_int8_t decimal_digits) {
+        add_field(ftos((double)v, (int)decimal_digits).c_str());
+    }
+
     virtual void transfer(NativeString & v) {
         add_field(v.c_str());
+    }
+
+    virtual void transfer(char & v) {
+        NativeString s;
+        s += v;
+         add_field(s.c_str());
     }
 
     virtual void transfer(int & v) {
@@ -93,6 +107,19 @@ public:
         field.reserve(s.length());
     }
 
+    virtual void transfer(float & v, u_int8_t ) {
+        v = strtof(get_field().c_str(), NULL);
+    }
+
+    virtual void transfer(char & v) {
+        auto f = get_field();
+        if(f.size()==0) {
+            v = ' ';
+        } else {
+            v = f[0];
+        }
+    }
+
     virtual void transfer(NativeString & v) {
         v = get_field();
     }
@@ -120,33 +147,49 @@ public:
 
 
 struct TraceDynamics {
-    long odo_fl_a;
-    unsigned long odo_fl_a_us;
-    long odo_fl_b;
-    unsigned long odo_fl_b_us;
-    unsigned long odo_fl_ab_us;
+    // acceleration
+    float ax = NAN;
+    float ay = NAN;
+    float az = NAN;
 
-    long odo_fr_a;
-    unsigned long odo_fr_a_us;
-    long odo_fr_b;
-    unsigned long odo_fr_b_us;
-    unsigned long odo_fr_ab_us;
-    
-    long odo_bl_a;
-    unsigned long odo_bl_a_us;
-    long odo_bl_b;
-    unsigned long odo_bl_b_us;
-    unsigned long odo_bl_ab_us;
-    
-    long odo_br_a;
-    unsigned long odo_br_a_us;
-    long odo_br_b;
-    unsigned long odo_br_b_us;
-    unsigned long odo_br_ab_us;
 
-    bool go;
+    char control_mode = '?';
+
+    long odo_fl_a = 0;
+    unsigned long odo_fl_a_us = 0;
+    long odo_fl_b = 0;
+    unsigned long odo_fl_b_us = 0;
+    unsigned long odo_fl_ab_us = 0;
+
+    long odo_fr_a = 0;
+    unsigned long odo_fr_a_us = 0;
+    long odo_fr_b = 0;
+    unsigned long odo_fr_b_us = 0;
+    unsigned long odo_fr_ab_us = 0;
+    
+    long odo_bl_a = 0;
+    unsigned long odo_bl_a_us = 0;
+    long odo_bl_b = 0;
+    unsigned long odo_bl_b_us = 0;
+    unsigned long odo_bl_ab_us = 0;
+    
+    long odo_br_a = 0;
+    unsigned long odo_br_a_us = 0;
+    long odo_br_b = 0;
+    unsigned long odo_br_b_us = 0;
+    unsigned long odo_br_ab_us = 0;
+
+    bool go = false;
 
     void transfer(ITransfer & document) {
+
+        // imu acceleration
+        document.transfer(ax);
+        document.transfer(ay);
+        document.transfer(az);
+
+        document.transfer(control_mode);
+
         document.transfer(odo_fl_a);
         document.transfer(odo_fl_a_us);
         document.transfer(odo_fl_b);
@@ -178,12 +221,16 @@ struct TraceDynamics {
 };
 
 struct SimpleMessage {
-    int number = 0;
-    NativeString label = "";
+    int int_value = 0;
+    NativeString string_value = "";
+    char char_value = '?';
+    float float_value = NAN;
     
     void transfer(ITransfer & document) {
-        document.transfer(number);
-        document.transfer(label);
+        document.transfer(int_value);
+        document.transfer(string_value);
+        document.transfer(char_value);
+        document.transfer(float_value);
         document.complete();
     }
 };
