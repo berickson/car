@@ -419,48 +419,8 @@ void loop() {
   }
 
   if(every_10_ms && TD) {
-    float battery_voltage = battery_sensor.v_bat;
-    
-    noInterrupts();
-    auto odo_fl_a = odo_fl.odometer_a;
-    auto odo_fl_a_us = odo_fl.last_odometer_a_us;
-    auto odo_fl_b = odo_fl.odometer_b;
-    auto odo_fl_b_us = odo_fl.last_odometer_b_us;
-    auto odo_fl_ab_us = odo_fl.odometer_ab_us;
-    interrupts();
-
-    noInterrupts();
-    auto odo_fr_a = odo_fr.odometer_a;
-    auto odo_fr_a_us = odo_fr.last_odometer_a_us;
-    auto odo_fr_b = odo_fr.odometer_b;
-    auto odo_fr_b_us = odo_fr.last_odometer_b_us;
-    auto odo_fr_ab_us = odo_fr.odometer_ab_us;
-    interrupts();
-    
-    noInterrupts();
-    auto motor_odo = motor.odometer;
-    auto motor_us = motor.last_change_us;
-    interrupts();
-
-
-    // HACK, motor being reported as bl
-    auto odo_bl_a = motor_odo;
-    auto odo_bl_a_us = motor_us;
-    auto odo_bl_b = odo_bl_a;
-    auto odo_bl_b_us = odo_bl_a_us;
-    auto odo_bl_ab_us = 0;
-    
-    auto odo_br_a = odo_bl_a;
-    auto odo_br_a_us = odo_bl_a_us;
-    auto odo_br_b = odo_bl_b;
-    auto odo_br_b_us = odo_bl_b_us;
-    auto odo_br_ab_us = odo_bl_ab_us;
-
-    // HACK: go button not enabled
-    int go = 1;
-
-
     Dynamics2 td2;
+    float battery_voltage = battery_sensor.v_bat;
 
     td2.ms = millis();
     td2.us = micros();
@@ -472,34 +432,42 @@ void loop() {
     td2.ay = mpu9150.ay;
     td2.az = mpu9150.az;
 
-    td2.spur_us = motor_us;
-    td2.spur_odo = motor_odo;
+    noInterrupts();
+    td2.spur_us = motor.last_change_us;
+    td2.spur_odo = motor.odometer;
+    interrupts();
 
     td2.mode = modes.current_task->name;
 
-    td2.odo_fl_a = odo_fl_a;
-    td2.odo_fl_a_us = odo_fl_a_us;
-    td2.odo_fl_b = odo_fl_b;
-    td2.odo_fl_b_us = odo_fl_b_us;
-    td2.odo_fl_ab_us = odo_fl_ab_us;
+    noInterrupts();
+    td2.odo_fl_a = odo_fl.odometer_a;
+    td2.odo_fl_a_us = odo_fl.last_odometer_a_us;
+    td2.odo_fl_b = odo_fl.odometer_b;
+    td2.odo_fl_b_us = odo_fl.last_odometer_b_us;
+    td2.odo_fl_ab_us = odo_fl.odometer_ab_us;
+    interrupts();
 
-    td2.odo_fr_a = odo_fr_a;
-    td2.odo_fr_a_us = odo_fr_a_us;
-    td2.odo_fr_b = odo_fr_b;
-    td2.odo_fr_b_us = odo_fr_b_us;
-    td2.odo_fr_ab_us = odo_fr_ab_us;
+    noInterrupts();
+    td2.odo_fr_a = odo_fr.odometer_a;
+    td2.odo_fr_a_us = odo_fr.last_odometer_a_us;
+    td2.odo_fr_b = odo_fr.odometer_b;
+    td2.odo_fr_b_us = odo_fr.last_odometer_b_us;
+    td2.odo_fr_ab_us = odo_fr.odometer_ab_us;
+    interrupts();
 
-    td2.odo_bl_a = odo_bl_a;
-    td2.odo_bl_a_us = odo_bl_a_us;
-    td2.odo_bl_b = odo_bl_b;
-    td2.odo_bl_b_us = odo_bl_b_us;
-    td2.odo_bl_ab_us = odo_bl_ab_us;
+    noInterrupts();
+    td2.odo_bl_a = motor.odometer;
+    td2.odo_bl_a_us = motor.last_change_us;
+    interrupts();
+    td2.odo_bl_b = td2.odo_bl_a;
+    td2.odo_bl_b_us = td2.odo_bl_a_us;
+    td2.odo_bl_ab_us = 0;
 
-    td2.odo_br_a = odo_br_a;
-    td2.odo_br_a_us = odo_br_a_us;
-    td2.odo_br_b = odo_br_b;
-    td2.odo_br_b_us = odo_br_b_us;
-    td2.odo_br_ab_us = odo_br_ab_us;
+    td2.odo_br_a = td2.odo_bl_a;
+    td2.odo_br_a_us = td2.odo_bl_a_us;
+    td2.odo_br_b = td2.odo_bl_b;
+    td2.odo_br_b_us = td2.odo_bl_b_us;
+    td2.odo_br_ab_us = td2.odo_bl_ab_us;
 
     td2.v_bat = battery_voltage;
 
@@ -509,33 +477,15 @@ void loop() {
 
     td2.mpu_deg_f = mpu9150.temperature /340.0 + 35.0;
 
+    // hack: car doesn't have kill switch yet
+    td2.go = true;
+
 
     StringOutTransfer stream;
     td2.transfer(stream);
 
     log(TD2, stream.str());
 
-
-    
-    log(TD,
-       "str," + str.readMicroseconds()
-       + ",esc," + esc.readMicroseconds()
-       + ",aa,"+ ftos(mpu9150.ax) + "," + ftos(mpu9150.ay)+","+ ftos(mpu9150.az)
-       //+ ",aa,"+ 0 + "," + 0+","+ 0
-       +",spur_us,"+   motor_us + "," + 0
-       +",spur_odo," + motor_odo // spur_pulse_count
-       +",mode,"+modes.current_task->name
-       +",odo_fl,"+ odo_fl_a +"," +  odo_fl_a_us + "," + odo_fl_b +"," + odo_fl_b_us + "," + odo_fl_ab_us
-       +",odo_fr,"+ odo_fr_a +"," +  odo_fr_a_us + "," + odo_fr_b +"," + odo_fr_b_us + "," + odo_fr_ab_us
-       +",odo_bl,"+ odo_bl_a +"," +  odo_bl_a_us + "," + odo_bl_b +"," + odo_bl_b_us + "," + odo_bl_ab_us
-       +",odo_br,"+ odo_br_a +"," +  odo_br_a_us + "," + odo_br_b +"," + odo_br_b_us + "," + odo_br_ab_us
-       +",ms,"+millis()
-       +",us,"+micros()
-       +",ypr,"+ mpu9150.heading() + "," + ftos(mpu9150.pitch* 180. / M_PI) + "," + ftos(-mpu9150.roll* 180. / M_PI)
-       +",vbat,"+ftos(battery_voltage)
-       +",go,"+go
-       +",temp,"+mpu9150.temperature
-       );
   }
 
   if(every_second && TRACE_LOOP_SPEED) {
