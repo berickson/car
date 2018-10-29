@@ -463,6 +463,8 @@ void Car::reset_odometry(double start_offset) {
 void Car::set_zero_heading() { 
   if(!isnan(current_dynamics.mpu_deg_yaw)) {
     zero_heading_angle = Angle::degrees(current_dynamics.mpu_deg_yaw);
+  } else {
+    zero_heading_angle = Angle::degrees(0);
   }
 }
 
