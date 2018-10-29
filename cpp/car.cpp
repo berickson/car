@@ -384,8 +384,8 @@ void Car::apply_dynamics(Dynamics2& d) {
   }
 
   // correct heading with adjustment factor
-  Angle d_theta = Angle::degrees(d.mpu_deg_yaw - previous.mpu_deg_yaw);
-  d_theta.standardize();
+  //Angle d_theta = Angle::degrees(d.mpu_deg_yaw - previous.mpu_deg_yaw);
+  //d_theta.standardize();
   // heading_adjustment += Angle::radians(d_theta.radians() *
   // gyro_adjustment_factor);
 
@@ -461,7 +461,9 @@ void Car::reset_odometry(double start_offset) {
 }
 
 void Car::set_zero_heading() { 
-  zero_heading_angle = Angle::degrees(current_dynamics.mpu_deg_yaw); 
+  if(!isnan(current_dynamics.mpu_deg_yaw)) {
+    zero_heading_angle = Angle::degrees(current_dynamics.mpu_deg_yaw);
+  }
 }
 
 Angle Car::get_zero_heading() { 
@@ -470,7 +472,6 @@ Angle Car::get_zero_heading() {
 
 Angle Car::get_heading() {
   Angle a = Angle::degrees(current_dynamics.mpu_deg_yaw) - zero_heading_angle;
-  a.standardize();
   return a;
 }
 
