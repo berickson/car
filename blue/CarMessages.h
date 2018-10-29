@@ -1,5 +1,7 @@
 // messages that will be sent
 // to the outside world
+#ifndef CAR_MESSAGES_H
+#define CAR_MESSAGES_H
 
 #ifdef ARDUINO
     #define NativeString String
@@ -172,8 +174,6 @@ struct Dynamics2 {
     float ay = NAN;
     float az = NAN;
 
-
-    char control_mode = '?';
     NativeString mode;
 
     unsigned long spur_us = 0;
@@ -203,6 +203,9 @@ struct Dynamics2 {
     unsigned long odo_br_b_us = 0;
     unsigned long odo_br_ab_us = 0;
 
+    float mpu_deg_yaw = NAN;
+    float mpu_deg_pitch = NAN;
+    float mpu_deg_roll = NAN;
     float mpu_deg_f = NAN;
 
     bool go = false;
@@ -211,8 +214,6 @@ struct Dynamics2 {
 
         document.transfer(ms);
         document.transfer(us);
-
-        document.transfer(control_mode);
 
         document.transfer(mode);
 
@@ -223,8 +224,6 @@ struct Dynamics2 {
         document.transfer(ax);
         document.transfer(ay);
         document.transfer(az);
-
-        document.transfer(control_mode);
 
         document.transfer(odo_fl_a);
         document.transfer(odo_fl_a_us);
@@ -250,6 +249,9 @@ struct Dynamics2 {
         document.transfer(odo_br_b_us);
         document.transfer(odo_br_ab_us);
 
+        document.transfer(mpu_deg_yaw);
+        document.transfer(mpu_deg_pitch);
+        document.transfer(mpu_deg_roll);
         document.transfer(mpu_deg_f);
 
         document.transfer(go);
@@ -274,3 +276,5 @@ struct SimpleMessage {
         document.complete();
     }
 };
+
+#endif

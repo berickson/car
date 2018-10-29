@@ -117,8 +117,8 @@ void write_path_from_recording_file(string recording_path, string outpath) {
             << next_reverse << ","
             << car.get_heading().degrees() << ","
             <<  " 0.0," // was heading adjustment, but we don't use that any more
-            << current.esc << ","
-            << current.str << ","
+            << current.rx_esc << ","
+            << current.rx_str << ","
             << wheel_meters_per_second << endl;
     p = p_next;
   }

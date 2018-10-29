@@ -346,7 +346,7 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
   // we will set error text if something goes wrong
   string error_text = "";
 
-  WorkQueue<Dynamics> queue(1); // limit to 1 to only get latest
+  WorkQueue<Dynamics2> queue(1); // limit to 1 to only get latest
   car.add_listener(&queue);
 
   try {
@@ -373,7 +373,7 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
     system_clock::time_point wait_end_time = system_clock::now();
     mode = "follow_route";
     while(!route_complete) {
-      Dynamics d;
+      Dynamics2 d;
       if(!queue.try_pop(d,1000)) {
         log_error("timed out reading dynamics in drive_route");
         throw (string) "timed out waiting to read dynamics";
@@ -558,7 +558,7 @@ Angle Driver::required_turn_curvature_by_look_ahead(Route &route, double look_ah
 void test_driver() {
     Car car(false);
     Route route;
-    Dynamics d;
+    Dynamics2 d;
     car.apply_dynamics(d);
     car.wheelbase_length = 1;
     car.reset_odometry();

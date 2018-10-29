@@ -15,6 +15,7 @@
 #include "async_buf.h"
 #include "socket_server.h"
 #include "lidar.h"
+#include "../blue/CarMessages.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -27,8 +28,8 @@ public:
 
   void reset_odometry(double start_offset = 0.0);
 
-  void add_listener(WorkQueue<Dynamics>*);
-  void remove_listener(WorkQueue<Dynamics>*);
+  void add_listener(WorkQueue<Dynamics2>*);
+  void remove_listener(WorkQueue<Dynamics2>*);
 
   string config_path = "car.ini";
 
@@ -41,8 +42,8 @@ public:
   Ackerman ackerman;
 
   // state variables
-  Dynamics current_dynamics;
-  Dynamics original_dynamics;
+  Dynamics2 current_dynamics;
+  Dynamics2 original_dynamics;
   int reading_count = 0;
   system_clock::time_point last_scan_request_time;
 
@@ -110,20 +111,13 @@ public:
 
   string get_mode();
 
-  int get_esc() {
-    return current_dynamics.esc;
-  }
-
-  int get_str() {
-    return current_dynamics.str;
-  }
 
   double get_voltage(){
-    return current_dynamics.battery_voltage;
+    return current_dynamics.v_bat;
   };
 
   double get_temperature() {
-    return current_dynamics.mpu_temperature;
+    return current_dynamics.mpu_deg_f;
   }
 
   int get_spur_odo() {
@@ -190,7 +184,7 @@ public:
 
   // infrastructure
   bool process_line_from_log(const StampedString & s);
-  void apply_dynamics(Dynamics & d);
+  void apply_dynamics(Dynamics2 & d);
   Usb usb;
 
   // lidar
@@ -218,7 +212,7 @@ private:
   void connect_usb();
 
   void read_configuration(string path);
-  list<WorkQueue<Dynamics>*> listeners;
+  list<WorkQueue<Dynamics2>*> listeners;
   std::mutex listeners_mutex;
 
   SocketServer socket_server;
