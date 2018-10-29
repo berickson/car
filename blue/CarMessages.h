@@ -164,17 +164,19 @@ struct Dynamics2 {
     unsigned long ms = 0;
     unsigned long us = 0;
 
+    float v_bat = NAN;
+
+    NativeString mode;
+    
     int rx_str = -1;
     int rx_esc = -1;
 
-    float v_bat = NAN;
 
     // acceleration
     float ax = NAN;
     float ay = NAN;
     float az = NAN;
 
-    NativeString mode;
 
     unsigned long spur_us = 0;
     long spur_odo = 0;
@@ -215,7 +217,12 @@ struct Dynamics2 {
         document.transfer(ms);
         document.transfer(us);
 
+        document.transfer(v_bat);
+
         document.transfer(mode);
+
+        document.transfer(rx_esc);
+        document.transfer(rx_str);
 
         document.transfer(spur_us);
         document.transfer(spur_odo);

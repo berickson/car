@@ -503,6 +503,10 @@ void loop() {
 
     td2.v_bat = battery_voltage;
 
+    td2.mpu_deg_yaw = mpu9150.heading();
+    td2.mpu_deg_pitch = mpu9150.pitch * 180. / M_PI;
+    td2.mpu_deg_roll = mpu9150.roll * 180. / M_PI;
+
     td2.mpu_deg_f = mpu9150.temperature /340.0 + 35.0;
 
 
