@@ -270,7 +270,7 @@ bool Car::process_line_from_log(const StampedString & msg) {
   }
 
   if(message_type == "TD2") {
-    TraceDynamics td2;
+    Dynamics2 td2;
     StringInTransfer stream(body.c_str());
     td2.transfer(stream);
     return false;

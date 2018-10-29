@@ -21,6 +21,7 @@ public:
     virtual void transfer(NativeString &) = 0;
     virtual void transfer(char &) = 0;
     virtual void transfer(int &) = 0;
+    virtual void transfer(bool &) = 0;
     virtual void transfer(unsigned long &) = 0;
     virtual void transfer(long &) = 0;
     virtual void complete() {};
@@ -64,6 +65,10 @@ public:
 
     virtual void transfer(int & v) {
          add_field(to_native_string(v).c_str());
+    }
+
+    virtual void transfer(bool & v) {
+        add_field(v ? "1" : "0");
     }
 
     virtual void transfer(unsigned long & v) {
@@ -130,6 +135,10 @@ public:
     virtual void transfer(int & v) {
         v = atoi(get_field().c_str());
     }
+
+    virtual void transfer(bool & v) {
+        v = (get_field() == "1");
+    }
     
     virtual void transfer(long & v) {
         v = atol(get_field().c_str());
@@ -149,7 +158,15 @@ public:
 };
 
 
-struct TraceDynamics {
+struct Dynamics2 {
+    unsigned long ms = 0;
+    unsigned long us = 0;
+
+    int rx_str = -1;
+    int rx_esc = -1;
+
+    float v_bat = NAN;
+
     // acceleration
     float ax = NAN;
     float ay = NAN;
@@ -157,6 +174,10 @@ struct TraceDynamics {
 
 
     char control_mode = '?';
+    NativeString mode;
+
+    unsigned long spur_us = 0;
+    long spur_odo = 0;
 
     long odo_fl_a = 0;
     unsigned long odo_fl_a_us = 0;
@@ -182,9 +203,21 @@ struct TraceDynamics {
     unsigned long odo_br_b_us = 0;
     unsigned long odo_br_ab_us = 0;
 
+    float mpu_deg_f = NAN;
+
     bool go = false;
 
     void transfer(ITransfer & document) {
+
+        document.transfer(ms);
+        document.transfer(us);
+
+        document.transfer(control_mode);
+
+        document.transfer(mode);
+
+        document.transfer(spur_us);
+        document.transfer(spur_odo);
 
         // imu acceleration
         document.transfer(ax);
@@ -216,6 +249,10 @@ struct TraceDynamics {
         document.transfer(odo_br_b);
         document.transfer(odo_br_b_us);
         document.transfer(odo_br_ab_us);
+
+        document.transfer(mpu_deg_f);
+
+        document.transfer(go);
 
 
         document.complete();

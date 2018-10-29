@@ -29,15 +29,14 @@ TEST(SimpleMessage, transfer) {
 }
 
 
-TEST(TraceDynamics, defaults_zero) {
-    TraceDynamics d;
+TEST(Dynamics2, defaults_zero) {
+    Dynamics2 d;
     EXPECT_EQ(d.odo_fl_a_us, 0);
     EXPECT_EQ(d.go, false);
 }
 
-
-TEST(TraceDynamics, transfer) {
-    TraceDynamics in, out;
+TEST(Dynamics2, transfer) {
+    Dynamics2 in, out;
     StringOutTransfer t;
     in.transfer(t);
     cout << t.str() << endl;
