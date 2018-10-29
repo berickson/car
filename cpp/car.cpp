@@ -252,7 +252,7 @@ bool Car::process_line_from_log(const StampedString& msg) {
   if (split_message.size() < 2) return false;
 
   string message_type = split_message[0];
-  string body = split_message[1];
+  string body = trimmed(split_message[1]);
   if (message_type != "TD2") {
     return false;
   }
