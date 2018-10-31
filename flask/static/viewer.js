@@ -87,7 +87,8 @@ let viewer = (function () {
     function set_car_state(car_state) {
         car.position.x = car_state.front_x - Math.cos(car_state.heading) * 0.3;
         car.position.y = car_state.front_y - Math.sin(car_state.heading) * 0.3;
-        car.rotation.z = car_state.heading
+        car.rotation.z = car_state.heading;
+        //controls.target.set(car.position);
     }
 
 
@@ -187,7 +188,7 @@ let viewer = (function () {
         controls.maxPolarAngle = 89.5 * Math.PI / 180;  // keep above ground
 
 
-        scene.add(camera);
+        car.add(camera);
         interaction = new THREE.Interaction(renderer, scene, camera);
         
         {
