@@ -410,8 +410,10 @@ void Car::apply_dynamics(Dynamics2& d) {
 
   // tell lidar we have moved
   {
-    Point p = get_front_position();
-    lidar.set_pose(p.x, p.y, get_heading().radians());
+    Point p = get_rear_position();
+    float lidar_d = 0.12; // meters from back
+    float theta = get_heading().radians();
+    lidar.set_pose(p.x + lidar_d * cos(theta), p.y + lidar_d * sin(theta), theta);
   }
   write_state();
 }
