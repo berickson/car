@@ -77,7 +77,7 @@ void Car::socket_get_scan(vector<string>& params) {
 
   // lidar.get_scan();
   if (recent_scans.size() > 0) {
-    auto wait_end_time = system_clock::now() + milliseconds(200);
+    auto wait_end_time = system_clock::now() + milliseconds(1000);
     while (!found && system_clock::now() < wait_end_time) {
       int scan_number;
       {
