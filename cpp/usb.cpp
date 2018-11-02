@@ -173,13 +173,14 @@ void Usb::monitor_incoming_data() {
         }
         if (wait_result > 0 ) {
           count = read(fd, buf, buf_size-1); // read(2)
-          if(count<0) {
+          if(count<=0) {
             count = 0;
             log_warning("couldn't read from " + usb_path + ". Closing.");
             close(fd);
             fd = fd_error;
+          } else {
+            buf[count]=0;
           }
-          buf[count]=0;
         }
       }
       if(count > 0) {
