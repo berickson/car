@@ -19,6 +19,16 @@ void SocketServer::open_socket(int portno) {
   server_socket_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
   if (server_socket_fd < 0)
     error("ERROR opening socket");
+
+  // release socket immediately after dying
+  linger lin;
+  lin.l_onoff = 0;
+  lin.l_linger = 0;
+  setsockopt(server_socket_fd, SOL_SOCKET, SO_LINGER, (const char *)&lin, sizeof(int));
+  int enable = 1;
+  if (setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+      error("setsockopt(SO_REUSEADDR) failed");
+  
   struct sockaddr_in serv_addr;
   bzero((char *)&serv_addr, sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
