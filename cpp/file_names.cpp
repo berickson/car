@@ -1,4 +1,7 @@
 #include "file_names.h"
+#include <iomanip>
+#include <string>
+#include <sstream>
 
 FileNames::FileNames(string tracks_folder) {
   this->tracks_folder = tracks_folder;
@@ -38,9 +41,11 @@ string FileNames::get_run_folder(string track_name, string route_name, string ru
 }
 
 string FileNames::next_route_name(string track_name){
-  for(char c = 'A';c<='Z';c++) {
-    string route_name;
-    route_name.push_back(c);
+  for(int i = 0; i<1000; i++) {
+    std::ostringstream ss;
+    ss << std::setw( 3 ) << std::setfill( '0' ) << i;
+
+    string route_name = ss.str();
     if(file_exists(get_route_folder(track_name,route_name)))
       continue;
     return route_name;
