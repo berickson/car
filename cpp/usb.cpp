@@ -123,7 +123,7 @@ void Usb::monitor_incoming_data_thread() {
 void Usb::monitor_incoming_data() {
   const int buf_size = 200;
   char buf[buf_size];
-  const int poll_us = 1000;
+  const int poll_us = 1E6; // one second
   const int max_wait_us = 2E6; // two second
 
   //fstream usb;
@@ -191,7 +191,7 @@ void Usb::monitor_incoming_data() {
       close(fd);
     }
     if(!quit){
-      usleep(poll_us*10);
+      usleep(poll_us);
     }
   }
 }
