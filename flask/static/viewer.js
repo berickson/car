@@ -88,6 +88,7 @@ let viewer = (function () {
         car.position.x = car_state.front_x - Math.cos(car_state.heading) * 0.3;
         car.position.y = car_state.front_y - Math.sin(car_state.heading) * 0.3;
         car.rotation.z = car_state.heading;
+        controls.update();
         //controls.target.set(car.position);
     }
 
