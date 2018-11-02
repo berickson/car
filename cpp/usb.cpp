@@ -61,7 +61,7 @@ int wait_for_data(int fd, __time_t tv_sec = 1, __suseconds_t tv_usec = 0) {
   /* Initialize the timeout data structure. */
   timeout.tv_sec = tv_sec;
   timeout.tv_usec = tv_usec;
-  return select(fd+1,&read_fds,NULL,NULL,&timeout) > 0;
+  return select(fd+1,&read_fds,NULL,NULL,&timeout);
 }
 
 
