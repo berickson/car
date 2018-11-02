@@ -50,7 +50,8 @@ void Usb::send_to_listeners(string s) {
   }
 }
 
-bool wait_for_data(int fd, __time_t tv_sec = 1, __suseconds_t tv_usec = 0) {
+// returns 0 if no data, > 0 if data, < 0 if error
+int wait_for_data(int fd, __time_t tv_sec = 1, __suseconds_t tv_usec = 0) {
   struct timeval timeout;
   /* Initialize the file descriptor set. */
   fd_set read_fds;
@@ -163,15 +164,23 @@ void Usb::monitor_incoming_data() {
       bool did_work = false;
       ssize_t count = 0;
 
-      if(fd != fd_error && wait_for_data(fd)) {
-        count = read(fd, buf, buf_size-1); // read(2)
-        if(count<0) {
-          count = 0;
-          log_warning("couldn't read from " + usb_path + ". Closing.");
-          close(fd);
-          fd = fd_error;
+      if(fd != fd_error) {
+        int wait_result = wait_for_data(fd);
+        if(wait_result < 0) {
+            log_warning("couldn't read from " + usb_path + ". Closing.");
+            close(fd);
+            fd = fd_error;
         }
-        buf[count]=0;
+        if (wait_result > 0 ) {
+          count = read(fd, buf, buf_size-1); // read(2)
+          if(count<0) {
+            count = 0;
+            log_warning("couldn't read from " + usb_path + ". Closing.");
+            close(fd);
+            fd = fd_error;
+          }
+          buf[count]=0;
+        }
       }
       if(count > 0) {
         process_data(buf);
