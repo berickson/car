@@ -387,17 +387,26 @@ void LidarUnit::motor_off() {
 
 
 void LidarUnit::run() {
-  usb2.write_on_connect("");
-  usb2.run("/dev/ttyACM0");
-  usb2.write_line("ResetConfig");
-  usb2.write_line("HideRaw");
-  usb2.write_line("HideAll");
-  usb2.write_line("SetSampleTime 40");
-  usb2.write_line("ShowAll");
-  //usb2.write_line("SetAngle 0, 15-30, 45-50, 10 ");
-  usb2.write_line("ShowAll");
-  usb2.write_line("MotorOn");
-  set_rpm(349);
+  usb2.write_on_connect(
+    "ResetConfig\n"
+    "HideRaw\n"
+    "HideAll\n"
+    "SetSampleTime 40\n"
+    "ShowAll\n"
+    "ShowAll\n"
+    "MotorOn\n"
+    "SetRPM 349"); // last \n added by usb2
+
+  usb2.run("/dev/teensy12345");
+  //usb2.write_line("ResetConfig");
+  //usb2.write_line("HideRaw");
+  //usb2.write_line("HideAll");
+  //usb2.write_line("SetSampleTime 40");
+  //usb2.write_line("ShowAll");
+  ////usb2.write_line("SetAngle 0, 15-30, 45-50, 10 ");
+  //usb2.write_line("ShowAll");
+  //usb2.write_line("MotorOn");
+  //set_rpm(349);
   is_running = true;
 
   usb2.add_line_listener(&usb_queue);

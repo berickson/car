@@ -129,12 +129,15 @@ void Usb::monitor_incoming_data() {
   const int fd_error = -1;
   auto fd = fd_error;
   while(!quit) {
+    string usb_path = "not connected";
     // find and open usb
-    for(string usb_path : glob(_device_path)) {
-      echo_off(usb_path);
-      fd = open(usb_path.c_str(), O_RDWR | O_NONBLOCK | O_SYNC | O_APPEND | O_NOCTTY);
+    for(string try_usb_path : glob(_device_path)) {
+      echo_off(try_usb_path);
+      fd = open(try_usb_path.c_str(), O_RDWR | O_NONBLOCK | O_SYNC | O_APPEND | O_NOCTTY);
       if(fd != fd_error) {
         make_raw(fd);
+        usb_path = try_usb_path;
+        log_info("connected to USB at "+usb_path);
         if(_write_on_connect.size() > 0) {
           write_line(_write_on_connect);
         }
@@ -148,9 +151,10 @@ void Usb::monitor_incoming_data() {
 
       if(fd!=fd_error && !quit && string_pending_write.size() > 0) {
         std::unique_lock<std::mutex> l(usb_mutex); // lock while we use string_pending_write
-        if(write(fd,string_pending_write.c_str(),string_pending_write.size()) != fd_error) {
+        if(write(fd,string_pending_write.c_str(),string_pending_write.size()) >0) {
           string_pending_write = "";
         } else {
+          log_warning("couldn't write to " + usb_path + ". Closing.");
           close(fd);
           fd = fd_error;
         }
@@ -161,8 +165,9 @@ void Usb::monitor_incoming_data() {
 
       if(fd != fd_error && wait_for_data(fd)) {
         count = read(fd, buf, buf_size-1); // read(2)
-        if(count==fd_error) {
+        if(count<0) {
           count = 0;
+          log_warning("couldn't read from " + usb_path + ". Closing.");
           close(fd);
           fd = fd_error;
         }
