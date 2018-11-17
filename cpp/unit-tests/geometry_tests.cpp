@@ -71,6 +71,7 @@ void test_collisions(int repeat = 1) {
 
   set<int> collisions;
   for (int i = 0; i < repeat; ++i) {
+    
     collisions =
         lidar_path_intersections(path_x, path_y, path_angles, lidar_theta,
                                  lidar_l, car_shape_x, car_shape_y);
@@ -118,3 +119,31 @@ TEST(linspace, linspace) {
   EXPECT_FLOAT_EQ(v2[1], 2.5);
   EXPECT_FLOAT_EQ(v2[2], 3);
 }
+
+TEST(Pose2d, construction) {
+  Pose2d p(Angle::degrees(90), Point(2,1));
+  EXPECT_FLOAT_EQ(p.heading.degrees(), 90);
+  EXPECT_FLOAT_EQ(p.position.x, 2);
+  EXPECT_FLOAT_EQ(p.position.y, 1);
+}
+
+TEST(Transform2d, world_to_pose) {
+  Pose2d pose(Angle::degrees(90), Point(5,3));
+
+  Pose2d world_p(Angle::degrees(10), Point(1,2));
+
+  Transform2d world_to_pose = Transform2d::world_to_pose_transform(pose);
+  Pose2d pose_p = world_to_pose(world_p);
+  EXPECT_FLOAT_EQ(pose_p.heading.degrees(), -80);
+  EXPECT_FLOAT_EQ(pose_p.position.x, -1);
+  EXPECT_FLOAT_EQ(pose_p.position.y, 4);
+
+  Transform2d pose_to_world = Transform2d::pose_to_world_transform(pose);
+  auto world_p2 = pose_to_world(pose_p);
+
+  EXPECT_FLOAT_EQ(world_p2.position.x, world_p.position.x);
+  EXPECT_FLOAT_EQ(world_p2.position.y, world_p.position.y);
+  EXPECT_FLOAT_EQ(world_p2.heading.degrees(), world_p.heading.degrees());
+
+}
+
