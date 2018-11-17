@@ -228,3 +228,43 @@ double time_at_position(double x, double a, double v0, double x0){
   }
   return min(t[0],t[1]);
 }
+
+Transform2d Transform2d::pose_to_world_transform(Pose2d pose) {
+  Transform2d t = world_to_pose_transform(pose);
+  t.t = t.t.inverse();
+  t.rotation = -t.rotation;
+  
+  return t;
+}
+
+Transform2d Transform2d::world_to_pose_transform(Pose2d pose) {
+  Transform2d t;
+  t.t.setIdentity();
+  Eigen::Translation2d translation(-pose.position.x, -pose.position.y);
+  t.t *= Eigen::Rotation2Dd(-pose.heading);
+  t.t *=  translation;
+  t.rotation = -pose.heading;
+
+  return t;
+}
+
+
+
+  Pose2d Transform2d::operator() (Pose2d & pose) {
+    Angle heading = pose.heading + rotation;
+    Eigen::Vector2d v;
+    v << pose.position.x, pose.position.y;
+    Eigen::Vector2d vt = t * v;
+
+    
+
+    
+    //double ddx = pose.position.x + dx;
+    //double ddy = pose.position.y + dy;
+    //double x = ddx * cos(rotation.radians() ) - ddy * sin(rotation.radians());
+    //double y = ddx * sin(rotation.radians() ) + ddy * cos(rotation.radians());
+  
+    
+    return Pose2d(heading, {vt[0],vt[1]});
+  }
+

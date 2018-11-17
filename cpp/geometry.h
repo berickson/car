@@ -6,6 +6,7 @@
 #include <vector>
 #include <sstream>
 #include <set>
+#include "eigen3/Eigen/Dense"
 
 
 using namespace std;
@@ -48,6 +49,32 @@ private:
 
   double theta; //radians
 };
+
+
+struct Pose2d {
+  Pose2d(Angle heading, Point position) 
+    : heading(heading), position(position) {
+
+  }
+  Angle heading;
+  Point position;
+};
+
+struct Transform2d {
+  Pose2d operator() (Pose2d & pose);
+
+  static Transform2d pose_to_world_transform(Pose2d pose);
+  static Transform2d world_to_pose_transform(Pose2d pose);
+private:
+  Eigen::Transform<double, 2, Eigen::Affine> t;
+  Angle rotation;
+  float dx;
+  float dy;
+};
+
+
+
+
 
 
 //
