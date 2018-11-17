@@ -128,9 +128,9 @@ TEST(Pose2d, construction) {
 }
 
 TEST(Transform2d, world_to_pose) {
-  Pose2d pose(Angle::degrees(90), Point(5,3));
+  Pose2d pose(Angle::degrees(90), Point(5, 3));
 
-  Pose2d world_p(Angle::degrees(10), Point(1,2));
+  Pose2d world_p(Angle::degrees(10), Point(1, 2));
 
   Transform2d world_to_pose = Transform2d::world_to_pose_transform(pose);
   Pose2d pose_p = world_to_pose(world_p);
@@ -144,6 +144,20 @@ TEST(Transform2d, world_to_pose) {
   EXPECT_FLOAT_EQ(world_p2.position.x, world_p.position.x);
   EXPECT_FLOAT_EQ(world_p2.position.y, world_p.position.y);
   EXPECT_FLOAT_EQ(world_p2.heading.degrees(), world_p.heading.degrees());
+
+  // origin in pose frame should be the same as pose in world frame
+  Pose2d origin(Angle::radians(0), Point(0, 0));
+  Pose2d pose_2 = pose_to_world(origin);
+  EXPECT_FLOAT_EQ(pose_2.heading.degrees(), pose.heading.degrees());
+  EXPECT_FLOAT_EQ(pose_2.position.x, pose.position.x);
+  EXPECT_FLOAT_EQ(pose_2.position.y, pose.position.y);
+
+  // pose in world frame should be the same as origin in pose frame
+  Pose2d origin_2 = world_to_pose(pose);
+  EXPECT_FLOAT_EQ(origin_2.heading.degrees(), 0);
+  EXPECT_FLOAT_EQ(origin_2.position.x, 0);
+  EXPECT_FLOAT_EQ(origin_2.position.y, 0);
+
 
 }
 
