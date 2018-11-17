@@ -1,15 +1,7 @@
-#ifndef CARMENU_H
-#define CARMENU_H
+#ifndef car_controller_h
+#define car_controller_h
 
 
-class CarMenu
-{
-public:
-    CarMenu();
-    void run();
-};
-
-void run_car_menu();
 void run_car_socket();
 
-#endif // CARMENU_H
+#endif // car_controller_h
