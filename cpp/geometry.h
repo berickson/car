@@ -66,7 +66,7 @@ struct Transform2d {
   static Transform2d pose_to_world_transform(Pose2d pose);
   static Transform2d world_to_pose_transform(Pose2d pose);
 private:
-  Eigen::Transform<double, 2, Eigen::Affine> t;
+  Eigen::Transform<double, 2, Eigen::Isometry> t;
   Angle rotation;
   float dx;
   float dy;
