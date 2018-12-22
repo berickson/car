@@ -14,11 +14,13 @@
 
 using namespace std;
 
-struct Pose2d {
+struct Pose2dSimple {
     float x = NAN;
     float y = NAN;
     float theta = NAN;
 };
+
+
 
 
 struct LidarMeasurement {
@@ -43,7 +45,7 @@ struct LidarScan {
     };
 
     int scan_number = 0;
-    vector<Pose2d> poses;
+    vector<Pose2dSimple> poses;
     vector<LidarMeasurement> measurements;
     vector<ScanSegment> find_lines(double tolerance, int min_point_count = 8);
 
@@ -59,7 +61,7 @@ class LidarUnit {
 public:
     Usb usb2;
     WorkQueue<LidarMeasurement> measurement_queue;
-    Pose2d pose;
+    Pose2dSimple pose;
     LidarScan scan1;
     LidarScan scan2;
     LidarScan & current_scan = scan1;

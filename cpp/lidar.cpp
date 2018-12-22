@@ -52,7 +52,7 @@ nlohmann::json LidarScan::get_json() {
       distances.push_back(m.distance_meters);
       strengths.push_back(m.signal_strength);
   }
-  for(Pose2d & p : poses) {
+  for(Pose2dSimple & p : poses) {
       poses_x.push_back(p.x);
       poses_y.push_back(p.y);
       poses_theta.push_back(p.theta);
