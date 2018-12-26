@@ -470,11 +470,11 @@ void Car::set_zero_heading() {
   }
 }
 
-Angle Car::get_zero_heading() { 
+Angle Car::get_zero_heading() const { 
   return zero_heading_angle;
 }
 
-Angle Car::get_heading() {
+Angle Car::get_heading() const {
   Angle a = Angle::degrees(current_dynamics.mpu_deg_yaw) - zero_heading_angle;
   return a;
 }

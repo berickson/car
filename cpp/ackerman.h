@@ -32,15 +32,15 @@ public:
 
   Ackerman(double front_wheelbase_width = 1.0, double wheelbase_length = 1.0, Point front_position=Point(0,0), Angle heading = Angle::radians(0));
 
-  Point front_left_position();
-  Point front_position();
-  Point rear_position();
+  Point front_left_position() const;
+  Point front_position() const;
+  Point rear_position() const;
 
 
   void move_right_wheel(Angle outside_wheel_angle, double wheel_distance, double new_heading = NAN);
   void move_relative_to_heading(Point p);
   Arc arc_to_relative_location(double x,double y);
-  string to_string();
+  string to_string() const;
 };
 
 // calculates an arc where the front wheel will travel to

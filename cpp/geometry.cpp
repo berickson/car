@@ -249,22 +249,28 @@ Transform2d Transform2d::world_to_pose_transform(Pose2d pose) {
 }
 
 
+Point Transform2d::operator() (Point & point) {
+  Eigen::Vector2d v;
+  v << point.x, point.y;
+  Eigen::Vector2d vt = t * v;
+  return Point(vt[0], vt[1]);
+}
 
-  Pose2d Transform2d::operator() (Pose2d & pose) {
-    Angle heading = pose.heading + rotation;
-    Eigen::Vector2d v;
-    v << pose.position.x, pose.position.y;
-    Eigen::Vector2d vt = t * v;
+Pose2d Transform2d::operator() (Pose2d & pose) {
+  Angle heading = pose.heading + rotation;
+  Eigen::Vector2d v;
+  v << pose.position.x, pose.position.y;
+  Eigen::Vector2d vt = t * v;
 
-    
-
-    
-    //double ddx = pose.position.x + dx;
-    //double ddy = pose.position.y + dy;
-    //double x = ddx * cos(rotation.radians() ) - ddy * sin(rotation.radians());
-    //double y = ddx * sin(rotation.radians() ) + ddy * cos(rotation.radians());
   
-    
-    return Pose2d(heading, {vt[0],vt[1]});
-  }
+
+  
+  //double ddx = pose.position.x + dx;
+  //double ddy = pose.position.y + dy;
+  //double x = ddx * cos(rotation.radians() ) - ddy * sin(rotation.radians());
+  //double y = ddx * sin(rotation.radians() ) + ddy * cos(rotation.radians());
+
+  
+  return Pose2d(heading, {vt[0],vt[1]});
+}
 

@@ -62,6 +62,7 @@ struct Pose2d {
 
 struct Transform2d {
   Pose2d operator() (Pose2d & pose);
+  Point operator() (Point & point);
 
   static Transform2d pose_to_world_transform(Pose2d pose);
   static Transform2d world_to_pose_transform(Pose2d pose);
@@ -241,12 +242,16 @@ void transform_shape(const vector<T> &old_x, const vector<T> &old_y, T delta_x,
 
 template <typename T>
 set<int> lidar_path_intersections(
-    const vector<T> &path_x, const vector<T> &path_y,
-    const vector<T> &path_theta, const vector<T> &lidar_theta,
-    const vector<T> &lidar_l, const vector<T> &car_shape_x,
-    const vector<T> &car_shape_y, T minimum_gap = 0.0) {
+    const vector<T> &path_x,
+    const vector<T> &path_y,
+    const vector<T> &path_theta,
+    const vector<T> &lidar_x,
+    const vector<T> &lidar_y,
+    const vector<T> &car_shape_x,
+    const vector<T> &car_shape_y,
+    T minimum_gap = 0.0) {
   size_t path_count = path_x.size();
-  size_t lidar_count = lidar_theta.size();
+  size_t lidar_count = lidar_x.size();
   size_t car_shape_count = car_shape_x.size();
 
   set<int> lidar_collision_indexes;
@@ -257,23 +262,14 @@ set<int> lidar_path_intersections(
     throw s;
   }
 
-  if (lidar_l.size() != lidar_count) {
-    string s = "size of lidar_theta and lidar_l must be the same";
+  if (lidar_y.size() != lidar_count) {
+    string s = "size of lidar_x and lidar_y must be the same";
     throw s;
   }
 
   if (car_shape_y.size() != car_shape_count) {
     string s = "size of car_shape_x and car_shape_y must be the same";
     throw s;
-  }
-
-  // pre-calculate trig
-  vector<T> lidar_sin_theta(lidar_theta.size());
-  vector<T> lidar_cos_theta(lidar_theta.size());
-  for (size_t i = 0; i < lidar_count; ++i) {
-    auto theta = lidar_theta[i];
-    lidar_sin_theta[i] = sin(theta);
-    lidar_cos_theta[i] = cos(theta);
   }
 
   // pre allocate new shape
@@ -284,13 +280,7 @@ set<int> lidar_path_intersections(
     transform_shape(car_shape_x, car_shape_y, path_x[i], path_y[i],
                     path_theta[i], new_shape_x, new_shape_y);
     for (size_t j = 0; j < lidar_count; ++j) {
-      T l = lidar_l[j];
-      if(isnan(l)) {
-        continue;
-      }
-      T lidar_x = l * lidar_cos_theta[j];
-      T lidar_y = l * lidar_sin_theta[j];
-      if (is_inside_convex_shape(lidar_x, lidar_y, new_shape_x, new_shape_y,
+      if (is_inside_convex_shape(lidar_x[j], lidar_y[j], new_shape_x, new_shape_y,
                                  -minimum_gap)) {
         lidar_collision_indexes.emplace(j);
       }

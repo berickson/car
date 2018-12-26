@@ -66,8 +66,8 @@ public:
 
   // accessors
   void set_zero_heading();
-  Angle get_zero_heading();
-  Angle get_heading();
+  Angle get_zero_heading() const;
+  Angle get_heading() const;
 
   const Speedometer & get_back_left_wheel() const {
     return back_left_wheel;
@@ -128,7 +128,7 @@ public:
     return ackerman.front_position();
   }
 
-  inline Point get_rear_position(){
+  inline Point get_rear_position() const {
     return ackerman.rear_position();
   }
 

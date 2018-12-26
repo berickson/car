@@ -308,11 +308,28 @@ double nearest_obstacle_distance_on_route(const Car & car, const Route & route, 
   }
 
   // get vectors for lidar
-  vector<double> lidar_theta;
-  vector<double> lidar_l;
-  for(const LidarMeasurement & measurement : scan.measurements) {
-    lidar_theta.emplace_back(measurement.angle.radians());
-    lidar_l.emplace_back(measurement.distance_meters);
+  vector<double> lidar_world_x;
+  vector<double> lidar_world_y;
+  Pose2d car_pose(car.get_heading(), car.get_rear_position());
+  assert(scan.measurements.size() == scan.poses.size());
+  for(size_t i = 0; i<scan.measurements.size(); i++) {
+    const LidarMeasurement & measurement = scan.measurements[i];
+    auto l = measurement.distance_meters;
+    if(isnan(l)) {
+      continue;
+    }
+    Pose2dSimple pose_simple = scan.poses[i];
+    Pose2d pose(Angle::radians(pose_simple.theta), {pose_simple.x,pose_simple.y});
+
+    auto pose_to_world = Transform2d::pose_to_world_transform(pose);
+    auto theta = measurement.angle.radians();
+    auto x = cos(theta) * l;
+    auto y = sin(theta) * l;
+    Point p(x, y);
+    Point point_world = pose_to_world(p);
+
+    lidar_world_x.emplace_back(point_world.x);
+    lidar_world_y.emplace_back(point_world.y);
   }
 
   // get car shape
@@ -323,7 +340,7 @@ double nearest_obstacle_distance_on_route(const Car & car, const Route & route, 
 
   // get intersections
   set<int> intersections =  lidar_path_intersections(
-    path_x, path_y, path_theta, lidar_theta, lidar_l, car_shape_x, car_shape_y, air_cushion);
+    path_x, path_y, path_theta, lidar_world_x, lidar_world_y, car_shape_x, car_shape_y, air_cushion);
   
   // return closest
   if(intersections.size() == 0) {
@@ -331,7 +348,7 @@ double nearest_obstacle_distance_on_route(const Car & car, const Route & route, 
   }
   double min_d = std::numeric_limits<double>::max();
   for(int intersection : intersections) {
-    double d = lidar_l[intersection];
+    double d = distance(lidar_world_x[intersection], lidar_world_y[intersection], car_pose.position.x, car_pose.position.y);
     // log_info((string) "intersection distance: " + to_string(d));
     min_d = std::min(d, min_d);
   }

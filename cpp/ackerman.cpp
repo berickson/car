@@ -18,28 +18,28 @@ Ackerman::Ackerman(double front_wheelbase_width, double wheelbase_length, Point 
   y = front_position.y - l*sin(heading);
 }
 
-Point Ackerman::front_left_position() {
+Point Ackerman::front_left_position() const{
   Point p;
   p.x = x + l * cos(heading) - sin(heading) * w/2;
   p.y = y + l * sin(heading) - cos(heading) * w/2;
   return p;
 }
 
-Point Ackerman::front_position() {
+Point Ackerman::front_position() const {
   Point p;
   p.x = x + l * cos(heading);
   p.y = y + l * sin(heading) ;
   return p;
 }
 
-Point Ackerman::rear_position() {
+Point Ackerman::rear_position() const {
   Point p;
   p.x = x;
   p.y = y;
   return p;
 }
 
-string Ackerman::to_string() {
+string Ackerman::to_string() const {
   stringstream ss;
   ss <<  "Ackerman x:" << x << " y:" << y << " heading: " << heading;
   return ss.str() ;
