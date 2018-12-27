@@ -349,7 +349,7 @@ double nearest_obstacle_distance_on_route(const Car & car, const Route & route, 
   double min_d = std::numeric_limits<double>::max();
   for(int intersection : intersections) {
     double d = distance(lidar_world_x[intersection], lidar_world_y[intersection], car_pose.position.x, car_pose.position.y);
-    // log_info((string) "intersection distance: " + to_string(d));
+    log_info((string) "intersection distance: " + to_string(d));
     min_d = std::min(d, min_d);
   }
   return min_d;
