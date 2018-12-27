@@ -410,7 +410,7 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
 
         for(double ahead = 0; ahead < total_ahead; ahead += step) {
           RouteNode n = route.get_position_ahead(ahead);
-          double obstacle_v = velocity_at_position(ahead - obstacle_distance - stop_margin, -settings.max_decel, 0);
+          double obstacle_v = velocity_at_position(obstacle_distance - ahead - stop_margin, settings.max_decel, 0);
           if(isnan(obstacle_v)) {
             obstacle_v = 0;
           }
