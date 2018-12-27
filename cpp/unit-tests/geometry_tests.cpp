@@ -37,6 +37,14 @@ string to_string(const vector<T> &v) {
   return rv;
 }
 
+template <class T>
+void expect_vector_eq(vector<T> v1, vector<T> v2) {
+  EXPECT_EQ(v1.size(), v2.size());
+  for(size_t i=0; i<v1.size(); ++i) {
+    EXPECT_NEAR(v1[i],v2[i],1E-6);
+  }
+}
+
 TEST(collision, get_path_angles) {
   vector<double> path_x{0, 1, 1};
   vector<double> path_y{0, 0, 1};
@@ -49,6 +57,7 @@ TEST(collision, get_path_angles) {
 
 template <class T>
 void test_collisions(int repeat = 1) {
+  cout << "0" << endl;
   // set up path path_x, path_y
   vector<T> path_x = linspace<T>(0, 10, 30);
   vector<T> path_y;
@@ -68,18 +77,29 @@ void test_collisions(int repeat = 1) {
 
   // calculate path angles
   vector<T> path_angles = get_path_angles(path_x, path_y);
-
-  set<int> collisions;
-  for (int i = 0; i < repeat; ++i) {
-    
-    collisions =
-        lidar_path_intersections(path_x, path_y, path_angles, lidar_theta,
-                                 lidar_l, car_shape_x, car_shape_y);
+  vector<T> lidar_x;
+  vector<T> lidar_y;
+  for(size_t i=0;i<lidar_theta.size();++i) {
+    auto l=lidar_l[i];
+    auto theta = lidar_theta[i];
+    lidar_x.push_back(l*cos(theta));
+    lidar_y.push_back(l*sin(theta));
   }
 
-  EXPECT_EQ(collisions.size(), 2);
-  EXPECT_TRUE(collisions.count(14));
-  EXPECT_TRUE(collisions.count(15));
+  vector<size_t> collisions;
+  for (int i = 0; i < repeat; ++i) {
+    try {
+      collisions =
+          lidar_path_intersections(path_x, path_y, path_angles, lidar_x,
+                                  lidar_y, car_shape_x, car_shape_y);
+    }
+    catch(string s) {
+      cout << "caught string: " << s << endl;
+
+    }
+  }
+
+  expect_vector_eq(collisions, vector<size_t>({3, 4}));
 }
 
 TEST(collision, test_collision_float) { test_collisions<float>(); }
@@ -157,7 +177,36 @@ TEST(Transform2d, world_to_pose) {
   EXPECT_FLOAT_EQ(origin_2.heading.degrees(), 0);
   EXPECT_FLOAT_EQ(origin_2.position.x, 0);
   EXPECT_FLOAT_EQ(origin_2.position.y, 0);
-
-
 }
 
+
+TEST(geometry, transform_shape) {
+  double l = 0.5;
+  double w = 0.2;
+  vector<double> shape_x{0, 0, l, l, 0};
+  vector<double> shape_y{w/2,-w/2,-w/2,w/2,w/2};
+  vector<double> new_shape_x(shape_x.size());
+  vector<double> new_shape_y(shape_x.size());
+
+  double dx,dy,dtheta;
+
+  dx=0;dy=0;dtheta=0;
+  transform_shape(shape_x, shape_y, dx, dy, dtheta, new_shape_x, new_shape_y);
+  expect_vector_eq(new_shape_x, shape_x);
+  expect_vector_eq(new_shape_y, shape_y);
+
+  dx=3;dy=1;dtheta=0;
+  transform_shape(shape_x, shape_y, dx, dy, dtheta, new_shape_x, new_shape_y);
+  expect_vector_eq(new_shape_x, {0+dx, 0+dx, l+dx, l+dx, 0+dx});
+  expect_vector_eq(new_shape_y, {w/2+dy,-w/2+dy,-w/2+dy,w/2+dy,w/2+dy});
+
+  dx=0;dy=0;dtheta=M_PI_2;
+  transform_shape(shape_x, shape_y, dx, dy, dtheta, new_shape_x, new_shape_y);
+  expect_vector_eq(new_shape_y, {0, 0, l, l, 0});
+  expect_vector_eq(new_shape_x, {-w/2,w/2,w/2,-w/2,-w/2});
+
+  dx=1;dy=2;dtheta=M_PI_2;
+  transform_shape(shape_x, shape_y, dx, dy, dtheta, new_shape_x, new_shape_y);
+  expect_vector_eq(new_shape_y, {0+dy, 0+dy, l+dy, l+dy, 0+dy});
+  expect_vector_eq(new_shape_x, {-w/2+dx,w/2+dx,w/2+dx,-w/2+dx,-w/2+dx});
+}

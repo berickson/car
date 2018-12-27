@@ -228,12 +228,12 @@ void transform_shape(const vector<T> &old_x, const vector<T> &old_y, T delta_x,
     throw s;
   }
 
+  T sin_theta = sin(delta_theta);
+  T cos_theta = cos(delta_theta);
+
   for (size_t i = 0; i < count; ++i) {
     T x = old_x[i];
     T y = old_y[i];
-
-    T sin_theta = sin(delta_theta);
-    T cos_theta = cos(delta_theta);
 
     new_x[i] = x * cos_theta - y * sin_theta + delta_x;
     new_y[i] = y * cos_theta + x * sin_theta + delta_y;
@@ -242,7 +242,6 @@ void transform_shape(const vector<T> &old_x, const vector<T> &old_y, T delta_x,
 
 template <typename T>
 vector<size_t> lidar_path_intersections(
-    const vector<T> &path_ahead,
     const vector<T> &path_x,
     const vector<T> &path_y,
     const vector<T> &path_theta,
