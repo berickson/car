@@ -271,10 +271,7 @@ void Driver::set_evasive_actions_for_crash(Route& route)
 // stopping range ahead of car.
 //
 // returns NAN if no obstacle or car going in reverse
-double nearest_obstacle_distance_on_route(const Car & car, const Route & route, const RunSettings & settings) {
-
-  // meters to stop before obstacle
-  double stop_margin = 0.5;
+double nearest_obstacle_distance_on_route(const Car & car, const Route & route, const RunSettings & settings, double stop_margin) {
 
   // meters between car positions to check
   double check_increment = 0.1;
@@ -292,7 +289,7 @@ double nearest_obstacle_distance_on_route(const Car & car, const Route & route, 
 
   double max_decel = settings.max_decel;
   double decel_time = v / max_decel;
-  double safe_distance = 0.5 * max_decel * decel_time * decel_time + stop_margin;
+  double safe_distance = 0.5 * max_decel * decel_time * decel_time + stop_margin + 1;
 
   // get vectors for path and theta to check
 
@@ -392,7 +389,8 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
         throw (string) "timed out waiting to read dynamics";
       }
 
-      double obstacle_distance = nearest_obstacle_distance_on_route(car, route, settings);
+      double stop_margin = 2;
+      double obstacle_distance = nearest_obstacle_distance_on_route(car, route, settings, stop_margin);
        if(isnan(obstacle_distance)) {
          ;//log_info((string)"No obstacle detected");
        } else {
@@ -404,7 +402,6 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
       Route short_term_route;
       if(!isnan(obstacle_distance)) {
         double step = 0.05;
-        double stop_margin = 2;
         double total_ahead = obstacle_distance + step + stop_margin + 1;
         total_ahead = max<double>(total_ahead, 1.); // one meter should ensure route is never empty
 
