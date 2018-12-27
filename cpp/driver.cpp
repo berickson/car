@@ -404,7 +404,7 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
       Route short_term_route;
       if(!isnan(obstacle_distance)) {
         double step = 0.05;
-        double stop_margin = 1.25;
+        double stop_margin = 2;
         double total_ahead = obstacle_distance + step + stop_margin + 1;
         total_ahead = max<double>(total_ahead, 1.); // one meter should ensure route is never empty
 
