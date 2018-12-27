@@ -387,7 +387,7 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
         throw (string) "timed out waiting to read dynamics";
       }
 
-      double stop_margin = 2;
+      double stop_margin = 1;
       double obstacle_distance = nearest_obstacle_distance_on_route(car, route, settings, stop_margin);
        if(isnan(obstacle_distance)) {
          ;//log_info((string)"No obstacle detected");
