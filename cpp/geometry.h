@@ -241,7 +241,7 @@ void transform_shape(const vector<T> &old_x, const vector<T> &old_y, T delta_x,
 }
 
 template <typename T>
-set<size_t> lidar_path_intersections(
+vector<size_t> lidar_path_intersections(
     const vector<T> &path_ahead,
     const vector<T> &path_x,
     const vector<T> &path_y,
@@ -255,7 +255,7 @@ set<size_t> lidar_path_intersections(
   size_t lidar_count = lidar_x.size();
   size_t car_shape_count = car_shape_x.size();
 
-  set<size_t> lidar_collision_indexes;
+  vector<size_t> lidar_collision_indexes;
 
   // sanity checks
   if (path_y.size() != path_count) {
@@ -283,7 +283,8 @@ set<size_t> lidar_path_intersections(
     for (size_t j = 0; j < lidar_count; ++j) {
       if (is_inside_convex_shape(lidar_x[j], lidar_y[j], new_shape_x, new_shape_y,
                                  -minimum_gap)) {
-        lidar_collision_indexes.emplace(j);
+        lidar_collision_indexes.emplace_back(i);
+        break;
       }
     }
   }

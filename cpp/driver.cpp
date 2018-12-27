@@ -341,7 +341,7 @@ double nearest_obstacle_distance_on_route(const Car & car, const Route & route, 
   vector<double> car_shape_y{w/2,-w/2,-w/2,w/2,w/2};
 
   // get intersections
-  set<size_t> intersections =  lidar_path_intersections(
+  vector<size_t> intersections =  lidar_path_intersections(
     path_d, path_x, path_y, path_theta, lidar_world_x, lidar_world_y, car_shape_x, car_shape_y, air_cushion);
   
   // return closest
