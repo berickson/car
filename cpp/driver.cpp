@@ -405,7 +405,10 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
       if(!isnan(obstacle_distance)) {
         double step = 0.05;
         double stop_margin = 1.25;
-        for(double ahead = 0; ahead < obstacle_distance + step; ahead += step) {
+        double total_ahead = obstacle_distance + step + 1;
+        total_ahead = max<double>(total_ahead, 1.); // one meter should ensure route is never empty
+
+        for(double ahead = 0; ahead < total_ahead; ahead += step) {
           RouteNode n = route.get_position_ahead(ahead);
           double obstacle_v = velocity_at_position(ahead - obstacle_distance - stop_margin, settings.max_decel, 0);
           if(isnan(obstacle_v)) {
@@ -418,7 +421,10 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
           short_term_route.add_node(n);
         }
         short_term_route.set_position(car.get_front_position(), car.get_rear_position(), car.get_velocity());
-        chosen_route = & short_term_route;
+        // avoid invalid routes
+        if(short_term_route.nodes.size() > 1) {
+          chosen_route = & short_term_route;
+        }
         //log_info(short_term_route.to_string());
       }
 
