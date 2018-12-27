@@ -241,7 +241,8 @@ void transform_shape(const vector<T> &old_x, const vector<T> &old_y, T delta_x,
 }
 
 template <typename T>
-set<int> lidar_path_intersections(
+set<size_t> lidar_path_intersections(
+    const vector<T> &path_ahead,
     const vector<T> &path_x,
     const vector<T> &path_y,
     const vector<T> &path_theta,
@@ -254,7 +255,7 @@ set<int> lidar_path_intersections(
   size_t lidar_count = lidar_x.size();
   size_t car_shape_count = car_shape_x.size();
 
-  set<int> lidar_collision_indexes;
+  set<size_t> lidar_collision_indexes;
 
   // sanity checks
   if (path_y.size() != path_count) {

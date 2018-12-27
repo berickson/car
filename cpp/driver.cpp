@@ -274,7 +274,7 @@ void Driver::set_evasive_actions_for_crash(Route& route)
 double nearest_obstacle_distance_on_route(const Car & car, const Route & route, const RunSettings & settings) {
 
   // meters to stop before obstacle
-  double stop_margin = 0.25;
+  double stop_margin = 0.03;
 
   // meters between car positions to check
   double check_increment = 0.1;
@@ -299,9 +299,11 @@ double nearest_obstacle_distance_on_route(const Car & car, const Route & route, 
   vector<double> path_x;
   vector<double> path_y;
   vector<double> path_theta;
+  vector<double> path_d;
 
   for(double ahead = 0; ahead < safe_distance + check_increment; ahead += check_increment) {
     RouteNode position = route.get_position_ahead(ahead); // todo: check for effiency
+    path_d.push_back(ahead);
     path_x.push_back(position.rear_x);
     path_y.push_back(position.rear_y);
     path_theta.push_back(position.heading);
@@ -339,18 +341,23 @@ double nearest_obstacle_distance_on_route(const Car & car, const Route & route, 
   vector<double> car_shape_y{w/2,-w/2,-w/2,w/2,w/2};
 
   // get intersections
-  set<int> intersections =  lidar_path_intersections(
-    path_x, path_y, path_theta, lidar_world_x, lidar_world_y, car_shape_x, car_shape_y, air_cushion);
+  set<size_t> intersections =  lidar_path_intersections(
+    path_d, path_x, path_y, path_theta, lidar_world_x, lidar_world_y, car_shape_x, car_shape_y, air_cushion);
   
   // return closest
   if(intersections.size() == 0) {
     return NAN;
   }
   double min_d = std::numeric_limits<double>::max();
+  /*
   for(int intersection : intersections) {
     double d = distance(lidar_world_x[intersection], lidar_world_y[intersection], car_pose.position.x, car_pose.position.y);
     log_info((string) "intersection distance: " + to_string(d));
     min_d = std::min(d, min_d);
+  }
+  */
+  if(intersections.size() > 0) {
+    min_d = path_d[0];
   }
   return min_d;
 }
