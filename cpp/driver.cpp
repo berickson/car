@@ -397,11 +397,11 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
       }
 
       double obstacle_distance = nearest_obstacle_distance_on_route(car, route, settings);
-      // if(isnan(obstacle_distance)) {
-      //   log_info((string)"No obstacle detected");
-      // } else {
-      //   log_info((string)"Nearest obstacle detected at distance " + to_string(obstacle_distance) + " meters.");
-      // }
+       if(isnan(obstacle_distance)) {
+         ;//log_info((string)"No obstacle detected");
+       } else {
+         log_info((string)"Nearest obstacle detected at distance " + to_string(obstacle_distance) + " meters.");
+       }
 
       //double obstacle_distance = NAN;
       Route * chosen_route = & route;
@@ -422,7 +422,7 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
           short_term_route.add_node(n);
         }
         short_term_route.set_position(car.get_front_position(), car.get_rear_position(), car.get_velocity());
-        //chosen_route = & short_term_route;
+        chosen_route = & short_term_route;
         //log_info(short_term_route.to_string());
       }
 
