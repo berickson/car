@@ -417,7 +417,10 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
           obstacle_v = max(obstacle_v, 0.0);
           double obstacle_a = -settings.max_decel;
           n.velocity = min(n.velocity, obstacle_v);
-          n.velocity = 0;
+          if(n.velocity == 0) {
+            n.road_sign_command = "stop";
+            n.road_sign_label =  "temporary stop";
+          }
           short_term_route.add_node(n);
         }
         short_term_route.set_position(car.get_front_position(), car.get_rear_position(), car.get_velocity());
