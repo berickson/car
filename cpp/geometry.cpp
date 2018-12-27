@@ -215,6 +215,9 @@ double acceleration_for_distance_and_velocities(double d, double v1, double v2) 
 }
 
 double time_at_position(double x, double a, double v0, double x0){
+  if(isnan(x)) {
+    return NAN;
+  }
   x = x-x0;
 
   if(a==0)
