@@ -274,7 +274,7 @@ void Driver::set_evasive_actions_for_crash(Route& route)
 double nearest_obstacle_distance_on_route(const Car & car, const Route & route, const RunSettings & settings) {
 
   // meters to stop before obstacle
-  double stop_margin = 0.03;
+  double stop_margin = 0.5;
 
   // meters between car positions to check
   double check_increment = 0.1;
