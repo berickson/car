@@ -1,22 +1,22 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include "math.h"
+#include <set>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
-#include <set>
 #include "eigen3/Eigen/Dense"
-
+#include "math.h"
+#include "logger.h"
 
 using namespace std;
 
 struct Point {
-  Point(double x=0, double y=0);
+  Point(double x = 0, double y = 0);
   double x;
   double y;
   string to_string() const;
-  Point operator -(Point p2);
+  Point operator-(Point p2);
 };
 
 string to_string(const Point &p);
@@ -35,48 +35,40 @@ struct Angle {
 
   const string to_string();
 
-  bool operator == (Angle& rhs);
+  bool operator==(Angle &rhs);
   operator double() { return theta; }
-  Angle & operator /= (double d);
-  Angle operator / (double d) const;
-  Angle operator * (double d) const;
-  Angle operator + (const Angle & rhs) const;
-  Angle & operator += (const Angle & rhs);
-  Angle operator -();
-  Angle operator - (const Angle & rhs) const;
+  Angle &operator/=(double d);
+  Angle operator/(double d) const;
+  Angle operator*(double d) const;
+  Angle operator+(const Angle &rhs) const;
+  Angle &operator+=(const Angle &rhs);
+  Angle operator-();
+  Angle operator-(const Angle &rhs) const;
 
-private:
-
-  double theta; //radians
+ private:
+  double theta;  // radians
 };
 
-
 struct Pose2d {
-  Pose2d(Angle heading, Point position) 
-    : heading(heading), position(position) {
-
-  }
+  Pose2d(Angle heading, Point position)
+      : heading(heading), position(position) {}
   Angle heading;
   Point position;
 };
 
 struct Transform2d {
-  Pose2d operator() (Pose2d & pose);
-  Point operator() (Point & point);
+  Pose2d operator()(Pose2d &pose);
+  Point operator()(Point &point);
 
   static Transform2d pose_to_world_transform(Pose2d pose);
   static Transform2d world_to_pose_transform(Pose2d pose);
-private:
+
+ private:
   Eigen::Transform<double, 2, Eigen::Isometry> t;
   Angle rotation;
   float dx;
   float dy;
 };
-
-
-
-
-
 
 //
 // Angular geometry
@@ -85,11 +77,9 @@ private:
 double degrees(double radians);
 double radians(double degrees);
 
-
 //#returns theta in range of [-pi,pi)
 double standardized_radians(double theta);
 double standardized_degrees(double theta);
-
 
 // returns theta2-theta1 in range of [-180,180)
 double degrees_diff(double theta1, double theta2);
@@ -102,28 +92,28 @@ double length(double x, double y);
 //
 
 // returns solutions to ax^2+bx+c=0
-vector<double> quadratic(double a,double b,double c);
+vector<double> quadratic(double a, double b, double c);
 
 // returns distane from (x1,y1) to (x2,y2)
 double distance(double x1, double y1, double x2, double y2);
 double distance(Point p1, Point p2);
-double distance_from_segment_to_pointt(Point start, Point end, Point p );
+double distance_from_segment_to_pointt(Point start, Point end, Point p);
 
 //
 // Kinematics
 //
 
-
 // acceleration to go from v1 to v2 in distance d
 double acceleration_for_distance_and_velocities(double x, double v1, double v2);
 
 // returns first t greater than zero that will reach position x
-double time_at_position(double x,double a,double v0,double x0=0.);
+double time_at_position(double x, double a, double v0, double x0 = 0.);
 
 // returns velocity at time t with initial velocity v0 and acceleration a
 double velocity_at_time(double t, double a, double v0);
 
-// returns velocity at position x with acceleration a, initial velocity v0 and initial position x0
+// returns velocity at position x with acceleration a, initial velocity v0 and
+// initial position x0
 double velocity_at_position(double x, double a, double v0, double x0 = 0);
 
 // returns unit length vector in the direction of p
@@ -145,18 +135,18 @@ double clamp(double value, double min_value, double max_value);
 template <typename T>
 vector<T> linspace(T from, T to, int count) {
   vector<T> v(count);
-  if(count == 0) {
-     return v;
+  if (count == 0) {
+    return v;
   }
-  if(count == 0) {
+  if (count == 0) {
     v[0] = from;
     return v;
   }
   T d = from;
-  T step = (to-from)/(count-1.);
-  for(int i = 0; i < count; ++i) {
+  T step = (to - from) / (count - 1.);
+  for (int i = 0; i < count; ++i) {
     v[i] = d;
-    d+= step;
+    d += step;
   }
   return v;
 }
@@ -242,14 +232,10 @@ void transform_shape(const vector<T> &old_x, const vector<T> &old_y, T delta_x,
 
 template <typename T>
 vector<size_t> lidar_path_intersections(
-    const vector<T> &path_x,
-    const vector<T> &path_y,
-    const vector<T> &path_theta,
-    const vector<T> &lidar_x,
-    const vector<T> &lidar_y,
-    const vector<T> &car_shape_x,
-    const vector<T> &car_shape_y,
-    T minimum_gap = 0.0) {
+    const vector<T> &path_x, const vector<T> &path_y,
+    const vector<T> &path_theta, const vector<T> &lidar_x,
+    const vector<T> &lidar_y, const vector<T> &car_shape_x,
+    const vector<T> &car_shape_y, T minimum_gap = 0.0) {
   size_t path_count = path_x.size();
   size_t lidar_count = lidar_x.size();
   size_t car_shape_count = car_shape_x.size();
@@ -280,9 +266,10 @@ vector<size_t> lidar_path_intersections(
     transform_shape(car_shape_x, car_shape_y, path_x[i], path_y[i],
                     path_theta[i], new_shape_x, new_shape_y);
     for (size_t j = 0; j < lidar_count; ++j) {
-      if (is_inside_convex_shape(lidar_x[j], lidar_y[j], new_shape_x, new_shape_y,
-                                 -minimum_gap)) {
+      if (is_inside_convex_shape(lidar_x[j], lidar_y[j], new_shape_x,
+                                 new_shape_y, -minimum_gap)) {
         lidar_collision_indexes.emplace_back(i);
+        log_info("colliding lidar at " +to_string(lidar_x[j]) +" " +to_string(lidar_y[j]));
         break;
       }
     }
@@ -290,9 +277,6 @@ vector<size_t> lidar_path_intersections(
   return lidar_collision_indexes;
 }
 
-
 void test_geometry();
 
-
-
-#endif // GEOMETRY_H
+#endif  // GEOMETRY_H
