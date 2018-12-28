@@ -271,6 +271,7 @@ vector<size_t> lidar_path_intersections(
                                  new_shape_y, -minimum_gap)) {
         lidar_collision_indexes.emplace_back(i);
         log_info("colliding lidar at " +to_string(lidar_x[j]) +" " +to_string(lidar_y[j]));
+        log_info("path i: " + to_string(i) + " x: "+ to_string(path_x[i]) + " y: " + to_string(path_y[i])+ " theta: " + to_string(path_theta[i]));
         log_info("new_shape_x: "+ vector_to_string(new_shape_x));
         log_info("new_shape_y: "+ vector_to_string(new_shape_y));
         break;
