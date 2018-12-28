@@ -8,6 +8,7 @@
 #include "eigen3/Eigen/Dense"
 #include "math.h"
 #include "logger.h"
+#include "string_utils.h"
 
 using namespace std;
 
@@ -270,6 +271,8 @@ vector<size_t> lidar_path_intersections(
                                  new_shape_y, -minimum_gap)) {
         lidar_collision_indexes.emplace_back(i);
         log_info("colliding lidar at " +to_string(lidar_x[j]) +" " +to_string(lidar_y[j]));
+        log_info("new_shape_x: "+ vector_to_string(new_shape_x));
+        log_info("new_shape_y: "+ vector_to_string(new_shape_y));
         break;
       }
     }

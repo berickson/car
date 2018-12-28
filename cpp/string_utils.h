@@ -36,5 +36,20 @@ std::string rtrimmed(std::string s);
 // trim from both ends (copying)
 std::string trimmed(std::string s);
 
+template <class T>
+string vector_to_string(const vector<T> &v) {
+  if (v.size() == 0) {
+    return "";
+  }
+  string rv;
+  rv += "[";
+  rv += to_string(v[0]);
+  for (int i = 1; i < v.size(); ++i) {
+    rv += (string) ", " + to_string(v[i]);
+  }
+  rv += "]";
+  return rv;
+}
+
 
 #endif // STRING_UTILS_H
