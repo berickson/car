@@ -315,7 +315,7 @@ double nearest_obstacle_distance_on_route(const Car & car, const Route & route,
     path_d.push_back(ahead);
     path_x.push_back(position.rear_x);
     path_y.push_back(position.rear_y);
-    path_theta.push_back(position.heading);
+    path_theta.push_back(Angle::degrees(position.heading).radians());
   }
 
   // get vectors for lidar
