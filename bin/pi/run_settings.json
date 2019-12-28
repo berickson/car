@@ -10,7 +10,7 @@
   "optimize_velocity": true,
   "prune_max": 0.2,
   "prune_tolerance": 0.02,
-  "route_name": "B",
+  "route_name": "003",
   "slip_rate": 0.2,
   "slip_slop": 0.5,
   "start_offset": 0.0,
