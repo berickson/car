@@ -400,6 +400,8 @@ void Car::apply_dynamics(Dynamics2& d) {
                                       d.odo_br_b, d.odo_br_b_us);
   front_left_wheel.update_from_sensor(d.us, d.odo_fl_a, d.odo_fl_a_us,
                                       d.odo_fl_b, d.odo_fl_b_us);
+  front_right_wheel.update_from_sensor(d.us, d.odo_fr_a, d.odo_fr_a_us,
+                                      d.odo_fr_b, d.odo_fr_b_us);
   motor.update_from_sensor(d.us, d.spur_odo, d.spur_us);
   double wheel_distance_meters = front_right_wheel.update_from_sensor(
       d.us, d.odo_fr_a, d.odo_fr_a_us, d.odo_fr_b, d.odo_fr_b_us);

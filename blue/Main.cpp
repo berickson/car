@@ -38,21 +38,16 @@ const int pin_cell4_sense = A17;
 const int pin_cell0_sense = A18;
 
 #elif defined(ORANGE_CAR)
+#pragma message("ORANGE_CAR defined")
 
+// orange-crash board layout at
+// https://docs.google.com/drawings/d/162KwWO05w_nAkaWieq2LWwWhbdojVjPIpCre_7vMy38/edit
 
-
-#define PIN_PING_TRIG 17
-#define PIN_PING_ECHO 32
 
 
 #define PIN_GO 16
 
 // "A" means toward front
-#define PIN_ODOMETER_BACK_LEFT_SENSOR_A 10
-#define PIN_ODOMETER_BACK_LEFT_SENSOR_B 27
-#define PIN_ODOMETER_BACK_RIGHT_SENSOR_A 28
-#define PIN_ODOMETER_BACK_RIGHT_SENSOR_B 11
-
 #define PIN_MOTOR_RPM 29
 
 #define PIN_SPEAKER   30
@@ -66,16 +61,22 @@ const int pin_cell3_sense = 14;
 const int pin_cell4_sense = 14;
 const int pin_cell0_sense = 14;
 
-const int pin_motor_a = 24;
-const int pin_motor_b = 25;
-const int pin_motor_c = 26;
+const int pin_motor_a = 17;
+const int pin_motor_b = 11;
+const int pin_motor_c = 32;
 const int pin_motor_temp = A13;
 
 
-const int pin_odo_fl_a = 22;
-const int pin_odo_fl_b = 23;
-const int pin_odo_fr_a = 20;
-const int pin_odo_fr_b = 21;
+#define pin_odo_bl_a 10
+#define pin_odo_bl_b 10
+#define pin_odo_br_a 10
+#define pin_odo_br_b 10
+
+
+#define pin_odo_fl_a 8
+#define pin_odo_fl_b 25
+#define pin_odo_fr_a 26
+#define pin_odo_fr_b 9
 
 const int pin_str = 5;
 const int pin_esc = 6;
@@ -119,6 +120,15 @@ Mpu9150 mpu9150;
 
 QuadratureEncoder odo_fl(pin_odo_fl_a, pin_odo_fl_b);
 QuadratureEncoder odo_fr(pin_odo_fr_a, pin_odo_fr_b);
+
+#if defined(pin_odo_bl_a)
+QuadratureEncoder odo_bl(pin_odo_bl_a, pin_odo_bl_b);
+#endif
+
+#if defined(pin_odo_br_a)
+QuadratureEncoder odo_br(pin_odo_br_a, pin_odo_br_b);
+#endif
+
 
 PwmInput rx_str;
 PwmInput rx_esc;
@@ -306,6 +316,22 @@ void rx_esc_handler() {
 }
 
 
+void odo_bl_a_changed() {
+  odo_bl.sensor_a_changed();
+}
+
+void odo_bl_b_changed() {
+  odo_bl.sensor_b_changed();
+}
+
+void odo_br_a_changed() {
+  odo_br.sensor_a_changed();
+}
+
+void odo_br_b_changed() {
+  odo_br.sensor_b_changed();
+}
+
 void odo_fl_a_changed() {
   odo_fl.sensor_a_changed();
 }
@@ -343,9 +369,8 @@ bool every_n_ms(unsigned long last_loop_ms, unsigned long loop_ms, unsigned long
 void setup() {
 
   Serial.begin(250000);
-  while(!Serial); // wait for serial to become ready
+  //while(!Serial); // wait for serial to become ready
   delay(1000);
-  Serial.println("Wating to start");
  
 
   // put your setup code here, to run once:
@@ -357,25 +382,46 @@ void setup() {
   // 1500 is usually safe...
   esc.writeMicroseconds(1500);
   str.writeMicroseconds(1500);
-  delay(1000);
-  Serial.println("Here I am");
   manual_mode.name = "manual";
   // follow_mode.name = "follow";
   remote_mode.name = "remote";
 
-  //delay(1000);
   interpreter.init(commands, count_of(commands));
   modes.begin();
+
+  pinMode(pin_motor_a, INPUT);
+  pinMode(pin_motor_b, INPUT);
+  pinMode(pin_motor_c, INPUT);
 
 
   attachInterrupt(pin_motor_a, motor_a_changed, CHANGE);
   attachInterrupt(pin_motor_b, motor_b_changed, CHANGE);
   attachInterrupt(pin_motor_c, motor_c_changed, CHANGE);
 
+  // pinmode is required for Teensy3.2?
+  pinMode(pin_odo_fl_a, INPUT);
+  pinMode(pin_odo_fl_b, INPUT);
+  pinMode(pin_odo_fr_a, INPUT);
+  pinMode(pin_odo_fr_a, INPUT);
   attachInterrupt(pin_odo_fl_a, odo_fl_a_changed, CHANGE);
   attachInterrupt(pin_odo_fl_b, odo_fl_b_changed, CHANGE);
   attachInterrupt(pin_odo_fr_a, odo_fr_a_changed, CHANGE);
   attachInterrupt(pin_odo_fr_b, odo_fr_b_changed, CHANGE);
+
+  #if defined(pin_odo_bl_a)
+  pinMode(pin_odo_bl_a, INPUT);
+  pinMode(pin_odo_bl_b, INPUT);
+  attachInterrupt(pin_odo_bl_a, odo_bl_a_changed, CHANGE);
+  attachInterrupt(pin_odo_bl_b, odo_bl_b_changed, CHANGE);
+  #endif
+
+  #if defined(pin_odo_br_a)
+  pinMode(pin_odo_br_a, INPUT);
+  pinMode(pin_odo_br_b, INPUT);
+  attachInterrupt(pin_odo_br_a, odo_br_a_changed, CHANGE);
+  attachInterrupt(pin_odo_br_b, odo_br_b_changed, CHANGE);
+  #endif
+
 
   // pinMode(pin_motor_temp, INPUT_PULLUP);
 
@@ -497,18 +543,20 @@ void loop() {
     interrupts();
 
     noInterrupts();
-    td2.odo_bl_a = motor.odometer;
-    td2.odo_bl_a_us = motor.last_change_us;
+    td2.odo_bl_a = odo_fl.odometer_a;
+    td2.odo_bl_a_us = odo_fl.last_odometer_a_us;
+    td2.odo_bl_b = odo_fl.odometer_b;
+    td2.odo_bl_b_us = odo_fl.last_odometer_b_us;
+    td2.odo_bl_ab_us = odo_fl.odometer_ab_us;
     interrupts();
-    td2.odo_bl_b = td2.odo_bl_a;
-    td2.odo_bl_b_us = td2.odo_bl_a_us;
-    td2.odo_bl_ab_us = 0;
 
-    td2.odo_br_a = td2.odo_bl_a;
-    td2.odo_br_a_us = td2.odo_bl_a_us;
-    td2.odo_br_b = td2.odo_bl_b;
-    td2.odo_br_b_us = td2.odo_bl_b_us;
-    td2.odo_br_ab_us = td2.odo_bl_ab_us;
+    noInterrupts();
+    td2.odo_br_a = odo_fr.odometer_a;
+    td2.odo_br_a_us = odo_fr.last_odometer_a_us;
+    td2.odo_br_b = odo_fr.odometer_b;
+    td2.odo_br_b_us = odo_fr.last_odometer_b_us;
+    td2.odo_br_ab_us = odo_fr.odometer_ab_us;
+    interrupts();
 
     td2.v_bat = battery_voltage;
 
