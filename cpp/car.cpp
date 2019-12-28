@@ -144,7 +144,8 @@ void Car::process_socket() {
       j["front_y"] = get_front_position().y;
       j["go_enabled"] = get_go_enabled();
 
-      socket_server.send_response(j.dump());
+      auto s = j.dump();
+      socket_server.send_response(s);
     } else if (request == "go") {
       log_info("go");
       command_from_socket = "go";
@@ -213,7 +214,10 @@ void Car::usb_thread_start() {
     // ATTRS{idVendor}=="16c0", , ATTRS{idProduct}=="04[789B]?",
     // SYMLINK+="teensy$attr{serial}"
 
-    usb.run("/dev/teensy4317960");
+    // usb.run("/dev/teensy4317960");
+    //usb.run("/dev/teensy1301550");
+    usb.run("/dev/ttyACM0");
+    
     while (!quit) {
       try {
         StampedString line;

@@ -6,8 +6,9 @@ User=pi
 WorkingDirectory=/home/pi/car/flask
 
 # todo: change back to anaconda
-ExecStart=-/usr/bin/python web_server.py
+#ExecStart=-/usr/bin/python web_server.py
 #ExecStart=-/home/pi/miniconda3/bin/python web_server.py
+ExecStart=-/home/pi/.conda/envs/car/bin/python web_server.py
 StandardOutput=journal
  
 [Install]

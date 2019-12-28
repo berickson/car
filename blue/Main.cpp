@@ -9,8 +9,7 @@
 #include "CarMessages.h"
 
 
-
-#if not defined(old_board)
+#if defined(BLUE_CAR)
 const int pin_led = 13;
 const int pin_motor_a = 14;
 const int pin_motor_b = 12;
@@ -38,24 +37,56 @@ const int pin_cell3_sense = A16;
 const int pin_cell4_sense = A17;
 const int pin_cell0_sense = A18;
 
-#else
-const int pin_motor_a = 24; // 12
-const int pin_motor_b = 25; // 11
-const int pin_motor_c = 26; // 10
+#elif defined(ORANGE_CAR)
+
+
+
+#define PIN_PING_TRIG 17
+#define PIN_PING_ECHO 32
+
+
+#define PIN_GO 16
+
+// "A" means toward front
+#define PIN_ODOMETER_BACK_LEFT_SENSOR_A 10
+#define PIN_ODOMETER_BACK_LEFT_SENSOR_B 27
+#define PIN_ODOMETER_BACK_RIGHT_SENSOR_A 28
+#define PIN_ODOMETER_BACK_RIGHT_SENSOR_B 11
+
+#define PIN_MOTOR_RPM 29
+
+#define PIN_SPEAKER   30
+
+
+const int pin_led = 13;
+const int pin_vbat_sense = 14;
+const int pin_cell1_sense = 14;
+const int pin_cell2_sense = 14;
+const int pin_cell3_sense = 14;
+const int pin_cell4_sense = 14;
+const int pin_cell0_sense = 14;
+
+const int pin_motor_a = 24;
+const int pin_motor_b = 25;
+const int pin_motor_c = 26;
 const int pin_motor_temp = A13;
 
-const int pin_odo_fl_a = 0; // 22
-const int pin_odo_fl_b = 1; // 23
-const int pin_odo_fr_a = 3; // 20
-const int pin_odo_fr_b = 2; // 21
 
-const int pin_str = 8; // 27
-const int pin_esc = 9; // 26
+const int pin_odo_fl_a = 22;
+const int pin_odo_fl_b = 23;
+const int pin_odo_fr_a = 20;
+const int pin_odo_fr_b = 21;
+
+const int pin_str = 5;
+const int pin_esc = 6;
 const int pin_esc_aux = 10;
-const int pin_rx_str = 11; // 24
-const int pin_rx_esc = 12; // 25
 
-const int pin_mpu_interrupt = 17; // 17
+const int pin_rx_str = 3;
+const int pin_rx_esc = 4;
+
+const int pin_mpu_interrupt = 33;
+#else
+#error "You must define BLUE_CAR or ORANGE_CAR"
 #endif
 
 // all these ugly pushes are because the 9150 has a lot of warnings
@@ -313,19 +344,29 @@ void setup() {
 
   Serial.begin(250000);
   while(!Serial); // wait for serial to become ready
+  delay(1000);
+  Serial.println("Wating to start");
+ 
 
-  manual_mode.name = "manual";
-  // follow_mode.name = "follow";
-  remote_mode.name = "remote";
-  modes.begin();
-
-  //delay(1000);
-  interpreter.init(commands, count_of(commands));
   // put your setup code here, to run once:
   rx_str.attach(pin_rx_str);
   rx_esc.attach(pin_rx_esc);
   str.attach(pin_str);
   esc.attach(pin_esc);
+
+  // 1500 is usually safe...
+  esc.writeMicroseconds(1500);
+  str.writeMicroseconds(1500);
+  delay(1000);
+  Serial.println("Here I am");
+  manual_mode.name = "manual";
+  // follow_mode.name = "follow";
+  remote_mode.name = "remote";
+
+  //delay(1000);
+  interpreter.init(commands, count_of(commands));
+  modes.begin();
+
 
   attachInterrupt(pin_motor_a, motor_a_changed, CHANGE);
   attachInterrupt(pin_motor_b, motor_b_changed, CHANGE);

@@ -306,6 +306,19 @@ void setup() {
   //trace_dynamics_on();
   LOG_ERROR = true;
   Serial.begin(250000);
+  delay(1000);
+  //pinMode(13, OUTPUT);
+  //int x = 0;
+  //while(1) {
+  //      ++x;
+//	delay(1000);
+//	digitalWrite(13, HIGH);
+//	delay(1000);
+//	digitalWrite(13, LOW);
+//	Serial.println("hello");
+//	Serial.println(x);
+//
+//  }
   Wire.begin();
   modes.begin();
 

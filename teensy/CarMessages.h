@@ -5,6 +5,7 @@
 
 #ifdef ARDUINO
     #define NativeString String
+    #define to_native_string NativeString
     #define to_string NativeString
 #else
     #define NativeString std::string

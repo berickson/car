@@ -203,7 +203,8 @@ def get_path(track_name, route_name):
     # allowed value are {‘split’,’records’,’index’,’columns’,’values’}
     orient = request.args.get('orient', 'records')
     if request.method == 'GET':
-        df = pd.read_csv(path_path)
+        df = pd.read_csv(path_path) if os.path.exists(path_path) else pd.DataFrame()
+
         s = df.to_json(orient=orient)
         return s
     elif request.method == 'PUT':
