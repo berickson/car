@@ -386,7 +386,6 @@ void Car::apply_dynamics(Dynamics2& d) {
   if (d.mode == "manual" && previous.mode != "manual") {
     rc_mode_enabled = false;
   }
-  log_info("reading_count: " + to_string(reading_count));
 
   // correct heading with adjustment factor
   //Angle d_theta = Angle::degrees(d.mpu_deg_yaw - previous.mpu_deg_yaw);
@@ -409,9 +408,6 @@ void Car::apply_dynamics(Dynamics2& d) {
       fabs(wheel_distance_meters) >
           0.) {  // adding 2 keeps out the big jump after a reset
     Angle outside_wheel_angle = angle_for_steering(previous.rx_str);
-    log_info("outside_wheel_angle:"+to_string( outside_wheel_angle.degrees()));
-    log_info((string)"wheel_distiance_meters:"+to_string(wheel_distance_meters));
-    log_info((string)"heading:"+to_string(get_heading().degrees()));
     ackerman.move_right_wheel(outside_wheel_angle, wheel_distance_meters,
                               get_heading().radians());
   }

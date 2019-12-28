@@ -268,12 +268,12 @@ public:
   float max_reading = 1024;
   float scale = (r1+r2) * 3.3 / (max_reading * r2);
 
-  float v_bat;
-  float v_cell0;
-  float v_cell1;
-  float v_cell2;
-  float v_cell3;
-  float v_cell4;
+  float v_bat = 0;
+  float v_cell0 = 0;
+  float v_cell1 = 0;
+  float v_cell2 = 0;
+  float v_cell3 = 0;
+  float v_cell4 = 0;
 
 
   void init() {
@@ -283,19 +283,19 @@ public:
   }
 
   void execute() {
+#if defined(BLUE_CAR)
     v_bat = analogRead(pin_vbat_sense) * scale * 12.41 / 12.25;
     v_cell0 = analogRead(pin_cell0_sense) * scale * 3.343/3.28;
     v_cell1 = analogRead(pin_cell1_sense)  * scale * 3.343/3.29;
     v_cell2 = analogRead(pin_cell2_sense)  * scale * 3.343/3.33;
     v_cell3 = analogRead(pin_cell3_sense) * scale * 3.343/3.29;
     v_cell4 = analogRead(pin_cell4_sense) * scale * 3.343/3.29;
-    String s = (String) "vbat: " + v_bat 
-                    + " v_cell0: " +  v_cell0 
-                    + " v_cell1: " +  v_cell1 
-                    + " v_cell2: "+  v_cell2 
-                    + " v_cell3: "+  v_cell3 
-                    + " v_cell4: "+  v_cell4;
-    log(LOG_INFO, s);
+#elif defined(ORANGE_CAR)
+    // constants below based on 220k and 1M resistor, 1023 steps and 3.3 reference voltage
+    v_bat = analogRead(pin_vbat_sense) * ((3.3/1023.) / 220.)*(220.+1000.);
+#else
+#error "voltage not defined for this car"
+#endif
   }
 
 
@@ -436,16 +436,25 @@ void setup() {
   mpu9150.enable_interrupts(pin_mpu_interrupt);
   log(LOG_INFO, "Interrupts enabled for mpu9150");
   mpu9150.setup();
-  
-  mpu9150.ax_bias = 0; // 7724.52;
-  mpu9150.ay_bias = 0; // -1458.47;
-  mpu9150.az_bias = 7893.51; // 715.62;
+#if defined(BLUE_CAR)
+  mpu9150.ax_bias = 0;
+  mpu9150.ay_bias = 0;
+  mpu9150.az_bias = 7893.51;
   mpu9150.rest_a_mag =  7893.51;
-  mpu9150.zero_adjust = Quaternion(0.0, 0.0, 0.0, 1);// Quaternion(-0.07, 0.67, -0.07, 0.73);
-  // was ((-13.823402+4.9) / (1000 * 60 * 60)) * PI/180;
-  mpu9150.yaw_slope_rads_per_ms  = -0.0000000680;// (2.7 / (10 * 60 * 1000)) * PI / 180;
-  mpu9150.yaw_actual_per_raw = 1; //(3600. / (3600 - 29.0 )); //1.0; // (360.*10.)/(360.*10.-328);// 1.00; // 1.004826221;
-
+  mpu9150.zero_adjust = Quaternion(0.0, 0.0, 0.0, 1);
+  mpu9150.yaw_slope_rads_per_ms  = -0.0000000680;
+  mpu9150.yaw_actual_per_raw = 1;
+#elif defined(ORANGE_CAR)
+  mpu9150.ax_bias = 7724.52;
+  mpu9150.ay_bias = -1458.47;
+  mpu9150.az_bias = 715.62;
+  mpu9150.rest_a_mag = 7893.51;
+  mpu9150.zero_adjust = Quaternion(-0.07, 0.67, -0.07, 0.73);
+  mpu9150.yaw_slope_rads_per_ms  = (2.7 / (10 * 60 * 1000)) * PI / 180;
+  mpu9150.yaw_actual_per_raw = (3600. / (3600 - 29.0 )); //1.0; // (360.*10.)/(360.*10.-328);// 1.00; // 1.004826221;
+#else
+#error "Car not defined for MPU"
+#endif
   mpu9150.zero_heading();
   blinker.init(pin_led);
   battery_sensor.init();

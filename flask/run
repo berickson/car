@@ -1,4 +1,4 @@
 
 #!/usr/bin/env bash
-sudo -E env "PATH=$PATH" python web_server.py
+sudo -E env "PATH=$PATH" /home/pi/.conda/envs/car/bin/python web_server.py
 
