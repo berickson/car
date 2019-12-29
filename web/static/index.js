@@ -81,7 +81,7 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
   };
 
 
-  vm.save_run_settings = function () {
+  vm.save_run_settings = function (include_route_path = true) {
     var deferred = $q.defer();
     vm.go_error = "";
     vm.set_changes_from_field_array(vm.run_settings, vm.run_settings_array);
@@ -105,14 +105,18 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
 
     $http(req).success(function () {
       $log.info('save run settings success');
-      $http(req2).success(function () {
+      if(include_route_path) {
+        $http(req2).success(function () {
+          deferred.resolve();
+          $log.info('save route path success');
+        }).error(function (response, code) {
+          $log.warn("failed to save route path");
+          $log.warn("  (" + code + ")" + response);
+          deferred.reject(response);
+        });
+      } else {
         deferred.resolve();
-        $log.info('save route path success');
-      }).error(function (response, code) {
-        $log.warn("failed to save route path");
-        $log.warn("  (" + code + ")" + response);
-        deferred.reject(response);
-      });
+      }
     }).error(function (response, code) {
       vm.go_error = "  (" + code + ")" + response;
       deferred.reject(response);
@@ -147,12 +151,14 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
   };
 
   vm.record = function () {
-    $http.put('/command/record', "1").success(function () {
-      $log.info('record success');
-    }).error(function (response, code) {
-      vm.record_error = "  (" + code + ")" + response.message;
+    vm.save_run_settings(false).then(function() { // save run settings first so recording knows where to go
+      $http.put('/command/record', "1").success(function () {
+        $log.info('record success');
+      }).error(function (response, code) {
+        vm.record_error = "  (" + code + ")" + response.message;
+      });
     });
-    $log.info("record clicked");
+  $log.info("record clicked");
   };
 
   vm.reset_odometer = function () {

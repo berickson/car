@@ -10,7 +10,7 @@
   "optimize_velocity": true,
   "prune_max": 0.2,
   "prune_tolerance": 0.02,
-  "route_name": "011",
+  "route_name": "000",
   "slip_rate": 0.2,
   "slip_slop": 0.5,
   "start_offset": 0.0,
@@ -18,7 +18,7 @@
   "steering_k_i": 0.0,
   "steering_k_p": 40.0,
   "t_ahead": 0.3,
-  "track_name": "avc",
+  "track_name": "2019-12-29T12:54:38",
   "v_k_d": 5.0,
   "v_k_i": 0.0,
   "v_k_p": 10.0

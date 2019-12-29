@@ -113,7 +113,7 @@ string path_join(string x, string y) {
 void mkdir(string folder) {
   if(file_exists(folder))
     return;
-  string cmd = "mkdir \""+folder+"\"";
+  string cmd = "mkdir -p \""+folder+"\"";
   system(cmd.c_str());
   if(!file_exists(folder)) {
     throw (string) "could not create " + folder;
