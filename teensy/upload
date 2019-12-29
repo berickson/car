@@ -1,1 +1,1 @@
-platformio run --target upload
+platformio run -e $ROBOT --target upload

@@ -62,6 +62,11 @@ Raspberry PI 4
     sudo apt install ffmpeg vlc streamer git libncurses5-dev screen
 
     ```
+1. Set which robot you are working on, add this to .bashrc
+    ```
+    export ROBOT=orange #or blue
+    ```
+
 1. Clone this repo
     ```bash
     git clone git@github.com:berickson/car.git
