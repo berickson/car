@@ -5,7 +5,7 @@
 #include "system.h"
 #include "string_utils.h"
 #include "logger.h"
-#include "../blue/CarMessages.h"
+#include "../teensy/CarMessages.h"
 
 
 Dynamics::Dynamics() {

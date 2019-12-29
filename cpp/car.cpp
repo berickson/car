@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include <chrono>
 #include <iostream>
-#include "../blue/CarMessages.h"
+#include "../teensy/CarMessages.h"
 #include "async_buf.h"
 #include "json.hpp"
 #include "logger.h"
