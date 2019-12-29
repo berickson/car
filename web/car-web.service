@@ -3,7 +3,7 @@ Description=Car Web Service
  
 [Service]
 User=pi
-WorkingDirectory=/home/pi/car/flask
+WorkingDirectory=/home/pi/car/web
 
 # todo: change back to anaconda
 #ExecStart=-/usr/bin/python web_server.py

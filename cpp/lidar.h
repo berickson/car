@@ -9,7 +9,7 @@
 #include <vector>
 #include <queue>
 #include <cstdint>
-#include "../../include/eigen3/Eigen/Dense"
+#include "eigen3/Eigen/Dense"
 #include "json.hpp"
 
 using namespace std;

@@ -3,8 +3,8 @@
 #include <chrono>
 #include <sstream>
 #include <vector>
-#include "../../include/eigen3/Eigen/Dense"
-#include "../../include/eigen3/Eigen/SVD"
+#include "eigen3/Eigen/Dense"
+#include "eigen3/Eigen/SVD"
 #include "json.hpp"
 #include "logger.h"
 #include "string_utils.h"

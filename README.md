@@ -59,7 +59,7 @@ Raspberry PI 4
     ```
 1. Install a few things on the Pi
     ```
-    sudo apt install ffmpeg vlc streamer git libncurses5-dev screen nginx
+    sudo apt install ffmpeg vlc streamer git libncurses5-dev screen nginx fdfind
 
     ```
 1. Set which robot you are working on, add this to .bashrc
