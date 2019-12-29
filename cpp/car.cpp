@@ -21,8 +21,6 @@ Car::Car(bool online) {
   read_configuration(config_path);
   front_right_wheel.meters_per_tick = this->meters_per_odometer_tick;
   front_left_wheel.meters_per_tick = this->meters_per_odometer_tick;
-  back_left_wheel.meters_per_tick = this->rear_meters_per_odometer_tick;
-  back_right_wheel.meters_per_tick = this->rear_meters_per_odometer_tick;
   motor.meters_per_tick = this->motor_meters_per_odometer_tick;
   log_info("all wheels set");
   this->online = online;
@@ -135,8 +133,6 @@ void Car::process_socket() {
       // from https://playground.arduino.cc/Main/MPU-9150
       j["mode"] = get_mode();
       j["heading"] = get_heading().radians();
-      j["bl"] = get_back_left_wheel().get_json_state();
-      j["br"] = get_back_right_wheel().get_json_state();
       j["fl"] = get_front_left_wheel().get_json_state();
       j["fr"] = get_front_right_wheel().get_json_state();
       j["motor"] = get_motor().get_json_state();
@@ -330,8 +326,7 @@ void Car::begin_recording_state(string path) {
 
   //*state_recording_file << Dynamics::csv_field_headers();
   *state_recording_file << "v_smooth,a_smooth,v_fl_smooth,a_fl_smooth,v_fr_"
-                           "smooth,a_fr_smooth,v_bl_smooth,a_bl_smooth,v_br_"
-                           "smooth,a_br_smooth,commanded_esc,commanded_str"
+                           "smooth,a_fr_smooth,commanded_esc,commanded_str"
                         << endl;
 }
 
@@ -344,10 +339,6 @@ void Car::write_state() {
                           << "," << front_left_wheel.get_smooth_acceleration()
                           << "," << front_right_wheel.get_smooth_velocity()
                           << "," << front_right_wheel.get_smooth_acceleration()
-                          << "," << back_left_wheel.get_smooth_velocity() << ","
-                          << back_left_wheel.get_smooth_acceleration() << ","
-                          << back_right_wheel.get_smooth_velocity() << ","
-                          << front_right_wheel.get_smooth_acceleration() << ","
                           << commanded_esc << "," << commanded_str << '\n';
   }
 }
@@ -394,10 +385,6 @@ void Car::apply_dynamics(Dynamics2& d) {
   // gyro_adjustment_factor);
 
   // if wheels have moved, update ackerman
-  back_left_wheel.update_from_sensor(d.us, d.odo_bl_a, d.odo_bl_a_us,
-                                     d.odo_bl_b, d.odo_bl_b_us);
-  back_right_wheel.update_from_sensor(d.us, d.odo_br_a, d.odo_br_a_us,
-                                      d.odo_br_b, d.odo_br_b_us);
   front_left_wheel.update_from_sensor(d.us, d.odo_fl_a, d.odo_fl_a_us,
                                       d.odo_fl_b, d.odo_fl_b_us);
   motor.update_from_sensor(d.us, d.spur_odo, d.spur_us);

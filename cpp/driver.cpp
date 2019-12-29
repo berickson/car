@@ -125,9 +125,7 @@ void Driver::avoid_barrels(StereoCamera & camera) {
 bool Driver::rear_slipping() {
   return false;
   double v_front = car.get_velocity();
-  double v_back = 0.5 *
-      (car.get_back_left_wheel().get_velocity() +
-          car.get_back_right_wheel().get_velocity());
+  double v_back = car.get_rear_velocity();
 
   bool spinning = fabs(v_front - v_back) >
       (settings.slip_slop + (settings.slip_rate * fabs(v_front)));
@@ -137,9 +135,7 @@ bool Driver::rear_slipping() {
 int Driver::esc_for_max_decel() {
   int esc = 1500;
   double v_front = car.get_velocity();
-  double v_back = (car.get_back_left_wheel().get_smooth_velocity(),
-                      car.get_back_right_wheel().get_smooth_velocity()) /
-      2.0;
+  double v_back = car.motor.get_smooth_velocity();
   if (v_front >= 0.1 && v_back >= v_front * (1.0 - settings.slip_rate)) {
     esc = 1100;
   }

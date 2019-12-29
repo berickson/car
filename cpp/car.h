@@ -47,7 +47,7 @@ public:
   int reading_count = 0;
   system_clock::time_point last_scan_request_time;
 
-  Speedometer front_right_wheel, front_left_wheel, back_left_wheel, back_right_wheel, motor;
+  Speedometer front_right_wheel, front_left_wheel, motor;
   Angle heading_adjustment;
   Angle zero_heading_angle;
 
@@ -69,13 +69,7 @@ public:
   Angle get_zero_heading() const;
   Angle get_heading() const;
 
-  const Speedometer & get_back_left_wheel() const {
-    return back_left_wheel;
-  }
 
-  const Speedometer & get_back_right_wheel() const {
-    return back_right_wheel;
-  }
 
   const Speedometer & get_front_left_wheel() const {
     return front_left_wheel;
@@ -89,22 +83,6 @@ public:
     return motor;
   }
 
-
-  /*
-  int get_odometer_front_left() {
-    return current_dynamics.odometer_front_left;
-  }
-  int get_odometer_front_right() {
-    return front_right_wheel.last_ticks;
-  }
-  int get_odometer_back_left() {
-    return current_dynamics.odometer_back_left;
-  }
-  int get_odometer_back_right() {
-
-    return current_dynamics.odometer_back_right;
-  }
-*/
   int get_reading_count() {
     return reading_count;
   }
@@ -141,7 +119,7 @@ public:
   }
 
   double get_rear_velocity() {
-    return (back_left_wheel.get_velocity() + back_right_wheel.get_velocity()) / 2;
+    return motor.get_velocity();
   }
 
 
