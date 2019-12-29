@@ -15,7 +15,7 @@
 #include "async_buf.h"
 #include "socket_server.h"
 #include "lidar.h"
-#include "../blue/CarMessages.h"
+#include "../teensy/CarMessages.h"
 
 using namespace std;
 using namespace std::chrono;
