@@ -65,4 +65,4 @@ class TrackStorage:
         return tracks
 
 def get_run_settings_path():
-    return "/home/pi/car/bin/pi/run_settings.json"
+    return "/home/pi/car/bin/run_settings.json"
