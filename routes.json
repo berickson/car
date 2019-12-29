@@ -1,6 +1,0 @@
-{
-    "routes": [
-        "FROM /messages/modules/sensor/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/filter/inputs/input1\")",
-        "FROM /messages/modules/filter/outputs/alertOutput INTO $upstream"
-    ]
-}

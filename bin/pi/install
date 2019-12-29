@@ -1,3 +1,4 @@
 sudo cp car.service /lib/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl restart car.service
+sudo systemctl enable car

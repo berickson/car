@@ -1,3 +1,0 @@
-sudo setsid sh -c 'exec screen -S lcd <> /dev/tty1 >&0 2>&1' &
-sleep 0.5
-sudo screen -x lcd

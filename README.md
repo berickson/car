@@ -59,12 +59,12 @@ Raspberry PI 4
     ```
 1. Install a few things on the Pi
     ```
-    sudo apt install ffmpeg vlc streamer git libncurses5-dev screen
+    sudo apt install ffmpeg vlc streamer git libncurses5-dev screen nginx
 
     ```
 1. Set which robot you are working on, add this to .bashrc
     ```
-    export ROBOT=orange #or blue
+    export ROBOT=orange # current valid values are orange or blue
     ```
 
 1. Clone this repo
