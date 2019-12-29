@@ -74,7 +74,6 @@ void Fsm::set_event(const char * event) {
   // move based on event
   for(int i = 0; i < edge_count; i++) {
     if(equals( edges[i].from, current_task->name ) && equals( edges[i].event, event )) {
-      Serial.println("found");
       set_current_task(edges[i].to);
       break;
     }

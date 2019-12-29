@@ -12,10 +12,7 @@ void CommandInterpreter::execute() {
     if( c==-1) break;
     if( c==0) break;
     if( c == '\n' || c =='\r') {
-      String s(buffer);
-      if (s.length() > 0) {
-        process_command(s);
-      }
+      process_command(String(buffer));
       buffer[0] = 0;
       buf_size = 0;
     } else {
@@ -37,10 +34,10 @@ void CommandInterpreter::process_command(String s) {
     String name = commands[i].name;
     if(s.startsWith(name)) {
       command_args = s.substring(name.length());
-      log(LOG_TRACE, "Executing command " + name + " with args (" + command_args + ")");
+      log(LOG_INFO, "Executing command " + name + " with args (" + command_args + ")");
       commands[i].f();
       return;
     }
   }
-  log(LOG_ERROR, (String) "Unknown command: " + s);
+  log(LOG_ERROR, "Unknown command: ");
 }

@@ -8,16 +8,21 @@ The source code of each library should be placed in separate directory, like
 For example, see how can be organized `Foo` and `Bar` libraries:
 
 |--lib
+|  |
 |  |--Bar
 |  |  |--docs
 |  |  |--examples
 |  |  |--src
 |  |     |- Bar.c
 |  |     |- Bar.h
+|  |  |- library.json (optional, custom build options, etc) https://docs.platformio.org/page/librarymanager/config.html
+|  |
 |  |--Foo
 |  |  |- Foo.c
 |  |  |- Foo.h
+|  |
 |  |- readme.txt --> THIS FILE
+|
 |- platformio.ini
 |--src
    |- main.c
@@ -33,4 +38,4 @@ PlatformIO will find your libraries automatically, configure preprocessor's
 include paths and build them.
 
 More information about PlatformIO Library Dependency Finder
-- http://docs.platformio.org/en/stable/librarymanager/ldf.html
+- https://docs.platformio.org/page/librarymanager/ldf.html

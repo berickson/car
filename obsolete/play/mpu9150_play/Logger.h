@@ -6,11 +6,10 @@ extern bool LOG_INFO;
 extern bool LOG_TRACE;
 extern bool TRACE_RX;
 extern bool TRACE_PINGS;
+extern bool TRACE_ESC;
 extern bool TRACE_MPU;
 extern bool TRACE_LOOP_SPEED;
-extern bool TRACE_TELEMETRY;
 extern bool TD;
-extern bool TD2;
 
 #include "Arduino.h"
 

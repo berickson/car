@@ -52,8 +52,7 @@ void Mpu9150::calibrate_nose_up() {
 
 void Mpu9150::start_calibrate_at_rest(float pause_seconds, float test_seconds)
 {
-    Serial.println((String) "performing rest calibration.  Keep still for " + (pause_seconds + test_seconds) + " seconds");
-    yaw_slope_rads_per_ms = 0; // reset yaw drift to properly measure
+    Serial.println((String) "performing rest calibration.  Keep still for " + test_seconds + " seconds");
     at_rest_calibrating = true;
     at_rest_calibration_start_millis = millis() + 1000 * pause_seconds;
     at_rest_calibration_end_millis = at_rest_calibration_start_millis + 1000 * test_seconds;
@@ -65,13 +64,14 @@ void Mpu9150::start_calibrate_at_rest(float pause_seconds, float test_seconds)
 }
 
 void Mpu9150::set_zero_orientation(Quaternion zero) {
-    log(LOG_INFO,"re-oriented zero on MPU");
+    Serial.println("re-oriented zero on MPU");
     zero_adjust = zero;
 }
 
 void Mpu9150::enable_interrupts(int interrupt_pin) {
     // enable Arduino interrupt detection
     log(TRACE_MPU,F("Enabling interrupt detection (Arduino external interrupt "));
+    Serial.println(interrupt_pin);
     pinMode(interrupt_pin, INPUT);
     attachInterrupt(interrupt_pin,dmpDataReady, RISING);
     interrupt_pending = mpu.getIntStatus();
@@ -89,6 +89,7 @@ void Mpu9150::setup() {
     yaw_raw_total = 0;
 
     // initialize device
+    Serial.println("9150 setup");
     log(TRACE_MPU,"Initializing I2C MPU devices...");
     mpu.initialize();
     log(TRACE_MPU,"Done Initializing I2C MPU devices...");
@@ -97,7 +98,7 @@ void Mpu9150::setup() {
     if(mpu.testConnection()) {
         log(TRACE_MPU, "MPU9150 connection successful");
     } else {
-        log(LOG_ERROR, "MPU9150 connection failed");
+        log(LOG_ERROR, "MPU9150 connection successful");
     }
 
 
@@ -110,7 +111,7 @@ void Mpu9150::setup() {
         // turn on the DMP, now that it's ready
         log(TRACE_MPU,F("Enabling DMP..."));
         mpu.setDMPEnabled(true);
-        log(TRACE_MPU,F("DMP ready"));
+        Serial.println(F("DMP ready!"));
 
         // get expected DMP packet size for later comparison
         packetSize = mpu.dmpGetFIFOPacketSize();
@@ -133,7 +134,7 @@ void Mpu9150::zero_heading() {
 }
 
 
-float standardized_degrees(float theta) {
+double standardized_degrees(double theta) {
   theta = fmod(theta, 360.0);
   if(theta < -180.)
       theta += 360.0;
@@ -144,7 +145,7 @@ float standardized_degrees(float theta) {
 // returns an inverted and corrected yaw value so rotation follows
 // standard of ccw being positive
 float Mpu9150::heading() {
-    float yaw = (yaw_raw_total - (millis()-yaw_adjust_start_ms) * yaw_slope_rads_per_ms) * yaw_actual_per_raw;
+    float yaw = (yaw_raw_total + (millis()-yaw_adjust_start_ms) * yaw_slope_rads_per_ms) * yaw_actual_per_raw;
     return standardized_degrees(-rads2degrees(yaw));
 }
 
@@ -178,7 +179,7 @@ void Mpu9150::execute(){
 
     log(TRACE_MPU,(String) "reading fifo");
     fifoCount = mpu.getFIFOCount();
-    log(TRACE_MPU,(String) "fifo count " + fifoCount + ", packet size " + packetSize);
+    log(TRACE_MPU,(String) "fifo count " + fifoCount);
 
     if (fifoCount < packetSize)
         return;
@@ -194,8 +195,6 @@ void Mpu9150::execute(){
         fifoCount -= packetSize;
         readingCount++;
     }
-
-    log(TRACE_MPU, (String)"readingCount: " + readingCount);
 
     mpu.dmpGetQuaternion(&qraw, fifoBuffer);
     mpu.dmpGetGravity(&graw, &qraw);
@@ -243,9 +242,7 @@ void Mpu9150::execute(){
             Serial.print(az_bias);
             Serial.print(" rest_a_mag: ");
             Serial.print(rest_a_mag);
-            Serial.print(" yaw_slope_rads_per_ms: ");
-            Serial.print(yaw_slope_rads_per_ms,10);
-            Serial.print(" degrees/hr drift: ");
+            Serial.print("degrees/hr drift: ");
             Serial.print(yaw_slope_rads_per_ms*1000*60*60*180/PI);
 
             Serial.println();

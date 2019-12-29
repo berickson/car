@@ -3,27 +3,33 @@
 #include "Servo2.h"
 #include "PwmInput.h"
 
-
+#include "Logger.h"
 
 const int timeout_ms = 1000; // minimum interval to receive commands before ending from timeout
 
-extern Servo2 speed;
-extern Servo2 steering;
+extern Servo2 esc;
+extern Servo2 str;
+
+RemoteMode::RemoteMode() {
+  name = "remote";
+}
 
 void RemoteMode::begin() {
-  Serial.println("begin of remote mode");
+  log(LOG_INFO, "begin of remote mode");
+  is_active = true;
   last_command_ms = millis();
-  steer_us = 1500;
+  str_us = 1500;
   esc_us = 1500;
   done = false;
 }
 
 void RemoteMode::end() {
     Serial.println("end of remote mode");
-    steer_us = 1500;
+    str_us = 1500;
     esc_us = 1500;
     update_pulses();
     done = true;
+    is_active = false;
 }
 
 void RemoteMode::execute() {
@@ -33,9 +39,13 @@ void RemoteMode::execute() {
   }
 }
 
-void RemoteMode::command_steer_and_esc(unsigned int _steer_us, unsigned int _esc_us) {
+void RemoteMode::command_steer_and_esc(unsigned int _str_us, unsigned int _esc_us) {
+  if (!is_active) {
+    Serial.println("RemoteMode::command_steer_and_esc called when mode inactive, ignoring");
+    return;
+  }
   last_command_ms = millis();
-  steer_us = _steer_us;
+  str_us = _str_us;
   esc_us = _esc_us;
   update_pulses();
 }
@@ -43,8 +53,7 @@ void RemoteMode::command_steer_and_esc(unsigned int _steer_us, unsigned int _esc
 
 void RemoteMode::update_pulses() {
   if(done) return;
-  steering.writeMicroseconds(steer_us);
-  speed.writeMicroseconds(esc_us);
-
+  str.writeMicroseconds(str_us);
+  esc.writeMicroseconds(esc_us);
 }
 

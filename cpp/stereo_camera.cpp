@@ -26,8 +26,8 @@
 
 StereoCamera::StereoCamera()
 {
-  left_camera.cam_number = 1;
-  right_camera.cam_number = 0;
+  left_camera.cam_number = 0;
+  right_camera.cam_number = 2;
 
   cameras.push_back(&left_camera);
   cameras.push_back(&right_camera);

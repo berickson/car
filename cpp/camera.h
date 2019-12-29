@@ -18,7 +18,7 @@ public:
   enum Mode {
     cap_320_by_240_by_30fps
   };
-  int cam_number = 0;
+  int cam_number = 10;
   double get_fps();
 
   Mode mode = cap_320_by_240_by_30fps;

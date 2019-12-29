@@ -51,7 +51,7 @@ void Camera::warm_up()
   if(warmed_up) return;
 
   cap.open(cam_number);
-  if(!cap.isOpened()) throw string("couldn't open camera");
+  if(!cap.isOpened()) throw string("couldn't open camera"+to_string(cam_number));
   
   /*
   v4l2-ctl --list-formats-ext --device=/dev/video1

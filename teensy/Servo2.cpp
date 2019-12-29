@@ -510,7 +510,6 @@ extern "C" void pdb_isr(void)
 
 
 
-
 #elif defined(__arm__) && defined(__MKL26Z64__)
 // ******************************************************************************
 // Teensy-LC implementation, using Low Power Timer
