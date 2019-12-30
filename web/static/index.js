@@ -250,11 +250,11 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
          + "/runs"
          ).
       success(function (result /*, status, headers, config*/) {
-        vm.runs = result
+        vm.runs = result.runs
         vm.run_names = [];
         var max_time = '';
         for(var i in vm.runs) {
-          var route = vm.runs[i];
+          var run = vm.runs[i];
           vm.run_names.push(run.name);
           if(select_latest && run.time > max_time) {
             max_time = run.time;
@@ -306,6 +306,7 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
 
   $scope.$watch("car.run_settings.route_name", function () {
     if (vm.run_settings && vm.run_settings.route_name !== null && vm.run_settings.route_name.length > 0) {
+      vm.refresh_runs();
       $http.get(vm.route_path_url()).
         success(function (route_path /*, status, headers, config*/) {
           viewer.set_path(route_path);
