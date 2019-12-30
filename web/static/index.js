@@ -306,7 +306,7 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
 
   $scope.$watch("car.run_settings.route_name", function () {
     if (vm.run_settings && vm.run_settings.route_name !== null && vm.run_settings.route_name.length > 0) {
-      vm.refresh_runs();
+      vm.refresh_runs(true);
       $http.get(vm.route_path_url()).
         success(function (route_path /*, status, headers, config*/) {
           viewer.set_path(route_path);
