@@ -19,6 +19,10 @@
 # Default server configuration
 #
 server {
+        # include mime.types;
+        types {
+            text/html  csv;
+        }
 	listen 80 default_server;
 	listen [::]:80 default_server;
 
@@ -44,6 +48,14 @@ server {
 	index index.html index.htm index.nginx-debian.html;
 
 	server_name _;
+
+        
+        location /raw_tracks {
+			#default_type text/html;
+			autoindex_format json;
+           	autoindex         on;
+           	alias             /home/pi/car/tracks/;
+        }
 
 	location / {
 		# First attempt to serve request as file, then
