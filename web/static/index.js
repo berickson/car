@@ -243,6 +243,31 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
       });
   };
 
+  vm.refresh_runs = function(select_latest) {
+    $log.info('select_latest' + select_latest);
+    $http.get('/tracks/' + encodeURIComponent(vm.run_settings.track_name) 
+         + "/routes/" + encodeURIComponent(vm.run_settings.route_name)
+         + "/runs"
+         ).
+      success(function (result /*, status, headers, config*/) {
+        vm.runs = result
+        vm.run_names = [];
+        var max_time = '';
+        for(var i in vm.runs) {
+          var route = vm.runs[i];
+          vm.run_names.push(run.name);
+          if(select_latest && run.time > max_time) {
+            max_time = run.time;
+            vm.run_settings.run_name = run.name;
+          }
+        }
+      }).error(function (/*data, status, headers, config*/) {
+        vm.runs = [''];
+        vm.runs = [''];
+        // log error
+      });
+  };
+
   $scope.$watch("car.run_settings.track_name", function () {
     if (vm.run_settings && vm.run_settings.track_name !== null && vm.run_settings.track_name.length > 0) {
       $log.info("selected track:", vm.run_settings.track_name);

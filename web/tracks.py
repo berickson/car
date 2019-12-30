@@ -22,9 +22,23 @@ class FolderBasedItem:
     def __str__(self):
         return self.get_name()
 
+class Run(FolderBasedItem):
+    pass
+
 class Route(FolderBasedItem):
     '''route'''
-    pass
+    def get_run(self, name):
+        return Run(os.path.join(self.folder, 'runs', name))
+
+    def get_runs(self):
+        ''' returns routes for this track '''
+        runs_folder = os.path.join(self.folder, 'runs')
+        try:
+            runs = [self.get_run(name) for name in os.listdir(runs_folder)]
+        except:
+            runs = []
+        runs = sorted(runs, key=methodcaller('get_name'))
+        return runs
 
 class Track(FolderBasedItem):
     '''track'''

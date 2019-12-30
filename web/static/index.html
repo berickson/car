@@ -249,6 +249,10 @@
             <div class='xitembox'>
               route: <select class='select' name='1' ng-model="car.run_settings.route_name" id="1" ng-options="route_name for route_name in car.route_names"></select>
             </div>
+            
+            <div class='xitembox'>
+              run: <select class='select' name='1' ng-model="car.run_settings.run_name" id="1" ng-options="run_name for run_name in car.run_names"></select>
+            </div>
 
             <button class='button' ng-click="car.poweroff()">Power Off</button>
             <button class='button' ng-click="car.save_run_settings()">Save</button>

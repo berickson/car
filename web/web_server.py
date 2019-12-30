@@ -189,12 +189,23 @@ def get_route_names(track_name):
 @app.route('/tracks/<track_name>/routes')
 def get_routes(track_name):
     routes = TRACK_STORAGE.get_track(track_name).get_routes()
-    return jsonify(routes=[{'name':route.get_name(),'time':time.strftime('%Y-%m-%dT%H:%M:%SZ',route.get_time())} for route in routes])
+    return jsonify(routes=[{
+        'name':route.get_name(),
+        'time':time.strftime('%Y-%m-%dT%H:%M:%SZ',
+        route.get_time())
+        } for route in routes])
+
+@app.route('/tracks/<track_name>/routes/<route_name>/runs')
+def get_runs(track_name, route_name):
+    runs = TRACK_STORAGE.get_track(track_name).get_route(route_name).get_runs()
+    # return "found runs - " + str(len(runs))
+    return jsonify(runs=[{'name':run.get_name(),'time':time.strftime('%Y-%m-%dT%H:%M:%SZ',run.get_time())} for run in runs])
+
 
 @app.route('/tracks/<track_name>/routes/<route_name>')
 def get_route(track_name, route_name):
     route = TRACK_STORAGE.get_track(track_name).get_route(route_name)
-    return jsonify({'name', route.get_name()})
+    return jsonify(name=route.get_name(),time=time.strftime('%Y-%m-%dT%H:%M:%SZ',route.get_time()))
 
 @app.route('/tracks/<track_name>/routes/<route_name>/path', methods=['GET','PUT'])
 def get_path(track_name, route_name):
