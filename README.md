@@ -10,7 +10,7 @@ This is my personal project to add autonomous capabilities RC cars.
 
 ![avatar](docs/media/anaranjado_avatar.jpg)
 
-* A Traxxas Slash 2wd
+* Traxxas Slash 2wd
 * Sensored motor
 * ELP 1.0 Stereo camera
 * Rasberry PI Model 4
@@ -24,14 +24,14 @@ This is my personal project to add autonomous capabilities RC cars.
 
 ![avatar](docs/media/blue-crash-avatar.jpg)
 
-* A Traxxas Slash 2wd
+* Traxxas Slash 2wd
 * Sensored motor
 * Neato Lidar
 * Rasberry PI Model 3
 * Hall effect quadrature encoded front wheel sensors
 * Teensy 3.5
 * MPU-9150 IMU
-* Tough looking roll cage
+* Tough looking metal roll cage
 
 </td></tr>
 </table>
@@ -45,11 +45,9 @@ UI, image processing, path recording and following are handled by the Rasberry P
 
 The Teensy microcontroller communicates with the ESC, servo, IMU and quadrature encoders.  The microcontroller code is in the [teensy](teensy) folder.
 
-## Hardware
-Raspberry PI 4
-
-
 ## Raspberry PI Setup
+
+
 1. Start with a new Raspberry Pi 4 w/4GB RAM and a Samsung EVO Plus 32GB SD Card
 1. Download and Raspbian Buster Lite image (released 2019-09-26)from https://www.raspberrypi.org/downloads/raspbian
 1. Use Balena Etcher to extract the Raspian image onto the SD card
@@ -70,7 +68,14 @@ Raspberry PI 4
     ```bash
     sudo raspi-config
     ```
-    Use the raspi-config menu system to configure the hostname (for me it's orange-crash), timezone, configure the SSID and password to connect to WiFi router, finally, expand the file system to take up all of th 32GB on your SD card. Save and reboot.
+    Use the raspi-config menu system to configure the hostname (for me it's orange-crash), 
+
+|
+| -|- |
+locale  | en_US.UTF-8 UTF-8 
+ddd |ddd
+
+    timezone, configure the SSID and password to connect to WiFi router, finally, expand the file system to take up all of th 32GB on your SD card. Save and reboot.
 1. SSH into the Pi, you should no longer need to use your password.
 1. On the PI, create an SSH key to use with GitHub
     ```bash
