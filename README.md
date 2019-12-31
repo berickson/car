@@ -1,27 +1,49 @@
 #  Orange Crash - Self Driving RC Car
-This is my personal project to add autonomous capabilities to an RC Car.
+This is my personal project to add autonomous capabilities RC cars.
 
-## The Car
+## The Cars
 
-![anaranjado avatar](media/anaranjado_avatar.jpg)
+<table >
+<tr><td style='vertical-align:top'>
+
+**Orange Crash**
+
+![avatar](docs/media/anaranjado_avatar.jpg)
 
 * A Traxxas Slash 2wd
-* Hall effect quadrature encoded wheel sensors
+* Sensored motor
 * ELP 1.0 Stereo camera
-* Teensy 3.2
 * Rasberry PI Model 4
+* Hall effect quadrature encoded front wheel sensors
+* Teensy 3.2
 * MPU-9250 IMU
+</td>
+<td style='vertical-align:top'>
 
+**Blue Crash**
+
+![avatar](docs/media/blue-crash-avatar.jpg)
+
+* A Traxxas Slash 2wd
+* Sensored motor
+* Neato Lidar
+* Rasberry PI Model 3
+* Hall effect quadrature encoded front wheel sensors
+* Teensy 3.5
+* MPU-9150 IMU
+* Tough looking roll cage
+
+</td></tr>
+</table>
 
 ## Software
 
-The code is primarily in C++.  I originally tried doing the high level logic in Python, but found C++ was a better fit.
+<image style="float:right" src="docs/media/browser-screenshot-thumbnail.jpg"></img>
+The cars expose web servers, and the main control is through a web application using a mixture of Nginx, Flask, and AngularJS.
 
-UI, image processing, path recording and following are handled by the Rasberry PI. You can find the Raspbery Pi code in the [cpp](cpp) folder.
+UI, image processing, path recording and following are handled by the Rasberry PI. The server logic is primarily in C++.  I originally tried doing the high level logic in Python, but found C++ was a better fit. You can find the Raspbery Pi code in the [cpp](cpp) folder.
 
 The Teensy microcontroller communicates with the ESC, servo, IMU and quadrature encoders.  The microcontroller code is in the [teensy](teensy) folder.
-
-Desktop software for offline analysis and visualization use QT and is in the [cpp/car-gui](cpp/car-gui) folder.
 
 ## Hardware
 Raspberry PI 4
@@ -29,11 +51,13 @@ Raspberry PI 4
 
 ## Raspberry PI Setup
 1. Start with a new Raspberry Pi 4 w/4GB RAM and a Samsung EVO Plus 32GB SD Card
-1. Download and extract Raspbian Buster Lite image (released 2019-09-26)from https://www.raspberrypi.org/downloads/raspbian
-1. Before placing in Pi, mount the card and create the file ssh in the boot folder
+1. Download and Raspbian Buster Lite image (released 2019-09-26)from https://www.raspberrypi.org/downloads/raspbian
+1. Use Balena Etcher to extract the Raspian image onto the SD card
+1. Before placing in Pi, mount the card (click mount button next to boot in explorer) and create the file ssh in the boot folder
     ```bash
     touch /media/$USER/boot/ssh
     ```
+1. Eject and remove SD card from PC
 1. Insert SD card, connect PI to your router with an Ethernet cable
 1. Plug USB3 power into the PI to boot it
 1. Find the Pi IP address by going to your router, in my case I go to http://192.168.1.1/ and connected devices are shown in "My Network"

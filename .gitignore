@@ -5,6 +5,8 @@
 
 test/test
 build-*
+#obsolete
+obsolete/
 #output folders
 **/CMakeCache.txt
 CMakeFiles/
@@ -22,6 +24,7 @@ build/
 **/*.cmake
 **/car-log.txt
 **/Makefile
+bin/car-service
 
 #recordings
 tracks/
