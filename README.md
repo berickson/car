@@ -70,25 +70,34 @@ The Teensy microcontroller communicates with the ESC, servo, IMU and quadrature 
     ```
     Use the raspi-config menu system to configure the hostname (for me it's orange-crash), 
 
-|
-| -|- |
-locale  | en_US.UTF-8 UTF-8 
-ddd |ddd
+    |        |                       |
+    ---------|----------------------
+    locale   | en_US.UTF-8 UTF-8 
+    timezone |US / Pacific Ocean 
+    hostname | {robot name} 
+    password | {you pick}  
+    WiFi     | US / {home SSID} / {password} 
 
-    timezone, configure the SSID and password to connect to WiFi router, finally, expand the file system to take up all of th 32GB on your SD card. Save and reboot.
+    finally, expand the file system to take up all of the 32GB on your SD card. Save and reboot.
+
 1. SSH into the Pi, you should no longer need to use your password.
 1. On the PI, create an SSH key to use with GitHub
     ```bash
     ssh-keygen -t rsa -b 4096 -C "{your email}"
     ```
     On GitHub, authorize your pi user by copying the contents of the Pis .ssh/id_rsa.pub to an authorized key
-1. Disable swap on Pi. You don't need it and you can avoid corrupting your flash.
+1. Disable swap on Pi. You don't need it with 4G Pi and you can avoid corrupting your flash.
+
+
     ```bash
     sudo systemctl disable dphys-swapfile.service
     ```
 1. Install a few things on the Pi
     ```
-    sudo apt install ffmpeg vlc streamer git libncurses5-dev screen nginx fdfind
+    sudo apt update
+    sudo apt upgrade
+    sudo apt install ffmpeg vlc streamer git libncurses5-dev screen nginx
+    sudo apt install libeigen3-dev  libblas-dev liblapack-dev
 
     ```
 1. Set which robot you are working on, add this to .bashrc
@@ -100,20 +109,33 @@ ddd |ddd
     ```bash
     git clone git@github.com:berickson/car.git
     ```
-1. install eigen 3.? library into /home/pi/eigen3/Eigen, maybe also into cpp folder?
+1. install eigen 3.? library into /home/pi/car/cpp/eigen3/Eigen
 1. Install and config Python Anaconda (miniconda)
     ```
     wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-armv7l.sh
     sudo /bin/bash Miniconda3-latest-Linux-armv7l.sh
-    # notes: install to /home/pi/miniconda3
+    # notes: install to /home/pi/miniconda3, prepend path[yes]
 
+ 
+    ```
+    ensure following added to end of your .bashrc
+    ```
+    export PATH="/home/pi/miniconda3/bin:$PATH"
+    export ROBOT=orange
+    ```
+
+    exit and resume ssh
+
+    ```
     conda config --add channels rpi
     conda create --name car python=3.5
 
-    source activate car
 
-    pip install pandas dateutil pytz --force-reinstall --upgrade
-    pip install flask
+    source activate car
+    conda install pandas
+
+    # pip install dateutil pytz --force-reinstall --upgrade
+    conda install flask
     pip install psutil platformio
    
     ```
@@ -132,5 +154,5 @@ ddd |ddd
 1. Download and compile OpenCV (this will take a while)
     ```bash
     cd car
-    bash ./cv3_install.sh
+    time bash ./cv3_install.sh
     ```
