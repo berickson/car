@@ -342,7 +342,7 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
       $http.get(vm.run_path_url()).
         success(function (run_path /*, status, headers, config*/) {
           viewer.set_run_path(run_path);
-          vm.route_path = run_path;
+          vm.run_path = run_path;
         }).error(function (/*data, status, headers, config*/) {
           vm.route_names = ['n/a'];
           $log.error('$http failed to get route path');
