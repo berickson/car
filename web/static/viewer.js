@@ -95,6 +95,73 @@ let viewer = (function () {
     }
 
 
+    function set_run_path(path) {
+        try {
+            scene.remove(scene.getObjectByName('run_path'))
+        } catch { }
+        let path_mesh = new THREE.Object3D();
+        path_mesh.name = 'path';
+        let waypoint_template = new THREE.Mesh(
+            new THREE.SphereGeometry(0.015, 10, 10),
+            new THREE.MeshLambertMaterial({ color: 0x0000FF, transparent: false, opacity: 1 })
+        );
+        waypoint_template.castShadow = true;
+        waypoint_template.receiveShadow = false;
+
+        // delete or they show in background
+        while (label_renderer.domElement.firstChild) {
+            label_renderer.domElement.removeChild(label_renderer.domElement.firstChild);
+        }
+
+        for (let i = 0; i < path.length; ++i) {
+            let node = path[i];
+            let waypoint = waypoint_template.clone();
+            waypoint.position.x = node.x;
+            waypoint.position.y = node.y;
+            waypoint.name = "waypoint" + i;
+            waypoint.node = node;
+            waypoint.cursor = 'pointer';
+//             waypoint.on('click', function(ev) {
+//                 car_vm.node_clicked(ev, ev.currentTarget.node);
+//             });            path_mesh.add(waypoint);
+//             let t = car_vm.has_road_sign(node);
+//             //if(node.road_sign_command && node.road_sign_command.length > 0 || node.road_sign_label && node.road_sign_label.length > 0) {
+//             if(t) {
+//                 let road_sign = new THREE.Mesh(
+//                     new THREE.SphereGeometry(0.03,10,10),
+//                     new THREE.MeshLambertMaterial({ color: 0xff0000})
+//                 );
+//                 let post = new THREE.Mesh(
+//                     new THREE.BoxGeometry(0.015,0.015, 0.4),
+//                     new THREE.MeshStandardMaterial({ color: 0x888888})
+//                 );
+//                 post.position.z = 0.2
+//                 //let label = makeTextSprite(node.road_sign_label + ": " + node.road_sign_command);
+
+//                 let earthDiv = document.createElement( 'div' );
+// 				earthDiv.textContent = node.road_sign_label + ": " + node.road_sign_command;
+//                 earthDiv.style.marginTop = '-1em';
+//                 earthDiv.className="label2d";
+//                 document.body.appendChild(earthDiv);
+//                 let earthLabel = new THREE.CSS2DObject( earthDiv );
+// 				earthLabel.position.set( 0, 0, 0.42 );
+//                 //earth.add( earthLabel );
+//                 //earthLabel.setSize(100,100);
+//                 waypoint.add(earthLabel)
+                
+
+//                 //road_sign.add(label);
+//                 road_sign.position.z = 0.4;
+//                 waypoint.add(post);
+//                 waypoint.add(road_sign);
+//             }
+        }
+        path_mesh.position.z = 0.1;
+
+        scene.add(path_mesh);
+    }
+
+
     function set_path(path) {
         try {
             scene.remove(scene.getObjectByName('path'))
@@ -330,6 +397,7 @@ let viewer = (function () {
         car: car,
         scene: scene,
         set_path: set_path,
+        set_run_path: set_run_path,
         set_car_state: set_car_state
     }
 

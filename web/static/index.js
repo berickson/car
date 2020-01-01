@@ -333,6 +333,19 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
     }
   });
 
+  $scope.$watch("car.run_settings.run_name", function () {
+    if (vm.run_settings && vm.run_settings.route_name !== null && vm.run_settings.route_name.length > 0) {
+      $http.get(vm.run_path_url()).
+        success(function (run_path /*, status, headers, config*/) {
+          viewer.set_run_path(run_path);
+          vm.route_path = run_path;
+        }).error(function (/*data, status, headers, config*/) {
+          vm.route_names = ['n/a'];
+          $log.error('$http failed to get route path');
+        });
+    }
+  });
+
 
   vm.refresh_track_names = function() {
     vm.track_names = [];
