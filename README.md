@@ -111,8 +111,11 @@ ddd |ddd
     conda create --name car python=3.5
 
     source activate car
+    conda install pandas
+    
+    pip install python-dateutil
 
-    pip install pandas dateutil pytz --force-reinstall --upgrade
+    #pip install dateutil pytz --force-reinstall --upgrade
     pip install flask
     pip install psutil platformio
    
