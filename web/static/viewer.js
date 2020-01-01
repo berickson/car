@@ -100,10 +100,10 @@ let viewer = (function () {
             scene.remove(scene.getObjectByName('run_path'))
         } catch { }
         let path_mesh = new THREE.Object3D();
-        path_mesh.name = 'path';
+        path_mesh.name = 'run_path';
         let waypoint_template = new THREE.Mesh(
             new THREE.SphereGeometry(0.015, 10, 10),
-            new THREE.MeshLambertMaterial({ color: 0x0000FF, transparent: false, opacity: 1 })
+            new THREE.MeshLambertMaterial({ color: 0x00FFFF, transparent: false, opacity: 1 })
         );
         waypoint_template.castShadow = true;
         waypoint_template.receiveShadow = false;
@@ -123,7 +123,8 @@ let viewer = (function () {
             waypoint.cursor = 'pointer';
 //             waypoint.on('click', function(ev) {
 //                 car_vm.node_clicked(ev, ev.currentTarget.node);
-//             });            path_mesh.add(waypoint);
+//             });            
+            path_mesh.add(waypoint);
 //             let t = car_vm.has_road_sign(node);
 //             //if(node.road_sign_command && node.road_sign_command.length > 0 || node.road_sign_label && node.road_sign_label.length > 0) {
 //             if(t) {
