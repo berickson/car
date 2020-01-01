@@ -39,6 +39,6 @@ cd build
 #CXX=/usr/bin/g++-5
 cmake  -D ENABLE_PRECOMPILED_HEADERS=OFF  -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local cmake -D CMAKE_BUILD_TYPE=Release -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules ..
 make clean
-make -j8 # runs n jobs in parallel
+make -j2 # runs n jobs in parallel
 
 sudo make install

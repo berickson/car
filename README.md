@@ -133,9 +133,17 @@ The Teensy microcontroller communicates with the ESC, servo, IMU and quadrature 
 
     source activate car
     conda install pandas
+<<<<<<< HEAD
 
     # pip install dateutil pytz --force-reinstall --upgrade
     conda install flask
+=======
+    
+    pip install python-dateutil
+
+    #pip install dateutil pytz --force-reinstall --upgrade
+    pip install flask
+>>>>>>> 4e3b2ccede256cbdbe60722891a8c3b076296a14
     pip install psutil platformio
    
     ```
