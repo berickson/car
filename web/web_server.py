@@ -207,6 +207,19 @@ def get_route(track_name, route_name):
     route = TRACK_STORAGE.get_track(track_name).get_route(route_name)
     return jsonify(name=route.get_name(),time=time.strftime('%Y-%m-%dT%H:%M:%SZ',route.get_time()))
 
+
+
+@app.route('/tracks/<track_name>/routes/<route_name>/runs/<run_name>/path')
+def get_run_path(track_name, route_name, run_name):
+    run = TRACK_STORAGE.get_track(track_name).get_route(route_name).get_run(run_name);
+    path_path = run.folder+"/path.csv"
+    # allowed value are {‘split’,’records’,’index’,’columns’,’values’}
+    orient = request.args.get('orient', 'records')
+    df = pd.read_csv(path_path) if os.path.exists(path_path) else pd.DataFrame()
+    s = df.to_json(orient=orient)
+    return s
+
+
 @app.route('/tracks/<track_name>/routes/<route_name>/path', methods=['GET','PUT'])
 def get_path(track_name, route_name):
     route = TRACK_STORAGE.get_track(track_name).get_route(route_name)
@@ -215,7 +228,6 @@ def get_path(track_name, route_name):
     orient = request.args.get('orient', 'records')
     if request.method == 'GET':
         df = pd.read_csv(path_path) if os.path.exists(path_path) else pd.DataFrame()
-
         s = df.to_json(orient=orient)
         return s
     elif request.method == 'PUT':

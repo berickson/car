@@ -279,6 +279,10 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
     return '/tracks/' + encodeURIComponent(vm.run_settings.track_name) + "/routes/" + encodeURIComponent(vm.run_settings.route_name) + "/path";
   };
 
+  vm.run_path_url = function () {
+    return '/tracks/' + encodeURIComponent(vm.run_settings.track_name) + "/routes/" + encodeURIComponent(vm.run_settings.route_name) + "/runs/" + encodeURIComponent(vm.run_settings.run_name) +"/path";
+  };
+
   vm.has_road_sign = function(node) {
     if ( angular.isDefined(node.road_sign_label) && node.road_sign_label && node.road_sign_label.length > 0 ){
       return true;
@@ -326,6 +330,19 @@ angular.module("car",[]).controller("CarController", function($scope, $http, $ti
           vm.populate_road_sign_nodes();
           */
 
+        }).error(function (/*data, status, headers, config*/) {
+          vm.route_names = ['n/a'];
+          $log.error('$http failed to get route path');
+        });
+    }
+  });
+
+  $scope.$watch("car.run_settings.run_name", function () {
+    if (vm.run_settings && vm.run_settings.route_name !== null && vm.run_settings.route_name.length > 0) {
+      $http.get(vm.run_path_url()).
+        success(function (run_path /*, status, headers, config*/) {
+          viewer.set_run_path(run_path);
+          vm.run_path = run_path;
         }).error(function (/*data, status, headers, config*/) {
           vm.route_names = ['n/a'];
           $log.error('$http failed to get route path');

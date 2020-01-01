@@ -95,6 +95,40 @@ let viewer = (function () {
     }
 
 
+    function set_run_path(path) {
+        try {
+            scene.remove(scene.getObjectByName('run_path'))
+        } catch { }
+        let path_mesh = new THREE.Object3D();
+        path_mesh.name = 'run_path';
+        let waypoint_template = new THREE.Mesh(
+            new THREE.SphereGeometry(0.010, 10, 10),
+            new THREE.MeshLambertMaterial({ color: 0x00FFFF, transparent: false, opacity: 1 })
+        );
+        waypoint_template.castShadow = true;
+        waypoint_template.receiveShadow = false;
+
+        // delete or they show in background
+        while (label_renderer.domElement.firstChild) {
+            label_renderer.domElement.removeChild(label_renderer.domElement.firstChild);
+        }
+
+        for (let i = 0; i < path.length; ++i) {
+            let node = path[i];
+            let waypoint = waypoint_template.clone();
+            waypoint.position.x = node.x;
+            waypoint.position.y = node.y;
+            waypoint.name = "waypoint" + i;
+            waypoint.node = node;
+            waypoint.cursor = 'pointer';
+            path_mesh.add(waypoint);
+        }
+        path_mesh.position.z = 0.115; // center on top of path waypoints
+
+        scene.add(path_mesh);
+    }
+
+
     function set_path(path) {
         try {
             scene.remove(scene.getObjectByName('path'))
@@ -330,6 +364,7 @@ let viewer = (function () {
         car: car,
         scene: scene,
         set_path: set_path,
+        set_run_path: set_run_path,
         set_car_state: set_car_state
     }
 
