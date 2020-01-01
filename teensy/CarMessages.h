@@ -193,17 +193,6 @@ struct Dynamics2 {
     unsigned long odo_fr_b_us = 0;
     unsigned long odo_fr_ab_us = 0;
     
-    long odo_bl_a = 0;
-    unsigned long odo_bl_a_us = 0;
-    long odo_bl_b = 0;
-    unsigned long odo_bl_b_us = 0;
-    unsigned long odo_bl_ab_us = 0;
-    
-    long odo_br_a = 0;
-    unsigned long odo_br_a_us = 0;
-    long odo_br_b = 0;
-    unsigned long odo_br_b_us = 0;
-    unsigned long odo_br_ab_us = 0;
 
     float mpu_deg_yaw = NAN;
     float mpu_deg_pitch = NAN;
@@ -243,18 +232,6 @@ struct Dynamics2 {
         document.transfer(odo_fr_b);
         document.transfer(odo_fr_b_us);
         document.transfer(odo_fr_ab_us);
-
-        document.transfer(odo_bl_a);
-        document.transfer(odo_bl_a_us);
-        document.transfer(odo_bl_b);
-        document.transfer(odo_bl_b_us);
-        document.transfer(odo_bl_ab_us);
-
-        document.transfer(odo_br_a);
-        document.transfer(odo_br_a_us);
-        document.transfer(odo_br_b);
-        document.transfer(odo_br_b_us);
-        document.transfer(odo_br_ab_us);
 
         document.transfer(mpu_deg_yaw);
         document.transfer(mpu_deg_pitch);

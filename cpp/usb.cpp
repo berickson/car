@@ -105,17 +105,21 @@ void make_raw(int fd) {
 
 
 void Usb::monitor_incoming_data_thread() {
-  log_info("begining usb monitor thread");
+  log_info("begining usb monitor thread for " + _device_path);
   try {
     monitor_incoming_data();
     log_info("exiting usb monitor thread normally");
   }
+  catch(string s) {
+    log_error("usb monitoring thread exiting because of exception "  + _device_path);
+    log_error(s);
+  }
   catch(std::exception & e) {
-    log_error("usb monitoring thread exiting because of standard exception");
+    log_error("usb monitoring thread exiting because of standard exception"  + _device_path);
     log_error(e.what());
   }
   catch(...) {
-    log_error("usb monitoring thread exiting because of unknown exception");
+    log_error("usb monitoring thread exiting because of unknown exception " + _device_path);
   }
 
 }
@@ -167,7 +171,7 @@ void Usb::monitor_incoming_data() {
       if(fd != fd_error) {
         int wait_result = wait_for_data(fd);
         if(wait_result < 0) {
-            log_warning("couldn't read from " + usb_path + ". Closing.");
+            log_warning("error waiting for " + usb_path + ". Closing.");
             close(fd);
             fd = fd_error;
         }
@@ -175,7 +179,7 @@ void Usb::monitor_incoming_data() {
           count = read(fd, buf, buf_size-1); // read(2)
           if(count<=0) {
             count = 0;
-            log_warning("couldn't read from " + usb_path + ". Closing.");
+            log_warning("couldn't read from " + usb_path + "count returned "+ to_string(count) +". Closing");
             close(fd);
             fd = fd_error;
           } else {

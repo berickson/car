@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.8.2)
 set(CMAKE_CXX_STANDARD 14)
 #add_subdirectory(unit-tests)
+add_definitions(-D$ENV{ROBOT}_car)
+
+message("robot set to")
+message("$ENV{ROBOT}")
 
 include_directories(/usr/local/include/opencv4)
 link_directories(/usr/local/lib)

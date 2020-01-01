@@ -91,9 +91,10 @@ ddd |ddd
     sudo apt install ffmpeg vlc streamer git libncurses5-dev screen nginx fdfind
 
     ```
-1. Set which robot you are working on, add this to .bashrc
+1. Set which robot you are working, default Python environment.  Add this to .bashrc
     ```
     export ROBOT=orange # current valid values are orange or blue
+    source activate car
     ```
 
 1. Clone this repo
@@ -132,8 +133,42 @@ ddd |ddd
     # added by brian, adds symlink /dev/teensy4317960 to read coms
     ATTRS{idVendor}=="16c0", , ATTRS{idProduct}=="04[789B]?", MODE:="0777",SYMLINK+="teensy$attr{serial}",GROUP="users"
     ```
+1.  Configure baud rate for lidar (if applicable)
+    ```
+    stty -F /dev/teensy12345 115200
+    ```
+
 1. Download and compile OpenCV (this will take a while)
     ```bash
     cd car
     bash ./cv3_install.sh
     ```
+## Hacking
+
+### car-web
+install and update with 
+```
+cd car/web
+sh ./install
+```
+
+
+
+### car-service
+
+download uploads and build with 
+```
+cd car/cpp
+upgrade
+```
+
+Install service with
+```
+cd car/web
+sh ./install
+```
+
+
+
+
+### teensy

@@ -210,9 +210,15 @@ void Car::usb_thread_start() {
     // ATTRS{idVendor}=="16c0", , ATTRS{idProduct}=="04[789B]?",
     // SYMLINK+="teensy$attr{serial}"
 
-    // usb.run("/dev/teensy4317960");
-    //usb.run("/dev/teensy1301550");
-    usb.run("/dev/ttyACM0");
+    string device_path;
+#if defined(blue_car)
+    device_path = "/dev/teensy4317960"; // for blue-crash
+#elif defined(orange_car)
+    device_path = "/dev/teensy1301550"; // orange-crash
+#else
+#error "Unknown robot"
+#endif
+    usb.run(device_path);
     
     while (!quit) {
       try {
@@ -423,6 +429,8 @@ void Car::read_configuration(string path) {
   Config config;
   config.load_from_file(path);
 
+  log_info("reading odometery");
+
   // odometery
   meters_per_odometer_tick = config.get_double("meters_per_odometer_tick");
   rear_meters_per_odometer_tick =
@@ -441,6 +449,8 @@ void Car::read_configuration(string path) {
   front_wheelbase_width = config.get_double("front_wheelbase_width_in_meters");
   rear_wheelbase_width = config.get_double("rear_wheelbase_width_in_meters");
   wheelbase_length = config.get_double("wheelbase_length_in_meters");
+
+  log_info("configuration set");
 }
 
 void Car::reset_odometry(double start_offset) {

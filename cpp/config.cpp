@@ -17,8 +17,11 @@ void Config::load_from_file(string path) {
   fstream fs;
   fs.open(path,fstream::in);
   if(fs.fail()) {
+    log_error((string) "could not open config file " + path );
     throw (string) "could not open config file " + path;
   }
+
+  log_info("parsing configuration");
 
   for (string line; getline(fs, line); ) {
     auto kv = split(line,'=');
@@ -35,10 +38,21 @@ void Config::load_from_file(string path) {
 }
 
 int Config::get_int(string s) {
+  log_trace((string) "loading " + s);
+
+  if(_data.find(s) == _data.end()) {
+    log_error((string)"config has no entry for" + s);
+  }
   return std::stoi(_data[s]);
 }
 
 double Config::get_double(string s) {
+  log_trace((string) "loading ");
+  log_trace(s);
+
+  if(_data.find(s) == _data.end()) {
+    log_error((string)"config has no entry for" + s);
+  }
   return std::stod(_data[s]);
 }
 

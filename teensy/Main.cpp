@@ -67,12 +67,6 @@ const int pin_motor_c = 32;
 const int pin_motor_temp = A13;
 
 
-#define pin_odo_bl_a 10
-#define pin_odo_bl_b 10
-#define pin_odo_br_a 10
-#define pin_odo_br_b 10
-
-
 #define pin_odo_fl_a 8
 #define pin_odo_fl_b 25
 #define pin_odo_fr_a 26
@@ -120,15 +114,6 @@ Mpu9150 mpu9150;
 
 QuadratureEncoder odo_fl(pin_odo_fl_a, pin_odo_fl_b);
 QuadratureEncoder odo_fr(pin_odo_fr_a, pin_odo_fr_b);
-
-#if defined(pin_odo_bl_a)
-QuadratureEncoder odo_bl(pin_odo_bl_a, pin_odo_bl_b);
-#endif
-
-#if defined(pin_odo_br_a)
-QuadratureEncoder odo_br(pin_odo_br_a, pin_odo_br_b);
-#endif
-
 
 PwmInput rx_str;
 PwmInput rx_esc;
@@ -315,23 +300,6 @@ void rx_esc_handler() {
   rx_esc.handle_change();
 }
 
-
-void odo_bl_a_changed() {
-  odo_bl.sensor_a_changed();
-}
-
-void odo_bl_b_changed() {
-  odo_bl.sensor_b_changed();
-}
-
-void odo_br_a_changed() {
-  odo_br.sensor_a_changed();
-}
-
-void odo_br_b_changed() {
-  odo_br.sensor_b_changed();
-}
-
 void odo_fl_a_changed() {
   odo_fl.sensor_a_changed();
 }
@@ -408,19 +376,6 @@ void setup() {
   attachInterrupt(pin_odo_fr_a, odo_fr_a_changed, CHANGE);
   attachInterrupt(pin_odo_fr_b, odo_fr_b_changed, CHANGE);
 
-  #if defined(pin_odo_bl_a)
-  pinMode(pin_odo_bl_a, INPUT);
-  pinMode(pin_odo_bl_b, INPUT);
-  attachInterrupt(pin_odo_bl_a, odo_bl_a_changed, CHANGE);
-  attachInterrupt(pin_odo_bl_b, odo_bl_b_changed, CHANGE);
-  #endif
-
-  #if defined(pin_odo_br_a)
-  pinMode(pin_odo_br_a, INPUT);
-  pinMode(pin_odo_br_b, INPUT);
-  attachInterrupt(pin_odo_br_a, odo_br_a_changed, CHANGE);
-  attachInterrupt(pin_odo_br_b, odo_br_b_changed, CHANGE);
-  #endif
 
 
   // pinMode(pin_motor_temp, INPUT_PULLUP);
@@ -549,22 +504,6 @@ void loop() {
     td2.odo_fr_b = odo_fr.odometer_b;
     td2.odo_fr_b_us = odo_fr.last_odometer_b_us;
     td2.odo_fr_ab_us = odo_fr.odometer_ab_us;
-    interrupts();
-
-    noInterrupts();
-    td2.odo_bl_a = odo_fl.odometer_a;
-    td2.odo_bl_a_us = odo_fl.last_odometer_a_us;
-    td2.odo_bl_b = odo_fl.odometer_b;
-    td2.odo_bl_b_us = odo_fl.last_odometer_b_us;
-    td2.odo_bl_ab_us = odo_fl.odometer_ab_us;
-    interrupts();
-
-    noInterrupts();
-    td2.odo_br_a = odo_fr.odometer_a;
-    td2.odo_br_a_us = odo_fr.last_odometer_a_us;
-    td2.odo_br_b = odo_fr.odometer_b;
-    td2.odo_br_b_us = odo_fr.last_odometer_b_us;
-    td2.odo_br_ab_us = odo_fr.odometer_ab_us;
     interrupts();
 
     td2.v_bat = battery_voltage;
