@@ -60,6 +60,11 @@ public:
 
     return true;
   }
+
+  size_t size() {
+    std::unique_lock<std::mutex> lock(q_mutex);
+    return q.size();
+  }
 };
 
 

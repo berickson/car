@@ -1,0 +1,2 @@
+tail -f /home/pi/car/bin/car-log.txt
+

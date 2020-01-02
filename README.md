@@ -121,7 +121,7 @@ The Teensy microcontroller communicates with the ESC, servo, IMU and quadrature 
     ```
     ensure following added to end of your .bashrc
     ```
-    export PATH="/home/pi/miniconda3/bin:$PATH"
+    export PATH="/home/pi/miniconda3/bin:/home/pi/car/bin:$PATH"
     export ROBOT=orange
     ```
 

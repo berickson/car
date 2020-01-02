@@ -15,7 +15,11 @@ using namespace std;
 using namespace std::chrono;
 using namespace std::chrono_literals;
 
-Car::Car(bool online) {
+#include "diagnostics.h"
+
+Car::Car(bool online) : 
+  usb_queue(1) // set to 1 to get the latest only
+{
   log_entry_exit("Car::Car");
   log_info("reading configuration");
   read_configuration(config_path);
@@ -82,7 +86,7 @@ void Car::socket_get_scan(vector<string>& params) {
         lock_guard<mutex> lock(recent_scans_mutex);
         scan_number = recent_scans.front().scan_number;
       }
-      if (scan_number != scan_to_skip) {
+      if (true || scan_number != scan_to_skip) {
         found = true;
         string result;
         try {
@@ -99,7 +103,7 @@ void Car::socket_get_scan(vector<string>& params) {
         socket_server.send_response(result);
         break;
       }
-      this_thread::sleep_for(chrono::milliseconds(1));
+      // this_thread::sleep_for(chrono::milliseconds(1));
     }
   }
   if (!found) {
@@ -109,8 +113,12 @@ void Car::socket_get_scan(vector<string>& params) {
 }
 
 void Car::process_socket() {
+  //static PerformanceData data("Car::process_socket");
+  //MethodTracker tracker(data);
+
   while (true) {
-    log_warning_if_duration_exceeded _("Car::process_socket", 1s);
+    // TODO: crank this way down
+    log_warning_if_duration_exceeded _("Car::process_socket", 30ms);
     string full_request = socket_server.get_request();
     if (full_request.length() == 0) return;
     // log_info("socket full request: \"" + full_request + "\"");
@@ -225,10 +233,25 @@ void Car::usb_thread_start() {
     
     while (!quit) {
       try {
+        static uint32_t processed_count = 0;
         StampedString line;
         if (usb_queue.try_pop(line, 1)) {
           log_warning_if_duration_exceeded w("processing usb line", 10ms);
+          size_t remaining = usb_queue.size();
+          if(remaining > 0) {
+            static uint32_t count = 0;
+            count++;
+            if(count%100 == 1) {
+              log_warning("car usb queue not empty after pop, remaining:  "+to_string(remaining) + " count: " + to_string(count));
+            }
+            //while(usb_queue.size() > 0) {
+            //  // take off excess lines
+            //  StampedLine l2;
+            //  usb_queue.try_pop(l2, 0);
+            //}
+          }
           process_line_from_log(line);
+          ++processed_count;
         }
         process_socket();
         if (online && lidar.is_running &&

@@ -393,10 +393,12 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
     system_clock::time_point wait_end_time = system_clock::now();
     mode = "follow_route";
     while (!route_complete) {
+      {
       Dynamics2 d;
-      if (!queue.try_pop(d, 1000)) {
+      if (!queue.try_pop(d, 100)) {
         log_error("timed out reading dynamics in drive_route");
         throw(string) "timed out waiting to read dynamics";
+      }
       }
 
       double stop_margin = 1;
