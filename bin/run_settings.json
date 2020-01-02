@@ -6,7 +6,7 @@
   "max_accel": 1.5,
   "max_accel_lat": 1.0,
   "max_decel": 0.3,
-  "max_v": 2.0,
+  "max_v": 1.0,
   "optimize_velocity": true,
   "prune_max": 0.2,
   "prune_tolerance": 0.02,

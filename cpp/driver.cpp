@@ -277,8 +277,8 @@ void Driver::set_evasive_actions_for_crash(Route & route) {
 //
 // returns NAN if no obstacle or car going in reverse
 double nearest_obstacle_distance_on_route(const Car & car, const Route & route,
-  log_warning_if_duration_exceeded _("Driver::nearest_obstacle_distance_on_route", 10ms);
     const RunSettings & settings, double stop_margin) {
+  log_warning_if_duration_exceeded checker("Driver::nearest_obstacle_distance_on_route", 10ms);
   // meters between car positions to check
   double check_increment = 0.1;
 
@@ -400,8 +400,8 @@ void Driver::drive_route(Route & route, StereoCamera & camera) {
       }
 
       double stop_margin = 1;
-      double obstacle_distance =
-          nearest_obstacle_distance_on_route(car, route, settings, stop_margin);
+      double obstacle_distance = NAN;
+      // = nearest_obstacle_distance_on_route(car, route, settings, stop_margin);
       if (isnan(obstacle_distance)) {
         ;  // log_info((string)"No obstacle detected");
       } else {

@@ -32,12 +32,20 @@ void Usb::remove_line_listener(WorkQueue<StampedString>*listener){
   line_listeners.remove(listener);
 }
 
-void Usb::send_to_listeners(string s) {
+void Usb::send_to_listeners(const string & s) {
+  // 1/2/20 line_callback ms average_duration: 0.009609 ms% wall: 1.808009
+  // 1/1/20 (coonst string &) average_duration: 0.018191 ms% wall: 3.248648
+  // 1/1/20 (by value) average_duration: 0.019101 ms% wall: 3.366067
   // 9/30 - about 8.0%  clock wall time
   //      - time_string to int - about 2.6 % wall time
   //      - time StampedString 1.373905 % wall time
-  //static PerformanceData perf_data("Usb::send_to_listeners");
-  //MethodTracker t(perf_data);
+  // static PerformanceData perf_data("Usb::send_to_listeners");
+  // MethodTracker t(perf_data);
+  if(line_callback != nullptr) {
+    line_callback(s.c_str());
+    return;
+  }
+    
 
   StampedString payload(s, system_clock::now());
 
@@ -226,6 +234,11 @@ void Usb::stop(){
     run_thread.join();
 }
 
+void Usb::set_line_callback(std::function <void(const char *)> line_callback) {
+  this->line_callback = line_callback;
+}
+
+
 
 void write_to_usb(Usb* usb, float seconds_between) {
   int i = 0;
@@ -269,3 +282,5 @@ void test_usb() {
   usb.stop();
   cout << "timed out waiting for data" << endl;
 }
+
+

@@ -11,7 +11,7 @@ using namespace std;
 using namespace std::chrono;
 
 struct StampedString {
-  StampedString(string s, system_clock::time_point timestamp) : message(s), timestamp(timestamp) {
+  StampedString(const string & s, system_clock::time_point timestamp) : message(s), timestamp(timestamp) {
   }
   StampedString(){}
   

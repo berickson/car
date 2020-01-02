@@ -187,6 +187,9 @@ void Car::lidar_thread_start() {
         // this_thread::sleep_for(chrono::milliseconds(1));
         // log_info("got scan " + to_string(scan_number));
       }
+      else {
+        this_thread::sleep_for(chrono::milliseconds(1));
+      }
     } catch (string error_string) {
       log_error("error caught in lidar_thread_start" + error_string);
     } catch (...) {

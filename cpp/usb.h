@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <sstream>
+#include <functional>
 #include "work_queue.h"
 
 using namespace std;
@@ -16,6 +17,7 @@ public:
   void run(string device_path);
   void stop();
   void write_line(string text);
+  void set_line_callback(std::function <void(const char *)> line_callback);
   void add_line_listener(WorkQueue<StampedString>*);
   void remove_line_listener(WorkQueue<StampedString>*);
   void write_on_connect(string s);
@@ -23,6 +25,7 @@ public:
   //std::string path ;
   
 private:
+  std::function <void(const char*)> line_callback;
   vector<char> read_buffer;
   string _device_path;
   string _write_on_connect = "\ntd+\n";
@@ -32,7 +35,7 @@ private:
   bool quit = false;
   void monitor_incoming_data();
   void monitor_incoming_data_thread();
-  void send_to_listeners(string s);
+  void send_to_listeners(const string & s);
   void process_data(const char * data);
   string leftover_data;
   list<WorkQueue<StampedString>*> line_listeners;

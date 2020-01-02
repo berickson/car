@@ -8,6 +8,7 @@
 #include "json.hpp"
 #include "logger.h"
 #include "string_utils.h"
+#include "diagnostics.h"
 
 using namespace Eigen;
 Eigen::IOFormat HeavyFormat(FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");
@@ -141,7 +142,7 @@ vector<LidarScan::ScanSegment> LidarScan::find_lines(double tolerance, int min_p
   vector<ScanSegment> found_lines;
   Matrix<float,360,3> points;
 
-  // get all measurment locations as homogeneous 2d points
+  // get all measurement locations as homogeneous 2d points
   for(int i=0; i < 360; ++i) {
     LidarMeasurement & m = measurements[i];
     // null yields null
@@ -247,34 +248,36 @@ vector<Corner>  find_corners(const vector<LidarScan::ScanSegment> & walls) {
   return corners;
 }
 
-bool LidarUnit::try_get_scan(int ms_to_wait = 1)
-{
-  StampedString stamped_l;
-  try {
-  while(true) {
-    if(! usb_queue.try_pop(stamped_l, ms_to_wait)) {
-      return false;
-    }
+
+
+
+// fills m with scan from stamped_l, 
+// returns false if stamped_l doesn't contain a scan line
+bool parse_scan_line(LidarMeasurement & m, StampedString & stamped_l, int & degrees) {
+
+    // call_count: 142000 total_duration: 2690.451988 ms average_duratioN: 0.018947 ms% wall: 3.340381
+    static PerformanceData data("lidar::parse_scan_line");
+    MethodTracker tracker(data);
+
     stringstream ss(trimmed(stamped_l.message));
     string token;
 
     // first must be "A"
-    if(!std::getline(ss,token,',')) break;
-    if(token != "A") break;
+    if(!std::getline(ss,token,',')) return false;
+    if(token != "A") return false;
 
     // angle
-    LidarMeasurement m;
     if(!std::getline(ss,token,',')) throw string("error reading angle"); // todo: throw
-    int degrees = atoi(token.c_str());
+    degrees = atoi(token.c_str());
     m.angle.set_degrees(degrees);
 
     // status
     if(!std::getline(ss,token,',')) throw string("error reading status");
-    if(token=="S") {
+    if(token[0]=='S'){
       m.status = LidarMeasurement::measure_status::low_signal;
-    } else if (token=="I") {
+    } else if (token[0]=='I') {
       m.status = LidarMeasurement::measure_status::invalid_data;
-    } else if (token=="CRC") {
+    } else if (token[0]== 'C' /*=="CRC"*/) {
       m.status = LidarMeasurement::measure_status::crc_error;
     } else {
       m.distance_meters = atoi(token.c_str())/1000.;
@@ -283,6 +286,88 @@ bool LidarUnit::try_get_scan(int ms_to_wait = 1)
       if(!std::getline(ss,token,',')) throw string("error reading signal strength");
       m.signal_strength = atoi(token.c_str());
     }
+    return true;
+}
+
+// callback to process line of text from usb
+void LidarUnit::process_scan_line(const char * line) {
+    // 1/2/20 ms average_duration: 0.009609 ms% wall: 1.808009
+    //static PerformanceData data("lidar::process_scan_line");
+    //MethodTracker tracker(data);
+
+    LidarMeasurement m;
+    stringstream ss(line);
+    string token;
+
+    // first must be "A"
+    if(!std::getline(ss,token,',')) return;
+    if(token != "A") return;
+
+    // angle
+    if(!std::getline(ss,token,',')) {
+      log_warning("LidarUnit::process_scan_line error reading angle");
+      return;
+    }
+    int degrees = atoi(token.c_str());
+    m.angle.set_degrees(degrees);
+
+    // status
+    if(!std::getline(ss,token,',')) {
+      log_warning("LidarUnit::process_scan_line error reading status");
+      return;
+    }
+    if(token[0]=='S') {
+      m.status = LidarMeasurement::measure_status::low_signal;
+    } else if (token[0]=='I') {
+      m.status = LidarMeasurement::measure_status::invalid_data;
+    } else if (token[0]=='C' /*"CRC"*/) {
+      m.status = LidarMeasurement::measure_status::crc_error;
+    } else {
+      m.distance_meters = atoi(token.c_str())/1000.;
+      m.status = LidarMeasurement::measure_status::ok;
+      
+      if(!std::getline(ss,token,',')) {
+        static uint32_t error_count = 0;
+        ++error_count;
+        if((error_count%1000)==1) {
+          log_warning((string)"LidarUnit::process_scan_line error reading signal strength, count: " + to_string(error_count) );
+          log_warning((string)"the line was: "+line);
+          log_warning((string)"token was: " + token);
+        }
+        return;
+      }
+      m.signal_strength = atoi(token.c_str());
+    }
+    next_scan.measurements[degrees] = m;
+    next_scan.poses[degrees] = pose;
+    if(degrees == 359) {
+      swap(current_scan, next_scan);
+      current_scan.scan_number = completed_scan_count;
+      completed_scan_count++;
+      has_unseen_scan = true; // todo: maybe just use scan count
+      return;
+    }
+}
+
+bool LidarUnit::try_get_scan(int ms_to_wait = 1)
+{
+  bool rv = has_unseen_scan;
+  has_unseen_scan = false;
+  return rv;
+
+
+  return true;
+
+  StampedString stamped_l;
+  try {
+  while(true) {
+    // todo: only wait 1ms total, not 1 per line!!!!
+    if(! usb_queue.try_pop(stamped_l, ms_to_wait)) {
+      return false;
+    }
+    LidarMeasurement m;
+    int degrees;
+    if(!parse_scan_line(m, stamped_l, degrees) ) break;
     next_scan.measurements[degrees] = m;
     next_scan.poses[degrees] = pose;
 
@@ -397,6 +482,7 @@ void LidarUnit::run() {
     "MotorOn\n"
     "SetRPM 349"); // last \n added by usb2
 
+  usb2.set_line_callback(std::bind(&LidarUnit::process_scan_line, this, std::placeholders::_1));
   usb2.run("/dev/teensy12345");
   //usb2.write_line("ResetConfig");
   //usb2.write_line("HideRaw");
@@ -409,7 +495,7 @@ void LidarUnit::run() {
   //set_rpm(349);
   is_running = true;
 
-  usb2.add_line_listener(&usb_queue);
+  //usb2.add_line_listener(&usb_queue);
 }
 
 void LidarUnit::stop() {

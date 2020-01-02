@@ -83,6 +83,9 @@ public:
 
     void stop();
     bool try_get_scan(int ms_to_wait);
+private:
+    void process_scan_line(const char * line);
+    bool has_unseen_scan = false;
 };
 
 struct Corner {

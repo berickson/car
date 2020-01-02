@@ -26,7 +26,7 @@ MethodTracker::~MethodTracker() {
         + to_string(_data.call_count) 
         + " total_duration: " 
         + to_string(_data.total_duration.count() / 1E6) + " ms"
-        + " average_duratioN: " 
+        + " average_duration: " 
         + to_string((_data.total_duration.count() / 1E6) / _data.call_count)+ " ms"
         + "% wall: " + to_string(percent_wall)
         );
