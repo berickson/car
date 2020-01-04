@@ -127,9 +127,13 @@ The Teensy microcontroller communicates with the ESC, servo, IMU and quadrature 
     ```
 1. Set which robot you are working, default Python environment.  Add this to .bashrc
     ```
-    export ROBOT=orange # current valid values are orange or blue
     source activate car
     ```
+    add the following to (new file) /etc/environment
+    ```
+    ROBOT=orange # current valid values are orange or blue
+    ```
+
 
 1. Clone this repo
     ```bash
@@ -202,6 +206,11 @@ install and update with
 ```
 cd car/web
 sh ./install
+```
+
+view log
+```
+sudo journalctl -u car-web -f
 ```
 
 run from console to debug

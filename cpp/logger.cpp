@@ -4,6 +4,8 @@
 #include <sstream>
 #include <execinfo.h> // backtrace
 
+#include <iostream>
+
 using namespace std;
 
 void log(string severity, string message)
@@ -11,6 +13,7 @@ void log(string severity, string message)
   ofstream f;
   f.open("car-log.txt", ofstream::out | ofstream::app );
   f << time_string() << "," << severity << "," << message << endl;
+  cout << time_string() << "," << severity << "," << message << endl;
 }
 
 void log_error(string message)
