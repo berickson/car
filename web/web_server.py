@@ -4,7 +4,7 @@
 started from tutorial at https://www.tutorialspoint.com/flask/flask_application.htm
 '''
 import pandas as pd # must import BEFORE flask or high CPU on PI
-from flask import Flask, request, send_from_directory, jsonify, json, Response, abort
+from flask import Flask, request, send_from_directory, jsonify, json, Response, abort, render_template
 import socket
 import tracks
 import psutil
@@ -20,9 +20,27 @@ app = Flask(__name__, static_folder='static', static_url_path='')
 #def static_from_root():
 #    return send_from_directory(app.static_folder, request.path[1:])
 
+
+def robot_vars():
+    robot = os.environ["ROBOT"]
+    if robot=="blue":
+        return {
+            "name" : "Blue Crash",
+            "color" : "blue"
+        }
+    if robot=="orange":
+        return {
+            "name" : "Orange Crash",
+            "color" : "#FFB97D"
+        }
+    return {
+        "name" : "Orange Crash",
+        "color" : "#555555"
+    }
+
 @app.route('/')
 def index():
-    return send_from_directory('static', 'index.html')
+    return render_template('index.html', robot=robot_vars())
 
 
 
