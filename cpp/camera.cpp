@@ -122,8 +122,8 @@ void Camera::prepare_video_writer(string path)
   //int fourcc = CV_FOURCC('M','J','P','G'); // files too big
   //int fourcc = CV_FOURCC('H','2','6','4'); // too slow
   int fourcc = cv::VideoWriter::fourcc('F','M','P','4'); // not bad
-  //fps = (int) cap.get(CV_CAP_PROP_FPS);
-  fps = 5; // if this is different from camera, we will down sample
+  fps = (int) cap.get(CV_CAP_PROP_FPS);
+  //fps = 15; // if this is different from camera, we will down sample
   bool is_color = true;
   recording_path = path;
 

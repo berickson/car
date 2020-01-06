@@ -174,7 +174,7 @@ void StereoCamera::record_thread_proc()
     left_camera.prepare_video_writer(left_recording_path);
     right_camera.prepare_video_writer(right_recording_path);
 
-    double fps = 5;//left_camera.get_fps();
+    double fps = left_camera.get_fps();
     auto t_start = std::chrono::high_resolution_clock::now();
     auto t_next_frame = t_start;
     std::chrono::microseconds us_per_frame((int) (1E6/fps) );
