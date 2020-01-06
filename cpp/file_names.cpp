@@ -95,7 +95,10 @@ string FileNames::path_file_path(string track_name, string route_name, string ru
 
 string FileNames::next_run_name(string track_name, string route_name) {
   for( int i=0; i<999; ++i) {
-    string run_name = to_string(i);
+    std::ostringstream ss;
+    ss << std::setw( 3 ) << std::setfill( '0' ) << i;
+
+    string run_name = ss.str();
     if (file_exists(get_run_folder(track_name, route_name, run_name)))
       continue;
     return run_name;
