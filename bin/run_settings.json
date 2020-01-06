@@ -17,7 +17,7 @@
   "steering_k_d": 20.0,
   "steering_k_i": 0.0,
   "steering_k_p": 40.0,
-  "t_ahead": 0.05,
+  "t_ahead": 0.1,
   "track_name": "HOME",
   "v_k_d": 5.0,
   "v_k_i": 0.0,

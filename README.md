@@ -92,6 +92,31 @@ The Teensy microcontroller communicates with the ESC, servo, IMU and quadrature 
     ```bash
     sudo systemctl disable dphys-swapfile.service
     ```
+1. Setup Wifi to use alternate hotspots
+
+    ```
+    sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+    ```
+    Replace wpa_supplicant contents with the following (or add whatever networks you need), don't forget to set the passwords
+
+    ```
+    ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+    update_config=1
+    country=US
+
+    network={
+        ssid="EH656"
+        psk="**********" # put password here
+        id_str="home"
+    }
+
+    network={
+        ssid="BkePixel3"
+        psk="***********" # put password here
+        id_str="hotspot"
+    }
+    ```
+
 1. Install a few things on the Pi
     ```
     sudo apt update
@@ -102,9 +127,13 @@ The Teensy microcontroller communicates with the ESC, servo, IMU and quadrature 
     ```
 1. Set which robot you are working, default Python environment.  Add this to .bashrc
     ```
-    export ROBOT=orange # current valid values are orange or blue
     source activate car
     ```
+    add the following to (new file) /etc/environment
+    ```
+    ROBOT=orange # current valid values are orange or blue
+    ```
+
 
 1. Clone this repo
     ```bash
@@ -178,6 +207,19 @@ install and update with
 cd car/web
 sh ./install
 ```
+
+view log
+```
+sudo journalctl -u car-web -f
+```
+
+run from console to debug
+```
+cd car/web
+sudo service car-web stop
+./run
+```
+
 
 
 
