@@ -98,7 +98,7 @@ void Usb::write_line(string text) {
 
 
 void echo_off(string tty) {
-  string command = (string) "stty -F " + tty + " -echo";
+  string command = (string) "stty -F " + tty + " 115200 -echo";
   if(system(command.c_str())!=0) throw "echo off failed";
 }
 
