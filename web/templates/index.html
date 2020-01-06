@@ -1,0 +1,296 @@
+<!doctype html>
+<html ng-app="car" ng-controller="CarController as car" id='html'>
+
+<head>
+  <title>{{robot.name}}</title>
+  <style>
+    /* colors from https://coolors.co/738873-9b9992-dbd7cd-ffb97d-c3c7ba */
+
+    .changed {
+      background-color: yellow;
+    }
+
+    input {
+      pointer-events: all;
+    }
+    button {
+      pointer-events:all;
+    }
+
+    .button {
+      background-color: #738873;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      padding: 12px 12px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      font-weight: bold;
+      pointer-events:all;
+
+      /*https://www.cssmatic.com/box-shadow*/
+      -webkit-box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
+      -moz-box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
+      box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
+    }
+
+    .error-background {
+      background-color: rgb(255,30,30);
+    }
+
+    .noclick {
+      pointer-events:none;
+    }
+
+    .label2d {
+      font-family: Consolas, monaco, monospace;
+      border-radius: 5px;
+      border-color: black;
+      background-color: #C3C7BACC;
+      
+      /* background-color: rgba(210, 210, 210, 0.8);*/
+      padding-left: 3px;
+      padding-right: 3px;
+      padding-bottom: 2px;
+
+    }
+
+    .select {
+      background-color: rgb(220, 220, 220);
+      /*height: 34px;*/
+      font-size: 24px;
+      /* width: 240px; */
+      pointer-events:all;
+    }
+
+
+    .small_text {
+      font-size: 10px;
+      pointer-events:none;
+    }
+
+    .bigtext {
+      font-size: 28px;
+      pointer-events:none;
+    }
+
+
+    .row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .itembox {
+      background-color: #C3C7BA88;
+      margin: 5px;
+      padding: 5px;
+
+      font-family: Consolas, monaco, monospace;
+      display: inline-block;
+      pointer-events: none;
+
+      /*https://www.cssmatic.com/box-shadow*/
+      -webkit-box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
+      -moz-box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
+      box-shadow: 5px 5px 11px -2px rgba(0, 0, 0, 0.5);
+    }
+
+    .data {
+      white-space: pre;
+    }
+
+    .orange {
+      color: {{robot.color}};
+      display: inline;
+      margin: 10px;
+      padding: 0px;
+    }
+
+    .atop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+    html, body {
+      margin:0;
+      padding:0;
+      border:0;
+      
+    }
+
+    .main {
+      background-color: #9B9992;
+      font-family: Consolas, monaco, monospace;
+    }
+  </style>
+  <script src="angular.min.js"></script>
+  <script src="panzoom.min.js"></script>
+  <script src="index.js"></script>
+
+  <script src="play_path.js"></script>
+  <script src="three.min.js"></script>
+  <script src="three.interaction.js"></script>
+  <script src="OrbitControls.js"></script>
+  <script src="CSS2DRenderer.js"></script>
+  <script src="stats.js"></script>
+  <script src="viewer.js"></script>
+  <link rel="favicon" href="favicon.png" />
+</head>
+
+<body class='main' style='border:none'>
+  <div id="webgl-container" style='width:99.99%;height:99.99%;position:absolute;z-index: -1;overflow:hidden;'></div>
+  <div  style='position:absolute;pointer-events:none'>
+
+
+    <h1 class='orange'>{{robot.name}}</h1>
+    {% raw %} <!--from here down, Flask / Jinja2 will ignore conflicting angular directives -->    
+    <div class='itembox'>
+      <div ng-class='car.poll_ok?"":"error-background"'>{{car.poll_ok ? "online - " + car.car_state.mode : "offline"}}</div>
+    </div>
+    <div class='itembox'>
+      <div ng-class='car.car_state.go_enabled?"":"error-background"'>{{car.car_state.go_enabled ? "go enabled" : "go
+        disabled"}}</div>
+    </div>
+
+
+    <!-- final div eats up space on right-->
+
+
+  <div class='groupbox row'>
+    <div class='' style='overflow:hidden'>
+      <div style='pointer-events: none'>
+        <div class="groupbox row">
+          <div class='itembox'>
+            <div class='bigtext data'>{{ car.rjust((car.car_state.velocity * 2.23694).toFixed(1),5) }}</div>
+            <div style='text-align:right'>mph</div>
+            <div style='text-align:right' class='data'>{{ car.rjust(car.car_state.velocity.toFixed(1),5) }} m/s</div>
+          </div>
+          <div class="itembox">
+            <div>{{car.car_state.v_bat | number:1}}V</div>
+            <svg width="64" height="32">
+              <rect x="2" y="2" width="60" height="28" style="fill:lightgray;stroke:gray;stroke-width:2" />
+              <rect ng-if="car.battery_percent" x="4" y="4" ng-attr-width="{{car.Math.max(56*car.battery_percent/100,0)}}"
+                height="24" style="fill:black;stroke:black" />
+
+            </svg>
+          </div>
+          <div class='itembox'>
+            <div>Heading</div>
+            <div>
+              <svg width="32" height="32">
+                <circle cx="16" cy="16" r="14" stroke="gray" stroke-width="2" fill="LightGray" />
+                <line ng-if="car.car_state" x1="16" y1="16" ng-attr-x2={{16-14*car.Math.sin(car.car_state.heading)}}
+                  ng-attr-y2={{16-14*car.Math.cos(car.car_state.heading)}} style="stroke:gray;stroke-width:2" />
+              </svg>
+            </div>
+            <div>
+              {{car.car_state.heading * 180 / car.Math.PI | number:1}}°
+            </div>
+          </div>
+          <div class='itembox'>
+            <div>Position</div>
+            <div>x: {{car.car_state.front_x.toFixed(2)}}</div>
+            <div>y: {{car.car_state.front_y.toFixed(2)}}</div>
+          </div>
+          <div class='itembox'>
+            <table class='small_text'>
+              <thead style='text-align:right'>
+                <td></td>
+                <td>v</td>
+                <td>v<sub>smooth</sub></td>
+                <td>a<sub>smooth</sub></td>
+                <td>meters</td>
+                <td>ticks</td>
+              </thead>
+              <tbody class='data small_text'>
+                <tr ng-repeat='wheel in ["fl","fr","motor"]'>
+                  <td>{{wheel}}</td>
+                  <td>{{car.rjust(car.car_state[wheel].v.toFixed(2),7)}}</td>
+                  <td>{{car.rjust(car.car_state[wheel].v_smooth.toFixed(1),6)}}</td>
+                  <td>{{car.rjust(car.car_state[wheel].a_smooth.toFixed(1),6)}}</td>
+                  <td>{{car.rjust(car.car_state[wheel].meters.toFixed(2),8)}}</td>
+                  <td>{{car.rjust(car.car_state[wheel].ticks,8)}}</td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+          <div class='itembox'>
+            <div ng-if="car.pi_state" ng-repeat="cpu in car.pi_state.cpu track by $index">cpu{{$index}}<span class='data'>{{car.rjust(cpu.toFixed(0),4)}}</span>
+            </div>
+          </div>
+          <div class='itembox'>
+            <div>mpu temp</div>
+            <div>{{(car.car_state.temperature*1.8+32).toFixed(1)}}°</div>
+          </div>
+        </div>
+
+        <div style='position:absolute;pointer-events:none'>
+          <!-- on top of webl container-->
+          <div class='groupbox'>
+            <div class='itembox'>
+              track:
+              <select class='select' name='2' ng-model="car.run_settings.track_name" id="2" ng-options="track_name for track_name in car.track_names"></select>
+            </div>
+            <button ng-click="car.add_track()">add</button>
+
+            <div class='xitembox'>
+              route: <select class='select' name='1' ng-model="car.run_settings.route_name" id="1" ng-options="route_name for route_name in car.route_names"></select>
+            </div>
+            
+            <div class='xitembox'>
+              run: <select class='select' name='1' ng-model="car.run_settings.run_name" id="1" ng-options="run_name for run_name in car.run_names"></select>
+            </div>
+
+            <button class='button' ng-click="car.poweroff()">Power Off</button>
+            <button class='button' ng-click="car.save_run_settings()">Save</button>
+            <button class='button' ng-click="car.go()">Go</button>
+            <button class='button' ng-click="car.stop()">Stop</button>
+            <button class='button' ng-click="car.record()">Record</button>
+            <button class='button' ng-click="car.reset_odometer()">Reset</button>
+          </div>
+          <div class='itembox'>
+          <table>
+            <tbody>
+              <tr ng-repeat="item in car.run_settings_array" ng.key="item.key">
+                <td>{{item.key}}</td>
+                <td style='pointer-events: all'>
+                  <input type="checkbox" ng-if="item.data_type === 'boolean'" ng-model="item.value" />
+                  <input ng-if="item.data_type === 'number'" ng-model="item.value" style='width:4ch' ng-class="is_changed(item) ? 'changed' : ''" />
+                </td>
+              <tr>
+          </table>
+        </div>
+          <div style='display: inline; '></div>
+          <div >
+            <div ng-repeat="node in car.road_sign_nodes">
+              <input ng-model="node.road_sign_label" size="2em" />
+              <input ng-model="node.road_sign_command" size="5en" />
+              <input ng-model="node.arg1" size="2em" />
+              <button ng-click="car.delete_road_sign($index)">X</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+</body>
+
+{% endraw %}
+
+</html>
