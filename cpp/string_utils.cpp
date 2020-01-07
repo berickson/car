@@ -35,6 +35,12 @@ string format(double d, int width, int precision) {
   return ss.str();
 }
 
+string  to_fixed_width_string(int n, int width, char fill) {
+    std::ostringstream ss;
+    ss << std::setw( width ) << std::setfill( fill ) << n;
+    return ss.str();
+}
+
 // setting all to true splits all occurances
 // setting to false only splits on first occurance of delim_char - if any
 vector<string> split(const string& s, char delim_char, bool all) {

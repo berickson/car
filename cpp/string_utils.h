@@ -36,6 +36,8 @@ std::string rtrimmed(std::string s);
 // trim from both ends (copying)
 std::string trimmed(std::string s);
 
+string to_fixed_width_string(int n, int width, char fill);
+
 template <class T>
 string vector_to_string(const vector<T> &v) {
   if (v.size() == 0) {

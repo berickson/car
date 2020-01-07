@@ -19,6 +19,8 @@
 
 #include "json.hpp"
 
+#include "string_utils.h"
+
 
 using namespace std;
 
@@ -200,6 +202,19 @@ void Camera::record_thread_proc() {
 }
 
 void Camera::write_latest_frame() {
+
+  // write to a JPEG
+  std::vector<uchar> buff;//buffer for coding
+  std::vector<int> param(2);
+  param[0] = cv::IMWRITE_JPEG_QUALITY;
+  param[1] = 80;//default(95) 0-100
+  cv::imencode(".jpg", latest_frame, buff, param);
+  
+  ofstream jpeg_file;
+  jpeg_file.open (recording_path+to_fixed_width_string(frame_count_saved,5,'0')+".jpeg");
+  jpeg_file.write((char*)&buff[0], buff.size());
+  jpeg_file.close();
+  
   output_video.write(latest_frame);
   ++frame_count_saved;
 }
