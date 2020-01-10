@@ -15,6 +15,7 @@ string join(vector<string> strings, string separator = ",");
 string ftos(double d, int precision);
 string format(double d);
 string format(double d, int width, int precision);
+vector<string> split(const string& s, const string & delim_string);
 vector<string> split(const string& s, char delim_char=',', bool all = true);
 
 

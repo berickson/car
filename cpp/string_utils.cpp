@@ -43,6 +43,25 @@ string  to_fixed_width_string(int n, int width, char fill) {
 
 // setting all to true splits all occurances
 // setting to false only splits on first occurance of delim_char - if any
+vector<string> split(const string& s, const string & delim_string) {
+
+  vector<string> items;
+  size_t start = 0;
+  while(start < s.length()-1) {
+    size_t pos = s.find(delim_string, start);
+    if(pos == string::npos) {
+      break;
+    }
+    items.push_back(s.substr(start, pos-start));
+    start = pos+delim_string.length();
+  }
+  items.push_back(s.substr(start, string::npos));
+  return items;
+}
+
+
+// setting all to true splits all occurances
+// setting to false only splits on first occurance of delim_char - if any
 vector<string> split(const string& s, char delim_char, bool all) {
   string delim = string(1, delim_char);
   vector<string> items;
