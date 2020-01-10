@@ -37,6 +37,7 @@ set(CPP_FILES
     system.cpp
     tracker.cpp
     usb.cpp
+    web_server.cpp
     work_queue.cpp
 )
 
