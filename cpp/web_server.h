@@ -25,6 +25,8 @@ class Request {
   string method;
   string http_version;
 
+  map<string, string> params;
+
  private:
   Request() {}
   map<string, string> headers;

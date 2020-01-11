@@ -330,6 +330,20 @@ void Car::get_state_handler(const Request &, Response & response) {
       response.write_content("application/json", s.c_str(), s.size());
 }
 
+void Car::get_scan_handler(const Request &request, Response & response) {
+  stringstream ss;
+
+  ss << "you reached get_scan_handler" << endl;
+  auto it = request.params.find("since");
+  if(it != request.params.end()) {
+    int since = atoi(it->second.c_str());
+    ss << "you requested a scan since " << to_string(since);
+  }
+  string s = ss.str();
+  response.write_status();
+  response.write_content("text/plain", s.c_str(), s.size());
+}
+
 void index_handler(const Request &, Response & response) {
   response.write_status();
   string content = "<html><body>Hello from car.cpp</body></html>\r\n";
@@ -343,6 +357,9 @@ void Car::web_server_thread_start() {
     server.add_handler("GET", "/", index_handler);
     server.add_handler("GET", "/get_state", [this](const Request & request, Response & response) {
       this->get_state_handler(request, response);
+    });
+    server.add_handler("GET", "/get_scan", [this](const Request & request, Response & response) {
+      this->get_scan_handler(request, response);
     });
     server.run(8081);
   }

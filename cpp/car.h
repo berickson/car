@@ -202,6 +202,7 @@ private:
 
   void web_server_thread_start();
   thread web_server_thread;
+  void get_scan_handler(const Request &, Response & response);
   void get_state_handler(const Request &, Response & response);
   void start_web_server();
 

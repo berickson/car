@@ -44,6 +44,20 @@ Request Request::from_string(string s) {
     r.headers[matches[1]] = matches[2];
   }
 
+  // break apart the command line parameters, if any example /my/path?color=green&fruit=apple
+  auto uri_and_params = split(r.uri,'?');
+  if(uri_and_params.size()==2) {
+    r.uri=uri_and_params[0];
+    auto params_string = uri_and_params[1];
+    for(auto param_setting : split(params_string,'&')) {
+      auto name_value = split(param_setting,'=');
+      if(name_value.size()==2) {
+        r.params[name_value[0]]=name_value[1];
+      }
+    }
+  }
+
+
   return r;
 }
 
