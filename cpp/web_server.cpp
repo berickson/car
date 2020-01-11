@@ -211,7 +211,6 @@ void WebServer::run(int port) {
   cout << "web-server listening on port " << port << endl;
 
   while (true) {
-    cout << "looping waiting for clients" << endl;
     struct timeval tv;
     tv.tv_sec = 10;
     tv.tv_usec = 0;
@@ -221,14 +220,9 @@ void WebServer::run(int port) {
     if (select(server_socket_fd + 1, &readfds, NULL, NULL, &tv) > 0) {
       auto client_socket_fd = accept(server_socket_fd, NULL, NULL);
       if (client_socket_fd > 0) {
-        // cout << "new client connected" << endl;
         std::thread t(connection_thread, client_socket_fd, &handler_map, &default_handler);
-        // cout << "waiting for thread" << endl;
-        // TODO: manage threads better, now it runs wild
-        // t.join();
         pthread_setname_np(t.native_handle(), "web-server-worker");
         t.detach();
-        // cout << "thread done" << endl;
       }
     }
   }

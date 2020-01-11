@@ -92,7 +92,7 @@ void Car::socket_get_scan(vector<string>& params) {
 
   // lidar.get_scan();
   if (recent_scans.size() > 0) {
-    auto wait_end_time = system_clock::now() + milliseconds(500);
+    auto wait_end_time = system_clock::now() + milliseconds(200);
     while (!found && system_clock::now() < wait_end_time) {
       int scan_number;
       {
@@ -137,14 +137,11 @@ void Car::process_socket() {
   //MethodTracker tracker(data);
 
   while (true) {
-    // TODO: crank this way down
-    log_warning_if_duration_exceeded _("Car::process_socket", 30ms);
+      
     string full_request = socket_server.get_request();
     if (full_request.length() == 0) return;
-    // log_info("socket full request: \"" + full_request + "\"");
     auto params = split(full_request, ',');
     string request = params[0];
-    // log_info("got socket request: \"" + request + "\"");
     if (request == "get_scan") {
       socket_get_scan(params);
     } else if (request == "get_state") {
