@@ -28,7 +28,7 @@ Request Request::from_string(string s) {
   std::smatch matches;
   std::regex_match(request_line, matches, request_regex);
   if (matches.size() != 4) {
-    throw string("bad request line");
+    throw string("bad request line \""+s+"\"");
   }
   r.method = matches[1];
   r.uri = matches[2];

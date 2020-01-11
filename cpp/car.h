@@ -96,6 +96,8 @@ public:
 
   string get_mode();
 
+  string get_scan_json(int since);
+
 
   double get_voltage(){
     return current_dynamics.v_bat;

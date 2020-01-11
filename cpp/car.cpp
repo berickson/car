@@ -72,6 +72,47 @@ string Car::get_mode() {
   return "manual";
 }
 
+string Car::get_scan_json(int scan_to_skip) {
+    last_scan_request_time = system_clock::now();
+
+  // lidar.get_scan();
+  if (recent_scans.size() > 0) {
+    auto wait_end_time = system_clock::now() + milliseconds(200);
+    while (system_clock::now() < wait_end_time) {
+      int scan_number;
+      {
+        lock_guard<mutex> lock(recent_scans_mutex);
+        scan_number = recent_scans.front().scan_number;
+      }
+      if (scan_number != scan_to_skip) {
+        string result;
+        try {
+          LidarScan scan;
+          {
+            lock_guard<mutex> lock(recent_scans_mutex);
+            scan = recent_scans.front();
+          }
+          result = scan.get_json().dump();
+        } catch (...) {
+          log_error("exception caught getting scan json");
+        }
+
+        return result;
+        break;
+      } else {
+        this_thread::sleep_for(chrono::milliseconds(1));
+      }
+    }
+  }
+
+  // not found
+  if(scan_to_skip==0) {
+    this_thread::sleep_for(chrono::milliseconds(500));
+  }
+  LidarScan fake;
+  return fake.get_json().dump();
+}
+
 void Car::socket_get_scan(vector<string>& params) {
   int scan_to_skip = -1;
   if (params.size() > 1) {
@@ -131,6 +172,7 @@ void Car::socket_get_scan(vector<string>& params) {
     socket_server.send_response(fake.get_json().dump());
   }
 }
+
 
 void Car::process_socket() {
   //static PerformanceData data("Car::process_socket");
@@ -331,17 +373,16 @@ void Car::get_state_handler(const Request &, Response & response) {
 }
 
 void Car::get_scan_handler(const Request &request, Response & response) {
-  stringstream ss;
-
-  ss << "you reached get_scan_handler" << endl;
   auto it = request.params.find("since");
+  int since;
   if(it != request.params.end()) {
-    int since = atoi(it->second.c_str());
-    ss << "you requested a scan since " << to_string(since);
+    since = atoi(it->second.c_str());
+  } else {
+    since = -1;
   }
-  string s = ss.str();
   response.write_status();
-  response.write_content("text/plain", s.c_str(), s.size());
+  string s = get_scan_json(since);
+  response.write_content("application/json", s.c_str(), s.size());
 }
 
 void index_handler(const Request &, Response & response) {
