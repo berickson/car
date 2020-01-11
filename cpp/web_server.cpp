@@ -211,8 +211,9 @@ void WebServer::run(int port) {
   cout << "web-server listening on port " << port << endl;
 
   while (true) {
+    cout << "looping waiting for clients" << endl;
     struct timeval tv;
-    tv.tv_sec = 1;
+    tv.tv_sec = 10;
     tv.tv_usec = 0;
     fd_set readfds;
     FD_ZERO(&readfds);

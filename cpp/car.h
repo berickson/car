@@ -196,6 +196,10 @@ private:
   thread usb_thread;
   void connect_usb();
 
+  void socket_thread_start();
+  thread socket_thread;
+  void start_socket();
+
   void web_server_thread_start();
   thread web_server_thread;
   void get_state_handler(const Request &, Response & response);

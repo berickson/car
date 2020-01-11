@@ -214,7 +214,7 @@ void Usb::run(std::string device_path){
   _device_path = device_path;
 
   run_thread = thread(&Usb::monitor_incoming_data_thread,this);
-  pthread_setname_np(run_thread.native_handle(), "car_usb_run");
+  pthread_setname_np(run_thread.native_handle(), ("usb-"+device_path).c_str());
 }
 
 void Usb::flush()
