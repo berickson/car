@@ -51,6 +51,12 @@ void Car::connect_usb() {
   pthread_setname_np(usb_thread.native_handle(), "car_usb");
 }
 
+void Car::start_web_server() {
+  web_server_thread = thread(&Car::web_server_thread_start, this);
+  pthread_setname_np(usb_thread.native_handle(), "car-web-server");
+
+}
+
 string Car::get_mode() {
   if (rc_mode_enabled) return "automatic";
 
@@ -86,7 +92,7 @@ void Car::socket_get_scan(vector<string>& params) {
         lock_guard<mutex> lock(recent_scans_mutex);
         scan_number = recent_scans.front().scan_number;
       }
-      if (true || scan_number != scan_to_skip) {
+      if (scan_number != scan_to_skip) {
         found = true;
         string result;
         try {
@@ -103,10 +109,12 @@ void Car::socket_get_scan(vector<string>& params) {
         socket_server.send_response(result);
         break;
       }
-      // this_thread::sleep_for(chrono::milliseconds(1));
     }
   }
   if (!found) {
+    if(scan_to_skip==0) {
+      this_thread::sleep_for(chrono::milliseconds(500));
+    }
     LidarScan fake;
     socket_server.send_response(fake.get_json().dump());
   }
@@ -230,6 +238,7 @@ void Car::usb_thread_start() {
 #error "Unknown robot"
 #endif
     usb.run(device_path);
+    start_web_server();
     
     while (!quit) {
       try {
@@ -271,6 +280,55 @@ void Car::usb_thread_start() {
   } catch (...) {
     log_error("error caught in usb_thread_start");
   }
+}
+
+void Car::get_state_handler(const Request &, Response & response) {
+      // todo: make static?
+      nlohmann::json j;
+
+      j["velocity"] = get_velocity();
+      j["v_bat"] = get_voltage();
+      // https://www.invensense.com/wp-content/uploads/2015/02/MPU-9150-Register-Map.pdf
+      // p.6
+      j["temperature"] =
+          get_temperature() / 340.0 +
+          35.0;  // constants from https://playground.arduino.cc/Main/MPU-9150
+      // j["temperature"] = (get_temperature() + 12412.0)/340.0; // constants
+      // from https://playground.arduino.cc/Main/MPU-9150
+      j["mode"] = get_mode();
+      j["heading"] = get_heading().radians();
+      j["fl"] = get_front_left_wheel().get_json_state();
+      j["fr"] = get_front_right_wheel().get_json_state();
+      j["motor"] = get_motor().get_json_state();
+      j["front_x"] = get_front_position().x;
+      j["front_y"] = get_front_position().y;
+      j["go_enabled"] = get_go_enabled();
+
+      auto s = j.dump();
+      response.write_status();
+      response.write_content("application/json", s.c_str(), s.size());
+}
+
+void index_handler(const Request &, Response & response) {
+  response.write_status();
+  string content = "<html><body>Hello from car.cpp</body></html>\r\n";
+  response.write_content("text/html", content.c_str(), content.size());
+}
+
+void Car::web_server_thread_start() {
+  try {
+    log_info("Starting web server");
+    WebServer server;
+    server.add_handler("GET", "/", index_handler);
+    server.add_handler("GET", "/get_state", [this](const Request & request, Response & response) {
+      this->get_state_handler(request, response);
+    });
+    server.run(8081);
+  }
+  catch(string s) {
+    log_error("Exception caught in web server"+s);
+  }
+
 }
 
 // returns true if the line is a valid TD

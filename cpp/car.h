@@ -16,6 +16,7 @@
 #include "socket_server.h"
 #include "lidar.h"
 #include "../teensy/CarMessages.h"
+#include "web_server.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -194,6 +195,11 @@ private:
   WorkQueue<StampedString> usb_queue;
   thread usb_thread;
   void connect_usb();
+
+  void web_server_thread_start();
+  thread web_server_thread;
+  void get_state_handler(const Request &, Response & response);
+  void start_web_server();
 
   void read_configuration(string path);
   list<WorkQueue<Dynamics2>*> listeners;
