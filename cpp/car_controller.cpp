@@ -10,7 +10,6 @@
 #include "driver.h"
 #include "run_settings.h"
 #include <unistd.h> // usleep
-#include "stereo_camera.h"
 #include "logger.h"
 
 
@@ -72,14 +71,6 @@ void go(Car& car) {
     log_info("loading route: " + input_path);
     rte.load_from_file(input_path);
     log_info("route loaded");
-    StereoCamera camera;
-    if(run_settings.capture_video) {
-      log_info("capture video enabled, warming up camera");
-      camera.warm_up();
-    } else {
-      log_info("capturing video not enabled");
-    }
-
 
     log_info("preparing route");
     rte.smooth(run_settings.k_smooth);
@@ -91,7 +82,7 @@ void go(Car& car) {
     }
     if(run_settings.capture_video) {
       vector<string> video_paths = f.stereo_video_file_paths(track_name,route_name,run_name);
-      camera.begin_recording(video_paths[0],video_paths[1]);
+      car.camera.begin_recording(video_paths[0],video_paths[1]);
     }
 
     string recording_file_path = f.recording_file_path(track_name, route_name, run_name);
@@ -109,14 +100,14 @@ void go(Car& car) {
 
     try {
       Driver d(car, run_settings);
-      d.drive_route(rte, camera);
+      d.drive_route(rte, car.camera);
       log_info("back from drive_route");
     } catch (std::string e) {
       error_text = e;
       log_error(e);
     }
     if(run_settings.capture_video) {
-      camera.end_recording();
+      car.camera.end_recording();
     }
     car.end_recording_input();
     car.end_recording_state();
@@ -156,11 +147,9 @@ void record(Car& car) {
   mkdir(f.get_routes_folder(track_name));
   mkdir(f.get_route_folder(track_name,route_name));
 
-  StereoCamera camera;
   if(run_settings.capture_video) {
-    camera.warm_up();
     vector<string> video_paths = f.stereo_video_file_paths(track_name,route_name);
-    camera.begin_recording(video_paths[0],video_paths[1]);
+    car.camera.begin_recording(video_paths[0],video_paths[1]);
   }
 
   string recording_path = f.recording_file_path(track_name,route_name);
@@ -175,7 +164,7 @@ void record(Car& car) {
   car.end_recording_state();
 
   if(run_settings.capture_video){
-    camera.end_recording();
+    car.camera.end_recording();
   }
 
   log_info("done recording - making path");
