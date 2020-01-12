@@ -17,6 +17,8 @@
 #include "lidar.h"
 #include "../teensy/CarMessages.h"
 #include "web_server.h"
+#include "stereo_camera.h"
+
 
 using namespace std;
 using namespace std::chrono;
@@ -178,6 +180,9 @@ public:
   // lidar
   LidarUnit lidar;
 
+  // camera
+  StereoCamera camera;
+
 
   string command_from_socket = "";
 private:
@@ -207,6 +212,7 @@ private:
   thread web_server_thread;
   void get_scan_handler(const Request &, Response & response);
   void get_state_handler(const Request &, Response & response);
+  void video_handler(const Request &, Response & response);
   void start_web_server();
 
   void read_configuration(string path);

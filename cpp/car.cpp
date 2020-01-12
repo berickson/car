@@ -34,6 +34,7 @@ Car::Car(bool online) :
     start_web_server();
     connect_lidar();
     start_socket();
+    camera.warm_up();
   }
 }
 
@@ -396,6 +397,36 @@ void index_handler(const Request &, Response & response) {
   response.write_content("text/html", content.c_str(), content.size());
 }
 
+void Car::video_handler(const Request &, Response & response) {
+   cout << "video_handler" << endl;
+  response.enable_multipart();
+  while(true) {
+    static int frame_number;
+    cout << "writing a frame of video" << endl;
+    this_thread::sleep_for(chrono::milliseconds(100));
+    camera.left_camera.get_latest_frame();
+    cv::Mat frame = camera.left_camera.latest_frame.clone();
+    ++frame_number;
+    string text = "Sent frame number: " + to_string(frame_number);
+    cv::putText(frame, 
+                text.c_str(),
+                cv::Point(50,50), // Coordinates
+                cv::FONT_HERSHEY_COMPLEX_SMALL, // Font
+                1.0, // Scale. 2.0 = 2x bigger
+                cv::Scalar(255,255,255), // BGR Color
+                1);//, // Line Thickness (Optional)
+                //cv::CV_AA); // Anti-alias (Optional)
+
+    std::vector<uchar> buff;//buffer for coding
+    std::vector<int> param(2);
+    param[0] = cv::IMWRITE_JPEG_QUALITY;
+    param[1] = 80;//default(95) 0-100
+    cv::imencode(".jpg", frame, buff, param);
+    response.write_content("image/jpeg", (char *)&buff[0], buff.size());
+  }
+}
+
+
 void Car::web_server_thread_start() {
   try {
     log_info("Starting web server");
@@ -406,6 +437,9 @@ void Car::web_server_thread_start() {
     });
     server.add_handler("GET", "/get_scan", [this](const Request & request, Response & response) {
       this->get_scan_handler(request, response);
+    });
+    server.add_handler("GET", "/video", [this](const Request & request, Response & response) {
+      this->video_handler(request, response);
     });
     server.run(8081);
   }
