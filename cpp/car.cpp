@@ -410,18 +410,26 @@ void Car::video_handler(const Request &, Response & response) {
     static int frame_number;
     cout << "writing a frame of video" << endl;
     cv::Mat grabber_frame;
-    queue.try_pop(grabber_frame, 1000); // get the frame just so we know when image is ready
-    camera.left_camera.get_latest_frame();
-    if(frame.empty()) {
-      // frame = camera.left_camera.latest_frame.clone();
-      frame = grabber_frame.clone();
-    } else {
-      //camera.left_camera.latest_frame.copyTo(frame);
-      grabber_frame.copyTo(frame);
-    }
-    if(frame.empty()) {
+    if(!queue.try_pop(grabber_frame, 1000)) {
+      if(response.is_closed()) {
+        break;
+      }
       continue;
-    }
+    } 
+    cv::flip(frame, grabber_frame, -1);
+
+    // // get the frame just so we know when image is ready
+    // camera.left_camera.get_latest_frame();
+    // if(frame.empty()) {
+    //   // frame = camera.left_camera.latest_frame.clone();
+    //   frame = grabber_frame.clone();
+    // } else {
+    //   //camera.left_camera.latest_frame.copyTo(frame);
+    //   grabber_frame.copyTo(frame);
+    // }
+    // if(frame.empty()) {
+    //   continue;
+    // }
     ++frame_number;
     string text = "Sent frame number: " + to_string(frame_number);
     cv::putText(frame, 

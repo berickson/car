@@ -14,6 +14,8 @@
 #include <thread>
 #include <unistd.h>
 #include <vector>
+#include <unistd.h>
+#include <fcntl.h>
 using namespace std;
 
 #include "web_server.h"
@@ -135,7 +137,12 @@ void Response::end() {
   end_written = true;
 }
 
-bool Response::is_closed() { return fd <= 0; }
+bool Response::is_closed() { 
+  if (fd <= 0 || fcntl(fd, F_GETFL) == -1) {
+    return true;
+  }
+  return false;
+}
 
 void Response::write_headers() {
   for (auto header : headers) {
