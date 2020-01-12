@@ -398,14 +398,23 @@ void index_handler(const Request &, Response & response) {
 }
 
 void Car::video_handler(const Request &, Response & response) {
+  //pthread_setname_np(pthread_self(), "car-vid-handler");
    cout << "video_handler" << endl;
   response.enable_multipart();
+  cv::Mat frame;
   while(true) {
     static int frame_number;
     cout << "writing a frame of video" << endl;
     this_thread::sleep_for(chrono::milliseconds(100));
     camera.left_camera.get_latest_frame();
-    cv::Mat frame = camera.left_camera.latest_frame.clone();
+    if(frame.empty()) {
+      frame = camera.left_camera.latest_frame.clone();
+    } else {
+      camera.left_camera.latest_frame.copyTo(frame);
+    }
+    if(frame.empty()) {
+      continue;
+    }
     ++frame_number;
     string text = "Sent frame number: " + to_string(frame_number);
     cv::putText(frame, 
