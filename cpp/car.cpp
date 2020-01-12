@@ -413,9 +413,11 @@ void Car::video_handler(const Request &, Response & response) {
     queue.try_pop(grabber_frame, 1000); // get the frame just so we know when image is ready
     camera.left_camera.get_latest_frame();
     if(frame.empty()) {
-      frame = camera.left_camera.latest_frame.clone();
+      // frame = camera.left_camera.latest_frame.clone();
+      frame = grabber_frame.clone();
     } else {
-      camera.left_camera.latest_frame.copyTo(frame);
+      //camera.left_camera.latest_frame.copyTo(frame);
+      grabber_frame.copyTo(frame);
     }
     if(frame.empty()) {
       continue;
