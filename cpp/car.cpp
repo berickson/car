@@ -398,6 +398,10 @@ void index_handler(const Request &, Response & response) {
 }
 
 void Car::video_handler(const Request &, Response & response) {
+  WorkQueue<cv::Mat> queue;
+  camera.left_camera.grabber.frames_topic.add_listener(&queue);
+  try {
+
   //pthread_setname_np(pthread_self(), "car-vid-handler");
    cout << "video_handler" << endl;
   response.enable_multipart();
@@ -405,7 +409,8 @@ void Car::video_handler(const Request &, Response & response) {
   while(true) {
     static int frame_number;
     cout << "writing a frame of video" << endl;
-    this_thread::sleep_for(chrono::milliseconds(100));
+    cv::Mat grabber_frame;
+    queue.try_pop(grabber_frame, 1000); // get the frame just so we know when image is ready
     camera.left_camera.get_latest_frame();
     if(frame.empty()) {
       frame = camera.left_camera.latest_frame.clone();
@@ -433,6 +438,13 @@ void Car::video_handler(const Request &, Response & response) {
     cv::imencode(".jpg", frame, buff, param);
     response.write_content("image/jpeg", (char *)&buff[0], buff.size());
   }
+  } catch (...) {
+    log_error("unknown error in video_handler");
+  }
+  camera.left_camera.grabber.frames_topic.add_listener(&queue);
+
+
+
 }
 
 

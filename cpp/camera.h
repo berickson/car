@@ -40,14 +40,18 @@ public:
   void load_calibration_from_json(std::string camera_name, std::string json_path);
   void undistort(cv::Mat frame);
   bool frame_is_ready();
-  WorkQueue<cv::Mat> frames_queue{1};
+
+  ObservableTopic<const cv::Mat> frames_topic;
 
   cv::Mat camera_matrix;
   cv::Mat dist_coefs;
 
   cv::Mat latest_frame;
 
+  FrameGrabber grabber; // todo: make private again, adding here so clients can use the queue
+
 private:
+  WorkQueue<cv::Mat> frames_queue{1};
   int fps = 0;
   bool warmed_up = false;
   std::string recording_path;
@@ -61,7 +65,6 @@ private:
 
   cv::VideoCapture cap;
 
-  FrameGrabber grabber;
 
 };
 
