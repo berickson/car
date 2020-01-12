@@ -96,6 +96,7 @@ public:
 
   string get_mode();
 
+  LidarScan get_latest_scan() const;
   string get_scan_json(int since);
 
 
@@ -190,7 +191,7 @@ private:
   void lidar_thread_start();
   thread lidar_thread;
   std::list<LidarScan> recent_scans;
-  std::mutex recent_scans_mutex;
+  mutable std::mutex recent_scans_mutex;
   void connect_lidar();
 
   void usb_thread_start();

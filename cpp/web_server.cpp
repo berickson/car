@@ -82,14 +82,21 @@ void Response::add_header(string name, string value) {
 }
 
 void Response::write_status(int code, string description) {
+  if(status_written) {
+    throw string("Error: Response::write_status called twice in same response");
+  }
   string s = (string) "HTTP/1.1 " + to_string(code) + " " + description + "\r\n";
   write(s.c_str(), s.size());
+  status_written = true;
 }
 
 void Response::enable_multipart() { multipart = true; }
 
-// writes content-length and bytes
+// writes content-length and bytes, writes good status if no status has been sent
 void Response::write_content(string mime_type, const char *bytes, size_t byte_count) {
+  if(!status_written) {
+    write_status();
+  }
   if (multipart) {
     if (results_sent == 0) {
       headers["Content-type"] = "multipart/x-mixed-replace;boundary=--boundarydonotcross";
@@ -102,6 +109,9 @@ void Response::write_content(string mime_type, const char *bytes, size_t byte_co
     write_headers();
     write(bytes, byte_count);
   } else {
+    if(results_sent > 0) {
+      throw string("write_content called multiple times in non-multipart response");
+    }
     headers["Content-type"] = mime_type;
     headers["Content-length"] = to_string(byte_count);
     write_headers();
@@ -110,13 +120,19 @@ void Response::write_content(string mime_type, const char *bytes, size_t byte_co
   ++results_sent;
 }
 
-// marks end of multi-part response
+// marks end of multi-part response,
+// calls after first time ignored
+
 void Response::end() {
+  if(end_written) {
+    return;
+  }
   if (multipart && fd > 0) {
     write(multipart_final_boundary);
     close(fd);
     this->fd = -1;
   }
+  end_written = true;
 }
 
 bool Response::is_closed() { return fd <= 0; }

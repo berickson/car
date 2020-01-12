@@ -72,6 +72,14 @@ string Car::get_mode() {
   return "manual";
 }
 
+LidarScan Car::get_latest_scan() const {
+  lock_guard<mutex> lock(recent_scans_mutex);
+  if(recent_scans.size() > 0) {
+    return recent_scans.front();
+  }
+  return LidarScan();
+}
+
 string Car::get_scan_json(int scan_to_skip) {
     last_scan_request_time = system_clock::now();
 
@@ -368,7 +376,6 @@ void Car::get_state_handler(const Request &, Response & response) {
       j["go_enabled"] = get_go_enabled();
 
       auto s = j.dump();
-      response.write_status();
       response.write_content("application/json", s.c_str(), s.size());
 }
 
@@ -380,13 +387,11 @@ void Car::get_scan_handler(const Request &request, Response & response) {
   } else {
     since = -1;
   }
-  response.write_status();
   string s = get_scan_json(since);
   response.write_content("application/json", s.c_str(), s.size());
 }
 
 void index_handler(const Request &, Response & response) {
-  response.write_status();
   string content = "<html><body>Hello from car.cpp</body></html>\r\n";
   response.write_content("text/html", content.c_str(), content.size());
 }

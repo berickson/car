@@ -49,13 +49,24 @@ server {
 
 	server_name _;
 
-        
-        location /raw_tracks {
-			#default_type text/html;
-			autoindex_format json;
-           	autoindex         on;
-           	alias             /home/pi/car/tracks/;
-        }
+	
+	location /raw_tracks {
+		#default_type text/html;
+		autoindex_format json;
+		autoindex         on;
+		alias             /home/pi/car/tracks/;
+	}
+
+	location /car/get_scan {
+		proxy_pass http://localhost:8081/get_scan;
+		include /etc/nginx/proxy_params;
+	}
+
+	location /car/get_state {
+		proxy_pass http://localhost:8081/get_state;
+		include /etc/nginx/proxy_params;
+	}
+
 
 	location / {
 		# First attempt to serve request as file, then
@@ -64,6 +75,7 @@ server {
 		proxy_pass http://localhost:8080;
 		include /etc/nginx/proxy_params;
 	}
+
 
 	# pass PHP scripts to FastCGI server
 	#

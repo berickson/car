@@ -43,6 +43,8 @@ class Response {
   bool is_closed();
 
  private:
+  bool status_written = false;
+  bool end_written = false;
   int results_sent = 0;
   const string multipart_boundary = "\r\n--boundarydonotcross\r\n";
   const string multipart_final_boundary = "\r\n--boundarydonotcross--\r\n";

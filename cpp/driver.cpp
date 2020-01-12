@@ -285,7 +285,7 @@ double nearest_obstacle_distance_on_route(const Car & car, const Route & route,
   // meters air cushion to have between car and obstacles
   double air_cushion = 0.0;
 
-  const auto & scan = car.lidar.current_scan;
+  const auto scan = car.get_latest_scan();
   double v = car.get_velocity();
 
   // only check in front for now
