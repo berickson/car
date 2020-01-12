@@ -416,7 +416,7 @@ void Car::video_handler(const Request &, Response & response) {
       }
       continue;
     } 
-    cv::flip(frame, grabber_frame, -1);
+    cv::flip(grabber_frame, frame, -1);
 
     // // get the frame just so we know when image is ready
     // camera.left_camera.get_latest_frame();
