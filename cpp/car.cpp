@@ -479,12 +479,7 @@ bool Car::process_line_from_log(const StampedString& msg) {
   if (stream.ok) {
     // log_info((string)"got td ms: " + to_string(d.ms));
     apply_dynamics(d);
-    {
-      lock_guard<mutex> lock(listeners_mutex);
-      for (auto listener : listeners) {
-        listener->push(d);
-      }
-    }
+    dynamics2_topic.send(d);
   } else {
     ++usb_error_count;
     log_warning((string) "bad dynamics: " + msg.to_string());
@@ -627,13 +622,11 @@ void Car::apply_dynamics(Dynamics2& d) {
 }
 
 void Car::add_listener(WorkQueue<Dynamics2>* listener) {
-  lock_guard<mutex> lock(listeners_mutex);
-  listeners.push_back(listener);
+  dynamics2_topic.add_listener(listener);
 }
 
 void Car::remove_listener(WorkQueue<Dynamics2>* listener) {
-  lock_guard<mutex> lock(listeners_mutex);
-  listeners.remove(listener);
+  dynamics2_topic.remove_listener(listener);
 }
 
 void Car::read_configuration(string path) {

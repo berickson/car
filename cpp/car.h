@@ -216,8 +216,9 @@ private:
   void start_web_server();
 
   void read_configuration(string path);
-  list<WorkQueue<Dynamics2>*> listeners;
-  std::mutex listeners_mutex;
+  ObservableTopic<Dynamics2> dynamics2_topic;
+  //list<WorkQueue<Dynamics2>*> listeners;
+  //std::mutex listeners_mutex;
 
   SocketServer socket_server;
   void process_socket();

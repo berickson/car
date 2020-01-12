@@ -33,13 +33,14 @@ public:
   WorkQueue(size_t max_size = 10) : max_size(max_size) {
   }
 
-  void push(T& s) {
+  void push(const T& s) {
     {
       std::lock_guard<std::mutex> lock(q_mutex);
       while(max_size && q.size() >= max_size) {
         q.pop();
+        
       }
-      q.emplace(s);
+      q.push(s);
     }
 
     cv.notify_one();
@@ -67,6 +68,30 @@ public:
   }
 };
 
+
+template <class T> class ObservableTopic {
+public:
+  void add_listener(WorkQueue<T>* listener) {
+    lock_guard<mutex> lock(topic_mutex);
+    listeners.push_back(listener);
+  }
+
+  void remove_listener(WorkQueue<T>* listener) {
+    lock_guard<mutex> lock(topic_mutex);
+    listeners.remove(listener);
+  }
+
+  void send(const T & message) {
+    lock_guard<mutex> lock(topic_mutex);
+    for (auto listener : listeners) {
+      listener->push(message);
+    }
+  }
+private:
+  std::mutex topic_mutex;
+  list<WorkQueue<T>*> listeners;
+
+};
 
 void test_work_queue();
 
