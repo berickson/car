@@ -95,7 +95,11 @@ void Response::write_status(int code, string description) {
 void Response::enable_multipart() { multipart = true; }
 
 // writes content-length and bytes, writes good status if no status has been sent
+// does nothing if connection is closed
 void Response::write_content(string mime_type, const char *bytes, size_t byte_count) {
+  if(is_closed()) {
+    return;
+  }
   if(!status_written) {
     write_status();
   }
@@ -138,7 +142,7 @@ void Response::end() {
 }
 
 bool Response::is_closed() { 
-  char buff[1];
+  char buff[2];
   if (fd <= 0 ||  (recv(fd, buff, 1, MSG_PEEK | MSG_DONTWAIT) == 0)) {
     return true;
   }

@@ -406,7 +406,7 @@ void Car::video_handler(const Request &, Response & response) {
    cout << "video_handler" << endl;
   response.enable_multipart();
   cv::Mat frame;
-  while(true) {
+  while(!response.is_closed()) {
     static int frame_number;
     cout << "writing a frame of video" << endl;
     cv::Mat grabber_frame;
@@ -452,10 +452,7 @@ void Car::video_handler(const Request &, Response & response) {
   } catch (...) {
     log_error("unknown error in video_handler");
   }
-  camera.left_camera.grabber.frames_topic.add_listener(&queue);
-
-
-
+  camera.left_camera.grabber.frames_topic.remove_listener(&queue);
 }
 
 
