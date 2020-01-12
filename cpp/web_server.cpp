@@ -138,7 +138,8 @@ void Response::end() {
 }
 
 bool Response::is_closed() { 
-  if (fd <= 0 || fcntl(fd, F_GETFL) == -1) {
+  char buff[1];
+  if (fd <= 0 ||  (recv(fd, buff, 1, MSG_PEEK | MSG_DONTWAIT) == 0)) {
     return true;
   }
   return false;

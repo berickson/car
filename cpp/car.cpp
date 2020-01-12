@@ -411,9 +411,10 @@ void Car::video_handler(const Request &, Response & response) {
     cout << "writing a frame of video" << endl;
     cv::Mat grabber_frame;
     if(!queue.try_pop(grabber_frame, 1000)) {
-      // if(response.is_closed()) {
-      //   break;
-      // }
+      if(response.is_closed()) {
+        cout << "leaving video_handler, client closed connection" << endl;
+        break;
+      }
       continue;
     } 
     cv::flip(grabber_frame, frame, -1);
