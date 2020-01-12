@@ -111,6 +111,7 @@ void Camera::warm_up()
   cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M','J','P','G'));
 
   grabber.begin_grabbing(&cap, to_string(cam_number));
+  grabber.frames_topic.add_listener(&frames_queue);
   warmed_up = true;
   log_info((string)"warmed up"+to_string(cam_number));
   
@@ -165,13 +166,14 @@ void Camera::release_video_writer()
 
 bool Camera::get_latest_frame()
 {
-  cv::Mat new_frame;
-  if(grabber.get_latest_frame(new_frame)) {
-    cv::flip(new_frame, latest_frame, -1); // todo: make separate function and accessor
+  if(frames_queue.size()>0) {
+    cv::Mat new_frame;
+    if(frames_queue.try_pop(new_frame, 0)) {
+      cv::flip(new_frame, latest_frame, -1);
+    }
   }
-
-  return grabber.get_frame_count_grabbed() > 0;
-
+  
+  return !latest_frame.empty();
 }
 
 int Camera::get_frame_count_grabbed()

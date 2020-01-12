@@ -11,6 +11,7 @@
 #include <queue>
 #include <atomic>
 #include <string>
+#include "work_queue.h"
 
 // based on http://answers.opencv.org/question/74255/time-delay-in-videocapture-opencv-due-to-capture-buffer/
 
@@ -39,8 +40,7 @@ public:
   std::thread grab_thread;
   void grab_thread_proc();
   std::string name;
-
-
+  ObservableTopic<cv::Mat> frames_topic;
 };
 
 #endif // FRAME_GRABBER_H

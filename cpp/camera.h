@@ -11,6 +11,7 @@
 #include "frame_grabber.h"
 #include <string>
 #include <vector>
+#include "work_queue.h"
 
 class Camera
 {
@@ -39,6 +40,7 @@ public:
   void load_calibration_from_json(std::string camera_name, std::string json_path);
   void undistort(cv::Mat frame);
   bool frame_is_ready();
+  WorkQueue<cv::Mat> frames_queue{1};
 
   cv::Mat camera_matrix;
   cv::Mat dist_coefs;

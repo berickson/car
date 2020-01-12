@@ -80,6 +80,7 @@ void FrameGrabber::grab_thread_proc()
         continue;
       }
       {
+        frames_topic.send(frame);
         // only lock after frame is grabbed
         lock_guard<mutex> lock(grabber_mutex);
         ++frames_grabbed;
