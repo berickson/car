@@ -70,6 +70,7 @@ int FrameGrabber::ready_frame_count()
 
 void FrameGrabber::grab_thread_proc()
 {
+  pthread_setname_np(pthread_self(), "car-grabber");
   try {
     while (grab_on.load() == true) //this is lock free
     {
@@ -80,6 +81,7 @@ void FrameGrabber::grab_thread_proc()
         continue;
       }
       {
+        cv::flip( frame, frame, -1); // tood: make pre-processing user-definable
         frames_topic.send(frame);
         // only lock after frame is grabbed
         lock_guard<mutex> lock(grabber_mutex);

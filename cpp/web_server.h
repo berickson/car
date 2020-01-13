@@ -6,6 +6,10 @@
 
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <linux/sockios.h>
+//#include <netinet/in.h>
+//#include <netinet/tcp.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -41,6 +45,11 @@ class Response {
   void write_content(string mime_type, const char *bytes, size_t byte_count);
   void end();
   bool is_closed();
+  int bytes_pending() {
+    int value = 0;
+    ioctl(fd, SIOCOUTQ, &value);
+    return value;
+  }
 
  private:
   bool status_written = false;
@@ -54,6 +63,7 @@ class Response {
   void write_headers();
   void write(string s);
   void write(const char *bytes, size_t byte_count);
+
 
   int fd;
 };

@@ -397,9 +397,22 @@ void index_handler(const Request &, Response & response) {
   response.write_content("text/html", content.c_str(), content.size());
 }
 
-void Car::video_handler(const Request &, Response & response) {
+void Car::video_handler(const Request &request, Response & response) {
+  pthread_setname_np(pthread_self(), "car-vid-handler");
   WorkQueue<cv::Mat> queue;
-  camera.left_camera.grabber.frames_topic.add_listener(&queue);
+  int camera_number = 0;
+  auto it = request.params.find("camera_number");
+  if(it != request.params.end()) {
+    camera_number = atoi(it->second.c_str());
+  }
+  if(camera.cameras.size() < camera_number + 1) {
+    response.write_status(404, "camera number not found");
+    response.end();
+    return;
+  }
+
+  camera.cameras[camera_number]->grabber.frames_topic.add_listener(&queue);
+  //camera.left_camera.grabber.frames_topic.add_listener(&queue);
   try {
 
   //pthread_setname_np(pthread_self(), "car-vid-handler");
@@ -417,7 +430,13 @@ void Car::video_handler(const Request &, Response & response) {
       }
       continue;
     } 
-    cv::flip(grabber_frame, frame, -1);
+    if(frame.empty()) {
+      frame = grabber_frame.clone();
+    } else {
+      grabber_frame.copyTo(frame);
+    }
+
+    
 
     // // get the frame just so we know when image is ready
     // camera.left_camera.get_latest_frame();
@@ -447,12 +466,21 @@ void Car::video_handler(const Request &, Response & response) {
     param[0] = cv::IMWRITE_JPEG_QUALITY;
     param[1] = 80;//default(95) 0-100
     cv::imencode(".jpg", frame, buff, param);
+
+
+    int bytes_pending = response.bytes_pending();
+    while(bytes_pending > 0 && ! response.is_closed()) {
+      cout << "bytes pending: " << bytes_pending << " waiting to send next video frame" << endl;
+      usleep(1000);
+      bytes_pending = response.bytes_pending();
+    }
+
     response.write_content("image/jpeg", (char *)&buff[0], buff.size());
   }
   } catch (...) {
     log_error("unknown error in video_handler");
   }
-  camera.left_camera.grabber.frames_topic.remove_listener(&queue);
+  camera.cameras[camera_number]->grabber.frames_topic.remove_listener(&queue);
 }
 
 
