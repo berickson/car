@@ -75,8 +75,8 @@ string Request::to_string() const {
   return ss.str();
 }
 
-Response::Response(int fd) {
-  this->fd = fd;
+Response::Response(int fd) : fd(fd) {
+
 }
 
 void Response::add_header(string name, string value) {
@@ -92,7 +92,10 @@ void Response::write_status(int code, string description) {
   status_written = true;
 }
 
-void Response::enable_multipart() { multipart = true; }
+void Response::enable_multipart() { 
+  multipart = true;
+  close_requested = true;
+}
 
 // writes content-length and bytes, writes good status if no status has been sent
 // does nothing if connection is closed
@@ -135,8 +138,6 @@ void Response::end() {
   }
   if (multipart && fd > 0) {
     write(multipart_final_boundary);
-    close(fd);
-    this->fd = -1;
   }
   end_written = true;
 }
@@ -175,8 +176,9 @@ void Response::write(const char *bytes, size_t byte_count) {
 typedef std::function<void(const Request &, Response &)> Handler;
 
 void connection_thread(int client_socket_fd, map<string, Handler> *handler_map, Handler *default_handler) {
+  bool trace=false;
   try {
-    // cout << "connected to client socket " << client_socket_fd << endl;
+    if(trace) cout << "connected to client socket " << client_socket_fd << endl;
 
     const size_t buffer_size = 2000;
     char buffer[buffer_size];
@@ -195,14 +197,11 @@ void connection_thread(int client_socket_fd, map<string, Handler> *handler_map, 
         auto count_received = recv(client_socket_fd, buffer, buffer_size - 1, MSG_DONTWAIT);
         buffer[count_received] = 0; // terminate string
         if (count_received == 0) {
-          // cout << "client disconnected" << endl;
-          close(client_socket_fd);
-          return;
+          if(trace) cout << "client disconnected " << client_socket_fd << endl;
+          break;
         }
-        // cout << "------- Request ------------" << endl;
-        // cout << buffer << endl;
         Request request = Request::from_string(buffer);
-        cout << request.method << " " << request.uri << endl;
+        if(trace) cout << request.method << " " << request.uri << endl;
         Response response(client_socket_fd);
 
         string handler_key = request.method + request.uri;
@@ -213,18 +212,18 @@ void connection_thread(int client_socket_fd, map<string, Handler> *handler_map, 
           (*default_handler)(request, response);
         }
 
-        // cout << "handler complete" << endl;
-        bool closed = response.is_closed();
-        if (closed) {
-          cout << "connection closed" << endl;
+        if (response.close_requested) {
+          if(trace) cout << "response requested close" << endl;
           break;
         }
       }
     }
-    cout << "leaving connection thread" << endl;
   } catch (string s) {
-    cout << "Error in connection thread: " << s << endl;
+    if(trace) cout << "Error in connection thread: " << s << endl;
   }
+  if(trace) cout << "closing connection " << client_socket_fd <<  endl;
+  close(client_socket_fd);
+  if(trace) cout << "leaving connection thread" << endl;
 }
 
 void WebServer::add_handler(string method, string uri, Handler handler) { handler_map[method + uri] = handler; }
@@ -259,12 +258,21 @@ void WebServer::run(int port) {
     fd_set readfds;
     FD_ZERO(&readfds);
     FD_SET(server_socket_fd, &readfds);
-    if (select(server_socket_fd + 1, &readfds, NULL, NULL, &tv) > 0) {
+    int select_result = select(server_socket_fd + 1, &readfds, NULL, NULL, &tv);
+    if (select_result > 0) {
       auto client_socket_fd = accept(server_socket_fd, NULL, NULL);
       if (client_socket_fd > 0) {
         std::thread t(connection_thread, client_socket_fd, &handler_map, &default_handler);
         pthread_setname_np(t.native_handle(), "web-server-worker");
         t.detach();
+      } else {
+        static int count = 0;
+        ++count;
+        cout << "select return " << select_result <<", and no client.  client_socket_fd=" << client_socket_fd << endl;
+        cout << "trying to read server_socket_fd to see if things clear up" << endl;
+          char buff[80];
+          int bytes_read = recv(server_socket_fd, buff, 80, MSG_PEEK | MSG_DONTWAIT);
+          cout << "recv returned " << bytes_read << ", this has happened " << count << " times." << endl;
       }
     }
   }

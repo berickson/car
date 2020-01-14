@@ -50,6 +50,7 @@ class Response {
     ioctl(fd, SIOCOUTQ, &value);
     return value;
   }
+  bool close_requested = false;
 
  private:
   bool status_written = false;
@@ -65,14 +66,14 @@ class Response {
   void write(const char *bytes, size_t byte_count);
 
 
-  int fd;
+  const int fd;
 };
 
 typedef std::function<void(const Request &, Response &)> Handler;
 
 class WebServer {
  public:
-  int max_connection_count = 4;
+  int max_connection_count = 30;
   void add_handler(string method, string uri, Handler handler);
   void run(int port);
 

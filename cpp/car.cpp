@@ -398,8 +398,9 @@ void index_handler(const Request &, Response & response) {
 }
 
 void Car::video_handler(const Request &request, Response & response) {
+  const bool trace = false;
   pthread_setname_np(pthread_self(), "car-vid-handler");
-  WorkQueue<cv::Mat> queue;
+  WorkQueue<cv::Mat> queue{1};
   int camera_number = 0;
   auto it = request.params.find("camera_number");
   if(it != request.params.end()) {
@@ -416,12 +417,12 @@ void Car::video_handler(const Request &request, Response & response) {
   try {
 
   //pthread_setname_np(pthread_self(), "car-vid-handler");
-   cout << "video_handler" << endl;
+  cout << "video_handler" << endl;
   response.enable_multipart();
   cv::Mat frame;
   while(!response.is_closed()) {
     static int frame_number;
-    cout << "writing a frame of video" << endl;
+    if(trace) cout << "writing a frame of video" << endl;
     cv::Mat grabber_frame;
     if(!queue.try_pop(grabber_frame, 1000)) {
       if(response.is_closed()) {
@@ -436,20 +437,7 @@ void Car::video_handler(const Request &request, Response & response) {
       grabber_frame.copyTo(frame);
     }
 
-    
 
-    // // get the frame just so we know when image is ready
-    // camera.left_camera.get_latest_frame();
-    // if(frame.empty()) {
-    //   // frame = camera.left_camera.latest_frame.clone();
-    //   frame = grabber_frame.clone();
-    // } else {
-    //   //camera.left_camera.latest_frame.copyTo(frame);
-    //   grabber_frame.copyTo(frame);
-    // }
-    // if(frame.empty()) {
-    //   continue;
-    // }
     ++frame_number;
     string text = "Sent frame number: " + to_string(frame_number);
     cv::putText(frame, 
