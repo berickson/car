@@ -67,3 +67,4 @@ tracks/
 
 # Debug files
 *.dSYM/
+bin/run_settings.json
