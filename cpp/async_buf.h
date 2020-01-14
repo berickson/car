@@ -25,6 +25,7 @@ struct async_buf
     void worker() {
         bool local_done(false);
         std::vector<char> buf;
+        pthread_setname_np(pthread_self(), "car-async-buf");
         while (!local_done) {
             {
                 std::unique_lock<std::mutex> guard(this->mutex);
