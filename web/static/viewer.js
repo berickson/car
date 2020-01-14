@@ -281,8 +281,9 @@ let viewer = (function () {
         }
         scene.add(scan_mesh);
 
-        stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-        document.body.appendChild(stats.dom);
+        // uncomment to show fps
+        // stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+        // document.body.appendChild(stats.dom);
         on_resize();
         render();
         get_scan();
