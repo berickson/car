@@ -122,7 +122,7 @@ The Teensy microcontroller communicates with the ESC, servo, IMU and quadrature 
     sudo apt update
     sudo apt upgrade
     sudo apt install ffmpeg vlc streamer git libncurses5-dev screen nginx
-    sudo apt install libeigen3-dev  libblas-dev liblapack-dev
+    sudo apt install libeigen3-dev  libblas-dev liblapack-dev git
 
     ```
 1. Set which robot you are working, default Python environment.  Add this to .bashrc
@@ -143,7 +143,7 @@ The Teensy microcontroller communicates with the ESC, servo, IMU and quadrature 
 1. Install and config Python Anaconda (miniconda)
     ```
     wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-armv7l.sh
-    sudo /bin/bash Miniconda3-latest-Linux-armv7l.sh
+    /bin/bash Miniconda3-latest-Linux-armv7l.sh
     # notes: install to /home/pi/miniconda3, prepend path[yes]
 
  
@@ -163,17 +163,7 @@ The Teensy microcontroller communicates with the ESC, servo, IMU and quadrature 
 
     source activate car
     conda install pandas
-<<<<<<< HEAD
-
-    # pip install dateutil pytz --force-reinstall --upgrade
     conda install flask
-=======
-    
-    pip install python-dateutil
-
-    #pip install dateutil pytz --force-reinstall --upgrade
-    pip install flask
->>>>>>> 4e3b2ccede256cbdbe60722891a8c3b076296a14
     pip install psutil platformio
    
     ```
@@ -216,12 +206,9 @@ sudo journalctl -u car-web -f
 run from console to debug
 ```
 cd car/web
-sudo service car-web stop
+sudo systemctl stop car-web
 ./run
 ```
-
-
-
 
 ### car-service
 
@@ -237,7 +224,10 @@ cd car/web
 sh ./install
 ```
 
-
+view log
+```
+sudo journalctl -u car -f
+```
 
 
 ### teensy
