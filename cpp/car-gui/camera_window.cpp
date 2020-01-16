@@ -1,6 +1,6 @@
-#include "camera_window.h"
-#include "ui_camera_window.h"
-#include "route_window.h"
+#include "camera-window.h"
+#include "ui-camera-window.h"
+#include "route-window.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "string_utils.h"
+#include "string-utils.h"
 #include <map>
 #include <netinet/in.h>
 #include <regex>
@@ -18,7 +18,7 @@
 #include <fcntl.h>
 using namespace std;
 
-#include "web_server.h"
+#include "web-server.h"
 
 Request Request::from_string(string s) {
   Request r;

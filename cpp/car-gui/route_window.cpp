@@ -1,5 +1,5 @@
-﻿#include "route_window.h"
-#include "ui_route_window.h"
+﻿#include "route-window.h"
+#include "ui-route-window.h"
 #include <QListView>
 #include <QStandardItemModel>
 
@@ -7,12 +7,12 @@
 #include <QtCharts/QLineSeries>
 #include <QFileDialog>
 
-#include "../run_settings.h"
+#include "../run-settings.h"
 
 #include <fstream>
 #include <string>
 #include "../system.h"
-#include "../file_names.h"
+#include "../file-names.h"
 #include "../route.h"
 
 using namespace std;

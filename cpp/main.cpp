@@ -7,22 +7,22 @@
 
 #include "ackerman.h"
 #include "usb.h"
-#include "work_queue.h"
+#include "work-queue.h"
 #include "dynamics.h"
 #include "config.h"
 #include "car.h"
-#include "fake_car.h"
+#include "fake-car.h"
 
-#include "string_utils.h"
+#include "string-utils.h"
 #include "system.h"
 #include "geometry.h"
 #include "route.h"
-#include "lookup_table.h"
+#include "lookup-table.h"
 #include "driver.h"
 #include "camera.h"
 #include "tracker.h"
 #include "pid.h"
-#include "car_controller.h"
+#include "car-controller.h"
 #include "logger.h"
 
 #include <signal.h>

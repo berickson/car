@@ -1,5 +1,5 @@
-#include "lidar_window.h"
-#include "ui_lidar_window.h"
+#include "lidar-window.h"
+#include "ui-lidar-window.h"
 #include <QPainter>
 
 LidarWindow::LidarWindow(QWidget *parent) :

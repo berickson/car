@@ -8,7 +8,7 @@
 #include "eigen3/Eigen/Dense"
 #include "math.h"
 #include "logger.h"
-#include "string_utils.h"
+#include "string-utils.h"
 
 using namespace std;
 

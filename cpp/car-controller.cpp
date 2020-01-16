@@ -1,14 +1,14 @@
-#include "car_controller.h"
+#include "car-controller.h"
 #include "route.h"
 #include "system.h"
-#include "fake_car.h"
-#include "file_names.h"
-#include "string_utils.h"
+#include "fake-car.h"
+#include "file-names.h"
+#include "string-utils.h"
 #include <fstream>
 #include <sstream>
 #include <bitset>
 #include "driver.h"
-#include "run_settings.h"
+#include "run-settings.h"
 #include <unistd.h> // usleep
 #include "logger.h"
 

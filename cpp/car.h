@@ -9,15 +9,15 @@
 #include "ackerman.h"
 #include "geometry.h"
 #include "dynamics.h"
-#include "work_queue.h"
+#include "work-queue.h"
 #include "usb.h"
 #include "speedometer.h"
-#include "async_buf.h"
-#include "socket_server.h"
+#include "async-buf.h"
+#include "socket-server.h"
 #include "lidar.h"
 #include "../teensy/CarMessages.h"
-#include "web_server.h"
-#include "stereo_camera.h"
+#include "web-server.h"
+#include "stereo-camera.h"
 
 
 using namespace std;

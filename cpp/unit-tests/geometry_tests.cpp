@@ -2,7 +2,7 @@
 //#include <gmock/gmock-matchers.h>
 #include <set>
 #include "../geometry.h"
-#include "../string_utils.h"
+#include "../string-utils.h"
 
 using namespace testing;
 using namespace std;

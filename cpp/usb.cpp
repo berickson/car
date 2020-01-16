@@ -6,8 +6,8 @@
 #include <termios.h> // for make_raw
 #include <string>
 #include <thread>
-#include "ends_with.h"
-#include "string_utils.h"
+#include "ends-with.h"
+#include "string-utils.h"
 #include "system.h"
 #include "logger.h"
 #include "diagnostics.h"

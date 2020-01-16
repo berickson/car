@@ -1,4 +1,4 @@
-#include "frame_grabber.h"
+#include "frame-grabber.h"
 #include <map>
 #include <unistd.h> // usleep
 #include "logger.h"

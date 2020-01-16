@@ -17,7 +17,7 @@
 #include "../camera.h"
 #include <memory>
 
-#include "../frame_grabber.h"
+#include "../frame-grabber.h"
 
 
 namespace Ui {

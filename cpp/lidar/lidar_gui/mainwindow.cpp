@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "ui-mainwindow.h"
 #include "../lidar.h"
 #include "QGraphicsView"
 #include "QGraphicsScene"

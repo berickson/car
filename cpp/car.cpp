@@ -5,12 +5,12 @@
 #include <chrono>
 #include <iostream>
 #include "../teensy/CarMessages.h"
-#include "async_buf.h"
+#include "async-buf.h"
 #include "json.hpp"
 #include "logger.h"
-#include "lookup_table.h"
-#include "socket_server.h"
-#include "string_utils.h"
+#include "lookup-table.h"
+#include "socket-server.h"
+#include "string-utils.h"
 using namespace std;
 using namespace std::chrono;
 using namespace std::chrono_literals;
@@ -790,7 +790,7 @@ Angle Car::angle_for_steering(int str) {
 
 #include <array>
 #include <vector>
-#include "lookup_table.h"
+#include "lookup-table.h"
 
 int Car::esc_for_velocity(double v) {
   static const LookupTable t({

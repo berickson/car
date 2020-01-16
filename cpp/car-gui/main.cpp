@@ -1,7 +1,7 @@
-#include "camera_window.h"
-#include "route_window.h"
-#include "stereo_window.h"
-#include "picker_window.h"
+#include "camera-window.h"
+#include "route-window.h"
+#include "stereo-window.h"
+#include "picker-window.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])

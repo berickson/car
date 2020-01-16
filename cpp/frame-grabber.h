@@ -11,7 +11,7 @@
 #include <queue>
 #include <atomic>
 #include <string>
-#include "work_queue.h"
+#include "work-queue.h"
 
 // based on http://answers.opencv.org/question/74255/time-delay-in-videocapture-opencv-due-to-capture-buffer/
 

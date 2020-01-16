@@ -4,8 +4,8 @@
 #include "logger.h"
 #include "math.h"
 #include "pid.h"
-#include "stereo_camera.h"
-#include "string_utils.h"
+#include "stereo-camera.h"
+#include "string-utils.h"
 
 class VelocityTracker {
  public:
@@ -593,7 +593,7 @@ Angle Driver::required_turn_curvature_by_look_ahead(
   return Angle::radians(arc.curvature);
 }
 
-#include "fake_car.h"
+#include "fake-car.h"
 
 void test_driver() {
   Car car(false);

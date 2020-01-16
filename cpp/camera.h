@@ -8,10 +8,10 @@
 #include "opencv2/videoio.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
 #include <thread>
-#include "frame_grabber.h"
+#include "frame-grabber.h"
 #include <string>
 #include <vector>
-#include "work_queue.h"
+#include "work-queue.h"
 
 class Camera
 {

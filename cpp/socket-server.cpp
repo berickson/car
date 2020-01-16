@@ -2,7 +2,7 @@
 // started from http://www.linuxhowtos.org/C_C++/socket.htm
 // http://www.linuxhowtos.org/data/6/server.c
 
-#include "socket_server.h"
+#include "socket-server.h"
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/socket.h>

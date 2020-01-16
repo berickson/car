@@ -1,4 +1,4 @@
-#include "stereo_camera.h"
+#include "stereo-camera.h"
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -19,7 +19,7 @@
 #include <chrono>
 
 #include "json.hpp"
-#include "image_utils.h"
+#include "image-utils.h"
 
 
 

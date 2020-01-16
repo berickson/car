@@ -119,7 +119,7 @@ void Ackerman::move_right_wheel(Angle outside_wheel_angle, double wheel_distance
   heading = isnan(new_heading) ? standardized_radians(heading + turn_angle) : new_heading;
 }
 
-#include "string_utils.h"
+#include "string-utils.h"
 
 // calculates an arc where the front wheel will travel to
 // point x ahead and point y t left

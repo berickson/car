@@ -11,34 +11,34 @@ link_directories(/usr/local/lib)
 set(CPP_FILES 
     ackerman.cpp
     camera.cpp
-    car_controller.cpp
+    car-controller.cpp
     car.cpp
     config.cpp
     diagnostics.cpp
     driver.cpp
     dynamics.cpp
-    fake_car.cpp
-    file_names.cpp
-    frame_grabber.cpp
+    fake-car.cpp
+    file-names.cpp
+    frame-grabber.cpp
     geometry.cpp
-    image_utils.cpp
+    image-utils.cpp
     kalman.cpp
     lidar.cpp
     logger.cpp
-    lookup_table.cpp
+    lookup-table.cpp
     main.cpp
     pid.cpp
     route.cpp
-    run_settings.cpp
-    socket_server.cpp
+    run-settings.cpp
+    socket-server.cpp
     speedometer.cpp
-    stereo_camera.cpp
-    string_utils.cpp
+    stereo-camera.cpp
+    string-utils.cpp
     system.cpp
     tracker.cpp
     usb.cpp
-    web_server.cpp
-    work_queue.cpp
+    web-server.cpp
+    work-queue.cpp
 )
 
 # use a generator expression to silence a spurious warning from gcc

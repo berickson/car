@@ -1,7 +1,7 @@
-#include "run_settings.h"
-#include "file_names.h"
+#include "run-settings.h"
+#include "file-names.h"
 #include "iostream"
-#include "string_utils.h"
+#include "string-utils.h"
 #include "json.hpp"
 
 #include <iomanip>

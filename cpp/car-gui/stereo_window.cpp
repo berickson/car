@@ -1,10 +1,10 @@
-#include "stereo_window.h"
-#include "ui_stereo_window.h"
+#include "stereo-window.h"
+#include "ui-stereo-window.h"
 #include <sstream>
 #include <opencv2/calib3d.hpp>
 #include <qcheckbox.h>
 #include <vector>
-#include "../image_utils.h"
+#include "../image-utils.h"
 
 
 using namespace cv;

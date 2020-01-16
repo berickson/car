@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "string_utils.h"
+#include "string-utils.h"
 #include "logger.h"
 
 using namespace std;

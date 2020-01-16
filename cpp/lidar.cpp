@@ -7,7 +7,7 @@
 #include "eigen3/Eigen/SVD"
 #include "json.hpp"
 #include "logger.h"
-#include "string_utils.h"
+#include "string-utils.h"
 #include "diagnostics.h"
 
 using namespace Eigen;

@@ -1,5 +1,5 @@
-#include "picker_window.h"
-#include "ui_picker_window.h"
+#include "picker-window.h"
+#include "ui-picker-window.h"
 
 PickerWindow::PickerWindow(QWidget *parent) :
     QDialog(parent),
@@ -13,16 +13,16 @@ PickerWindow::~PickerWindow()
     delete ui;
 }
 
-#include "route_window.h"
+#include "route-window.h"
 void PickerWindow::on_routes_button_clicked()
 {
     RouteWindow w;
     w.exec();
 }
 
-#include "stereo_window.h"
-#include "camera_window.h"
-#include "lidar_window.h"
+#include "stereo-window.h"
+#include "camera-window.h"
+#include "lidar-window.h"
 
 void PickerWindow::on_camera_button_clicked()
 {

@@ -2,11 +2,11 @@
 #define ROUTE_WINDOW_H
 
 #include <QDialog>
-#include "../file_names.h"
+#include "../file-names.h"
 #include <QGraphicsScene>
 #include <QStandardItemModel>
 #include "../route.h"
-#include "../run_settings.h"
+#include "../run-settings.h"
 #include <memory>
 
 

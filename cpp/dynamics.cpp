@@ -1,9 +1,9 @@
 #include "dynamics.h"
-#include "work_queue.h"
+#include "work-queue.h"
 #include <string.h> // for memset of all things
 #include <iostream>
 #include "system.h"
-#include "string_utils.h"
+#include "string-utils.h"
 #include "logger.h"
 #include "../teensy/CarMessages.h"
 

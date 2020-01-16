@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../string_utils.h"
+#include "../string-utils.h"
 
 TEST(split, three_fields) {
     string s = "a,bb,c";

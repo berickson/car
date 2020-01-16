@@ -6,7 +6,7 @@
 #include <mutex>
 #include <sstream>
 #include <functional>
-#include "work_queue.h"
+#include "work-queue.h"
 
 using namespace std;
 using namespace std::chrono;

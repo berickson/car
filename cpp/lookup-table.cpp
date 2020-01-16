@@ -1,4 +1,4 @@
-#include "lookup_table.h"
+#include "lookup-table.h"
 #include <vector>
 #include <array>
 #include "geometry.h"
