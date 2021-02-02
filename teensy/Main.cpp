@@ -396,7 +396,7 @@ void setup() {
   mpu9150.ay_bias = 0;
   mpu9150.az_bias = 7893.51;
   mpu9150.rest_a_mag =  7893.51;
-  mpu9150.zero_adjust = Quaternion(0.0, 0.0, 0.0, 1);
+  mpu9150.zero_adjust = Quaternion(0.707, 0.024, -0.024, 0.707);
   mpu9150.yaw_slope_rads_per_ms  = -0.0000000680;
   mpu9150.yaw_actual_per_raw = 1;
 #elif defined(ORANGE_CAR)

@@ -33,7 +33,6 @@ public:
 
   void add_listener(WorkQueue<Dynamics2>*);
   void remove_listener(WorkQueue<Dynamics2>*);
-
 #if defined(orange_car)
   string config_path = "car.ini";
 #elif defined(blue_car)
