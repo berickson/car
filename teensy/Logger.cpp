@@ -8,10 +8,11 @@ bool TRACE_PINGS = false;
 bool TRACE_MPU = false;
 bool TRACE_LOOP_SPEED = false;
 bool TRACE_TELEMETRY = false;
-bool TD = false;
+bool TD = true;
 bool TD2 = true;
 
 void log_line(String s) {
+  return;
   Serial.println(s);
   Serial.send_now();
 }

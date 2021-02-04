@@ -3,10 +3,19 @@
 #include "Fsm.h"
 #include "ManualMode.h"
 #include "RemoteMode.h"
-#include "CommandInterpreter.h"
 #include "RxEvents.h"
 #include "Blinker.h"
-#include "CarMessages.h"
+
+// https://platformio.org/lib/show/1634/Rosserial%20Arduino%20Library
+#include <ros.h>
+#include <std_msgs/Bool.h>
+#include <car_msgs/update.h>
+#include <car_msgs/rc_command.h>
+
+ros::NodeHandle  nh;
+
+car_msgs::update update_msg;
+ros::Publisher  car_update("car/update", &update_msg);
 
 
 #if defined(BLUE_CAR)
@@ -47,7 +56,7 @@ const int pin_cell0_sense = A18;
 
 #define PIN_GO 16
 
-// "A" means toward front
+// "A" means toward front2
 #define PIN_MOTOR_RPM 29
 
 #define PIN_SPEAKER   30
@@ -144,59 +153,6 @@ Fsm::Edge edges[] = {
 
 Fsm modes(tasks, count_of(tasks), edges, count_of(edges));
 
-///////////////////////////////////////////////
-// commands
-
-CommandInterpreter interpreter;
-
-void command_pulse_steer_and_esc() {
-  String & args = interpreter.command_args;
-  log(LOG_TRACE,"pse args" + args);
-  int i = args.indexOf(",");
-  if(i == -1) {
-    log(LOG_ERROR,"invalid args to pse " + args);
-    return;
-  }
-  String s_str = args.substring(0, i);
-  String s_esc = args.substring(i+1);
-
-  remote_mode.command_steer_and_esc(s_str.toInt(),  s_esc.toInt());
-}
-
-void trace_telemetry_on() {
-  TRACE_TELEMETRY = true;
-}
-
-void trace_telemetry_off() {
-  TRACE_TELEMETRY = false;
-}
-
-void trace_mpu_on() {
-  TRACE_MPU = true;
-}
-
-void trace_mpu_off() {
-  TRACE_MPU = false;
-}
-
-void trace_loop_speed_on() {
-  TRACE_LOOP_SPEED = true;
-}
-
-void trace_loop_speed_off() {
-  TRACE_LOOP_SPEED = false;
-}
-
-void trace_dynamics_on() {
-  TD = true;
-}
-
-void trace_dynamics_off() {
-  TD = false;
-}
-
-
-
 
 void command_manual() {
   modes.set_event("manual");
@@ -204,45 +160,11 @@ void command_manual() {
 
 void command_remote_control() {
   modes.set_event("remote");
-  Serial.println("remote event");
 }
 
 void calibrate_mpu() {
   mpu9150.start_calibrate_at_rest(0, 60);
 }
-
-void help(); // forward decl for commands
-
-const Command commands[] = {
-  {"?", "help", help},
-  {"help", "help", help},
-  {"calibrate", "calibrate at rest mpu", calibrate_mpu},
-  {"td+", "trace dynamics on", trace_dynamics_on},
-  {"td-", "trace dynamics off", trace_dynamics_off},
-//  {"tp+", "trace ping on", trace_ping_on},
-//  {"tp-", "trace ping off", trace_ping_off},
-  {"tt+", "trace telemetry on", trace_telemetry_on},
-  {"tt-", "trace telemetry on", trace_mpu_off},
-  {"tm+", "trace mpu on", trace_mpu_on},
-  {"tm-", "trace mpu off", trace_mpu_off},
-  {"tl+", "trace loop speed on", trace_loop_speed_on},
-  {"tl-", "trace loop speed off", trace_loop_speed_off},
-//  {"c", "circle", command_circle},
-  {"m", "manual", command_manual},
-//  {"f", "follow", command_follow},
-  {"rc", "remote control", command_remote_control},
-  {"pse", "pulse steer, esc", command_pulse_steer_and_esc},
-//  {"beep", "beep", command_beep},
-  
-};
-
-void help() {
-  for(unsigned int i = 0; i < count_of(commands); i++) {
-    const Command &c = commands[i];
-    Serial.println(String(c.name)+ " - " + c.description);
-  }
-}
-
 
 class BatterySensor {
 public:
@@ -334,11 +256,32 @@ bool every_n_ms(unsigned long last_loop_ms, unsigned long loop_ms, unsigned long
 }
 
 
+void rc_command_callback( const car_msgs::rc_command& rc_command_msg){
+  remote_mode.command_steer_and_esc(rc_command_msg.str_us,  rc_command_msg.str_us);
+}
+
+void enable_remote_control_callback( const std_msgs::Bool& enable_rc_msg) {
+  if(enable_rc_msg.data == true) {
+      modes.set_event("remote");
+  } else {
+      modes.set_event("manual");
+  }
+}
+
+ros::Subscriber<car_msgs::rc_command> rc_command_sub("car/rc_command", &rc_command_callback );
+ros::Subscriber<std_msgs::Bool> enable_rc_mode("car/enable_rc_mode", &enable_remote_control_callback);
+
+
 void setup() {
 
   Serial.begin(250000);
   //while(!Serial); // wait for serial to become ready
   delay(1000);
+
+  nh.initNode();
+  nh.advertise(car_update);
+  nh.subscribe(rc_command_sub);
+  nh.subscribe(enable_rc_mode);
  
 
   // put your setup code here, to run once:
@@ -354,7 +297,7 @@ void setup() {
   // follow_mode.name = "follow";
   remote_mode.name = "remote";
 
-  interpreter.init(commands, count_of(commands));
+  // interpreter.init(commands, count_of(commands));
   modes.begin();
 
   pinMode(pin_motor_a, INPUT);
@@ -414,6 +357,7 @@ void setup() {
   blinker.init(pin_led);
   battery_sensor.init();
   log(LOG_INFO, "setup complete");
+  nh.loginfo("teensy setup complete");
 }
 
 // diagnostics for reporting loop speeds
@@ -423,6 +367,7 @@ unsigned long last_loop_time_ms = 0;
 unsigned long last_report_ms = 0;
 unsigned long last_report_loop_count = 0;
 
+
 void loop() {
   loop_count++;
   last_loop_time_ms = loop_time_ms;
@@ -431,10 +376,11 @@ void loop() {
   bool every_second = every_n_ms(last_loop_time_ms, loop_time_ms, 1000);
   bool every_10_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 10);
 
+  
 
   blinker.execute();
   mpu9150.execute();
-  interpreter.execute();
+  // interpreter.execute();
 
   rx_events.process_pulses(rx_str.pulse_us(), rx_esc.pulse_us());
   bool new_rx_event = rx_events.get_event();
@@ -446,6 +392,7 @@ void loop() {
   }  
 
 
+
   if (every_10_ms) {
     modes.execute();
   }
@@ -454,87 +401,57 @@ void loop() {
     battery_sensor.execute();
   }
 
-  if (every_second && TRACE_TELEMETRY) {
 
-      log(TRACE_TELEMETRY,
-        (String) "odo:" + motor.odometer 
-        + " odo_us: " + motor.last_change_us
-        + " a: " + motor.a_count 
-        + " b: " + motor.b_count 
-        + " c: " + motor.c_count 
-//        + " temp: " + analogRead(pin_motor_temp)
-        + " heading: " + mpu9150.heading()
-        + " fl: (" + odo_fl.odometer_a + ","+odo_fl.odometer_b+")"
-        + " fr: (" + odo_fr.odometer_a + ","+odo_fr.odometer_b+")"
-      );
-  }
-
-  if(every_10_ms && TD) {
-    Dynamics2 td2;
+    if(every_10_ms) {
     float battery_voltage = battery_sensor.v_bat;
 
-    td2.ms = millis();
-    td2.us = micros();
+    update_msg.ms = millis();
+    update_msg.us = micros();
 
-    td2.rx_str = str.readMicroseconds();
-    td2.rx_esc = esc.readMicroseconds();
+    update_msg.rx_str = str.readMicroseconds();
+    update_msg.rx_esc = esc.readMicroseconds();
 
-    td2.ax = mpu9150.ax;
-    td2.ay = mpu9150.ay;
-    td2.az = mpu9150.az;
-
-    noInterrupts();
-    td2.spur_us = motor.last_change_us;
-    td2.spur_odo = motor.odometer;
-    interrupts();
-
-    td2.mode = modes.current_task->name;
+    update_msg.ax = mpu9150.ax;
+    update_msg.ay = mpu9150.ay;
+    update_msg.az = mpu9150.az;
 
     noInterrupts();
-    td2.odo_fl_a = odo_fl.odometer_a;
-    td2.odo_fl_a_us = odo_fl.last_odometer_a_us;
-    td2.odo_fl_b = odo_fl.odometer_b;
-    td2.odo_fl_b_us = odo_fl.last_odometer_b_us;
-    td2.odo_fl_ab_us = odo_fl.odometer_ab_us;
+    update_msg.spur_us = motor.last_change_us;
+    update_msg.spur_odo = motor.odometer;
+    interrupts();
+
+    update_msg.mode = modes.current_task->name;
+
+    noInterrupts();
+    update_msg.odo_fl_a = odo_fl.odometer_a;
+    update_msg.odo_fl_a_us = odo_fl.last_odometer_a_us;
+    update_msg.odo_fl_b = odo_fl.odometer_b;
+    update_msg.odo_fl_b_us = odo_fl.last_odometer_b_us;
+    update_msg.odo_fl_ab_us = odo_fl.odometer_ab_us;
     interrupts();
 
     noInterrupts();
-    td2.odo_fr_a = odo_fr.odometer_a;
-    td2.odo_fr_a_us = odo_fr.last_odometer_a_us;
-    td2.odo_fr_b = odo_fr.odometer_b;
-    td2.odo_fr_b_us = odo_fr.last_odometer_b_us;
-    td2.odo_fr_ab_us = odo_fr.odometer_ab_us;
+    update_msg.odo_fr_a = odo_fr.odometer_a;
+    update_msg.odo_fr_a_us = odo_fr.last_odometer_a_us;
+    update_msg.odo_fr_b = odo_fr.odometer_b;
+    update_msg.odo_fr_b_us = odo_fr.last_odometer_b_us;
+    update_msg.odo_fr_ab_us = odo_fr.odometer_ab_us;
     interrupts();
 
-    td2.v_bat = battery_voltage;
+    update_msg.v_bat = battery_voltage;
 
-    td2.mpu_deg_yaw = mpu9150.heading();
-    td2.mpu_deg_pitch = mpu9150.pitch * 180. / M_PI;
-    td2.mpu_deg_roll = mpu9150.roll * 180. / M_PI;
+    update_msg.mpu_deg_yaw = mpu9150.heading();
+    update_msg.mpu_deg_pitch = mpu9150.pitch * 180. / M_PI;
+    update_msg.mpu_deg_roll = mpu9150.roll * 180. / M_PI;
 
-    td2.mpu_deg_f = mpu9150.temperature /340.0 + 35.0;
+    update_msg.mpu_deg_f = mpu9150.temperature /340.0 + 35.0;
 
     // hack: car doesn't have kill switch yet
-    td2.go = true;
+    update_msg.go = true;
+
+    car_update.publish(&update_msg);
+    nh.spinOnce();
 
 
-    StringOutTransfer stream;
-    td2.transfer(stream);
-
-    log(TD2, stream.str());
-
-  }
-
-  if(every_second && TRACE_LOOP_SPEED) {
-    unsigned long loops_since_report = loop_count - last_report_loop_count;
-    float seconds_since_report =  (loop_time_ms - last_report_ms) / 1000.;
-
-    log(TRACE_LOOP_SPEED, 
-      "loops per second: "+ (loops_since_report / seconds_since_report ) 
-      + " microseconds per loop "+ (1E6 * seconds_since_report / loops_since_report) );
-
-    // remember stats for next report
-    last_report_ms = loop_time_ms;
-    last_report_loop_count = loop_count;
   }
 }
