@@ -251,8 +251,8 @@ void motor_c_changed() {
 }
 
 
-bool every_n_ms(unsigned long last_loop_ms, unsigned long loop_ms, unsigned long ms) {
-  return (last_loop_ms % ms) + (loop_ms - last_loop_ms) >= ms;
+bool every_n_ms(unsigned long last_loop_ms, unsigned long loop_ms, unsigned long ms, unsigned long offset = 0) {
+  return ((last_loop_ms-offset) % ms) + (loop_ms - last_loop_ms) >= ms;
 }
 
 
@@ -331,7 +331,7 @@ void setup() {
 
   log(LOG_TRACE, "starting mpu");
 
-  mpu9150.enable_interrupts(pin_mpu_interrupt);
+  // mpu9150.enable_interrupts(pin_mpu_interrupt);
   log(LOG_INFO, "Interrupts enabled for mpu9150");
   mpu9150.setup();
 #if defined(BLUE_CAR)
@@ -377,11 +377,15 @@ void loop() {
   bool every_10_ms = every_n_ms(last_loop_time_ms, loop_time_ms, 10);
 
   
-
   blinker.execute();
-  mpu9150.execute();
-  // interpreter.execute();
 
+  // mpu9150 execute takes about 3ms when there is an interrupt,
+  // and this messes up the perfect 10ms update timings.  Running it at
+  // 2ms offset from the updates keeps it from interfering
+  if(every_n_ms(last_loop_time_ms, loop_time_ms, 10, 2)) {
+    mpu9150.execute();
+  }
+ 
   rx_events.process_pulses(rx_str.pulse_us(), rx_esc.pulse_us());
   bool new_rx_event = rx_events.get_event();
   // send events through modes state machine
@@ -389,7 +393,7 @@ void loop() {
     if(!rx_events.current.equals(RxEvent('C','N'))) {
       modes.set_event("non-neutral");
     }
-  }  
+  } 
 
 
 
@@ -401,13 +405,14 @@ void loop() {
     battery_sensor.execute();
   }
 
+  
 
-    if(every_10_ms) {
+  if(every_10_ms) {
+    static uint32_t update_number = 0;
     float battery_voltage = battery_sensor.v_bat;
 
     update_msg.ms = millis();
     update_msg.us = micros();
-
     update_msg.rx_str = str.readMicroseconds();
     update_msg.rx_esc = esc.readMicroseconds();
 
@@ -449,6 +454,10 @@ void loop() {
     // hack: car doesn't have kill switch yet
     update_msg.go = true;
 
+    update_msg.header.seq = update_number;
+    ++update_number;
+    update_msg.header.stamp = nh.now();
+    update_msg.header.frame_id = "base_link";
     car_update.publish(&update_msg);
     nh.spinOnce();
 
