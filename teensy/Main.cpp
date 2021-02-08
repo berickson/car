@@ -9,6 +9,7 @@
 // https://platformio.org/lib/show/1634/Rosserial%20Arduino%20Library
 #include <ros.h>
 #include <std_msgs/Bool.h>
+#include <sensor_msgs/BatteryState.h>
 #include <car_msgs/update.h>
 #include <car_msgs/rc_command.h>
 
@@ -17,6 +18,9 @@ ros::NodeHandle  nh;
 car_msgs::update update_msg;
 ros::Publisher  car_update("car/update", &update_msg);
 
+sensor_msgs::BatteryState battery_state_msg;
+float cell_voltages[4];
+ros::Publisher battery_state_publisher("car/battery", &battery_state_msg);
 
 #if defined(BLUE_CAR)
 const int pin_led = 13;
@@ -183,6 +187,7 @@ public:
   float v_cell4 = 0;
 
 
+
   void init() {
     analogReadResolution(resolution_bits);	
     max_reading = pow(2, resolution_bits);
@@ -204,8 +209,6 @@ public:
 #error "voltage not defined for this car"
 #endif
   }
-
-
 };
 
 BatterySensor battery_sensor;
@@ -273,6 +276,9 @@ ros::Subscriber<std_msgs::Bool> enable_rc_mode("car/enable_rc_mode", &enable_rem
 
 
 void setup() {
+  battery_state_msg.cell_voltage = cell_voltages;
+  battery_state_msg.cell_voltage_length = 4;
+
 
   Serial.begin(250000);
   //while(!Serial); // wait for serial to become ready
@@ -280,6 +286,7 @@ void setup() {
 
   nh.initNode();
   nh.advertise(car_update);
+  nh.advertise(battery_state_publisher);
   nh.subscribe(rc_command_sub);
   nh.subscribe(enable_rc_mode);
  
@@ -403,6 +410,27 @@ void loop() {
 
   if(every_second) {
     battery_sensor.execute();
+    ++update_msg.header.seq;
+    update_msg.header.stamp = nh.now();
+    update_msg.header.frame_id = "base_link";
+    battery_state_msg.charge = NAN;
+    battery_state_msg.current = NAN;
+    battery_state_msg.location = "blue-crash4";
+
+
+
+
+    battery_state_msg.cell_voltage[0] = battery_sensor.v_cell1 - battery_sensor.v_cell0;
+    battery_state_msg.cell_voltage[1] = battery_sensor.v_cell2 - battery_sensor.v_cell1;
+    battery_state_msg.cell_voltage[2] = battery_sensor.v_cell3 - battery_sensor.v_cell2;
+    battery_state_msg.voltage = battery_sensor.v_cell3 - battery_sensor.v_cell0;
+    battery_state_msg.cell_voltage_length = 3;
+
+    float cell_average = (battery_state_msg.cell_voltage[0]+battery_state_msg.cell_voltage[1]+battery_state_msg.cell_voltage[2])/3.0;
+    battery_state_msg.percentage = constrain(map(cell_average,3.5,4.2,0.0,1.0),0.0,1.0);
+
+
+    battery_state_publisher.publish(&battery_state_msg);
   }
 
   
