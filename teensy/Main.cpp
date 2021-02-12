@@ -196,12 +196,21 @@ public:
 
   void execute() {
 #if defined(BLUE_CAR)
-    v_bat = analogRead(pin_vbat_sense) * scale * 12.41 / 12.25;
-    v_cell0 = analogRead(pin_cell0_sense) * scale * 3.343/3.28;
-    v_cell1 = analogRead(pin_cell1_sense)  * scale * 3.343/3.29;
-    v_cell2 = analogRead(pin_cell2_sense)  * scale * 3.343/3.33;
-    v_cell3 = analogRead(pin_cell3_sense) * scale * 3.343/3.29;
-    v_cell4 = analogRead(pin_cell4_sense) * scale * 3.343/3.29;
+    v_bat = analogRead(pin_vbat_sense) * 12.47/744;
+    v_cell0 = analogRead(pin_cell0_sense) * scale;
+    v_cell1 = analogRead(pin_cell1_sense)  * 4.161/246;
+    v_cell2 = analogRead(pin_cell2_sense)  * 8.32/497;
+    v_cell3 = analogRead(pin_cell3_sense) * 12.48/744;
+    v_cell4 = analogRead(pin_cell4_sense) * 12.48/744;
+
+    /* 
+    // calibration logging
+    char buffer[200];
+    sprintf(buffer, "V Cells: bat %4.3f cell0: %4.3f cell1: %4.3f cell2: %4.3f cell3: %4.3f cell4: %4.3f", v_bat, v_cell0, v_cell1, v_cell2, v_cell3, v_cell4);
+    nh.loginfo(buffer);
+    sprintf(buffer, "Raw Cells: bat %d cell0: %d cell1: %d cell2: %d cell3: %d cell4: %d", analogRead(pin_vbat_sense), analogRead(pin_cell0_sense), analogRead(pin_cell1_sense), analogRead(pin_cell2_sense), analogRead(pin_cell3_sense), analogRead(pin_cell4_sense));
+    nh.loginfo(buffer);
+    */
 #elif defined(ORANGE_CAR)
     // constants below based on 220k and 1M resistor, 1023 steps and 3.3 reference voltage
     v_bat = analogRead(pin_vbat_sense) * ((3.3/1023.) / 220.)*(220.+1000.);
@@ -410,9 +419,9 @@ void loop() {
 
   if(every_second) {
     battery_sensor.execute();
-    ++update_msg.header.seq;
-    update_msg.header.stamp = nh.now();
-    update_msg.header.frame_id = "base_link";
+    ++battery_state_msg.header.seq;
+    battery_state_msg.header.stamp = nh.now();
+    battery_state_msg.header.frame_id = "base_link";
     battery_state_msg.charge = NAN;
     battery_state_msg.current = NAN;
     battery_state_msg.location = "blue-crash4";
@@ -423,12 +432,28 @@ void loop() {
     battery_state_msg.cell_voltage[0] = battery_sensor.v_cell1 - battery_sensor.v_cell0;
     battery_state_msg.cell_voltage[1] = battery_sensor.v_cell2 - battery_sensor.v_cell1;
     battery_state_msg.cell_voltage[2] = battery_sensor.v_cell3 - battery_sensor.v_cell2;
-    battery_state_msg.voltage = battery_sensor.v_cell3 - battery_sensor.v_cell0;
-    battery_state_msg.cell_voltage_length = 3;
+    battery_state_msg.cell_voltage[3] = battery_sensor.v_cell4 - battery_sensor.v_cell3;
+    battery_state_msg.voltage = battery_sensor.v_bat;
+    if(battery_sensor.v_cell4 > 2.0) {
+      battery_state_msg.cell_voltage_length = 4;
+    } else if(battery_sensor.v_cell3 > 2.0 ) {
+       battery_state_msg.cell_voltage_length = 3;
+    } else if(battery_sensor.v_cell2 > 2.0 ) {
+       battery_state_msg.cell_voltage_length = 2;
+    } else if(battery_sensor.v_cell1 > 2.0 ) {
+      battery_state_msg.cell_voltage_length = 1;
+    } else {
+       battery_state_msg.cell_voltage_length = 0;
+    }
 
-    float cell_average = (battery_state_msg.cell_voltage[0]+battery_state_msg.cell_voltage[1]+battery_state_msg.cell_voltage[2])/3.0;
-    battery_state_msg.percentage = constrain(map(cell_average,3.5,4.2,0.0,1.0),0.0,1.0);
+    battery_state_msg.present = battery_state_msg.cell_voltage_length > 0;
 
+    if(battery_state_msg.cell_voltage_length > 0) {
+      float cell_average = battery_sensor.v_bat / battery_state_msg.cell_voltage_length;
+      battery_state_msg.percentage = constrain(map(cell_average,3.5,4.2,0.0,1.0),0.0,1.0);
+    } else {
+      battery_state_msg.percentage = NAN;
+    }
 
     battery_state_publisher.publish(&battery_state_msg);
   }
