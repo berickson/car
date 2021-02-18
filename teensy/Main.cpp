@@ -10,12 +10,14 @@
 #include <ros.h>
 #include <std_msgs/Bool.h>
 #include <sensor_msgs/BatteryState.h>
-#include <car_msgs/update.h>
-#include <car_msgs/rc_command.h>
+// #include <std_srvs/Empty.h>
+#include <std_srvs/Trigger.h>
+#include <car_msgs/Update.h>
+#include <car_msgs/RcCommand.h>
 
 ros::NodeHandle  nh;
 
-car_msgs::update update_msg;
+car_msgs::Update update_msg;
 ros::Publisher  car_update("car/update", &update_msg);
 
 sensor_msgs::BatteryState battery_state_msg;
@@ -268,20 +270,29 @@ bool every_n_ms(unsigned long last_loop_ms, unsigned long loop_ms, unsigned long
 }
 
 
-void rc_command_callback( const car_msgs::rc_command& rc_command_msg){
-  remote_mode.command_steer_and_esc(rc_command_msg.str_us,  rc_command_msg.str_us);
+void rc_command_callback( const car_msgs::RcCommand& rc_command_msg){
+  remote_mode.command_steer_and_esc(rc_command_msg.str_us,  rc_command_msg.esc_us);
 }
 
-void enable_remote_control_callback( const std_msgs::Bool& enable_rc_msg) {
-  if(enable_rc_msg.data == true) {
-      modes.set_event("remote");
-  } else {
-      modes.set_event("manual");
-  }
+void enable_rc_mode_callback( const std_srvs::Trigger::Request &, std_srvs::Trigger::Response &response  ) {
+  modes.set_event("remote");
+  nh.loginfo("remote control enabled");
+  response.success = true;
+  response.message = "ok";
+
 }
 
-ros::Subscriber<car_msgs::rc_command> rc_command_sub("car/rc_command", &rc_command_callback );
-ros::Subscriber<std_msgs::Bool> enable_rc_mode("car/enable_rc_mode", &enable_remote_control_callback);
+void disable_rc_mode_callback( const std_srvs::Trigger::Request &, std_srvs::Trigger::Response &response  ) {
+  modes.set_event("manual");
+  nh.loginfo("remote control disabled");
+  response.success = true;
+  response.message = "ok";
+}
+
+
+ros::Subscriber<car_msgs::RcCommand> rc_command_sub("car/rc_command", &rc_command_callback );
+ros::ServiceServer<std_srvs::Trigger::Request, std_srvs::Trigger::Response> enable_rc_mode_server("car/enable_rc_mode",&enable_rc_mode_callback);
+ros::ServiceServer<std_srvs::Trigger::Request, std_srvs::Trigger::Response> disable_rc_mode_server("car/disable_rc_mode",&disable_rc_mode_callback);
 
 
 void setup() {
@@ -296,9 +307,10 @@ void setup() {
   nh.initNode();
   nh.advertise(car_update);
   nh.advertise(battery_state_publisher);
+  nh.advertiseService(enable_rc_mode_server);
+  nh.advertiseService(disable_rc_mode_server);  
   nh.subscribe(rc_command_sub);
-  nh.subscribe(enable_rc_mode);
- 
+  
 
   // put your setup code here, to run once:
   rx_str.attach(pin_rx_str);
