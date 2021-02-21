@@ -353,6 +353,7 @@ bool Servo2::attached()
 #define PDB_PRESCALE 4 // 
 #define usToTicks(us)    ((us) * (F_BUS / 1000) / PDB_PRESCALE / 1000)
 #define ticksToUs(ticks) ((ticks) * PDB_PRESCALE * 1000 / (F_BUS / 1000))
+#define ticksToUsFloat(ticks) ((float)(ticks) * PDB_PRESCALE * 1000 / (F_BUS / 1000))
 
 #if SERVOS_PER_TIMER <= 16
 static uint16_t servo_active_mask = 0;
@@ -435,6 +436,7 @@ void Servo2::write(int value)
 	servo_ticks[servoIndex] = map(value, 0, 180, min_ticks, max_ticks);
 }
 
+
 void Servo2::writeMicroseconds(int value)
 {
 	value = usToTicks(value);
@@ -447,6 +449,20 @@ void Servo2::writeMicroseconds(int value)
 	servo_ticks[servoIndex] = value;
 }
 
+
+void Servo2::writeMicrosecondsFloat(float value)
+{
+	int ticks = usToTicks(value);
+	if (ticks < min_ticks) {
+		ticks = min_ticks;
+	} else if (ticks > max_ticks) {
+		ticks = max_ticks;
+	}
+	if (servoIndex >= MAX_SERVOS) return;
+	servo_ticks[servoIndex] = ticks;
+}
+
+
 int Servo2::read() // return the value as degrees
 {
 	if (servoIndex >= MAX_SERVOS) return 0;
@@ -458,6 +474,13 @@ int Servo2::readMicroseconds()
 	if (servoIndex >= MAX_SERVOS) return 0;
 	return ticksToUs(servo_ticks[servoIndex]);
 }
+
+float Servo2::readMicrosecondsFloat()
+{
+	if (servoIndex >= MAX_SERVOS) return 0;
+	return ticksToUsFloat(servo_ticks[servoIndex]);
+}
+
 
 bool Servo2::attached()
 {

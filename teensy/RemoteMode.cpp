@@ -1,7 +1,10 @@
+#include "ros.h"
 #include "RemoteMode.h"
 #include "Arduino.h"
 #include "Servo2.h"
 #include "PwmInput.h"
+
+extern ros::NodeHandle  nh;
 
 #include "Logger.h"
 
@@ -39,7 +42,7 @@ void RemoteMode::execute() {
   }
 }
 
-void RemoteMode::command_steer_and_esc(unsigned int _str_us, unsigned int _esc_us) {
+void RemoteMode::command_steer_and_esc(float _str_us, float _esc_us) {
   if (!is_active) {
     Serial.println("RemoteMode::command_steer_and_esc called when mode inactive, ignoring");
     return;
@@ -53,7 +56,11 @@ void RemoteMode::command_steer_and_esc(unsigned int _str_us, unsigned int _esc_u
 
 void RemoteMode::update_pulses() {
   if(done) return;
-  str.writeMicroseconds(str_us);
-  esc.writeMicroseconds(esc_us);
+  str.writeMicrosecondsFloat(str_us);
+  esc.writeMicrosecondsFloat(esc_us);
+
+  // char buffer[200];
+  // sprintf(buffer, "str_us: in: %f out: %f esc_us: in: %f  out: %f\n", str_us, str.readMicrosecondsFloat(), esc_us, esc.readMicrosecondsFloat());
+  // nh.loginfo(buffer);
 }
 
